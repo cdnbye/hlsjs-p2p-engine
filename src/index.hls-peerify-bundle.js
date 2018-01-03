@@ -2,18 +2,28 @@
  * Created by xieting on 2018/1/2.
  */
 
-let HlsPeerify = require('./index.hls-peerify');
-let Hlsjs = require('hls.js');
-let UAParser = require('ua-parser-js');
-//
-// const uaParserResult = (new UAParser()).getResult();
+import HlsPeerify from './index.hls-peerify';
+import Hlsjs from 'hls.js';
+import UAParser from 'ua-parser-js';
+import {recommendedHlsjsConfig} from './config';
 
-class HlsPeerifyBundle {
-    constructor() {
+const uaParserResult = (new UAParser()).getResult();
 
-        new HlsPeerify(1,2);
-        console.log('HlsPeerifyBundle')
+class HlsPeerifyBundle extends Hlsjs{
+    constructor(p2pConfig, hlsjsConfig = {}) {
+
+
+        let mergedHlsjsConfig = Object.assign({}, recommendedHlsjsConfig, hlsjsConfig);
+
+        super(mergedHlsjsConfig);
+
+        this.p2pPlugin = new HlsPeerify(this, p2pConfig);
+
     }
+
+
 }
 
-module.exports = HlsPeerifyBundle;
+HlsPeerifyBundle.pluginVersion = HlsPeerify.version;
+
+export default HlsPeerifyBundle

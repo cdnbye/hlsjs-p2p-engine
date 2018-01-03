@@ -2,7 +2,7 @@
  * Created by xieting on 2018/1/2.
  */
 
-
+const pkgJson = require('./package.json');
 const path = require('path');
 const webpack = require('webpack');
 
@@ -43,7 +43,8 @@ function getPluginsForConfig(minify = false) {
     // common plugins.
     const plugins = [
         new webpack.optimize.OccurrenceOrderPlugin(),
-        new webpack.optimize.ModuleConcatenationPlugin()
+        new webpack.optimize.ModuleConcatenationPlugin(),
+        new webpack.DefinePlugin(getConstantsForConfig())
     ];
 
     if (minify) {
@@ -60,6 +61,13 @@ function getPluginsForConfig(minify = false) {
     return plugins;
 }
 
+function getConstantsForConfig() {
+
+    return {
+        __VERSION__: JSON.stringify(pkgJson.version)
+    };
+}
+
 const multiConfig = [
         {
             name: 'debug-hls-peerify',
@@ -70,7 +78,7 @@ const multiConfig = [
                 path: path.resolve(__dirname, 'dist'),
                 publicPath: '/dist/',
                 library: ['HlsPeerify'],
-                libraryTarget: 'umd'
+                libraryTarget: 'umd2'
             },
             plugins: getPluginsForConfig(),
             devtool: 'source-map',

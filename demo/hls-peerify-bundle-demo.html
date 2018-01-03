@@ -6,8 +6,44 @@
 </head>
 <script src="../dist/hls-peerify-bundle.js"></script>
 <body>
+<video id="video" controls></video>
 <script>
-    var hlsjs = new Hls();
+//    console.log('hlsjs version: ' + Hls.version());
+    console.log('plugin version: ' + Hls.pluginVersion);
+    if(Hls.isSupported()) {
+        var video = document.getElementById('video');
+
+        var hlsjsConfig = {
+//        debug: true,
+//      pLoader : pLoader,
+        }
+
+        var p2pConfig = {};
+
+        var hls = new Hls(p2pConfig, hlsjsConfig);
+
+        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
+//    hls.loadSource('https://video-dev.github.io/streams/test_001/stream.m3u8');
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
+
+            video.play();
+        });
+
+        hls.on(Hls.Events.ERROR, function (event, data) {
+            var errorType = data.type;
+            var errorDetails = data.details;
+            var errorFatal = data.fatal;
+            console.warn('error details:'+errorDetails);
+//      switch(data.details) {
+//        case hls.ErrorDetails.FRAG_LOAD_ERROR:
+//          // ....
+//          break;
+//        default:
+//          break;
+//      }
+        });
+    }
 </script>
 </body>
 </html>
