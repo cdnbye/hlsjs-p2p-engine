@@ -5,6 +5,7 @@
 import EventEmitter from 'events';
 import {defaultP2PConfig as config} from './config';
 import DataChannel from './data-channel';
+import P2PScheduler from './p2p-scheduler';
 
 export default class P2PSignaler extends EventEmitter {
     constructor(channel, peerId) {
@@ -98,6 +99,24 @@ export default class P2PSignaler extends EventEmitter {
             };
             this.websocket.send(msg);
         })
+            .on('error', () => {
+                datachannel.destroy();
+                let msg = {
+                    action: 'dc_failed',
+                    peer_id: this.peerId,
+                    to_peer_id: datachannel.channelId,
+                };
+                this.websocket.send(msg);
+            })
+            .on('open', () => {
+
+                let msg = {
+                    action: 'dc_opened',
+                    peer_id: this.peerId,
+                    to_peer_id: datachannel.channelId,
+                };
+                this.websocket.send(msg);
+            })
     }
 
     destroy() {

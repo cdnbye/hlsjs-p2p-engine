@@ -9,8 +9,7 @@
     "dist-hls-peerify": "webpack --progress --env.dist-hls-peerify",
     "dist-hls-peerif-bundle": "webpack --progress --env.dist-hls-peerify-bundle",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "push_to_gitee": "git add . && git commit -m 'update' && git push",
-    "pull_from_gitee": "git pull"
+    "push_to_gitee": "git add . && git commit -m 'update' && git push"
   },
   "repository": {
     "type": "git",

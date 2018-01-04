@@ -28,14 +28,16 @@ class DataChannel extends EventEmitter {
 
         datachannel.once('connect', () => {
             console.log('datachannel CONNECTED to ' + this.channelId);
-
+            this.emit('open');
             // datachannel.send(JSON.stringify({'whatever': Math.random()}));
             if (this.isReceiver) {
-                this.keepAliveInterval = setInterval(() => {                      //数据接收者每隔一段时间发送keep-alive信息
+                this.keepAliveInterval = window.setInterval(() => {                      //数据接收者每隔一段时间发送keep-alive信息
                     let msg = {
                         event: 'KEEPALIVE'
                     };
                     datachannel.send(JSON.stringify(msg));
+                    this.keepAliveAckTimeout = window.setTimeout(this._handleKeepAliveAckTimeout.bind(this),
+                        config.dcKeepAliveAckTimeout*1000);
                 }, config.dcKeepAliveInterval*1000);
             }
         });
@@ -51,7 +53,7 @@ class DataChannel extends EventEmitter {
                         this._handleKeepAlive();
                         break;
                     case 'KEEPALIVE-ACK':
-
+                        this._handleKeepAliveAck();
                         break;
                     case 'BINARY':
 
@@ -84,7 +86,10 @@ class DataChannel extends EventEmitter {
     }
 
     destroy() {
-        clearInterval(this.keepAliveInterval);
+        window.clearInterval(this.keepAliveInterval);
+        this.keepAliveInterval = null;
+        window.clearTimeout(this.keepAliveAckTimeout);
+        this.keepAliveAckTimeout = null;
         this._datachannel.removeAllListeners();
         this.removeAllListeners();
         this._datachannel.destroy();
@@ -98,7 +103,12 @@ class DataChannel extends EventEmitter {
     }
 
     _handleKeepAliveAck() {
+        window.clearTimeout(this.keepAliveAckTimeout);
+    }
 
+    _handleKeepAliveAckTimeout() {
+        console.warn('KeepAliveAckTimeout');
+        this.emit('error');
     }
 }
 

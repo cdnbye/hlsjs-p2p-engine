@@ -963,7 +963,9 @@ var defaultP2PConfig = {
     websocketAddr: 'ws://localhost:12034',
     websocketRetryDelay: 5,
 
-    dcKeepAliveInterval: 10,
+    dcKeepAliveInterval: 10, //datachannel多少秒发送一次keep-alive信息
+    dcKeepAliveAckTimeout: 2, //datachannel接收keep-alive-ack信息的超时时间，超时则认为连接失败并主动关闭
+    dcRequestTimeout: 2, //datachannel接收二进制数据的超时时间
 
     maxCacheSize: 1024 * 1024 * 100 //p2p缓存的最大数据量
 };
@@ -7574,6 +7576,8 @@ var P2PSignaler = function (_EventEmitter) {
                     data: data
                 };
                 _this3.websocket.send(msg);
+            }).on('error', function () {
+                datachannel.destroy();
             });
         }
     }, {
@@ -7658,12 +7662,13 @@ var DataChannel = function (_EventEmitter) {
 
                 // datachannel.send(JSON.stringify({'whatever': Math.random()}));
                 if (_this2.isReceiver) {
-                    _this2.keepAliveInterval = setInterval(function () {
+                    _this2.keepAliveInterval = window.setInterval(function () {
                         //数据接收者每隔一段时间发送keep-alive信息
                         var msg = {
                             event: 'KEEPALIVE'
                         };
                         datachannel.send(JSON.stringify(msg));
+                        _this2.keepAliveAckTimeout = window.setTimeout(_this2._handleKeepAliveAckTimeout.bind(_this2), _config.defaultP2PConfig.dcKeepAliveAckTimeout * 1000);
                     }, _config.defaultP2PConfig.dcKeepAliveInterval * 1000);
                 }
             });
@@ -7679,7 +7684,7 @@ var DataChannel = function (_EventEmitter) {
                             _this2._handleKeepAlive();
                             break;
                         case 'KEEPALIVE-ACK':
-
+                            _this2._handleKeepAliveAck();
                             break;
                         case 'BINARY':
 
@@ -7710,7 +7715,10 @@ var DataChannel = function (_EventEmitter) {
     }, {
         key: 'destroy',
         value: function destroy() {
-            clearInterval(this.keepAliveInterval);
+            window.clearInterval(this.keepAliveInterval);
+            this.keepAliveInterval = null;
+            window.clearTimeout(this.keepAliveAckTimeout);
+            this.keepAliveAckTimeout = null;
             this._datachannel.removeAllListeners();
             this.removeAllListeners();
             this._datachannel.destroy();
@@ -7725,7 +7733,15 @@ var DataChannel = function (_EventEmitter) {
         }
     }, {
         key: '_handleKeepAliveAck',
-        value: function _handleKeepAliveAck() {}
+        value: function _handleKeepAliveAck() {
+            window.clearTimeout(this.keepAliveAckTimeout);
+        }
+    }, {
+        key: '_handleKeepAliveAckTimeout',
+        value: function _handleKeepAliveAckTimeout() {
+            console.warn('KeepAliveAckTimeout');
+            this.emit('error');
+        }
     }]);
 
     return DataChannel;
