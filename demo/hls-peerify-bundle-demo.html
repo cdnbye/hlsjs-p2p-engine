@@ -22,8 +22,8 @@
 
         var hls = new Hls(p2pConfig, hlsjsConfig);
 
-        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
-//    hls.loadSource('https://video-dev.github.io/streams/test_001/stream.m3u8');
+//        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
+        hls.loadSource('https://video-dev.github.io/streams/test_001/stream.m3u8?a=123');
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
 

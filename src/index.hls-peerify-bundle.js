@@ -17,7 +17,10 @@ class HlsPeerifyBundle extends Hlsjs{
 
         super(mergedHlsjsConfig);
 
-        this.p2pPlugin = new HlsPeerify(this, p2pConfig);
+        if (HlsPeerify.WEBRTC_SUPPORT) {
+            this.p2pPlugin = new HlsPeerify(this, p2pConfig);
+        }
+
 
     }
 
