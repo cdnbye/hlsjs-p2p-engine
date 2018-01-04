@@ -17,9 +17,10 @@
 ```javastript
 {
     channel: string               //频道标识，目前是m3u0的url
-    Id: string                //peer的唯一标识
+    peer_id: string                //唯一标识
     action: string                //'enter':进入频道请求, 'leave':离开频道, 'signal':发送信令给peer, 'dc_opened':datachannel建立成功, 'dc_failed':datachannel建立失败
-    peerId: string                //对等端的Id
+    to_peer_id: string            //对等端的Id
+    data: string                  //需要传送的数据
 }
 ```
 
@@ -28,6 +29,7 @@
 {
     action: string                //'accept':允许进入频道, 'reject':拒绝进入频道, 'signal':peer发送的信令, 'connect':建立datachannel请求, 'disconnect':断开datachannel请求
     initiator: boolean            //是否主动发起连接
-    peerId: string                //对等端的Id
+    from_peer_id: string            //对等端的Id
+    data: string                  //需要传送的数据
 }
 ```

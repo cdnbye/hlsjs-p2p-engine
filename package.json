@@ -33,7 +33,9 @@
     "babili-webpack-plugin": "^0.1.2",
     "mocha": "^4.1.0",
     "mversion": "^1.10.1",
-    "webpack": "^3.10.0"
+    "node-static": "^0.7.10",
+    "webpack": "^3.10.0",
+    "websocket": "^1.0.25"
   },
   "keywords": [
     "WebRTC",
