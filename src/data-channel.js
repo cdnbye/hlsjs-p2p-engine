@@ -5,6 +5,8 @@
 import SimplePeer from 'simple-peer';
 import EventEmitter from 'events';
 import {defaultP2PConfig as config} from './config';
+import Buffer from 'buffer';
+
 
 class DataChannel extends EventEmitter {
     constructor(channelId, isInitiator) {
@@ -56,10 +58,10 @@ class DataChannel extends EventEmitter {
                         this._handleKeepAliveAck();
                         break;
                     case 'BINARY':
-
+                        this._prepareForBinary(msg.attachments, msg.url, msg.size);
                         break;
                     case 'REQUEST':
-
+                        this.emit('request', msg);
                         break;
                     case 'LACK':
                         this.emit('datanotfound', msg);
@@ -70,6 +72,12 @@ class DataChannel extends EventEmitter {
                     default:
 
                 }
+            } else if (data instanceof Buffer){                                       //binary data
+                this.bufArr.push(data);
+                this.remainAttachments --;
+                if (this.incomingAttachments === 0) {
+                    this._handleBanaryData();
+                }
             }
 
 
@@ -78,6 +86,12 @@ class DataChannel extends EventEmitter {
         datachannel.once('close', () => {
 
         });
+    }
+
+    send(data) {
+        if (this._datachannel.connected) {
+            this._datachannel.send(data);
+        }
     }
 
     receiveSignal(data) {
@@ -93,6 +107,23 @@ class DataChannel extends EventEmitter {
         this._datachannel.removeAllListeners();
         this.removeAllListeners();
         this._datachannel.destroy();
+    }
+
+    _prepareForBinary(attachments, url, expectedSize) {
+        this.bufArr = [];
+        this.remainAttachments = attachments;
+        this.bufUrl = url;
+        this.expectedSize = expectedSize;
+    }
+
+    _handleBanaryData() {
+        let payload = Buffer.concat(this.bufArr);
+        if (payload.byteLength == this.expectedSize) {
+            this.emit('response', {url: this.bufUrl, payload: payload});
+        }
+        this.bufUrl = '';
+        this.bufArr = [];
+        this.expectedSize = -1;
     }
 
     _handleKeepAlive() {

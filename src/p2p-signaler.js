@@ -2,10 +2,13 @@
  * Created by xieting on 2018/1/3.
  */
 
+import debug from 'debug';
 import EventEmitter from 'events';
 import {defaultP2PConfig as config} from './config';
 import DataChannel from './data-channel';
 import P2PScheduler from './p2p-scheduler';
+
+const log = debug('p2p-scheduler')
 
 export default class P2PSignaler extends EventEmitter {
     constructor(channel, peerId) {
@@ -15,7 +18,7 @@ export default class P2PSignaler extends EventEmitter {
         this.channel = channel;
         this.peerId = peerId;
 
-        console.log('connecting to :' + config.websocketAddr);
+        log('connecting to :' + config.websocketAddr);
         this.websocket = new WebSocket(config.websocketAddr);
 
         this._init(this.websocket);

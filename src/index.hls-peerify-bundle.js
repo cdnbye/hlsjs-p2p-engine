@@ -9,6 +9,7 @@ import {recommendedHlsjsConfig} from './config';
 
 const uaParserResult = (new UAParser()).getResult();
 
+
 class HlsPeerifyBundle extends Hlsjs{
     constructor(p2pConfig, hlsjsConfig = {}) {
 

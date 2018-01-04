@@ -2,7 +2,11 @@
  * Created by xieting on 2018/1/4.
  */
 
+
 import EventEmitter from 'events';
+import XhrLoader from 'hls.js/src/utils/xhr-loader';
+
+
 
 class P2PScheduler extends EventEmitter {
     constructor() {

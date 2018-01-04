@@ -5,6 +5,7 @@
 const pkgJson = require('./package.json');
 const path = require('path');
 const webpack = require('webpack');
+const BabiliPlugin = require("babili-webpack-plugin");
 
 const uglifyJsOptions = {
     screwIE8: true,
@@ -50,7 +51,8 @@ function getPluginsForConfig(minify = false) {
     if (minify) {
         // minification plugins.
         return plugins.concat([
-            new webpack.optimize.UglifyJsPlugin(uglifyJsOptions),
+            // new webpack.optimize.UglifyJsPlugin(uglifyJsOptions),
+            new BabiliPlugin({}, {comments: false}),
             new webpack.LoaderOptionsPlugin({
                 minimize: true,
                 debug: false
