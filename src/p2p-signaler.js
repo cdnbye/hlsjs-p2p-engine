@@ -19,6 +19,8 @@ export default class P2PSignaler extends EventEmitter {
         this.websocket = new WebSocket(config.websocketAddr);
 
         this._init(this.websocket);
+
+        this.scheduler = new P2PScheduler();
     }
 
     _init(websocket) {
@@ -108,7 +110,14 @@ export default class P2PSignaler extends EventEmitter {
                 };
                 this.websocket.send(msg);
             })
+            .on('close', () => {
+
+                datachannel.destroy();
+            })
             .on('open', () => {
+
+                //将datachannel加入P2PScheduler
+                this.scheduler.addDataChannel(datachannel);
 
                 let msg = {
                     action: 'dc_opened',

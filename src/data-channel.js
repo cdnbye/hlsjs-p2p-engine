@@ -13,7 +13,7 @@ class DataChannel extends EventEmitter {
         this.channelId = channelId;
         this.connected = false;
         this._datachannel = new SimplePeer({ initiator: isInitiator, objectMode: true});
-        this.isReceiver = isInitiator;                 //主动发起连接的为数据接受者
+        this.isReceiver = isInitiator;                 //主动发起连接的为数据接受者，用于标识本节点的类型
         this._init(this._datachannel);
     }
 
@@ -62,10 +62,10 @@ class DataChannel extends EventEmitter {
 
                         break;
                     case 'LACK':
-
+                        this.emit('datanotfound', msg);
                         break;
                     case 'CLOSE':
-
+                        this.emit('close');
                         break;
                     default:
 
