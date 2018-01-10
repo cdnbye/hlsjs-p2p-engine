@@ -4,13 +4,17 @@
 
 import HlsPeerify from './index.hls-peerify';
 import Hlsjs from 'hls.js';
-import UAParser from 'ua-parser-js';
-import {recommendedHlsjsConfig} from './config';
+import Events from './events';
 
-const uaParserResult = (new UAParser()).getResult();
+import {recommendedHlsjsConfig} from './config';
 
 
 class HlsPeerifyBundle extends Hlsjs{
+
+    static get P2PEvents() {
+        return Events;
+    }
+
     constructor(p2pConfig, hlsjsConfig = {}) {
 
 

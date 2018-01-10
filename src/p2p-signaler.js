@@ -4,11 +4,12 @@
 
 import debug from 'debug';
 import EventEmitter from 'events';
+import Events from './events';
 import {defaultP2PConfig as config} from './config';
 import DataChannel from './data-channel';
 import P2PScheduler from './p2p-scheduler';
 
-const log = debug('p2p-scheduler')
+const log = debug('p2p-signal');
 
 export default class P2PSignaler extends EventEmitter {
     constructor(channel, peerId) {
@@ -17,26 +18,28 @@ export default class P2PSignaler extends EventEmitter {
         this.connected = false;
         this.channel = channel;
         this.peerId = peerId;
+        this.scheduler = new P2PScheduler();
 
         log('connecting to :' + config.websocketAddr);
         this.websocket = new WebSocket(config.websocketAddr);
 
         this._init(this.websocket);
 
-        this.scheduler = new P2PScheduler();
+
     }
 
     _init(websocket) {
 
         websocket.onopen = () => {
-            console.log('websocket connection opened with channel: ' + this.channel);
+            log('websocket connection opened with channel: ' + this.channel);
             this.connected = true;
 
             //发送进入频道请求
             let msg = {
                 action: 'enter',
                 peer_id: this.peerId,
-                channel: this.channel
+                channel: this.channel,
+                isLive: config.live
             }
 
             websocket.push(JSON.stringify(msg));
@@ -45,26 +48,26 @@ export default class P2PSignaler extends EventEmitter {
         websocket.push = websocket.send;
         websocket.send = msg => {
             if (websocket.readyState != 1) {
-                console.warn('websocket connection is not opened yet.');
+                log('websocket connection is not opened yet.');
                 return setTimeout(function() {
                     websocket.send(data);
                 }, 1000);
             }
             let msgStr = JSON.stringify(Object.assign({channel: this.channel}, msg));
-            console.log("send to signal is " + msgStr);
+            log("send to websocket is " + msgStr);
             websocket.push(msgStr);
         };
         websocket.onmessage = (e) => {
-            console.log('websocket on msg: ' + e.data);
+            log('websocket on msg: ' + e.data);
             let msg = JSON.parse(e.data);
             let action = msg.action;
             switch (action) {
                 case 'signal':
-                    console.log('start _handleSignal');
+                    log('start _handleSignal');
                     this._handleSignal(msg.data);
                     break;
                 case 'connect':
-                    console.log('start _handleConnect');
+                    log('start _handleConnect');
                     this._handleConnect(msg.to_peer_id, msg.initiator);       //将to_peer_id作为channelId
                     break;
                 case 'disconnect':
@@ -77,7 +80,7 @@ export default class P2PSignaler extends EventEmitter {
 
                     break;
                 default:
-                    console.log('websocket unknown action ' + action);
+                    log('websocket unknown action ' + action);
 
             }
 
@@ -112,15 +115,19 @@ export default class P2PSignaler extends EventEmitter {
                     to_peer_id: datachannel.channelId,
                 };
                 this.websocket.send(msg);
+                log(`datachannel ${data.channelId} error`);
             })
             .on('close', () => {
 
+                log(`datachannel ${data.channelId} closed`);
+                // this.emit(Events.SIG_DCCLOSED, datachannel);
+                this.scheduler.deleteDataChannel(datachannel);
                 datachannel.destroy();
             })
             .on('open', () => {
 
-                //将datachannel加入P2PScheduler
-                this.scheduler.addDataChannel(datachannel);
+                //将datachannel emit出去
+                // this.emit(Events.SIG_DCOPENED, datachannel);
 
                 let msg = {
                     action: 'dc_opened',
@@ -128,6 +135,8 @@ export default class P2PSignaler extends EventEmitter {
                     to_peer_id: datachannel.channelId,
                 };
                 this.websocket.send(msg);
+
+                this.scheduler.addDataChannel(datachannel);
             })
     }
 

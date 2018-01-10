@@ -9,6 +9,9 @@
 <body>
 <video id="video" controls></video>
 <script>
+
+    console.log(JSON.stringify(HlsPeerify.uaParserResult, null, 2));
+
     if(Hls.isSupported()) {
         var video = document.getElementById('video');
 

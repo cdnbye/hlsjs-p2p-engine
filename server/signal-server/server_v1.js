@@ -127,10 +127,11 @@ function enterChannel(message, websocket) {
 
 }
 
-app.listen(12034);
+app.listen(12035);
 
-console.log('Please open NON-SSL URL: http://localhost:12034/');
+console.log('Please open NON-SSL URL: http://localhost:12035/');
 
 var topology = [
     []
 ]
+

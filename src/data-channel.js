@@ -2,11 +2,14 @@
  * Created by xieting on 2018/1/4.
  */
 
+import debug from 'debug';
 import SimplePeer from 'simple-peer';
 import EventEmitter from 'events';
+import Events from './events';
 import {defaultP2PConfig as config} from './config';
 import Buffer from 'buffer';
 
+const log = debug('data-channel');
 
 class DataChannel extends EventEmitter {
     constructor(channelId, isInitiator) {
@@ -14,6 +17,11 @@ class DataChannel extends EventEmitter {
 
         this.channelId = channelId;
         this.connected = false;
+
+        //下载控制
+        this.queue = [];                           //下载队列
+        this.loading = false
+
         this._datachannel = new SimplePeer({ initiator: isInitiator, objectMode: true});
         this.isReceiver = isInitiator;                 //主动发起连接的为数据接受者，用于标识本节点的类型
         this._init(this._datachannel);
@@ -21,16 +29,16 @@ class DataChannel extends EventEmitter {
 
     _init(datachannel) {
 
-        datachannel.on('error', (err) => { console.log('datachannel error', err); });
+        datachannel.on('error', (err) => { log('datachannel error', err); });
 
         datachannel.on('signal', data => {
-            // console.log('SIGNAL', JSON.stringify(data));
-            this.emit('signal', data);
+            // log('SIGNAL', JSON.stringify(data));
+            this.emit(Events.DC_SIGNAL, data);
         });
 
         datachannel.once('connect', () => {
-            console.log('datachannel CONNECTED to ' + this.channelId);
-            this.emit('open');
+            log('datachannel CONNECTED to ' + this.channelId);
+            this.emit(Events.DC_OPEN);
             // datachannel.send(JSON.stringify({'whatever': Math.random()}));
             if (this.isReceiver) {
                 this.keepAliveInterval = window.setInterval(() => {                      //数据接收者每隔一段时间发送keep-alive信息
@@ -46,28 +54,28 @@ class DataChannel extends EventEmitter {
 
         datachannel.on('data', data => {
             if (typeof data === 'string') {
-                console.log('datachannel receive string: ' + data);
+                log('datachannel receive string: ' + data);
 
                 let msg = JSON.parse(data);
                 let event = msg.event;
                 switch (event) {
                     case 'KEEPALIVE':
-                        this._handleKeepAlive();
+                        this._handleKeepAlive(msg);
                         break;
                     case 'KEEPALIVE-ACK':
-                        this._handleKeepAliveAck();
+                        this._handleKeepAliveAck(msg);
                         break;
                     case 'BINARY':
-                        this._prepareForBinary(msg.attachments, msg.url, msg.size);
+                        this._prepareForBinary(msg.attachments, msg.url, msg.sn, msg.size);
                         break;
                     case 'REQUEST':
-                        this.emit('request', msg);
+                        this.emit(Events.DC_REQUEST, msg);
                         break;
                     case 'LACK':
-                        this.emit('datanotfound', msg);
+                        this.emit(Events.DC_REQUESTFAIL, msg);
                         break;
                     case 'CLOSE':
-                        this.emit('close');
+                        this.emit(Events.DC_CLOSE);
                         break;
                     default:
 
@@ -94,8 +102,19 @@ class DataChannel extends EventEmitter {
         }
     }
 
+    request(data) {                                     //由于需要阻塞下载数据，因此request请求用新的API
+        if (this._datachannel.connected) {
+           if (this.loading) {
+               this.queue.push(data);
+           } else {
+               this._datachannel.send(data);
+               this.loading = true;
+           }
+        }
+    }
+
     receiveSignal(data) {
-        console.log('datachannel receive siganl ' + JSON.stringify(data));
+        log('datachannel receive siganl ' + JSON.stringify(data));
         this._datachannel.signal(data);
     }
 
@@ -109,21 +128,34 @@ class DataChannel extends EventEmitter {
         this._datachannel.destroy();
     }
 
-    _prepareForBinary(attachments, url, expectedSize) {
+    clearQueue() {
+        if (this.queue.length > 0) {
+            this.queue = [];
+        }
+    }
+
+    _prepareForBinary(attachments, url, sn, expectedSize) {
         this.bufArr = [];
         this.remainAttachments = attachments;
         this.bufUrl = url;
+        this.bufSN = sn;
         this.expectedSize = expectedSize;
     }
 
     _handleBanaryData() {
         let payload = Buffer.concat(this.bufArr);
-        if (payload.byteLength == this.expectedSize) {
-            this.emit('response', {url: this.bufUrl, payload: payload});
+        if (payload.byteLength == this.expectedSize) {                            //校验数据
+            this.emit(Events.DC_RESPONSE, {url: this.bufUrl, sn: this.bufSN, payload: payload});
         }
         this.bufUrl = '';
         this.bufArr = [];
         this.expectedSize = -1;
+
+        this.loading = false;
+        if (this.queue.length > 0) {                     //如果下载队列不为空
+            let data = this.queue.shift();
+            this.request(data);
+        }
     }
 
     _handleKeepAlive() {
@@ -138,8 +170,8 @@ class DataChannel extends EventEmitter {
     }
 
     _handleKeepAliveAckTimeout() {
-        console.warn('KeepAliveAckTimeout');
-        this.emit('error');
+        log('KeepAliveAckTimeout');
+        this.emit(Events.DC_ERROR);
     }
 }
 
