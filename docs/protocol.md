@@ -23,8 +23,8 @@ datachannel KEEPALIVE-ACK
 ```javastript       
 {
     event: 'REQUEST'   
-    url: string        //ts数据的url（相对url）
-    sn: number         //ts数据的播放序号
+    url: string             //ts数据的url（相对url）
+    sn: number              //ts数据的播放序号
 }
 ```
 
@@ -37,15 +37,6 @@ datachannel KEEPALIVE-ACK
     sn: number         //ts数据的播放序号
     size: number    //二进制数据的总大小，可用于校验
     current:        //目前最新缓存的序号
-    type:  'push'/'pull'     //返回数据的请求类型
-}
-```
-
-向peer发起push请求
-```javastript 
-{
-    event: 'PUSH'   
-    sn: number         //ts数据的播放序号
 }
 ```
 
@@ -84,12 +75,20 @@ datachannel 发生错误
 }
 ```
 
-### peer ---> server    离开频道请求
+### peer ---> server    允许进入频道
 ```javastript
 {
-    action: 'leave'                
+    action: 'accept'  
+    live: boolean                   //直播或点播                
 }
 ```
+
+### peer ---> server    离开频道请求
+   ```javastript
+   {
+       action: 'leave'                
+   }
+   ```
 
 ### peer ---> server    发送信令给peer
 ```javastript
@@ -120,9 +119,9 @@ datachannel 发生错误
 ### server ---> peer
 ```javastript
 {
-    action: string                //'accept':允许进入频道, 'reject':拒绝进入频道, 'signal':peer发送的信令, 'connect':建立datachannel请求, 'disconnect':断开datachannel请求
-    initiator: boolean            //是否主动发起连接
+    action: string                  //'accept':允许进入频道, 'reject':拒绝进入频道, 'signal':peer发送的信令, 'connect':建立datachannel请求, 'disconnect':断开datachannel请求
+    initiator: boolean              //是否主动发起连接
     from_peer_id: string            //对等端的Id
-    data: string                  //需要传送的数据
+    data: string                    //需要传送的数据
 }
 ```

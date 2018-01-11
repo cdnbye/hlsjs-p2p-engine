@@ -7,7 +7,7 @@ import SimplePeer from 'simple-peer';
 import EventEmitter from 'events';
 import Events from './events';
 import {defaultP2PConfig as config} from './config';
-import Buffer from 'buffer';
+var Buffer = require('buffer/').Buffer;
 
 const log = debug('data-channel');
 
@@ -66,6 +66,7 @@ class DataChannel extends EventEmitter {
                         this._handleKeepAliveAck(msg);
                         break;
                     case 'BINARY':
+                        this.emit(Events.DC_BINARY);
                         this._prepareForBinary(msg.attachments, msg.url, msg.sn, msg.size);
                         break;
                     case 'REQUEST':
@@ -81,9 +82,10 @@ class DataChannel extends EventEmitter {
 
                 }
             } else if (data instanceof Buffer){                                       //binary data
+                // log(`datachannel receive binary data size ${data.byteLength}`);
                 this.bufArr.push(data);
                 this.remainAttachments --;
-                if (this.incomingAttachments === 0) {
+                if (this.remainAttachments === 0) {
                     this._handleBanaryData();
                 }
             }
@@ -143,9 +145,10 @@ class DataChannel extends EventEmitter {
     }
 
     _handleBanaryData() {
+        log(`datachannel _handleBanaryData`);
         let payload = Buffer.concat(this.bufArr);
         if (payload.byteLength == this.expectedSize) {                            //校验数据
-            this.emit(Events.DC_RESPONSE, {url: this.bufUrl, sn: this.bufSN, payload: payload});
+            this.emit(Events.DC_RESPONSE, {url: this.bufUrl, sn: this.bufSN, data: payload});
         }
         this.bufUrl = '';
         this.bufArr = [];

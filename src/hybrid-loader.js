@@ -36,29 +36,57 @@ class LoaderScheduler extends EventEmitter {
     }
 
     /*
-      currLoading-currPlay>1 && currLoading-currLoaded=1 的currLoading用p2p下载
-      其他情况用http下载
+      首先从缓存中寻找请求的seg，如果缓存中找不到则在urgent情况下用http请求，非urgent情况下用p2p请求。
      */
     load(context, config, callbacks) {
         const frag = context.frag;
-        this.loadByP2P = (frag.sn - this.currPlay > 1) && (frag.sn - this.currLoaded == 1)
-            && (this.currLoaded - this.currPlay >= 1) && this.p2pLoader.hasUpstreamer;
-        log(`loading ${frag.sn} loaded ${this.currLoaded} play ${this.currPlay} loaded by ${this.loadByP2P?'P2P':'HTTP'}`);
+        let seg;
 
-        if (this.loadByP2P) {
-            this.loader = this.p2pLoader;
-        } else {
-            log(`xhrLoader load ${frag.relurl} at ${frag.sn}`);
-            this.loader = this.xhrLoader;
+        if (this.bufMgr.hasSegOfURL(frag.relurl)) {
+            seg = this.bufMgr.getSegByURL(frag.relurl);
         }
+        if (false) {                                                                     //如果buffer-manager找到了seg
+            log(`bufMgr found seg ${frag.relurl} at ${frag.sn}`);
+            let response = {
+                url: seg.relurl,
+                payload: seg.data
+            };
+            let stats = {trequest: performance.now(), retry: 0, tfirst: performance.now(),
+                loaded: seg.size, tload: performance.now(), total: seg.size};
+            callbacks.onSuccess(response, stats, context);
+        } else {
+            this.loadByP2P = (frag.sn - this.currPlay > 1) && (frag.sn - this.currLoaded == 1)
+                && (this.currLoaded - this.currPlay > 1) && this.p2pLoader.hasUpstreamer;
+            log(`loading ${frag.sn} loaded ${this.currLoaded} play ${this.currPlay} loaded by ${this.loadByP2P?'P2P':'HTTP'}`);
 
-        const onSuccess = callbacks.onSuccess;
-        callbacks.onSuccess = (response, stats, context) => {
-            this._copyFrag(response.data, frag.relurl, frag.sn);
-            onSuccess(response,stats,context);
-        };
-        this.loader.load(context, config, callbacks);
+            if (this.loadByP2P) {                                                      //如果非urgent且有父节点则用p2p下载
+                this.loader = this.p2pLoader;
+            } else {
+                log(`xhrLoader load ${frag.relurl} at ${frag.sn}`);
+                this.loader = this.xhrLoader;
+                context.loadByXhr = true;
+            }
+
+            const onSuccess = callbacks.onSuccess;
+            callbacks.onSuccess = (response, stats, context) => {
+                if (this.bufMgr && !this.bufMgr.hasSegOfURL(frag.relurl)) {
+                    this._copyFrag(response.data, frag.relurl, frag.sn);
+                }
+                onSuccess(response,stats,context);
+            };
+            const onTimeout = callbacks.onTimeout;
+            callbacks.onTimeout = (stats, context) => {
+                if (context.loadByXhr) {                                        //如果用xhrloader请求超时，则改成p2p下载
+                    log(`last loaded by xhr`);
+                    this.p2pLoader.load(context, config, callbacks);
+                } else {
+                    onTimeout(stats, context, null);
+                }
+            };
+            this.loader.load(context, config, callbacks);
+        }
     }
+
 
     _copyFrag(data, url, sn) {
         let payloadBuf = Buffer.from(data);

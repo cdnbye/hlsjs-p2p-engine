@@ -6,7 +6,14 @@
 - 通过FRAG_BUFFERED可以获取估算带宽（单位bit）
 - 通过FRAG_CHANGED可以获取目前播放的frag序号
 
-### loaded的frag不会再重复下载，loading和loaded交替进行
+### loaded的frag不会再重复下载(除非前面缓存的buffer被清空)，loading和loaded交替进行
+
+### 码率必须匹配，不然会解析错误
+
+### stats
+- @param stats.tfirst {number} - performance.now() of first received byte
+- @param stats.tload {number} - performance.now() on load complete
+- @param stats.loaded {number} - nb of loaded bytes
 
 ```javascript
 - [fragment-loader] loadsuccess stats:

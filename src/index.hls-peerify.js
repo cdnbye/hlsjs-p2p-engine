@@ -68,6 +68,9 @@ class HlsPeerify extends EventEmitter {
         //通过config向hybrid-loader导入p2p-scheduler
         this.hlsjs.config.p2pLoader = this.signaler.scheduler;
 
+        //向hybrid-loader导入buffer-manager
+        this.hlsjs.config.p2pLoader.bufMgr = this.bufMgr;
+
         //替换fLoader
         this.hlsjs.config.fLoader = HybridLoader;
 

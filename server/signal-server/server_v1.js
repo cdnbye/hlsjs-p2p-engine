@@ -38,9 +38,10 @@ function onRequest(socket) {
         }
     });
 
-    // websocket.on('close', function() {
-    //     truncateChannels(websocket);
-    // });
+    websocket.on('close', function() {
+        console.log('delete node: ' + websocket.peerId);
+        truncateChannels(websocket);                                 //将该节点从频道中删除
+    });
 }
 
 function onMessage(message, websocket) {
@@ -110,21 +111,83 @@ function enterChannel(message, websocket) {
         CHANNELS[message.channel][channel.length] = websocket;
 
         //test
-        channel[0].sendUTF(JSON.stringify({
+        // channel[0].sendUTF(JSON.stringify({
+        //     action: 'connect',
+        //     to_peer_id: channel[1].peerId,
+        //     initiator: false
+        // }));
+        // channel[1].sendUTF(JSON.stringify({
+        //     action: 'connect',
+        //     to_peer_id: channel[0].peerId,
+        //     initiator: true
+        // }));
+
+        //构造链式拓扑结构
+        let length = channel.length;                  //大于等于2
+        channel[length-2].sendUTF(JSON.stringify({
             action: 'connect',
-            to_peer_id: channel[1].peerId,
+            to_peer_id: channel[length-1].peerId,
             initiator: false
         }));
-        channel[1].sendUTF(JSON.stringify({
+        channel[length-1].sendUTF(JSON.stringify({
             action: 'connect',
-            to_peer_id: channel[0].peerId,
+            to_peer_id: channel[length-2].peerId,
             initiator: true
         }));
+
+        //倒三角拓扑结构
+        let length = channel.length;
+        if (length === 2) {
+            channel[0].sendUTF(JSON.stringify({
+                action: 'connect',
+                to_peer_id: channel[2].peerId,
+                initiator: false
+            }));
+            channel[1].sendUTF(JSON.stringify({
+                action: 'connect',
+                to_peer_id: channel[2].peerId,
+                initiator: false
+            }));
+            channel[2].sendUTF(JSON.stringify({
+                action: 'connect',
+                to_peer_id: channel[0].peerId,
+                initiator: true
+            }));
+            channel[2].sendUTF(JSON.stringify({
+                action: 'connect',
+                to_peer_id: channel[1].peerId,
+                initiator: true
+            }));
+        }
+
 
     } else {
         CHANNELS[message.channel] = [websocket];
     }
 
+}
+
+function swapArray(arr) {
+    var swapped = [],
+        length = arr.length;
+    for (var i = 0; i < length; i++) {
+        if (arr[i])
+            swapped[swapped.length] = arr[i];
+    }
+    return swapped;
+}
+
+function truncateChannels(websocket) {
+    for (var channel in CHANNELS) {
+        var _channel = CHANNELS[channel];
+        for (var i = 0; i < _channel.length; i++) {
+            if (_channel[i] == websocket)
+                delete _channel[i];
+        }
+        CHANNELS[channel] = swapArray(_channel);
+        if (CHANNELS && CHANNELS[channel] && !CHANNELS[channel].length)
+            delete CHANNELS[channel];
+    }
 }
 
 app.listen(12035);

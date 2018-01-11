@@ -3,7 +3,6 @@
  */
 
 import EventEmitter from 'events';
-import Events from './events';
 import {defaultP2PConfig as config} from './config';
 import debug from 'debug';
 
@@ -21,21 +20,25 @@ class BufferManager extends EventEmitter {
          */
         this._segArray = [];             //最新的数据加在最左端
         this._currBufSize = 0;           //目前的buffer总大小
-        this.urlSet = new Set();
+        this.urlSet = new Set();         //用于按url查找
     }
 
     get currBufSize() {
         return this._currBufSize;
     }
 
+    hasSegOfURL(url) {                                                     //防止重复加入seg
+        return this.urlSet.has(url);
+    }
+
     addSeg(seg) {
-        if (this.urlSet.has(seg.relurl)) return;                                  //防止重复加入seg
         log(`add seg ${seg.sn} url ${seg.relurl} size ${seg.data.byteLength}`);
         this._segArray.unshift(seg);
         this.urlSet.add(seg.relurl);
         this._currBufSize += seg.size;
         while (this._currBufSize > config.maxBufSize) {         //去掉多余的数据
             const lastSeg = this._segArray.pop();
+            this.urlSet.delete(lastSeg.relurl);
             this._currBufSize -= lastSeg.size;
         }
     }
@@ -61,6 +64,7 @@ class BufferManager extends EventEmitter {
     clear() {
         this._segArray = [];
         this._currBufSize = 0;
+        this.urlSet.clear();
     }
 }
 

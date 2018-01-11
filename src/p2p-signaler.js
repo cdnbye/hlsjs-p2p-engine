@@ -108,14 +108,14 @@ export default class P2PSignaler extends EventEmitter {
             this.websocket.send(msg);
         })
             .on('error', () => {
-                datachannel.destroy();
                 let msg = {
                     action: 'dc_failed',
                     peer_id: this.peerId,
                     to_peer_id: datachannel.channelId,
                 };
                 this.websocket.send(msg);
-                log(`datachannel ${data.channelId} error`);
+                log(`datachannel ${datachannel.channelId} error`);
+                datachannel.destroy();
             })
             .on('close', () => {
 
