@@ -29,6 +29,14 @@ class HlsPeerifyBundle extends Hlsjs{
 
     }
 
+    enableP2P() {
+        this.p2pPlugin.enableP2P();
+    }
+
+    disableP2P() {
+        this.p2pPlugin.disableP2P();
+    }
+
 
 }
 

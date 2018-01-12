@@ -3,7 +3,6 @@
  */
 
 import debug from 'debug';
-// let UAParser = require('ua-parser-js');
 import Events from './events';
 import EventEmitter from 'events';
 import {defaultP2PConfig} from './config';
@@ -38,6 +37,7 @@ class HlsPeerify extends EventEmitter {
         }
 
         this.hlsjs = hlsjs;
+        this.p2pEnabled = true;                                      //默认开启P2P
 
        hlsjs.config.currLoaded = hlsjs.config.currPlay = 0;
 
@@ -54,7 +54,10 @@ class HlsPeerify extends EventEmitter {
         //level上报
         this.levelCounter = 0;
         this.averageLevel = -1;
-        this.levelIntervalId = window.setInterval(this._setLevelInterval.bind(this), this.config.levelReportInterval*1000);
+        //流量上报
+        this.cdnDownloaded = 0;
+        this.p2pDownloaded = 0;
+        this.reportIntervalId = window.setInterval(this._statisticsReport.bind(this), this.config.reportInterval*1000);
     }
 
     _init(channel) {
@@ -75,6 +78,8 @@ class HlsPeerify extends EventEmitter {
         //替换fLoader
         this.hlsjs.config.fLoader = HybridLoader;
 
+        this.hlsjs.config.p2pEnabled = this.p2pEnabled;
+
         this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADING, (id, data) => {
             // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
             log('FRAG_LOADING: ' + data.frag.sn);
@@ -84,9 +89,15 @@ class HlsPeerify extends EventEmitter {
         });
 
         this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADED, (id, data) => {
-            // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
-            log('FRAG_LOADED: ' + data.frag.sn);
             this.hlsjs.config.currLoaded = data.frag.sn;
+            this.hlsjs.config.currLoadedDuration = data.frag.duration;
+            if (data.frag.loadByXhr) {
+                log(`FRAG_LOADED ${data.frag.sn} loadByXhr`);
+                this.cdnDownloaded += data.frag.loaded;
+            } else {
+                log(`FRAG_LOADED ${data.frag.sn} loadByP2P`);
+                this.p2pDownloaded += data.frag.loaded;
+            }
         });
 
         this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_CHANGED, (id, data) => {
@@ -107,27 +118,39 @@ class HlsPeerify extends EventEmitter {
             this.signaler.destroy();
             this.signaler = null;
 
-            window.clearInterval(this.levelIntervalId);
+            window.clearInterval(this.reportIntervalId);
         });
     }
 
     disableP2P() {                                              //停止p2p
-
+        if (this.p2pEnabled) {
+            this.p2pEnabled = false;
+            this.hlsjs.config.p2pEnabled = this.p2pEnabled;
+        }
     }
 
     enableP2P() {                                               //在停止的情况下重新启动P2P
-
+        log(`enableP2P`);
+        if (!this.p2pEnabled) {
+            this.p2pEnabled = true;
+            this.hlsjs.config.p2pEnabled = this.p2pEnabled;
+        }
     }
 
-    _setLevelInterval() {
+    _statisticsReport() {
 
         if (this.signaler) {
             let msg = {
-                level: this.averageLevel.toFixed(2)
+                action: 'statistics',
+                level: this.averageLevel.toFixed(2),
+                cdn: Math.round(this.cdnDownloaded/1024),                  //单位KB
+                p2p: Math.round(this.p2pDownloaded/1024)
             };
             this.signaler.send(msg);
+            this.cdnDownloaded = this.p2pDownloaded = 0;                   //上报的是增量部分
         }
     }
+
 
 }
 

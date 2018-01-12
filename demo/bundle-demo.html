@@ -27,15 +27,18 @@
 //        hls.loadSource('https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8');
             hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
-//            hls.loadLevel = 0;
+            hls.loadLevel = 0;
             video.play();
         });
-
+//        hls.disableP2P();
+//        setTimeout(()=>{
+//            hls.enableP2P();
+//        }, 31000);
         hls.on(Hls.Events.ERROR, function (event, data) {
             var errorType = data.type;
             var errorDetails = data.details;
             var errorFatal = data.fatal;
-            console.warn('error details:'+errorDetails);
+            console.warn('warn details:'+errorDetails);
 //      switch(data.details) {
 //        case hls.ErrorDetails.FRAG_LOAD_ERROR:
 //          // ....

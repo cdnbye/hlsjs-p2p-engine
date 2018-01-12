@@ -840,7 +840,7 @@ var defaultP2PConfig = {
     maxBufSize: 1024 * 1024 * 100, //p2p缓存的最大数据量
     live: true, //直播或点播
     loadTimeout: 2, //p2p下载的超时时间
-    levelReportInterval: 30 //平均level上报的时间间隔
+    reportInterval: 30 //统计信息上报的时间间隔
 };
 
 exports.recommendedHlsjsConfig = recommendedHlsjsConfig;
@@ -6389,6 +6389,18 @@ var HlsPeerifyBundle = function (_Hlsjs) {
         return _this;
     }
 
+    _createClass(HlsPeerifyBundle, [{
+        key: 'enableP2P',
+        value: function enableP2P() {
+            this.p2pPlugin.enableP2P();
+        }
+    }, {
+        key: 'disableP2P',
+        value: function disableP2P() {
+            this.p2pPlugin.disableP2P();
+        }
+    }]);
+
     return HlsPeerifyBundle;
 }(_hls2.default);
 
@@ -6454,9 +6466,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * Created by xieting on 2018/1/2.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 
-// let UAParser = require('ua-parser-js');
-
-
 var log = (0, _debug2.default)('index.hls-peerify');
 var uaParserResult = new _uaParserJs2.default().getResult();
 
@@ -6488,6 +6497,7 @@ var HlsPeerify = function (_EventEmitter) {
         }
 
         _this.hlsjs = hlsjs;
+        _this.p2pEnabled = true; //默认开启P2P
 
         hlsjs.config.currLoaded = hlsjs.config.currPlay = 0;
 
@@ -6504,7 +6514,10 @@ var HlsPeerify = function (_EventEmitter) {
         //level上报
         _this.levelCounter = 0;
         _this.averageLevel = -1;
-        _this.levelIntervalId = window.setInterval(_this._setLevelInterval.bind(_this), _this.config.levelReportInterval * 1000);
+        //流量上报
+        _this.cdnDownloaded = 0;
+        _this.p2pDownloaded = 0;
+        _this.reportIntervalId = window.setInterval(_this._statisticsReport.bind(_this), _this.config.reportInterval * 1000);
         return _this;
     }
 
@@ -6529,6 +6542,8 @@ var HlsPeerify = function (_EventEmitter) {
             //替换fLoader
             this.hlsjs.config.fLoader = _hybridLoader2.default;
 
+            this.hlsjs.config.p2pEnabled = this.p2pEnabled;
+
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADING, function (id, data) {
                 // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
                 log('FRAG_LOADING: ' + data.frag.sn);
@@ -6538,9 +6553,15 @@ var HlsPeerify = function (_EventEmitter) {
             });
 
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADED, function (id, data) {
-                // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
-                log('FRAG_LOADED: ' + data.frag.sn);
                 _this2.hlsjs.config.currLoaded = data.frag.sn;
+                _this2.hlsjs.config.currLoadedDuration = data.frag.duration;
+                if (data.frag.loadByXhr) {
+                    log('FRAG_LOADED ' + data.frag.sn + ' loadByXhr');
+                    _this2.cdnDownloaded += data.frag.loaded;
+                } else {
+                    log('FRAG_LOADED ' + data.frag.sn + ' loadByP2P');
+                    _this2.p2pDownloaded += data.frag.loaded;
+                }
             });
 
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_CHANGED, function (id, data) {
@@ -6560,28 +6581,41 @@ var HlsPeerify = function (_EventEmitter) {
                 _this2.signaler.destroy();
                 _this2.signaler = null;
 
-                window.clearInterval(_this2.levelIntervalId);
+                window.clearInterval(_this2.reportIntervalId);
             });
         }
     }, {
         key: 'disableP2P',
-        value: function disableP2P() {//停止p2p
-
+        value: function disableP2P() {
+            //停止p2p
+            if (this.p2pEnabled) {
+                this.p2pEnabled = false;
+                this.hlsjs.config.p2pEnabled = this.p2pEnabled;
+            }
         }
     }, {
         key: 'enableP2P',
-        value: function enableP2P() {//在停止的情况下重新启动P2P
-
+        value: function enableP2P() {
+            //在停止的情况下重新启动P2P
+            log('enableP2P');
+            if (!this.p2pEnabled) {
+                this.p2pEnabled = true;
+                this.hlsjs.config.p2pEnabled = this.p2pEnabled;
+            }
         }
     }, {
-        key: '_setLevelInterval',
-        value: function _setLevelInterval() {
+        key: '_statisticsReport',
+        value: function _statisticsReport() {
 
             if (this.signaler) {
                 var msg = {
-                    level: this.averageLevel.toFixed(2)
+                    action: 'statistics',
+                    level: this.averageLevel.toFixed(2),
+                    cdn: Math.round(this.cdnDownloaded / 1024), //单位KB
+                    p2p: Math.round(this.p2pDownloaded / 1024)
                 };
                 this.signaler.send(msg);
+                this.cdnDownloaded = this.p2pDownloaded = 0; //上报的是增量部分
             }
         }
     }]);
@@ -8028,7 +8062,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * Created by xieting on 2018/1/3.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 
-var log = (0, _debug2.default)('p2p-signal');
+var log = (0, _debug2.default)('p2p-signaler');
 
 var P2PSignaler = function (_EventEmitter) {
     _inherits(P2PSignaler, _EventEmitter);
@@ -8145,21 +8179,22 @@ var P2PSignaler = function (_EventEmitter) {
                     data: data
                 };
                 _this3.websocket.send(msg);
-            }).on('error', function () {
+            }).once('error', function () {
                 var msg = {
                     action: 'dc_failed',
                     dc_id: datachannel.channelId
                 };
                 _this3.websocket.send(msg);
-                log('datachannel ' + datachannel.channelId + ' error');
+                log('datachannel error ' + datachannel.channelId);
+                _this3.scheduler.deleteDataChannel(datachannel);
                 datachannel.destroy();
-            }).on('close', function () {
+            }).once(_events4.default.DC_CLOSE, function () {
 
-                log('datachannel ' + data.channelId + ' closed');
+                log('datachannel closed ' + datachannel.channelId + ' ');
                 // this.emit(Events.SIG_DCCLOSED, datachannel);
                 _this3.scheduler.deleteDataChannel(datachannel);
                 datachannel.destroy();
-            }).on('open', function () {
+            }).once(_events4.default.DC_OPEN, function () {
 
                 _this3.scheduler.addDataChannel(datachannel);
                 if (datachannel.isReceiver) {
@@ -8261,6 +8296,7 @@ var DataChannel = function (_EventEmitter) {
 
             datachannel.on('error', function (err) {
                 log('datachannel error', err);
+                _this2.emit(_events4.default.DC_ERROR);
             });
 
             datachannel.on('signal', function (data) {
@@ -8271,15 +8307,14 @@ var DataChannel = function (_EventEmitter) {
             datachannel.once('connect', function () {
                 log('datachannel CONNECTED to ' + _this2.remotePeerId);
                 _this2.emit(_events4.default.DC_OPEN);
-                // datachannel.send(JSON.stringify({'whatever': Math.random()}));
                 // if (this.isReceiver) {
                 //     this.keepAliveInterval = window.setInterval(() => {                      //数据接收者每隔一段时间发送keep-alive信息
                 //         let msg = {
                 //             event: 'KEEPALIVE'
                 //         };
                 //         datachannel.send(JSON.stringify(msg));
-                //         this.keepAliveAckTimeout = window.setTimeout(this._handleKeepAliveAckTimeout.bind(this),
-                //             config.dcKeepAliveAckTimeout*1000);
+                //         // this.keepAliveAckTimeout = window.setTimeout(this._handleKeepAliveAckTimeout.bind(this),
+                //         //     config.dcKeepAliveAckTimeout*1000);
                 //     }, config.dcKeepAliveInterval*1000);
                 // }
             });
@@ -8325,12 +8360,14 @@ var DataChannel = function (_EventEmitter) {
                 }
             });
 
-            datachannel.once('close', function () {});
+            datachannel.once('close', function () {
+                _this2.emit(_events4.default.DC_CLOSE);
+            });
         }
     }, {
         key: 'send',
         value: function send(data) {
-            if (this._datachannel.connected) {
+            if (this._datachannel && this._datachannel.connected) {
                 this._datachannel.send(data);
             }
         }
@@ -8338,7 +8375,7 @@ var DataChannel = function (_EventEmitter) {
         key: 'request',
         value: function request(data) {
             //由于需要阻塞下载数据，因此request请求用新的API
-            if (this._datachannel.connected) {
+            if (this._datachannel && this._datachannel.connected) {
                 if (this.loading) {
                     this.queue.push(data);
                 } else {
@@ -8495,7 +8532,8 @@ var P2PScheduler = function (_EventEmitter) {
             this.callbacks = callbacks;
             this.stats = { trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0 };
             this.retryDelay = config.retryDelay;
-            this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), _config.defaultP2PConfig.loadTimeout * 1000);
+            var timeout = Math.min(_config.defaultP2PConfig.loadTimeout, config.p2pTimeout); //p2p下载最大允许时间是一个块的时长
+            this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), timeout * 1000);
             this._loadInternal();
         }
     }, {
@@ -8544,8 +8582,14 @@ var P2PScheduler = function (_EventEmitter) {
                     window.clearTimeout(_this2.requestTimeout); //清除定时器
                     _this2.requestTimeout = null;
                     if (!_this2.stats.tload) {
-                        _this2.stats.tload = Math.max(_this2.stats.tfirst, performance.now());
-                        _this2.stats.loaded = _this2.stats.total = response.data.byteLength;
+                        var stats = _this2.stats;
+                        stats.tload = Math.max(stats.tfirst, performance.now());
+                        stats.loaded = stats.total = response.data.byteLength;
+                        var onProgress = _this2.callbacks.onProgress;
+                        if (onProgress) {
+                            // third arg is to provide on progress data
+                            onProgress(stats, _this2.context, null);
+                        }
                     }
                     _this2.callbacks.onSuccess(response, _this2.stats, _this2.context);
                     //将获取成功的节点放在最前
@@ -8680,6 +8724,7 @@ var P2PScheduler = function (_EventEmitter) {
     }, {
         key: 'deleteDataChannel',
         value: function deleteDataChannel(channel) {
+            log('delete datachannel ' + channel.channelId);
             for (var i = 0; i < this.downstreamers.length; ++i) {
                 if (this.downstreamers[i] === channel) {
                     this.downstreamers.splice(i, 1);
@@ -8695,7 +8740,16 @@ var P2PScheduler = function (_EventEmitter) {
         }
     }, {
         key: '_setupChannel',
-        value: function _setupChannel(channel) {}
+        value: function _setupChannel(channel) {
+
+            // channel.once('close', () => {
+            //
+            //     log(`datachannel closed ${channel.channelId} `);
+            //     // this.emit(Events.SIG_DCCLOSED, datachannel);
+            //     this.deleteDataChannel(channel);
+            //     channel.destroy();
+            // })
+        }
     }, {
         key: '_addSegToBuf',
         value: function _addSegToBuf(response) {
@@ -8780,11 +8834,13 @@ var LoaderScheduler = function (_EventEmitter) {
         var _this = _possibleConstructorReturn(this, (LoaderScheduler.__proto__ || Object.getPrototypeOf(LoaderScheduler)).call(this));
 
         _this.currLoaded = config.currLoaded;
+        _this.currLoadedDuration = config.currLoadedDuration; //最新下载的块的时长
         _this.currPlay = config.currPlay;
 
         _this.bufMgr = config.bufMgr;
         _this.xhrLoader = new _xhrLoader2.default(config);
         _this.p2pLoader = config.p2pLoader;
+        _this.p2pEnabled = config.p2pEnabled;
 
         _this.loader = _this.xhrLoader; //loader是当前用来下载的loader
         return _this;
@@ -8812,53 +8868,38 @@ var LoaderScheduler = function (_EventEmitter) {
             var _this2 = this;
 
             var frag = context.frag;
-            var seg = void 0;
+            this.loadByP2P = frag.sn - this.currPlay > 1 && frag.sn - this.currLoaded == 1 && this.currLoaded - this.currPlay > 1 && this.p2pLoader.hasUpstreamer;
+            log('loading ' + frag.sn + ' loaded ' + this.currLoaded + ' play ' + this.currPlay + ' loaded by ' + (this.loadByP2P ? 'P2P' : 'HTTP'));
 
-            if (this.bufMgr.hasSegOfURL(frag.relurl)) {
-                seg = this.bufMgr.getSegByURL(frag.relurl);
-            }
-            if (false) {
-                //如果buffer-manager找到了seg
-                log('bufMgr found seg ' + frag.relurl + ' at ' + frag.sn);
-                var response = {
-                    url: seg.relurl,
-                    payload: seg.data
-                };
-                var stats = { trequest: performance.now(), retry: 0, tfirst: performance.now(),
-                    loaded: seg.size, tload: performance.now(), total: seg.size };
-                callbacks.onSuccess(response, stats, context);
+            if (this.p2pEnabled && this.loadByP2P) {
+                //如果非urgent且有父节点则用p2p下载
+                config.p2pTimeout = this.currLoadedDuration; //本次p2p下载允许最大超时时间
+                this.loader = this.p2pLoader;
             } else {
-                this.loadByP2P = frag.sn - this.currPlay > 1 && frag.sn - this.currLoaded == 1 && this.currLoaded - this.currPlay > 1 && this.p2pLoader.hasUpstreamer;
-                log('loading ' + frag.sn + ' loaded ' + this.currLoaded + ' play ' + this.currPlay + ' loaded by ' + (this.loadByP2P ? 'P2P' : 'HTTP'));
-
-                if (this.loadByP2P) {
-                    //如果非urgent且有父节点则用p2p下载
-                    this.loader = this.p2pLoader;
-                } else {
-                    log('xhrLoader load ' + frag.relurl + ' at ' + frag.sn);
-                    this.loader = this.xhrLoader;
-                    context.loadByXhr = true;
-                }
-
-                var onSuccess = callbacks.onSuccess;
-                callbacks.onSuccess = function (response, stats, context) {
-                    if (_this2.bufMgr && !_this2.bufMgr.hasSegOfURL(frag.relurl)) {
-                        _this2._copyFrag(response.data, frag.relurl, frag.sn);
-                    }
-                    onSuccess(response, stats, context);
-                };
-                var onTimeout = callbacks.onTimeout;
-                callbacks.onTimeout = function (stats, context) {
-                    if (context.loadByXhr) {
-                        //如果用xhrloader请求超时，则改成p2p下载
-                        log('last loaded by xhr');
-                        _this2.p2pLoader.load(context, config, callbacks);
-                    } else {
-                        onTimeout(stats, context, null);
-                    }
-                };
-                this.loader.load(context, config, callbacks);
+                log('xhrLoader load ' + frag.relurl + ' at ' + frag.sn);
+                this.loader = this.xhrLoader;
+                context.frag.loadByXhr = true;
             }
+
+            var onSuccess = callbacks.onSuccess;
+            callbacks.onSuccess = function (response, stats, context) {
+                if (_this2.bufMgr && !_this2.bufMgr.hasSegOfURL(frag.relurl)) {
+                    _this2._copyFrag(response.data, frag.relurl, frag.sn);
+                }
+                onSuccess(response, stats, context);
+            };
+            var onTimeout = callbacks.onTimeout;
+            callbacks.onTimeout = function (stats, context) {
+                if (context.frag.loadByXhr && _this2.p2pLoader.hasUpstreamer && _this2.p2pEnabled) {
+                    //如果用xhrloader请求超时，则改成p2p下载
+                    log('last loaded by xhr');
+                    context.frag.loadByXhr = false;
+                    _this2.p2pLoader.load(context, config, callbacks);
+                } else {
+                    onTimeout(stats, context, null);
+                }
+            };
+            this.loader.load(context, config, callbacks);
         }
     }, {
         key: '_copyFrag',

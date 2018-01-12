@@ -31,7 +31,10 @@ class DataChannel extends EventEmitter {
 
     _init(datachannel) {
 
-        datachannel.on('error', (err) => { log('datachannel error', err); });
+        datachannel.on('error', (err) => {
+            log('datachannel error', err);
+            this.emit(Events.DC_ERROR);
+        });
 
         datachannel.on('signal', data => {
             // log('SIGNAL', JSON.stringify(data));
@@ -41,15 +44,14 @@ class DataChannel extends EventEmitter {
         datachannel.once('connect', () => {
             log('datachannel CONNECTED to ' + this.remotePeerId);
             this.emit(Events.DC_OPEN);
-            // datachannel.send(JSON.stringify({'whatever': Math.random()}));
             // if (this.isReceiver) {
             //     this.keepAliveInterval = window.setInterval(() => {                      //数据接收者每隔一段时间发送keep-alive信息
             //         let msg = {
             //             event: 'KEEPALIVE'
             //         };
             //         datachannel.send(JSON.stringify(msg));
-            //         this.keepAliveAckTimeout = window.setTimeout(this._handleKeepAliveAckTimeout.bind(this),
-            //             config.dcKeepAliveAckTimeout*1000);
+            //         // this.keepAliveAckTimeout = window.setTimeout(this._handleKeepAliveAckTimeout.bind(this),
+            //         //     config.dcKeepAliveAckTimeout*1000);
             //     }, config.dcKeepAliveInterval*1000);
             // }
         });
@@ -97,18 +99,18 @@ class DataChannel extends EventEmitter {
         });
 
         datachannel.once('close', () => {
-
+            this.emit(Events.DC_CLOSE);
         });
     }
 
     send(data) {
-        if (this._datachannel.connected) {
+        if (this._datachannel && this._datachannel.connected) {
             this._datachannel.send(data);
         }
     }
 
     request(data) {                                     //由于需要阻塞下载数据，因此request请求用新的API
-        if (this._datachannel.connected) {
+        if (this._datachannel && this._datachannel.connected) {
            if (this.loading) {
                this.queue.push(data);
            } else {

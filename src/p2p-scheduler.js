@@ -33,7 +33,8 @@ class P2PScheduler extends EventEmitter {
         this.callbacks = callbacks;
         this.stats = {trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0};
         this.retryDelay = config.retryDelay;
-        this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), p2pConfig.loadTimeout*1000);
+        let timeout = Math.min(p2pConfig.loadTimeout, config.p2pTimeout);             //p2p下载最大允许时间是一个块的时长
+        this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), timeout*1000);
         this._loadInternal();
     }
 
@@ -83,8 +84,14 @@ class P2PScheduler extends EventEmitter {
                 window.clearTimeout(this.requestTimeout);                            //清除定时器
                 this.requestTimeout = null;
                 if (!this.stats.tload) {
-                    this.stats.tload = Math.max(this.stats.tfirst, performance.now());
-                    this.stats.loaded = this.stats.total = response.data.byteLength;
+                    let stats = this.stats;
+                    stats.tload = Math.max(stats.tfirst, performance.now());
+                    stats.loaded = stats.total = response.data.byteLength;
+                    let onProgress = this.callbacks.onProgress;
+                    if (onProgress) {
+                        // third arg is to provide on progress data
+                        onProgress(stats, this.context, null);
+                    }
                 }
                 this.callbacks.onSuccess(response, this.stats, this.context);
                 [this.upstreamers[0], this.upstreamers[this.target]] = [this.upstreamers[this.target], this.upstreamers[0]]; //将获取成功的节点放在最前
@@ -200,6 +207,7 @@ class P2PScheduler extends EventEmitter {
     }
 
     deleteDataChannel(channel) {
+        log(`delete datachannel ${channel.channelId}`);
         for (let i=0;i<this.downstreamers.length;++i){
             if (this.downstreamers[i] === channel) {
                 this.downstreamers.splice(i, 1);
@@ -216,7 +224,13 @@ class P2PScheduler extends EventEmitter {
 
     _setupChannel(channel) {
 
-
+        // channel.once('close', () => {
+        //
+        //     log(`datachannel closed ${channel.channelId} `);
+        //     // this.emit(Events.SIG_DCCLOSED, datachannel);
+        //     this.deleteDataChannel(channel);
+        //     channel.destroy();
+        // })
     }
 
     _addSegToBuf(response) {

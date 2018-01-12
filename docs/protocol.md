@@ -124,10 +124,14 @@ datachannel 发生错误
 }
 ```
 
-### peer ---> server    定时上报平均level信息
+### peer ---> server    定时上报统计信息
 ```javastript
 {
-    action: 'level'            
-    level:   number                  //平均level，用于调度
+    action: 'statistics'            
+    level:   number              //平均level，用于调度
+    cdn: number                  //cdn下载的流量大小（单位KB）
+    p2p: number                  //p2p下载的流量大小（单位KB）
 }
 ```
+
+

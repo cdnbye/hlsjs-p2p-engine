@@ -9,7 +9,7 @@ import {defaultP2PConfig as config} from './config';
 import DataChannel from './data-channel';
 import P2PScheduler from './p2p-scheduler';
 
-const log = debug('p2p-signal');
+const log = debug('p2p-signaler');
 
 export default class P2PSignaler extends EventEmitter {
     constructor(channel) {
@@ -115,23 +115,24 @@ export default class P2PSignaler extends EventEmitter {
             };
             this.websocket.send(msg);
         })
-            .on('error', () => {
+            .once('error', () => {
                 let msg = {
                     action: 'dc_failed',
                     dc_id: datachannel.channelId,
                 };
                 this.websocket.send(msg);
-                log(`datachannel ${datachannel.channelId} error`);
-                datachannel.destroy();
-            })
-            .on('close', () => {
-
-                log(`datachannel ${data.channelId} closed`);
-                // this.emit(Events.SIG_DCCLOSED, datachannel);
+                log(`datachannel error ${datachannel.channelId}`);
                 this.scheduler.deleteDataChannel(datachannel);
                 datachannel.destroy();
             })
-            .on('open', () => {
+            .once(Events.DC_CLOSE, () => {
+
+            log(`datachannel closed ${datachannel.channelId} `);
+            // this.emit(Events.SIG_DCCLOSED, datachannel);
+            this.scheduler.deleteDataChannel(datachannel);
+            datachannel.destroy();
+        })
+            .once(Events.DC_OPEN, () => {
 
                 this.scheduler.addDataChannel(datachannel);
                 if (datachannel.isReceiver) {                              //子节点发送已连接消息
