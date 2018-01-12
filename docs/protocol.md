@@ -69,24 +69,24 @@ datachannel 发生错误
 ```javastript
 {
     action: 'enter'                
-    channel: string               //频道标识，目前是m3u0的url
-    peer_id: string                //唯一标识
-    isLive: boolean                //直播或点播
+    channel: string               //频道标识，目前是m3u0的url                           
 }
 ```
 
-### peer ---> server    允许进入频道
+### server ---> peer    允许进入频道
 ```javastript
 {
     action: 'accept'  
-    live: boolean                   //直播或点播                
-}
+    live: boolean                   //直播或点播    
+    peer_id: string                //本节点唯一标识
+}   
 ```
 
 ### peer ---> server    离开频道请求
    ```javastript
    {
-       action: 'leave'                
+       action: 'leave'    
+       peer_id: string                //本节点唯一标识            
    }
    ```
 
@@ -103,7 +103,7 @@ datachannel 发生错误
 ```javastript
 {
     action: 'dc_opened'                
-    to_peer_id: string            //对等端的Id
+    dc_id: string            //datachannel的Id
 }
 ```
 
@@ -111,17 +111,23 @@ datachannel 发生错误
 ```javastript
 {
     action: 'dc_failed'            
-    to_peer_id: string            //对等端的Id
+    dc_id: string            //datachannel的Id
 }
 ```
 
-
-### server ---> peer
+### server ---> peer        发送信令给peer
 ```javastript
 {
-    action: string                  //'accept':允许进入频道, 'reject':拒绝进入频道, 'signal':peer发送的信令, 'connect':建立datachannel请求, 'disconnect':断开datachannel请求
-    initiator: boolean              //是否主动发起连接
+    action: 'signal'           
     from_peer_id: string            //对等端的Id
     data: string                    //需要传送的数据
+}
+```
+
+### peer ---> server    定时上报平均level信息
+```javastript
+{
+    action: 'level'            
+    level:   number                  //平均level，用于调度
 }
 ```

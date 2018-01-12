@@ -12,10 +12,12 @@ var Buffer = require('buffer/').Buffer;
 const log = debug('data-channel');
 
 class DataChannel extends EventEmitter {
-    constructor(channelId, isInitiator) {
+    constructor(peerId, remotePeerId, isInitiator) {
         super();
 
-        this.channelId = channelId;
+        this.remotePeerId = remotePeerId;
+        this.channelId = peerId + remotePeerId;                    //标识该channel
+
         this.connected = false;
 
         //下载控制
@@ -37,19 +39,19 @@ class DataChannel extends EventEmitter {
         });
 
         datachannel.once('connect', () => {
-            log('datachannel CONNECTED to ' + this.channelId);
+            log('datachannel CONNECTED to ' + this.remotePeerId);
             this.emit(Events.DC_OPEN);
             // datachannel.send(JSON.stringify({'whatever': Math.random()}));
-            if (this.isReceiver) {
-                this.keepAliveInterval = window.setInterval(() => {                      //数据接收者每隔一段时间发送keep-alive信息
-                    let msg = {
-                        event: 'KEEPALIVE'
-                    };
-                    datachannel.send(JSON.stringify(msg));
-                    this.keepAliveAckTimeout = window.setTimeout(this._handleKeepAliveAckTimeout.bind(this),
-                        config.dcKeepAliveAckTimeout*1000);
-                }, config.dcKeepAliveInterval*1000);
-            }
+            // if (this.isReceiver) {
+            //     this.keepAliveInterval = window.setInterval(() => {                      //数据接收者每隔一段时间发送keep-alive信息
+            //         let msg = {
+            //             event: 'KEEPALIVE'
+            //         };
+            //         datachannel.send(JSON.stringify(msg));
+            //         this.keepAliveAckTimeout = window.setTimeout(this._handleKeepAliveAckTimeout.bind(this),
+            //             config.dcKeepAliveAckTimeout*1000);
+            //     }, config.dcKeepAliveInterval*1000);
+            // }
         });
 
         datachannel.on('data', data => {
@@ -59,12 +61,12 @@ class DataChannel extends EventEmitter {
                 let msg = JSON.parse(data);
                 let event = msg.event;
                 switch (event) {
-                    case 'KEEPALIVE':
-                        this._handleKeepAlive(msg);
-                        break;
-                    case 'KEEPALIVE-ACK':
-                        this._handleKeepAliveAck(msg);
-                        break;
+                    // case 'KEEPALIVE':
+                    //     this._handleKeepAlive(msg);
+                    //     break;
+                    // case 'KEEPALIVE-ACK':
+                    //     this._handleKeepAliveAck(msg);
+                    //     break;
                     case 'BINARY':
                         this.emit(Events.DC_BINARY);
                         this._prepareForBinary(msg.attachments, msg.url, msg.sn, msg.size);
@@ -73,6 +75,7 @@ class DataChannel extends EventEmitter {
                         this.emit(Events.DC_REQUEST, msg);
                         break;
                     case 'LACK':
+                        this.loading = false;
                         this.emit(Events.DC_REQUESTFAIL, msg);
                         break;
                     case 'CLOSE':
@@ -121,10 +124,10 @@ class DataChannel extends EventEmitter {
     }
 
     destroy() {
-        window.clearInterval(this.keepAliveInterval);
-        this.keepAliveInterval = null;
-        window.clearTimeout(this.keepAliveAckTimeout);
-        this.keepAliveAckTimeout = null;
+        // window.clearInterval(this.keepAliveInterval);
+        // this.keepAliveInterval = null;
+        // window.clearTimeout(this.keepAliveAckTimeout);
+        // this.keepAliveAckTimeout = null;
         this._datachannel.removeAllListeners();
         this.removeAllListeners();
         this._datachannel.destroy();
@@ -161,21 +164,21 @@ class DataChannel extends EventEmitter {
         }
     }
 
-    _handleKeepAlive() {
-        let msg = {
-            event: 'KEEPALIVE-ACK'
-        };
-        this._datachannel.send(JSON.stringify(msg));
-    }
+    // _handleKeepAlive() {
+    //     let msg = {
+    //         event: 'KEEPALIVE-ACK'
+    //     };
+    //     this._datachannel.send(JSON.stringify(msg));
+    // }
 
-    _handleKeepAliveAck() {
-        window.clearTimeout(this.keepAliveAckTimeout);
-    }
+    // _handleKeepAliveAck() {
+    //     window.clearTimeout(this.keepAliveAckTimeout);
+    // }
 
-    _handleKeepAliveAckTimeout() {
-        log('KeepAliveAckTimeout');
-        this.emit(Events.DC_ERROR);
-    }
+    // _handleKeepAliveAckTimeout() {
+    //     log('KeepAliveAckTimeout');
+    //     this.emit(Events.DC_ERROR);
+    // }
 }
 
 export default DataChannel;

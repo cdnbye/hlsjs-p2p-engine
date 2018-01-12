@@ -789,10 +789,6 @@ Object.defineProperty(exports, "__esModule", {
 
 exports.default = {
 
-    //p2p-signaler
-    SIG_DCOPENED: 'dc_opened',
-    SIG_DCCLOSED: 'dc_closed',
-
     //data-channel
     DC_SIGNAL: 'signal',
     DC_OPEN: 'open',
@@ -843,7 +839,8 @@ var defaultP2PConfig = {
     packetSize: 60 * 1024, //每次通过datachannel发送的包的大小
     maxBufSize: 1024 * 1024 * 100, //p2p缓存的最大数据量
     live: true, //直播或点播
-    loadTimeout: 4 //p2p下载的超时时间
+    loadTimeout: 2, //p2p下载的超时时间
+    levelReportInterval: 30 //平均level上报的时间间隔
 };
 
 exports.recommendedHlsjsConfig = recommendedHlsjsConfig;
@@ -1050,8 +1047,8 @@ function forEach(xs, f) {
 
 
 
-var base64 = __webpack_require__(25)
-var ieee754 = __webpack_require__(26)
+var base64 = __webpack_require__(24)
+var ieee754 = __webpack_require__(25)
 var isArray = __webpack_require__(14)
 
 exports.Buffer = Buffer
@@ -3229,11 +3226,11 @@ function plural(ms, n, name) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {module.exports = Peer
 
-var debug = __webpack_require__(27)('simple-peer')
-var getBrowserRTC = __webpack_require__(29)
+var debug = __webpack_require__(26)('simple-peer')
+var getBrowserRTC = __webpack_require__(28)
 var inherits = __webpack_require__(6)
-var randombytes = __webpack_require__(30)
-var stream = __webpack_require__(31)
+var randombytes = __webpack_require__(29)
+var stream = __webpack_require__(30)
 
 var MAX_BUFFERED_AMOUNT = 64 * 1024
 
@@ -4137,7 +4134,7 @@ util.inherits = __webpack_require__(6);
 /*</replacement>*/
 
 /*<replacement>*/
-var debugUtil = __webpack_require__(32);
+var debugUtil = __webpack_require__(31);
 var debug = void 0;
 if (debugUtil && debugUtil.debuglog) {
   debug = debugUtil.debuglog('stream');
@@ -4146,7 +4143,7 @@ if (debugUtil && debugUtil.debuglog) {
 }
 /*</replacement>*/
 
-var BufferList = __webpack_require__(33);
+var BufferList = __webpack_require__(32);
 var destroyImpl = __webpack_require__(17);
 var StringDecoder;
 
@@ -5237,7 +5234,7 @@ util.inherits = __webpack_require__(6);
 
 /*<replacement>*/
 var internalUtil = {
-  deprecate: __webpack_require__(36)
+  deprecate: __webpack_require__(35)
 };
 /*</replacement>*/
 
@@ -5829,7 +5826,7 @@ Writable.prototype._destroy = function (err, cb) {
   this.end();
   cb(err);
 };
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(34).setImmediate, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(33).setImmediate, __webpack_require__(5)))
 
 /***/ }),
 /* 19 */
@@ -6346,7 +6343,7 @@ var _index = __webpack_require__(22);
 
 var _index2 = _interopRequireDefault(_index);
 
-var _hls = __webpack_require__(46);
+var _hls = __webpack_require__(45);
 
 var _hls2 = _interopRequireDefault(_hls);
 
@@ -6427,27 +6424,23 @@ var _events4 = _interopRequireDefault(_events3);
 
 var _config = __webpack_require__(4);
 
-var _peeridGenerator = __webpack_require__(24);
-
-var _peeridGenerator2 = _interopRequireDefault(_peeridGenerator);
-
 var _simplePeer = __webpack_require__(13);
 
 var _simplePeer2 = _interopRequireDefault(_simplePeer);
 
-var _p2pSignaler = __webpack_require__(38);
+var _p2pSignaler = __webpack_require__(37);
 
 var _p2pSignaler2 = _interopRequireDefault(_p2pSignaler);
 
-var _hybridLoader = __webpack_require__(41);
+var _hybridLoader = __webpack_require__(40);
 
 var _hybridLoader2 = _interopRequireDefault(_hybridLoader);
 
-var _bufferManager = __webpack_require__(43);
+var _bufferManager = __webpack_require__(42);
 
 var _bufferManager2 = _interopRequireDefault(_bufferManager);
 
-var _uaParserJs = __webpack_require__(44);
+var _uaParserJs = __webpack_require__(43);
 
 var _uaParserJs2 = _interopRequireDefault(_uaParserJs);
 
@@ -6494,8 +6487,6 @@ var HlsPeerify = function (_EventEmitter) {
             _debug2.default.disable();
         }
 
-        _this.peerId = (0, _peeridGenerator2.default)();
-        log('peerId: ' + _this.peerId);
         _this.hlsjs = hlsjs;
 
         hlsjs.config.currLoaded = hlsjs.config.currPlay = 0;
@@ -6510,6 +6501,10 @@ var HlsPeerify = function (_EventEmitter) {
             });
         }
 
+        //level上报
+        _this.levelCounter = 0;
+        _this.averageLevel = -1;
+        _this.levelIntervalId = window.setInterval(_this._setLevelInterval.bind(_this), _this.config.levelReportInterval * 1000);
         return _this;
     }
 
@@ -6519,7 +6514,7 @@ var HlsPeerify = function (_EventEmitter) {
             var _this2 = this;
 
             //实例化信令
-            this.signaler = new _p2pSignaler2.default(channel, this.peerId);
+            this.signaler = new _p2pSignaler2.default(channel);
 
             //实例化BufferManager
             this.bufMgr = new _bufferManager2.default();
@@ -6537,6 +6532,9 @@ var HlsPeerify = function (_EventEmitter) {
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADING, function (id, data) {
                 // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
                 log('FRAG_LOADING: ' + data.frag.sn);
+
+                //level统计
+                _this2.averageLevel = (_this2.averageLevel * _this2.levelCounter + data.frag.level) / ++_this2.levelCounter;
             });
 
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADED, function (id, data) {
@@ -6561,6 +6559,8 @@ var HlsPeerify = function (_EventEmitter) {
                 // log('DESTROYING: '+JSON.stringify(frag));
                 _this2.signaler.destroy();
                 _this2.signaler = null;
+
+                window.clearInterval(_this2.levelIntervalId);
             });
         }
     }, {
@@ -6572,6 +6572,17 @@ var HlsPeerify = function (_EventEmitter) {
         key: 'enableP2P',
         value: function enableP2P() {//在停止的情况下重新启动P2P
 
+        }
+    }, {
+        key: '_setLevelInterval',
+        value: function _setLevelInterval() {
+
+            if (this.signaler) {
+                var msg = {
+                    level: this.averageLevel.toFixed(2)
+                };
+                this.signaler.send(msg);
+            }
         }
     }]);
 
@@ -6823,42 +6834,6 @@ function coerce(val) {
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.default = getPeerId;
-function getPeerId() {
-
-    //20位
-    // var num = Math.floor(Math.random()*10000000000);
-    // // }
-    // // console.log(str.toString('base64'));
-    // var buffer = new ArrayBuffer()
-    // console.log(num.toString('base64'));
-
-    var len = 9;
-    var timestamp = parseInt(new Date().valueOf() / 1000);
-
-    var x = "0123456789qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
-    var tmp = "";
-    for (var i = 0; i < len; i++) {
-        tmp += x.charAt(Math.ceil(Math.random() * 100000000) % x.length);
-    }
-
-    return timestamp + '-' + tmp;
-}
-
-// console.log(peerId());
-
-module.exports = exports["default"];
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
 exports.byteLength = byteLength
 exports.toByteArray = toByteArray
 exports.fromByteArray = fromByteArray
@@ -6974,7 +6949,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -7064,7 +7039,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {/**
@@ -7073,7 +7048,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
  * Expose `debug()` as the module.
  */
 
-exports = module.exports = __webpack_require__(28);
+exports = module.exports = __webpack_require__(27);
 exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
@@ -7256,7 +7231,7 @@ function localstorage() {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -7464,7 +7439,7 @@ function coerce(val) {
 
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, exports) {
 
 // originally pulled out of simple-peer
@@ -7485,7 +7460,7 @@ module.exports = function getBrowserRTC () {
 
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7531,7 +7506,7 @@ function randomBytes (size, cb) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5), __webpack_require__(1)))
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(15);
@@ -7540,17 +7515,17 @@ exports.Readable = exports;
 exports.Writable = __webpack_require__(18);
 exports.Duplex = __webpack_require__(7);
 exports.Transform = __webpack_require__(20);
-exports.PassThrough = __webpack_require__(37);
+exports.PassThrough = __webpack_require__(36);
 
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7630,7 +7605,7 @@ module.exports = function () {
 }();
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var apply = Function.prototype.apply;
@@ -7683,13 +7658,13 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(35);
+__webpack_require__(34);
 exports.setImmediate = setImmediate;
 exports.clearImmediate = clearImmediate;
 
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -7882,7 +7857,7 @@ exports.clearImmediate = clearImmediate;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5), __webpack_require__(1)))
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {
@@ -7956,7 +7931,7 @@ function config (name) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8009,7 +7984,7 @@ PassThrough.prototype._transform = function (chunk, encoding, cb) {
 };
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8035,11 +8010,11 @@ var _events4 = _interopRequireDefault(_events3);
 
 var _config = __webpack_require__(4);
 
-var _dataChannel = __webpack_require__(39);
+var _dataChannel = __webpack_require__(38);
 
 var _dataChannel2 = _interopRequireDefault(_dataChannel);
 
-var _p2pScheduler = __webpack_require__(40);
+var _p2pScheduler = __webpack_require__(39);
 
 var _p2pScheduler2 = _interopRequireDefault(_p2pScheduler);
 
@@ -8058,16 +8033,15 @@ var log = (0, _debug2.default)('p2p-signal');
 var P2PSignaler = function (_EventEmitter) {
     _inherits(P2PSignaler, _EventEmitter);
 
-    function P2PSignaler(channel, peerId) {
+    function P2PSignaler(channel) {
         _classCallCheck(this, P2PSignaler);
 
         var _this = _possibleConstructorReturn(this, (P2PSignaler.__proto__ || Object.getPrototypeOf(P2PSignaler)).call(this));
 
         _this.connected = false;
-        _this.channel = channel;
-        _this.peerId = peerId;
+        _this.channel = channel; //频道
         _this.scheduler = new _p2pScheduler2.default();
-
+        _this.DCMap = new Map(); //{key: channelId, value: DataChannnel}
         log('connecting to :' + _config.defaultP2PConfig.websocketAddr);
         _this.websocket = new WebSocket(_config.defaultP2PConfig.websocketAddr);
 
@@ -8077,6 +8051,13 @@ var P2PSignaler = function (_EventEmitter) {
     }
 
     _createClass(P2PSignaler, [{
+        key: 'send',
+        value: function send(msg) {
+            if (this.connected) {
+                this.websocket.send(msg);
+            }
+        }
+    }, {
         key: '_init',
         value: function _init(websocket) {
             var _this2 = this;
@@ -8088,9 +8069,7 @@ var P2PSignaler = function (_EventEmitter) {
                 //发送进入频道请求
                 var msg = {
                     action: 'enter',
-                    peer_id: _this2.peerId,
-                    channel: _this2.channel,
-                    isLive: _config.defaultP2PConfig.live
+                    channel: _this2.channel
                 };
 
                 websocket.push(JSON.stringify(msg));
@@ -8115,20 +8094,20 @@ var P2PSignaler = function (_EventEmitter) {
                 switch (action) {
                     case 'signal':
                         log('start _handleSignal');
-                        _this2._handleSignal(msg.data);
+                        _this2._handleSignal(msg.from_peer_id, msg.data);
                         break;
                     case 'connect':
                         log('start _handleConnect');
-                        _this2._handleConnect(msg.to_peer_id, msg.initiator); //将to_peer_id作为channelId
+                        _this2._handleConnect(msg.to_peer_id, msg.initiator);
                         break;
                     case 'disconnect':
 
                         break;
                     case 'accept':
-
+                        _this2.peerId = msg.peer_id; //获取本端Id
                         break;
                     case 'reject':
-
+                        _this2.connected = false; //如果拒绝进入频道则不允许发消息
                         break;
                     default:
                         log('websocket unknown action ' + action);
@@ -8138,14 +8117,19 @@ var P2PSignaler = function (_EventEmitter) {
         }
     }, {
         key: '_handleSignal',
-        value: function _handleSignal(data) {
-            this.datachannel.receiveSignal(data);
+        value: function _handleSignal(remotePeerId, data) {
+            var datachannel = this.DCMap.get(remotePeerId);
+            if (datachannel) {
+                datachannel.receiveSignal(data);
+            } else {
+                log('can not find datachannel remotePeerId ' + remotePeerId);
+            }
         }
     }, {
         key: '_handleConnect',
-        value: function _handleConnect(channelId, isInitiator) {
-            var datachannel = new _dataChannel2.default(channelId, isInitiator);
-            this.datachannel = datachannel;
+        value: function _handleConnect(remotePeerId, isInitiator) {
+            var datachannel = new _dataChannel2.default(this.peerId, remotePeerId, isInitiator);
+            this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
             this._setupDC(datachannel);
         }
     }, {
@@ -8157,15 +8141,14 @@ var P2PSignaler = function (_EventEmitter) {
                 var msg = {
                     action: 'signal',
                     peer_id: _this3.peerId,
-                    to_peer_id: datachannel.channelId,
+                    to_peer_id: datachannel.remotePeerId,
                     data: data
                 };
                 _this3.websocket.send(msg);
             }).on('error', function () {
                 var msg = {
                     action: 'dc_failed',
-                    peer_id: _this3.peerId,
-                    to_peer_id: datachannel.channelId
+                    dc_id: datachannel.channelId
                 };
                 _this3.websocket.send(msg);
                 log('datachannel ' + datachannel.channelId + ' error');
@@ -8178,17 +8161,15 @@ var P2PSignaler = function (_EventEmitter) {
                 datachannel.destroy();
             }).on('open', function () {
 
-                //将datachannel emit出去
-                // this.emit(Events.SIG_DCOPENED, datachannel);
-
-                var msg = {
-                    action: 'dc_opened',
-                    peer_id: _this3.peerId,
-                    to_peer_id: datachannel.channelId
-                };
-                _this3.websocket.send(msg);
-
                 _this3.scheduler.addDataChannel(datachannel);
+                if (datachannel.isReceiver) {
+                    //子节点发送已连接消息
+                    var msg = {
+                        action: 'dc_opened',
+                        dc_id: datachannel.channelId
+                    };
+                    _this3.websocket.send(msg);
+                }
             });
         }
     }, {
@@ -8206,7 +8187,7 @@ exports.default = P2PSignaler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 39 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8253,12 +8234,14 @@ var log = (0, _debug2.default)('data-channel');
 var DataChannel = function (_EventEmitter) {
     _inherits(DataChannel, _EventEmitter);
 
-    function DataChannel(channelId, isInitiator) {
+    function DataChannel(peerId, remotePeerId, isInitiator) {
         _classCallCheck(this, DataChannel);
 
         var _this = _possibleConstructorReturn(this, (DataChannel.__proto__ || Object.getPrototypeOf(DataChannel)).call(this));
 
-        _this.channelId = channelId;
+        _this.remotePeerId = remotePeerId;
+        _this.channelId = peerId + remotePeerId; //标识该channel
+
         _this.connected = false;
 
         //下载控制
@@ -8286,19 +8269,19 @@ var DataChannel = function (_EventEmitter) {
             });
 
             datachannel.once('connect', function () {
-                log('datachannel CONNECTED to ' + _this2.channelId);
+                log('datachannel CONNECTED to ' + _this2.remotePeerId);
                 _this2.emit(_events4.default.DC_OPEN);
                 // datachannel.send(JSON.stringify({'whatever': Math.random()}));
-                if (_this2.isReceiver) {
-                    _this2.keepAliveInterval = window.setInterval(function () {
-                        //数据接收者每隔一段时间发送keep-alive信息
-                        var msg = {
-                            event: 'KEEPALIVE'
-                        };
-                        datachannel.send(JSON.stringify(msg));
-                        _this2.keepAliveAckTimeout = window.setTimeout(_this2._handleKeepAliveAckTimeout.bind(_this2), _config.defaultP2PConfig.dcKeepAliveAckTimeout * 1000);
-                    }, _config.defaultP2PConfig.dcKeepAliveInterval * 1000);
-                }
+                // if (this.isReceiver) {
+                //     this.keepAliveInterval = window.setInterval(() => {                      //数据接收者每隔一段时间发送keep-alive信息
+                //         let msg = {
+                //             event: 'KEEPALIVE'
+                //         };
+                //         datachannel.send(JSON.stringify(msg));
+                //         this.keepAliveAckTimeout = window.setTimeout(this._handleKeepAliveAckTimeout.bind(this),
+                //             config.dcKeepAliveAckTimeout*1000);
+                //     }, config.dcKeepAliveInterval*1000);
+                // }
             });
 
             datachannel.on('data', function (data) {
@@ -8308,12 +8291,12 @@ var DataChannel = function (_EventEmitter) {
                     var msg = JSON.parse(data);
                     var event = msg.event;
                     switch (event) {
-                        case 'KEEPALIVE':
-                            _this2._handleKeepAlive(msg);
-                            break;
-                        case 'KEEPALIVE-ACK':
-                            _this2._handleKeepAliveAck(msg);
-                            break;
+                        // case 'KEEPALIVE':
+                        //     this._handleKeepAlive(msg);
+                        //     break;
+                        // case 'KEEPALIVE-ACK':
+                        //     this._handleKeepAliveAck(msg);
+                        //     break;
                         case 'BINARY':
                             _this2.emit(_events4.default.DC_BINARY);
                             _this2._prepareForBinary(msg.attachments, msg.url, msg.sn, msg.size);
@@ -8322,6 +8305,7 @@ var DataChannel = function (_EventEmitter) {
                             _this2.emit(_events4.default.DC_REQUEST, msg);
                             break;
                         case 'LACK':
+                            _this2.loading = false;
                             _this2.emit(_events4.default.DC_REQUESTFAIL, msg);
                             break;
                         case 'CLOSE':
@@ -8372,10 +8356,10 @@ var DataChannel = function (_EventEmitter) {
     }, {
         key: 'destroy',
         value: function destroy() {
-            window.clearInterval(this.keepAliveInterval);
-            this.keepAliveInterval = null;
-            window.clearTimeout(this.keepAliveAckTimeout);
-            this.keepAliveAckTimeout = null;
+            // window.clearInterval(this.keepAliveInterval);
+            // this.keepAliveInterval = null;
+            // window.clearTimeout(this.keepAliveAckTimeout);
+            // this.keepAliveAckTimeout = null;
             this._datachannel.removeAllListeners();
             this.removeAllListeners();
             this._datachannel.destroy();
@@ -8416,25 +8400,23 @@ var DataChannel = function (_EventEmitter) {
                 this.request(data);
             }
         }
-    }, {
-        key: '_handleKeepAlive',
-        value: function _handleKeepAlive() {
-            var msg = {
-                event: 'KEEPALIVE-ACK'
-            };
-            this._datachannel.send(JSON.stringify(msg));
-        }
-    }, {
-        key: '_handleKeepAliveAck',
-        value: function _handleKeepAliveAck() {
-            window.clearTimeout(this.keepAliveAckTimeout);
-        }
-    }, {
-        key: '_handleKeepAliveAckTimeout',
-        value: function _handleKeepAliveAckTimeout() {
-            log('KeepAliveAckTimeout');
-            this.emit(_events4.default.DC_ERROR);
-        }
+
+        // _handleKeepAlive() {
+        //     let msg = {
+        //         event: 'KEEPALIVE-ACK'
+        //     };
+        //     this._datachannel.send(JSON.stringify(msg));
+        // }
+
+        // _handleKeepAliveAck() {
+        //     window.clearTimeout(this.keepAliveAckTimeout);
+        // }
+
+        // _handleKeepAliveAckTimeout() {
+        //     log('KeepAliveAckTimeout');
+        //     this.emit(Events.DC_ERROR);
+        // }
+
     }]);
 
     return DataChannel;
@@ -8444,7 +8426,7 @@ exports.default = DataChannel;
 module.exports = exports['default'];
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8513,6 +8495,7 @@ var P2PScheduler = function (_EventEmitter) {
             this.callbacks = callbacks;
             this.stats = { trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0 };
             this.retryDelay = config.retryDelay;
+            this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), _config.defaultP2PConfig.loadTimeout * 1000);
             this._loadInternal();
         }
     }, {
@@ -8537,7 +8520,7 @@ var P2PScheduler = function (_EventEmitter) {
 
             peer.clearQueue(); //先清空下载队列
             // setup timeout before we perform request
-            this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), _config.defaultP2PConfig.loadTimeout * 1000);
+
             var msg = {
                 event: 'REQUEST',
                 url: this.context.frag.relurl,
@@ -8556,7 +8539,7 @@ var P2PScheduler = function (_EventEmitter) {
 
             channel.on(_events4.default.DC_RESPONSE, function (response) {
                 //response: {url: string, sn: number, payload: Buffer}
-                log('receive response sn ' + response.sn + ' url ' + response.url + ' size ' + response.data.byteLength);
+                log('receive response sn ' + response.sn + ' url ' + response.url + ' size ' + response.data.byteLength + ' from ' + channel.remotePeerId);
                 if (_this2.expectedSeg && response.url === _this2.expectedSeg.relurl && _this2.requestTimeout) {
                     window.clearTimeout(_this2.requestTimeout); //清除定时器
                     _this2.requestTimeout = null;
@@ -8565,12 +8548,17 @@ var P2PScheduler = function (_EventEmitter) {
                         _this2.stats.loaded = _this2.stats.total = response.data.byteLength;
                     }
                     _this2.callbacks.onSuccess(response, _this2.stats, _this2.context);
+                    //将获取成功的节点放在最前
+                    var _ref = [_this2.upstreamers[_this2.target], _this2.upstreamers[0]];
+                    _this2.upstreamers[0] = _ref[0];
+                    _this2.upstreamers[_this2.target] = _ref[1];
                 } else {
                     //不是目前request的则保存到buffer-manager
                     if (_this2.bufMgr && !_this2.bufMgr.hasSegOfURL(response.url)) {
                         _this2._addSegToBuf(response);
                     }
                 }
+                // log(`this.upstreamers.length ${this.upstreamers.length}`);
             }).on(_events4.default.DC_REQUESTFAIL, function () {
                 //当请求的数据找不到时触发
                 if (_this2.requestTimeout) {
@@ -8739,7 +8727,7 @@ exports.default = P2PScheduler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 41 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8763,7 +8751,7 @@ var _events3 = __webpack_require__(3);
 
 var _events4 = _interopRequireDefault(_events3);
 
-var _xhrLoader = __webpack_require__(42);
+var _xhrLoader = __webpack_require__(41);
 
 var _xhrLoader2 = _interopRequireDefault(_xhrLoader);
 
@@ -8899,7 +8887,7 @@ exports.default = LoaderScheduler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 42 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9147,7 +9135,7 @@ class xhr_loader_XhrLoader {
 
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9306,7 +9294,7 @@ exports.default = BufferManager;
 module.exports = exports['default'];
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -10349,7 +10337,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
         exports.UAParser = UAParser;
     } else {
         // requirejs env (optional)
-        if ("function" === FUNC_TYPE && __webpack_require__(45)) {
+        if ("function" === FUNC_TYPE && __webpack_require__(44)) {
             !(__WEBPACK_AMD_DEFINE_RESULT__ = (function () {
                 return UAParser;
             }).call(exports, __webpack_require__, exports, module),
@@ -10385,7 +10373,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
@@ -10394,7 +10382,7 @@ module.exports = __webpack_amd_options__;
 /* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function webpackUniversalModuleDefinition(root, factory) {

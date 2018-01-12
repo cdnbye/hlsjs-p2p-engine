@@ -20,7 +20,8 @@ let defaultP2PConfig = {
     packetSize: 60*1024,                         //每次通过datachannel发送的包的大小
     maxBufSize: 1024*1024*100,                  //p2p缓存的最大数据量
     live: true,                                 //直播或点播
-    loadTimeout: 4,                             //p2p下载的超时时间
+    loadTimeout: 2,                             //p2p下载的超时时间
+    levelReportInterval: 30,                    //平均level上报的时间间隔
 };
 
 export {recommendedHlsjsConfig, defaultP2PConfig}

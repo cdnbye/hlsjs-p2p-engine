@@ -5,7 +5,7 @@
 import debug from 'debug';
 import EventEmitter from 'events';
 import Events from './events';
-import {defaultP2PConfig as config} from './config';
+import {defaultP2PConfig as p2pConfig} from './config';
 
 const log = debug('p2p-scheduler');
 
@@ -33,6 +33,7 @@ class P2PScheduler extends EventEmitter {
         this.callbacks = callbacks;
         this.stats = {trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0};
         this.retryDelay = config.retryDelay;
+        this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), p2pConfig.loadTimeout*1000);
         this._loadInternal();
     }
 
@@ -54,7 +55,7 @@ class P2PScheduler extends EventEmitter {
 
         peer.clearQueue();                                               //先清空下载队列
         // setup timeout before we perform request
-        this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), config.loadTimeout*1000);
+
         const msg = {
             event: 'REQUEST',
             url: this.context.frag.relurl,
@@ -77,7 +78,7 @@ class P2PScheduler extends EventEmitter {
         this._setupChannel(channel);                          //设置通用监听
 
         channel.on(Events.DC_RESPONSE, response => {         //response: {url: string, sn: number, payload: Buffer}
-            log(`receive response sn ${response.sn} url ${response.url} size ${response.data.byteLength}`);
+            log(`receive response sn ${response.sn} url ${response.url} size ${response.data.byteLength} from ${channel.remotePeerId}`);
             if (this.expectedSeg && response.url === this.expectedSeg.relurl && this.requestTimeout) {
                 window.clearTimeout(this.requestTimeout);                            //清除定时器
                 this.requestTimeout = null;
@@ -86,11 +87,13 @@ class P2PScheduler extends EventEmitter {
                     this.stats.loaded = this.stats.total = response.data.byteLength;
                 }
                 this.callbacks.onSuccess(response, this.stats, this.context);
+                [this.upstreamers[0], this.upstreamers[this.target]] = [this.upstreamers[this.target], this.upstreamers[0]]; //将获取成功的节点放在最前
             } else {                                                            //不是目前request的则保存到buffer-manager
                 if (this.bufMgr && !this.bufMgr.hasSegOfURL(response.url)) {
                     this._addSegToBuf(response);
                 }
             }
+            // log(`this.upstreamers.length ${this.upstreamers.length}`);
         })
             .on(Events.DC_REQUESTFAIL, () => {                                  //当请求的数据找不到时触发
                 if (this.requestTimeout) {                                      //如果还没有超时
@@ -133,7 +136,7 @@ class P2PScheduler extends EventEmitter {
                     log(`bufMgr found seg sn ${sn} url ${seg.relurl}`);
                     let payload = seg.data,                                 //二进制数据
                         dataSize = seg.size,                                //二进制数据大小
-                        packetSize = config.packetSize,                     //每个数据包的大小
+                        packetSize = p2pConfig.packetSize,                     //每个数据包的大小
                         remainder = 0,                                      //最后一个包的大小
                         attachments = 0;                                    //分多少个包发
                     if (dataSize % packetSize === 0) {

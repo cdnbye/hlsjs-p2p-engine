@@ -12,20 +12,25 @@ import P2PScheduler from './p2p-scheduler';
 const log = debug('p2p-signal');
 
 export default class P2PSignaler extends EventEmitter {
-    constructor(channel, peerId) {
+    constructor(channel) {
         super();
 
         this.connected = false;
-        this.channel = channel;
-        this.peerId = peerId;
+        this.channel = channel;                                  //频道
         this.scheduler = new P2PScheduler();
-
+        this.DCMap = new Map();                                  //{key: channelId, value: DataChannnel}
         log('connecting to :' + config.websocketAddr);
         this.websocket = new WebSocket(config.websocketAddr);
 
         this._init(this.websocket);
 
 
+    }
+
+    send(msg) {
+        if (this.connected) {
+            this.websocket.send(msg);
+        }
     }
 
     _init(websocket) {
@@ -37,9 +42,7 @@ export default class P2PSignaler extends EventEmitter {
             //发送进入频道请求
             let msg = {
                 action: 'enter',
-                peer_id: this.peerId,
-                channel: this.channel,
-                isLive: config.live
+                channel: this.channel
             }
 
             websocket.push(JSON.stringify(msg));
@@ -64,20 +67,20 @@ export default class P2PSignaler extends EventEmitter {
             switch (action) {
                 case 'signal':
                     log('start _handleSignal');
-                    this._handleSignal(msg.data);
+                    this._handleSignal(msg.from_peer_id, msg.data);
                     break;
                 case 'connect':
                     log('start _handleConnect');
-                    this._handleConnect(msg.to_peer_id, msg.initiator);       //将to_peer_id作为channelId
+                    this._handleConnect(msg.to_peer_id, msg.initiator);
                     break;
                 case 'disconnect':
 
                     break;
                 case 'accept':
-
+                    this.peerId = msg.peer_id;                              //获取本端Id
                     break;
                 case 'reject':
-
+                    this.connected = false;                                 //如果拒绝进入频道则不允许发消息
                     break;
                 default:
                     log('websocket unknown action ' + action);
@@ -87,13 +90,18 @@ export default class P2PSignaler extends EventEmitter {
         };
     }
 
-    _handleSignal(data) {
-        this.datachannel.receiveSignal(data);
+    _handleSignal(remotePeerId, data) {
+        const datachannel = this.DCMap.get(remotePeerId);
+        if (datachannel) {
+            datachannel.receiveSignal(data);
+        } else {
+            log(`can not find datachannel remotePeerId ${remotePeerId}`);
+        }
     }
 
-    _handleConnect(channelId, isInitiator) {
-        let datachannel = new DataChannel(channelId, isInitiator);
-        this.datachannel = datachannel;
+    _handleConnect(remotePeerId, isInitiator) {
+        let datachannel = new DataChannel(this.peerId, remotePeerId, isInitiator);
+        this.DCMap.set(remotePeerId, datachannel);                                  //将对等端Id作为键
         this._setupDC(datachannel);
     }
 
@@ -102,7 +110,7 @@ export default class P2PSignaler extends EventEmitter {
             let msg = {
                 action: 'signal',
                 peer_id: this.peerId,
-                to_peer_id: datachannel.channelId,
+                to_peer_id: datachannel.remotePeerId,
                 data: data
             };
             this.websocket.send(msg);
@@ -110,8 +118,7 @@ export default class P2PSignaler extends EventEmitter {
             .on('error', () => {
                 let msg = {
                     action: 'dc_failed',
-                    peer_id: this.peerId,
-                    to_peer_id: datachannel.channelId,
+                    dc_id: datachannel.channelId,
                 };
                 this.websocket.send(msg);
                 log(`datachannel ${datachannel.channelId} error`);
@@ -126,17 +133,14 @@ export default class P2PSignaler extends EventEmitter {
             })
             .on('open', () => {
 
-                //将datachannel emit出去
-                // this.emit(Events.SIG_DCOPENED, datachannel);
-
-                let msg = {
-                    action: 'dc_opened',
-                    peer_id: this.peerId,
-                    to_peer_id: datachannel.channelId,
-                };
-                this.websocket.send(msg);
-
                 this.scheduler.addDataChannel(datachannel);
+                if (datachannel.isReceiver) {                              //子节点发送已连接消息
+                    let msg = {
+                        action: 'dc_opened',
+                        dc_id: datachannel.channelId,
+                    };
+                    this.websocket.send(msg);
+                }
             })
     }
 

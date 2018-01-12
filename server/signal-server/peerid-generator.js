@@ -1,6 +1,6 @@
 
 
-export default function getPeerId() {
+module.exports = function getPeerId() {
 
     //20位
     // var num = Math.floor(Math.random()*10000000000);
@@ -19,7 +19,7 @@ export default function getPeerId() {
         tmp  +=  x.charAt(Math.ceil(Math.random()*100000000)%x.length);
     }
 
-    return  timestamp+'-'+tmp;
+    return  timestamp+tmp;
 
 
 }

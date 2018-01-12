@@ -7,7 +7,6 @@ import debug from 'debug';
 import Events from './events';
 import EventEmitter from 'events';
 import {defaultP2PConfig} from './config';
-import getPeerId from './utils/peerid-generator';
 import SimplePeer from 'simple-peer';
 import P2PSignaler from './p2p-signaler';
 import HybridLoader from './hybrid-loader';
@@ -38,8 +37,6 @@ class HlsPeerify extends EventEmitter {
             debug.disable();
         }
 
-        this.peerId = getPeerId();
-        log('peerId: ' + this.peerId);
         this.hlsjs = hlsjs;
 
        hlsjs.config.currLoaded = hlsjs.config.currPlay = 0;
@@ -54,12 +51,16 @@ class HlsPeerify extends EventEmitter {
             });
         }
 
+        //level上报
+        this.levelCounter = 0;
+        this.averageLevel = -1;
+        this.levelIntervalId = window.setInterval(this._setLevelInterval.bind(this), this.config.levelReportInterval*1000);
     }
 
     _init(channel) {
 
         //实例化信令
-        this.signaler = new P2PSignaler(channel, this.peerId);
+        this.signaler = new P2PSignaler(channel);
 
         //实例化BufferManager
         this.bufMgr = new BufferManager();
@@ -77,6 +78,9 @@ class HlsPeerify extends EventEmitter {
         this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADING, (id, data) => {
             // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
             log('FRAG_LOADING: ' + data.frag.sn);
+
+            //level统计
+            this.averageLevel = (this.averageLevel*this.levelCounter + data.frag.level)/(++this.levelCounter);
         });
 
         this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADED, (id, data) => {
@@ -102,6 +106,8 @@ class HlsPeerify extends EventEmitter {
             // log('DESTROYING: '+JSON.stringify(frag));
             this.signaler.destroy();
             this.signaler = null;
+
+            window.clearInterval(this.levelIntervalId);
         });
     }
 
@@ -111,6 +117,16 @@ class HlsPeerify extends EventEmitter {
 
     enableP2P() {                                               //在停止的情况下重新启动P2P
 
+    }
+
+    _setLevelInterval() {
+
+        if (this.signaler) {
+            let msg = {
+                level: this.averageLevel.toFixed(2)
+            };
+            this.signaler.send(msg);
+        }
     }
 
 }

@@ -4,10 +4,6 @@
 
 export default {
 
-    //p2p-signaler
-    SIG_DCOPENED: 'dc_opened',
-    SIG_DCCLOSED: 'dc_closed',
-
     //data-channel
     DC_SIGNAL: 'signal',
     DC_OPEN: 'open',
