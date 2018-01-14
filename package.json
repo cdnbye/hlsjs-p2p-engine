@@ -11,7 +11,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "push_to_gitee": "git add . && git commit -m 'update' && git push",
     "copy_html_to_remote": "scp -r ./demo/index.html root@120.78.168.126:/var/www/html/hls-frontend/demo",
-    "copy_bundle_to_remote": "scp -r ./dist/hls-peerify-bundle.js root@120.78.168.126:/var/www/html/hls-frontend/dist"
+    "copy_dist_to_remote": "scp -r ./dist/hls-peerify-bundle.min.js root@120.78.168.126:/var/www/html/hls-frontend/dist"
   },
   "repository": {
     "type": "git",

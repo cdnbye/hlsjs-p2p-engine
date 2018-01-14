@@ -3,7 +3,7 @@
  */
 
 import HlsPeerify from './index.hls-peerify';
-import Hlsjs from 'hls.js';
+import Hlsjs from 'hls.js/dist/hls.min';
 import Events from './events';
 
 import {recommendedHlsjsConfig} from './config';

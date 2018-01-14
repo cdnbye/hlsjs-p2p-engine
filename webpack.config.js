@@ -19,7 +19,7 @@ const uglifyJsOptions = {
     },
     output: {
         comments: false,  // remove all comments
-        preamble: "/* A p2p-based hls player powered by WebRTC data channel. @author XieTing <86755838@qq.com> <https://github.com/snowinszu> */"
+        preamble: "/* A p2p-based hls player via WebRTC data channel. @author XieTing <86755838@qq.com> <https://github.com/snowinszu> */"
     }
 };
 
@@ -51,8 +51,8 @@ function getPluginsForConfig(minify = false) {
     if (minify) {
         // minification plugins.
         return plugins.concat([
-            // new webpack.optimize.UglifyJsPlugin(uglifyJsOptions),
-            new BabiliPlugin({}, {comments: false}),
+            new webpack.optimize.UglifyJsPlugin(uglifyJsOptions),
+            // new BabiliPlugin({}, {comments: false}),                            //Hls.js不能用BabiliPlugin压缩，否则报错
             new webpack.LoaderOptionsPlugin({
                 minimize: true,
                 debug: false
@@ -114,12 +114,13 @@ const multiConfig = [
         {
             name: 'dist-hls-peerify-bundle',
             entry: './src/index.hls-peerify-bundle.js',
+            // entry: './dist/hls-peerify-bundle.js',
             output: {
                 filename: 'hls-peerify-bundle.min.js',
                 path: path.resolve(__dirname, 'dist'),
                 publicPath: '/dist/',
                 library: ['Hls'],
-                libraryTarget: 'umd'
+                libraryTarget: 'umd2'
             },
             plugins: getPluginsForConfig(true)
         }

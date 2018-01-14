@@ -5,7 +5,7 @@
 import debug from 'debug';
 import EventEmitter from 'events';
 // import Events from './events';
-import XhrLoader from 'hls.js/src/utils/xhr-loader';
+import XhrLoader from './utils/xhr-loader';
 // import Buffer from 'buffer';
 var Buffer = require('buffer/').Buffer;
 

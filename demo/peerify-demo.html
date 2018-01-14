@@ -13,7 +13,7 @@
 
     console.log(JSON.stringify(HlsPeerify.uaParserResult, null, 2));
     console.log('hls.js version: ' + Hls.version);
-    console.log('p2p plugin version: ' + Hls.pluginVersion);
+    console.log('p2p plugin version: ' + HlsPeerify.version);
     if(Hls.isSupported()) {
         var video = document.getElementById('video');
 
@@ -29,11 +29,11 @@
 
         var hls = new Hls(hlsjsConfig);
 
-//        new HlsPeerify(hls, p2pConfig);
+        new HlsPeerify(hls, p2pConfig);
 
-//        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
+        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
 //        hls.loadSource('https://video-dev.github.io/streams/test_001/stream.m3u8?a=123');
-        hls.loadSource('http://112.90.52.139/hls/test.m3u8');
+//        hls.loadSource('http://112.90.52.139/hls/test.m3u8');
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
             hls.loadLevel = 0;
