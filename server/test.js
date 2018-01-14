@@ -26,6 +26,6 @@ for (var i = listenerEventsArr.length - 1; i >= 0; i--) {
 };
 
 let a=[1,2,3, 4, 5];
-[a[0], a[4]]=[a[4], a[0]];
+[a[0], a[0]]=[a[0], a[0]];
 
 console.log(a)

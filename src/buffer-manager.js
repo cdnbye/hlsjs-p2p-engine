@@ -3,15 +3,15 @@
  */
 
 import EventEmitter from 'events';
-import {defaultP2PConfig as config} from './config';
 import debug from 'debug';
 
 const log = debug('buffer-manager');
 
 class BufferManager extends EventEmitter {
-    constructor() {
+    constructor(config) {
         super();
 
+        this.config = config;
         /* segment
         sn: number
         relurl: string
@@ -36,7 +36,7 @@ class BufferManager extends EventEmitter {
         this._segArray.unshift(seg);
         this.urlSet.add(seg.relurl);
         this._currBufSize += seg.size;
-        while (this._currBufSize > config.maxBufSize) {         //去掉多余的数据
+        while (this._currBufSize > this.config.maxBufSize) {         //去掉多余的数据
             const lastSeg = this._segArray.pop();
             this.urlSet.delete(lastSeg.relurl);
             this._currBufSize -= lastSeg.size;

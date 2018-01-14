@@ -5,14 +5,14 @@
 import debug from 'debug';
 import EventEmitter from 'events';
 import Events from './events';
-import {defaultP2PConfig as p2pConfig} from './config';
 
 const log = debug('p2p-scheduler');
 
 class P2PScheduler extends EventEmitter {
-    constructor() {
+    constructor(config) {
         super();
 
+        this.p2pConfig = config;
         this.upstreamers = [];                        //存放父节点的数组
         this.downstreamers = [];                      //存放子节点的数组
 
@@ -24,16 +24,16 @@ class P2PScheduler extends EventEmitter {
     load(context, config, callbacks) {
 
         this.target = 0;                                  //当前下载目标父节点的索引
-
         this.context = context;
         const frag = context.frag;
         this.expectedSeg = {sn: frag.sn, relurl: frag.relurl};
         log(`p2pLoader load ${frag.relurl} at ${frag.sn}`);
-        this.config = config;
+        // this.config = config;
         this.callbacks = callbacks;
         this.stats = {trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0};
         this.retryDelay = config.retryDelay;
-        let timeout = Math.min(p2pConfig.loadTimeout, config.p2pTimeout);             //p2p下载最大允许时间是一个块的时长
+        let timeout = Math.min(this.p2pConfig.loadTimeout, config.p2pTimeout);             //p2p下载最大允许时间是一个块的时长
+        // setup timeout before we perform request
         this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), timeout*1000);
         this._loadInternal();
     }
@@ -55,7 +55,7 @@ class P2PScheduler extends EventEmitter {
         this.currUpstreamer = peer;                                      //目前用于下载的父节点
 
         peer.clearQueue();                                               //先清空下载队列
-        // setup timeout before we perform request
+
 
         const msg = {
             event: 'REQUEST',
@@ -143,7 +143,7 @@ class P2PScheduler extends EventEmitter {
                     log(`bufMgr found seg sn ${sn} url ${seg.relurl}`);
                     let payload = seg.data,                                 //二进制数据
                         dataSize = seg.size,                                //二进制数据大小
-                        packetSize = p2pConfig.packetSize,                     //每个数据包的大小
+                        packetSize = this.p2pConfig.packetSize,                     //每个数据包的大小
                         remainder = 0,                                      //最后一个包的大小
                         attachments = 0;                                    //分多少个包发
                     if (dataSize % packetSize === 0) {
@@ -220,6 +220,33 @@ class P2PScheduler extends EventEmitter {
                 return;
             }
         }
+    }
+
+    clearUpstreamers() {
+        for (let i=0;i<this.upstreamers.length;++i){
+            let streamer = this.upstreamers.pop();
+            let msg = {
+                event: 'CLOSE'
+            };
+            streamer.send(JSON.stringify(msg));
+            streamer.destroy();
+        }
+    }
+
+    clearDownstreamers() {
+        for (let i=0;i<this.downstreamers.length;++i){
+            let streamer = this.downstreamers.pop();
+            let msg = {
+                event: 'CLOSE'
+            };
+            streamer.send(JSON.stringify(msg));
+            streamer.destroy();
+        }
+    }
+
+    clearAllStreamers() {
+        this.clearUpstreamers();
+        this.clearDownstreamers();
     }
 
     _setupChannel(channel) {

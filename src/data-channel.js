@@ -6,15 +6,15 @@ import debug from 'debug';
 import SimplePeer from 'simple-peer';
 import EventEmitter from 'events';
 import Events from './events';
-import {defaultP2PConfig as config} from './config';
 var Buffer = require('buffer/').Buffer;
 
 const log = debug('data-channel');
 
 class DataChannel extends EventEmitter {
-    constructor(peerId, remotePeerId, isInitiator) {
+    constructor(peerId, remotePeerId, isInitiator, config) {
         super();
 
+        this.config = config;
         this.remotePeerId = remotePeerId;
         this.channelId = peerId + remotePeerId;                    //标识该channel
 
@@ -22,10 +22,10 @@ class DataChannel extends EventEmitter {
 
         //下载控制
         this.queue = [];                           //下载队列
-        this.loading = false
+        this.loading = false;
 
         this._datachannel = new SimplePeer({ initiator: isInitiator, objectMode: true});
-        this.isReceiver = isInitiator;                 //主动发起连接的为数据接受者，用于标识本节点的类型
+        this.isReceiver = isInitiator;                                           //主动发起连接的为数据接受者，用于标识本节点的类型
         this._init(this._datachannel);
     }
 

@@ -13,8 +13,8 @@
     </style>
 </head>
 
-<!--<script src="../dist/hls-peerify-bundle.js"></script>-->
-<script src="../dist/hls-peerify-bundle.min.js"></script>
+<script src="../dist/hls-peerify-bundle.js"></script>
+<!--<script src="../dist/hls-peerify-bundle.min.js"></script>-->
 <body>
 <div id="main">
     <video id="video" width="320" height="240" controls></video>
@@ -38,9 +38,9 @@
     //view
 
     var cpm = {
-            downloadresult: document.querySelectorAll('.cpm-downloadresult')[0],
-            table: document.querySelectorAll('.cpm-downloadresult table tbody')[0]
-        };
+        downloadresult: document.querySelectorAll('.cpm-downloadresult')[0],
+        table: document.querySelectorAll('.cpm-downloadresult table tbody')[0]
+    };
     var  addToTable = function (sn, url, level, downloaded, source) {
         cpm.table.innerHTML +=
             `<tr style="text-align: center">
@@ -74,9 +74,8 @@
 
         hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
 //        hls.loadSource('https://video-dev.github.io/streams/test_001/stream.m3u8');
-//        hls.loadSource('http://112.90.52.139/hls/test.m3u8');
-//        hls.loadSource('http://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/gear2/prog_index.m3u8');
-            hls.attachMedia(video);
+//        hls.loadSource('http://att.livem3u8.na.itv.cn/li ... a68356f8c2bd00.m3u8');
+        hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
             hls.loadLevel = 0;
             video.play();
@@ -89,19 +88,19 @@
             addToTable(frag.sn, frag.relurl, frag.level, frag.loaded, source);
         });
 
-        hls.on(Hls.Events.ERROR, function (event, data) {
-            var errorType = data.type;
-            var errorDetails = data.details;
-            var errorFatal = data.fatal;
-            console.warn('warn details:'+errorDetails);
-//      switch(data.details) {
-//        case hls.ErrorDetails.FRAG_LOAD_ERROR:
-//          // ....
-//          break;
-//        default:
-//          break;
-//      }
-        });
+//        hls.on(Hls.Events.ERROR, function (event, data) {
+//            var errorType = data.type;
+//            var errorDetails = data.details;
+//            var errorFatal = data.fatal;
+//            console.warn('warn details:'+errorDetails);
+////      switch(data.details) {
+////        case hls.ErrorDetails.FRAG_LOAD_ERROR:
+////          // ....
+////          break;
+////        default:
+////          break;
+////      }
+//        });
     }
 </script>
 </body>

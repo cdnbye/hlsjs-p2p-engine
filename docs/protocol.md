@@ -69,7 +69,10 @@ datachannel 发生错误
 ```javastript
 {
     action: 'enter'                
-    channel: string               //频道标识，目前是m3u0的url                           
+    channel: string               //频道标识，目前是m3u0的url  
+    browser:   string              //浏览器名
+    device: string               //mobile 或 PC
+    OS: string                    //操作系统          
 }
 ```
 
@@ -85,8 +88,7 @@ datachannel 发生错误
 ### peer ---> server    离开频道请求
    ```javastript
    {
-       action: 'leave'    
-       peer_id: string                //本节点唯一标识            
+       action: 'leave'             
    }
    ```
 
@@ -103,6 +105,14 @@ datachannel 发生错误
 ```javastript
 {
     action: 'dc_opened'                
+    dc_id: string            //datachannel的Id
+}
+```
+
+### peer ---> server    datachannel关闭
+```javastript
+{
+    action: 'dc_closed'                
     dc_id: string            //datachannel的Id
 }
 ```
@@ -133,5 +143,3 @@ datachannel 发生错误
     p2p: number                  //p2p下载的流量大小（单位KB）
 }
 ```
-
-

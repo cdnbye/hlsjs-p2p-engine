@@ -62,11 +62,18 @@ class HlsPeerify extends EventEmitter {
 
     _init(channel) {
 
+        //上传浏览器信息
+        let browserInfo = {
+            browser: uaParserResult.browser.name,
+            device: uaParserResult.device.type === 'mobile' ? 'mobile' : 'PC',
+            os: uaParserResult.os.name
+        }
+
         //实例化信令
-        this.signaler = new P2PSignaler(channel);
+        this.signaler = new P2PSignaler(channel, this.config, browserInfo);
 
         //实例化BufferManager
-        this.bufMgr = new BufferManager();
+        this.bufMgr = new BufferManager(this.config);
         this.hlsjs.config.bufMgr = this.bufMgr;
 
         //通过config向hybrid-loader导入p2p-scheduler
@@ -126,6 +133,7 @@ class HlsPeerify extends EventEmitter {
         if (this.p2pEnabled) {
             this.p2pEnabled = false;
             this.hlsjs.config.p2pEnabled = this.p2pEnabled;
+            this.signaler.stopP2P();
         }
     }
 

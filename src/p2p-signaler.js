@@ -2,27 +2,31 @@
  * Created by xieting on 2018/1/3.
  */
 
+/*
+TODO:
+ */
+
 import debug from 'debug';
 import EventEmitter from 'events';
 import Events from './events';
-import {defaultP2PConfig as config} from './config';
 import DataChannel from './data-channel';
 import P2PScheduler from './p2p-scheduler';
 
 const log = debug('p2p-signaler');
 
 export default class P2PSignaler extends EventEmitter {
-    constructor(channel) {
+    constructor(channel, config, info) {
         super();
 
+        this.config = config;
         this.connected = false;
         this.channel = channel;                                  //频道
-        this.scheduler = new P2PScheduler();
+        this.scheduler = new P2PScheduler(config);
         this.DCMap = new Map();                                  //{key: channelId, value: DataChannnel}
         log('connecting to :' + config.websocketAddr);
         this.websocket = new WebSocket(config.websocketAddr);
 
-        this._init(this.websocket);
+        this._init(this.websocket, info);
 
 
     }
@@ -33,7 +37,15 @@ export default class P2PSignaler extends EventEmitter {
         }
     }
 
-    _init(websocket) {
+    stopP2P() {
+        this.scheduler.clearAllStreamers();
+        let msg = {
+            action: 'leave'
+        };
+        this.send(msg);
+    }
+
+    _init(websocket, info) {
 
         websocket.onopen = () => {
             log('websocket connection opened with channel: ' + this.channel);
@@ -43,6 +55,10 @@ export default class P2PSignaler extends EventEmitter {
             let msg = {
                 action: 'enter',
                 channel: this.channel
+            };
+
+            if (info) {
+                msg = Object.assign(msg, info);
             }
 
             websocket.push(JSON.stringify(msg));
@@ -52,9 +68,14 @@ export default class P2PSignaler extends EventEmitter {
         websocket.send = msg => {
             if (websocket.readyState != 1) {
                 log('websocket connection is not opened yet.');
+                //重新连接
+                websocket.close();
+                this.websocket = new WebSocket(this.config.websocketAddr);
+                this._init(this.websocket);
+
                 return setTimeout(function() {
-                    websocket.send(data);
-                }, 1000);
+                    websocket.send(msg);
+                }, this.config.websocketRetryDelay*1000);
             }
             let msgStr = JSON.stringify(Object.assign({channel: this.channel}, msg));
             log("send to websocket is " + msgStr);
@@ -88,6 +109,9 @@ export default class P2PSignaler extends EventEmitter {
             }
 
         };
+        websocket.onerror = websocket.onclose = () => {              //websocket断开时清除datachannel
+            this.scheduler.clearAllStreamers();
+        };
     }
 
     _handleSignal(remotePeerId, data) {
@@ -100,7 +124,7 @@ export default class P2PSignaler extends EventEmitter {
     }
 
     _handleConnect(remotePeerId, isInitiator) {
-        let datachannel = new DataChannel(this.peerId, remotePeerId, isInitiator);
+        let datachannel = new DataChannel(this.peerId, remotePeerId, isInitiator, this.config);
         this.DCMap.set(remotePeerId, datachannel);                                  //将对等端Id作为键
         this._setupDC(datachannel);
     }
@@ -128,7 +152,11 @@ export default class P2PSignaler extends EventEmitter {
             .once(Events.DC_CLOSE, () => {
 
             log(`datachannel closed ${datachannel.channelId} `);
-            // this.emit(Events.SIG_DCCLOSED, datachannel);
+                let msg = {
+                    action: 'dc_closed',
+                    dc_id: datachannel.channelId,
+                };
+                this.websocket.send(msg);
             this.scheduler.deleteDataChannel(datachannel);
             datachannel.destroy();
         })

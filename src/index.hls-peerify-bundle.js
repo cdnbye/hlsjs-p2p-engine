@@ -15,6 +15,10 @@ class HlsPeerifyBundle extends Hlsjs{
         return Events;
     }
 
+    static get uaParserResult() {
+        return HlsPeerify.uaParserResult;
+    }
+
     constructor(p2pConfig, hlsjsConfig = {}) {
 
 

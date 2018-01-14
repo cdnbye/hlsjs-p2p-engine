@@ -33,8 +33,9 @@ function onRequest(socket) {
     websocket.on('message', function(message) {
 
         if (message.type === 'utf8') {
-            console.log('on message: ' + message.utf8Data);
-            onMessage(JSON.parse(message.utf8Data), websocket);
+            var msg = JSON.parse(message.utf8Data);
+            if (msg.action !== 'signal') console.log('on message: ' + message.utf8Data);          //不打印signal
+            onMessage(msg, websocket);
         }
     });
 
@@ -180,9 +181,9 @@ function truncateChannels(websocket) {
     }
 }
 
-app.listen(12035);
+app.listen(3389);
 
-console.log('Please open NON-SSL URL: http://localhost:12035/');
+console.log('Please open NON-SSL URL: http://localhost:3389/');
 
 var topology = [
     []
