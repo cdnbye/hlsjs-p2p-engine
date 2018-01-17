@@ -17,33 +17,33 @@
     </style>
 </head>
 
-<!--<script src="../dist/hls-peerify-bundle.js"></script>-->
-<script src="../dist/hls-peerify-bundle.min.js"></script>
+
+<script src="../peerify-hls-bundle.js"></script>
+
 <body>
 <div id="main">
     <video id="video" width="320" height="240" controls></video>
-    <table class="table table-hover" style="border: 0; margin: 0">
-        <thead>
-        <tr style="text-align: center">
-            <td width="129" style="margin: 0">sn</td>
-            <td width="578" style="margin: 0">url</td>
-            <td width="49">level</td>
-            <td width="146">size</td>
-            <td width="98">source</td>
-        </tr>
-        </thead>
-    </table>
-    <div class="sr-only cpm-downloadresult"  style="height:360px; overflow:auto;">
+    <div class="sr-only cpm-downloadresult"  style="height:360px; overflow:scroll;">
 
         <!--<p class="help-block">Downloading...</p>-->
         <table id="table-body" class="table table-hover">
+            <thead>
+            <tr style="text-align: center">
+                <td>sn</td>
+                <td>url</td>
+                <td>level</td>
+                <td>size</td>
+                <td>source</td>
+            </tr>
+            </thead>
             <tbody ></tbody>
         </table>
     </div>
 </div>
+<!--<script src="../dist/test-bundle.js"></script>-->
 <script>
     //view
-
+//
     var cpm = {
             downloadresult: document.querySelectorAll('.cpm-downloadresult')[0],
             table: document.querySelectorAll('#table-body tbody')[0]
@@ -69,21 +69,26 @@
         var hlsjsConfig = {
 //        debug: true,
 //      pLoader : pLoader,
-        }
+           maxBufferSize: 0,
+        };
 
         var p2pConfig = {
             debug: true,
-            websocketAddr: 'ws://120.78.168.126:3389',
+//            websocketAddr: 'ws://120.78.168.126:3389',
+            websocketAddr: 'ws://localhost:3389',
             reportInterval: 36000,
+            p2pEnabled: true
         };
 
-        var hls = new Hls(p2pConfig, hlsjsConfig);
+        hlsjsConfig.p2pConfig = p2pConfig;
 
-//        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
+        var hls = new Hls(hlsjsConfig);
+
+        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
 //        hls.loadSource('https://video-dev.github.io/streams/test_001/stream.m3u8');
-//        hls.loadSource('http://112.90.52.139/hls/test.m3u8');
-        hls.loadSource('http://wowza.peer5.com/live/smil:bbb_abr.smil/chunklist_w794046364_b2204000.m3u8');
-            hls.attachMedia(video);
+//        hls.loadSource('//bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8');
+//        hls.loadSource('http://wowza.peer5.com/live/smil:bbb_abr.smil/chunklist_w794046364_b2204000.m3u8');
+        hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
             hls.loadLevel = 0;
             video.play();
@@ -91,8 +96,9 @@
         });
         hls.on(Hls.Events.FRAG_LOADED, (id, data) => {
             var frag = data.frag;
+//            console.warn(JSON.stringify(data.frag));
 //            console.warn(`sn ${frag.sn} relurl ${frag.relurl} level ${frag.level} downloaded ${frag.loaded} source ${frag.loadByXhr?'CDN':'P2P'}`);
-            var source = frag.loadByXhr?'CDN':'P2P';
+            var source = frag.loadByXhr? 'CDN' : 'P2P';
             addToTable(frag.sn, frag.relurl, frag.level, frag.loaded, source);
         });
 
@@ -109,6 +115,12 @@
 //          break;
 //      }
         });
+
+//        hls.disableP2P();
+//
+//        setTimeout(function () {
+//            hls.enableP2P();
+//        }, 10000)
     }
 </script>
 </body>

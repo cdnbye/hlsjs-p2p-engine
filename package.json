@@ -4,14 +4,14 @@
   "description": "通过WebRTC datachannel技术来实现hls的p2p传输",
   "main": "./dist/hls-peerify.js",
   "scripts": {
-    "debug-hls-peerify": "webpack --progress --env.debug-hls-peerify",
-    "debug-hls-peerify-bundle": "webpack --progress --env.debug-hls-peerify-bundle",
-    "dist-hls-peerify": "webpack --progress --env.dist-hls-peerify",
-    "dist-hls-peerif-bundle": "webpack --progress --env.dist-hls-peerify-bundle",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-hls-peerify": "webpack --progress --env.build-hls-peerify",
+    "bundle-peerify-hls": "webpack --progress --env.bundle-peerify-hls",
+    "release-hls-peerify": "webpack --progress --env.release-hls-peerify",
+    "release-peerify-hls": "webpack --progress --env.release-peerify-hls",
+    "test": "webpack --progress --env.test-bundle",
     "push_to_gitee": "git add . && git commit -m 'update' && git push",
     "copy_html_to_remote": "scp -r ./demo/index.html root@120.78.168.126:/var/www/html/hls-frontend/demo",
-    "copy_dist_to_remote": "scp -r ./dist/hls-peerify-bundle.min.js root@120.78.168.126:/var/www/html/hls-frontend/dist"
+    "copy_dist_to_remote": "scp -r ./peerify-hls-bundle.js root@120.78.168.126:/var/www/html/hls-frontend"
   },
   "repository": {
     "type": "git",

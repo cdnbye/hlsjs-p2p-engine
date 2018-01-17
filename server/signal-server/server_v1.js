@@ -113,18 +113,18 @@ function enterChannel(message, websocket) {
 
         CHANNELS[message.channel][channel.length] = websocket;
 
-        //构造链式拓扑结构
-        let length = channel.length;                  //大于等于2
-        channel[length-2].sendUTF(JSON.stringify({
-            action: 'connect',
-            to_peer_id: channel[length-1].peerId,
-            initiator: false
-        }));
-        channel[length-1].sendUTF(JSON.stringify({
-            action: 'connect',
-            to_peer_id: channel[length-2].peerId,
-            initiator: true
-        }));
+        // //构造链式拓扑结构
+        // let length = channel.length;                  //大于等于2
+        // channel[length-2].sendUTF(JSON.stringify({
+        //     action: 'connect',
+        //     to_peer_id: channel[length-1].peerId,
+        //     initiator: false
+        // }));
+        // channel[length-1].sendUTF(JSON.stringify({
+        //     action: 'connect',
+        //     to_peer_id: channel[length-2].peerId,
+        //     initiator: true
+        // }));
 
         //倒三角拓扑结构
         // let length = channel.length;
@@ -150,6 +150,33 @@ function enterChannel(message, websocket) {
         //         initiator: true
         //     }));
         // }
+
+        //构造二叉拓扑结构
+        let length = channel.length;
+        if (length === 2) {
+            channel[0].sendUTF(JSON.stringify({
+                action: 'connect',
+                to_peer_id: channel[1].peerId,
+                initiator: false
+            }));
+            channel[1].sendUTF(JSON.stringify({
+                action: 'connect',
+                to_peer_id: channel[0].peerId,
+                initiator: true
+            }));
+        }
+        if (length === 3) {
+            channel[0].sendUTF(JSON.stringify({
+                action: 'connect',
+                to_peer_id: channel[2].peerId,
+                initiator: false
+            }));
+            channel[2].sendUTF(JSON.stringify({
+                action: 'connect',
+                to_peer_id: channel[0].peerId,
+                initiator: true
+            }));
+        }
 
 
     } else {

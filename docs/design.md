@@ -11,3 +11,4 @@ currPlay:目前在播放的块  currLoading:目前在下载的块  currLoaded:�
 
 ### src/p2p-scheduler
 用于调度datachannel
+

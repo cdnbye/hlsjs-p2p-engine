@@ -72,7 +72,7 @@ datachannel 发生错误
     channel: string               //频道标识，目前是m3u0的url  
     browser:   string              //浏览器名
     device: string               //mobile 或 PC
-    OS: string                    //操作系统          
+    os: string                    //操作系统          
 }
 ```
 
@@ -141,5 +141,44 @@ datachannel 发生错误
     level:   number              //平均level，用于调度
     cdn: number                  //cdn下载的流量大小（单位KB）
     p2p: number                  //p2p下载的流量大小（单位KB）
+}
+```
+
+## server data model （live）
+
+### Peer model
+```javastript
+{
+    peerId: string
+    parents: Map<peerId, Peer>
+    children: Map<peerId, Peer>
+    parentNum: number
+    childNum: number
+    info: {
+        browser:   string              //浏览器名
+        device: string                //mobile 或 PC
+        os: string                    //操作系统
+        ISP: string                   //运营商
+        province: string                //省份
+        IP: string                   
+    }
+    CDN: number                       //cdn下载的数据量（KB）
+    P2P: number                       //p2p下载的数据量（KB）
+    level: number                     //平均level，用于调度
+    class: number                     //所属阶层（0，1，2，3……）
+    upBW: number                      //上行带宽
+}
+```
+
+### Channel model
+```javastript
+{
+    ID: string
+    nodes: Map<peerId, Peer>
+    filterClass: Map<class, Map<ISP, Map<level, Map<Prov, Map<peerId, Peer>>>>>  //class-->ISP-->Prov-->level
+    CDN: number                       //cdn下载的数据量（KB）
+    P2P: number                       //p2p下载的数据量（KB）
+    host: string                      //域名
+    type: string                      //"live", "vod"
 }
 ```

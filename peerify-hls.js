@@ -2,27 +2,33 @@
  * Created by xieting on 2018/1/2.
  */
 
-import HlsPeerify from './index.hls-peerify';
-import Hlsjs from 'hls.js/dist/hls.min';
-import Events from './events';
+import HlsPeerify from './hls-peerify';
+import Hlsjs from 'hls.js';
+// import Hlsjs from 'hls.js/dist/hls.light';
 
-import {recommendedHlsjsConfig} from './config';
-
+let recommendedHlsjsConfig = {
+    maxBufferSize: 0,
+    maxBufferLength: 20,
+    liveSyncDuration: 30,
+    fragLoadingTimeOut: 4000,              // used by fragment-loader
+};
 
 class HlsPeerifyBundle extends Hlsjs{
 
     static get P2PEvents() {
-        return Events;
+        return HlsPeerify.Events;
     }
 
     static get uaParserResult() {
         return HlsPeerify.uaParserResult;
     }
 
-    constructor(p2pConfig, hlsjsConfig = {}) {
+    constructor(config = {}) {
 
+        let p2pConfig = config.p2pConfig || {};
+        delete config.p2pConfig;
 
-        let mergedHlsjsConfig = Object.assign({}, recommendedHlsjsConfig, hlsjsConfig);
+        let mergedHlsjsConfig = Object.assign({}, recommendedHlsjsConfig, config);
 
         super(mergedHlsjsConfig);
 

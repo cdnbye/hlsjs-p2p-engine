@@ -5,13 +5,14 @@
 const pkgJson = require('./package.json');
 const path = require('path');
 const webpack = require('webpack');
-const BabiliPlugin = require("babili-webpack-plugin");
 
 const uglifyJsOptions = {
     screwIE8: true,
     stats: true,
     compress: {
-        warnings: false
+        warnings: false,
+        drop_debugger: true,
+        drop_console: true
     },
     mangle: {
         toplevel: true,
@@ -52,7 +53,6 @@ function getPluginsForConfig(minify = false) {
         // minification plugins.
         return plugins.concat([
             new webpack.optimize.UglifyJsPlugin(uglifyJsOptions),
-            // new BabiliPlugin({}, {comments: false}),                            //Hls.js不能用BabiliPlugin压缩，否则报错
             new webpack.LoaderOptionsPlugin({
                 minimize: true,
                 debug: false
@@ -72,27 +72,27 @@ function getConstantsForConfig() {
 
 const multiConfig = [
         {
-            name: 'debug-hls-peerify',
+            name: 'build-hls-peerify',
             entry: './src/index.hls-peerify.js',
             output: {
-                filename: 'hls-peerify.js',
-                sourceMapFilename: 'hls-peerify.js.map',
-                path: path.resolve(__dirname, 'dist'),
-                publicPath: '/dist/',
+                filename: './hls-peerify.js',
+                sourceMapFilename: './hls-peerify.js.map',
+                path: path.resolve(__dirname),
+                // publicPath: '/src/',
                 library: ['HlsPeerify'],
-                libraryTarget: 'umd2'
+                libraryTarget: 'umd'
             },
             plugins: getPluginsForConfig(),
             devtool: 'source-map',
         },
         {
-            name: 'debug-hls-peerify-bundle',
-            entry: './src/index.hls-peerify-bundle.js',
+            name: 'bundle-peerify-hls',
+            entry: './peerify-hls.js',
             output: {
-                filename: 'hls-peerify-bundle.js',
-                sourceMapFilename: 'hls-peerify-bundle.js.map',
-                path: path.resolve(__dirname, 'dist'),
-                publicPath: '/dist/',
+                filename: 'peerify-hls-bundle.js',
+                sourceMapFilename: './peerify-hls-bundle.js.map',
+                path: path.resolve(__dirname),
+                // publicPath: '/dist/',
                 library: ['Hls'],
                 libraryTarget: 'umd'
             },
@@ -100,30 +100,40 @@ const multiConfig = [
             devtool: 'source-map',
         },
         {
-            name: 'dist-hls-peerify',
+            name: 'release-hls-peerify',
             entry: './src/index.hls-peerify.js',
             output: {
-                filename: 'hls-peerify.min.js',
-                path: path.resolve(__dirname, 'dist'),
-                publicPath: '/dist/',
+                filename: './hls-peerify.js',
+                path: path.resolve(__dirname),
+                // publicPath: '/src/',
                 library: ['HlsPeerify'],
                 libraryTarget: 'umd'
             },
             plugins: getPluginsForConfig(true)
         },
         {
-            name: 'dist-hls-peerify-bundle',
-            entry: './src/index.hls-peerify-bundle.js',
-            // entry: './dist/hls-peerify-bundle.js',
+            name: 'release-peerify-hls',
+            entry: './peerify-hls.js',
             output: {
-                filename: 'hls-peerify-bundle.min.js',
-                path: path.resolve(__dirname, 'dist'),
-                publicPath: '/dist/',
+                filename: 'peerify-hls-bundle.js',
+                path: path.resolve(__dirname),
+                // publicPath: '/dist/',
                 library: ['Hls'],
-                libraryTarget: 'umd2'
+                libraryTarget: 'umd'
             },
             plugins: getPluginsForConfig(true)
-        }
+        },
+        //test
+        {
+            name: 'test-bundle',
+            entry: './test/bundle/index.bundle.js',
+            output: {
+                filename: 'test-bundle.js',
+                // sourceMapFilename: 'hls-peerify-bundle.js.map',
+                path: path.resolve(__dirname, 'test/bundle')
+            },
+            plugins: getPluginsForConfig()
+        },
     ].map(fragment => Object.assign({}, commonConfig, fragment));
 
 // webpack matches the --env arguments to a string; for example, --env.debug.min translates to { debug: true, min: true }
