@@ -6022,7 +6022,7 @@ var HlsPeerify = function (_EventEmitter) {
 
         //level上报
         _this.levelCounter = 0;
-        _this.averageLevel = -1;
+        _this.averageLevel = 0;
         //流量上报
         _this.cdnDownloaded = 0;
         _this.p2pDownloaded = 0;
@@ -7642,7 +7642,7 @@ var P2PSignaler = function (_EventEmitter) {
                         break;
                     case 'connect':
                         console.log('start _handleConnect');
-                        _this2._handleConnect(msg.to_peer_id, msg.initiator);
+                        _this2._createDatachannel(msg.to_peer_id, true);
                         break;
                     case 'disconnect':
 
@@ -7668,18 +7668,20 @@ var P2PSignaler = function (_EventEmitter) {
         key: '_handleSignal',
         value: function _handleSignal(remotePeerId, data) {
             var datachannel = this.DCMap.get(remotePeerId);
-            if (datachannel) {
-                datachannel.receiveSignal(data);
-            } else {
-                console.log('can not find datachannel remotePeerId ' + remotePeerId);
+            if (!datachannel) {
+                //收到子节点连接请求
+                console.log('receive child node connection request');
+                datachannel = this._createDatachannel(remotePeerId, false);
             }
+            datachannel.receiveSignal(data);
         }
     }, {
-        key: '_handleConnect',
-        value: function _handleConnect(remotePeerId, isInitiator) {
+        key: '_createDatachannel',
+        value: function _createDatachannel(remotePeerId, isInitiator) {
             var datachannel = new _dataChannel2.default(this.peerId, remotePeerId, isInitiator, this.config);
             this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
             this._setupDC(datachannel);
+            return datachannel;
         }
     }, {
         key: '_setupDC',
@@ -7702,6 +7704,7 @@ var P2PSignaler = function (_EventEmitter) {
                 _this3.websocket.send(msg);
                 console.log('datachannel error ' + datachannel.channelId);
                 _this3.scheduler.deleteDataChannel(datachannel);
+                _this3.DCMap.delete(datachannel.remotePeerId);
                 datachannel.destroy();
             }).once(_events4.default.DC_CLOSE, function () {
 
@@ -7712,6 +7715,7 @@ var P2PSignaler = function (_EventEmitter) {
                 };
                 _this3.websocket.send(msg);
                 _this3.scheduler.deleteDataChannel(datachannel);
+                _this3.DCMap.delete(datachannel.remotePeerId);
                 datachannel.destroy();
             }).once(_events4.default.DC_OPEN, function () {
 
@@ -7789,8 +7793,8 @@ var DataChannel = function (_EventEmitter) {
 
         _this.config = config;
         _this.remotePeerId = remotePeerId;
-        _this.channelId = peerId + remotePeerId; //标识该channel
-
+        _this.channelId = isInitiator ? peerId + '-' + remotePeerId : remotePeerId + '-' + peerId; //标识该channel
+        console.warn('this.channelId ' + _this.channelId);
         _this.connected = false;
 
         //下载控制

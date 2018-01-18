@@ -125,6 +125,14 @@ datachannel 发生错误
 }
 ```
 
+### server ---> peer        发送连接命令给peer
+```javastript
+{
+    action: 'connect'           
+    to_peer_id: string            //父节点的Id
+}
+```
+
 ### server ---> peer        发送信令给peer
 ```javastript
 {
@@ -175,7 +183,7 @@ datachannel 发生错误
 {
     ID: string
     nodes: Map<peerId, Peer>
-    filterClass: Map<class, Map<ISP, Map<level, Map<Prov, Map<peerId, Peer>>>>>  //class-->ISP-->Prov-->level
+    filterClass:   //class-->ISP-->Prov-->level
     CDN: number                       //cdn下载的数据量（KB）
     P2P: number                       //p2p下载的数据量（KB）
     host: string                      //域名

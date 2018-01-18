@@ -1,17 +1,21 @@
-// https://www.webrtc-experiment.com/
+/**
+ * Created by xieting on 2018/1/4.
+ *
+ * 二叉树拓扑结构
+ *
+ *
+ */
 
-// Dependencies:
-// 1. WebSocket
-// 2. Node-Static
 
-// Features:
-// 1. WebSocket over Nodejs connection
-// 2. WebSocket channels i.e. rooms
 
 var fs = require('fs');
-
+var peerIdGenerator = require('./lib/peerid-generator');
 var _static = require('node-static');
 var file = new _static.Server('./public');
+
+let Channel = require('./lib/channel');
+let Peer = require('./lib/peer');
+let Topology = require('./lib/topology');
 
 // HTTP server
 var app = require('http').createServer(function(request, response) {
@@ -30,6 +34,7 @@ new WebSocketServer({
 // shared stuff
 
 var CHANNELS = { };
+var TOPOLOGY = { };
 
 function onRequest(socket) {
     var origin = socket.origin + socket.resource;
@@ -37,71 +42,159 @@ function onRequest(socket) {
     var websocket = socket.accept(null, origin);
 
     websocket.on('message', function(message) {
-        console.log("sendMessage: " + message.utf8Data);
-        if (message.type === 'utf8') {
 
-            onMessage(JSON.parse(message.utf8Data), websocket);
+        if (message.type === 'utf8') {
+            var msg = JSON.parse(message.utf8Data);
+            if (msg.action !== 'signal') console.log('on message: ' + message.utf8Data);          //不打印signal
+            onMessage(msg, websocket);
         }
     });
 
     websocket.on('close', function() {
-        truncateChannels(websocket);
+        console.log('delete node: ' + websocket.peerId);
+        // truncateChannels(websocket);                                 //将该节点从频道中删除
+        let peerId = websocket.peerId;
+        for (let key in CHANNELS) {
+            let channel = CHANNELS[key];
+            if (channel.hasPeer(peerId)) {
+                channel.removePeer(peerId);
+            }
+        }
+        for (let key in TOPOLOGY) {
+            let topology = TOPOLOGY[key];
+            topology.deleteNode(peerId);
+        }
     });
 }
 
 function onMessage(message, websocket) {
-    if (message.checkPresence)
-    {
-        checkPresence(message, websocket);
-        console.log("checkPresence");
+
+    let action = message.action;
+
+    switch (action) {
+
+        case 'enter':
+            enterChannel(message, websocket);
+            console.log("peer enter channel: " + message.channel);
+            break;
+        case 'signal':
+            handleSignal(message);
+            break;
+
     }
-    else if (message.open)
-    {
-        onOpen(message, websocket);
-        console.log("onOpen");
-    }
-    else
-    {
-        sendMessage(message, websocket);
-        //console.log("sendMessage");
-    }
+
+    // if (message.enter)
+    // {
+    //     enterChannel(message, websocket);
+    //     console.log("peer enter channel: " + message.channel);
+    // }
+    // else if (message.open)
+    // {
+    //     onOpen(message, websocket);
+    //     console.log("onOpen");
+    // }
+    // else
+    // {
+    //     sendMessage(message, websocket);
+    //     //console.log("sendMessage");
+    // }
 }
 
-function onOpen(message, websocket) {                        //如果不传入open字段其他人无法向你广播
-    //console.log("test!!!!");
+function handleSignal(message) {
     var channel = CHANNELS[message.channel];
-
-    if (channel)
-        CHANNELS[message.channel][channel.length] = websocket;
-    else
-        CHANNELS[message.channel] = [websocket];
+    if (channel.hasPeer(message.to_peer_id)) {
+        let remotePeer = channel.getPeer(message.to_peer_id);
+        let msg = {
+            action: 'signal',
+            from_peer_id: message.peer_id,
+            data: message.data
+        };
+        remotePeer.send(msg);
+    }
+    // for (var i = 0; i < channel.length; i++) {
+    //     if (channel[i] && channel[i].peerId === message.to_peer_id) {
+    //         try {
+    //             //console.log('message.data' + message.data);
+    //             // console.log("sendMessageToPeer");
+    //             let msg = {
+    //                 action: 'signal',
+    //                 from_peer_id: message.peer_id,
+    //                 data: message.data
+    //             };
+    //             channel[i].sendUTF(JSON.stringify(msg));
+    //             break;
+    //         } catch(e) {
+    //         }
+    //     }
+    // }
 }
 
-function sendMessage(message, websocket) {
-    message.data = JSON.stringify(message.data);
-    console.log('channel' + message.channel);
-    var channel = CHANNELS[message.channel];
-    if (!channel) {
-        console.error('no such channel exists');
-        return;
-    }
-    console.log('channel.length: ' + channel.length);
-    for (var i = 0; i < channel.length; i++) {
-        if (channel[i] && channel[i] != websocket) {
-            try {
-                //console.log('message.data' + message.data);
-                console.log("sendMessageToPeer");
-                channel[i].sendUTF(message.data);
-            } catch(e) {
-            }
-        }
-    }
-}
+function enterChannel(message, websocket) {
 
-function checkPresence(message, websocket) {
+    //允许进入频道
+    var peerId = peerIdGenerator();
+    let peer = new Peer(peerId, websocket, message);
+    websocket.peerId = peerId;
     websocket.sendUTF(JSON.stringify({
-        isChannelPresent: !!CHANNELS[message.channel]
+        action: 'accept',
+        peer_id: peerId
     }));
+
+    var channel = CHANNELS[message.channel];
+
+    if (channel){
+
+        channel.addPeer(peer);
+
+        //构造二叉拓扑结构
+        let topology = TOPOLOGY[message.channel];
+        let remotePeerId = topology.addNode(peer);
+        console.log(`remotePeerId ${remotePeerId}`);
+        let msg = {
+            action: 'connect',
+            to_peer_id: remotePeerId
+        };
+        peer.send(msg);
+
+        // let length = channel.peerNum;
+        // if (length === 2) {
+        //     channel[0].sendUTF(JSON.stringify({
+        //         action: 'connect',
+        //         to_peer_id: channel[1].peerId,
+        //         initiator: false
+        //     }));
+        //     channel[1].sendUTF(JSON.stringify({
+        //         action: 'connect',
+        //         to_peer_id: channel[0].peerId,
+        //         initiator: true
+        //     }));
+        // }
+        // if (length === 3) {
+        //     channel[0].sendUTF(JSON.stringify({
+        //         action: 'connect',
+        //         to_peer_id: channel[2].peerId,
+        //         initiator: false
+        //     }));
+        //     channel[2].sendUTF(JSON.stringify({
+        //         action: 'connect',
+        //         to_peer_id: channel[0].peerId,
+        //         initiator: true
+        //     }));
+        // }
+
+
+    } else {
+
+        let channel = new Channel(message.channel, 'live');
+
+        channel.addPeer(peer);
+        CHANNELS[message.channel] = channel;
+
+        let topology = new Topology();
+        TOPOLOGY[message.channel] = topology;
+        topology.addNode(peer);
+    }
+
 }
 
 function swapArray(arr) {
@@ -127,6 +220,8 @@ function truncateChannels(websocket) {
     }
 }
 
-app.listen(12034);
+app.listen(3389);
 
-console.log('Please open NON-SSL URL: http://localhost:12034/');
+console.log('Please open NON-SSL URL: http://localhost:3389/');
+
+

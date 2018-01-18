@@ -21,7 +21,6 @@
   "license": "ISC",
   "dependencies": {
     "buffer": "^5.0.8",
-    "debug": "^3.1.0",
     "hls.js": "^0.8.9",
     "simple-peer": "^8.2.0",
     "ua-parser-js": "^0.7.17"

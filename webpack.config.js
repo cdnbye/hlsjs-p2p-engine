@@ -73,7 +73,7 @@ function getConstantsForConfig() {
 const multiConfig = [
         {
             name: 'build-hls-peerify',
-            entry: './src/index.hls-peerify.js',
+            entry: './lib/index.hls-peerify.js',
             output: {
                 filename: './hls-peerify.js',
                 sourceMapFilename: './hls-peerify.js.map',
@@ -101,7 +101,7 @@ const multiConfig = [
         },
         {
             name: 'release-hls-peerify',
-            entry: './src/index.hls-peerify.js',
+            entry: './lib/index.hls-peerify.js',
             output: {
                 filename: './hls-peerify.js',
                 path: path.resolve(__dirname),

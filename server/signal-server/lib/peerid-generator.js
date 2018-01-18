@@ -13,13 +13,14 @@ module.exports = function getPeerId() {
     var timestamp = parseInt((new Date()).valueOf()/1000);
 
 
-    var  x="0123456789qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
-    var  tmp="";
-    for(var  i=0;i<  len;i++)  {
-        tmp  +=  x.charAt(Math.ceil(Math.random()*100000000)%x.length);
-    }
+    // var  x="0123456789qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
+    // var  tmp="";
+    // for(var  i=0;i<  len;i++)  {
+    //     tmp  +=  x.charAt(Math.ceil(Math.random()*100000000)%x.length);
+    // }
 
-    return  timestamp+tmp;
+    // return  timestamp+tmp;
+    return  timestamp;
 
 
 }

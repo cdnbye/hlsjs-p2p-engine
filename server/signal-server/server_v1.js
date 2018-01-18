@@ -3,7 +3,7 @@
  */
 
 var fs = require('fs');
-var peerIdGenerator = require('./peerid-generator');
+var peerIdGenerator = require('./lib/peerid-generator');
 var _static = require('node-static');
 var file = new _static.Server('./public');
 
@@ -153,28 +153,15 @@ function enterChannel(message, websocket) {
 
         //构造二叉拓扑结构
         let length = channel.length;
-        if (length === 2) {
-            channel[0].sendUTF(JSON.stringify({
+        if (length >= 2) {
+            // channel[0].sendUTF(JSON.stringify({
+            //     action: 'connect',
+            //     to_peer_id: channel[1].peerId,
+            //     initiator: false
+            // }));
+            channel[length-1].sendUTF(JSON.stringify({
                 action: 'connect',
-                to_peer_id: channel[1].peerId,
-                initiator: false
-            }));
-            channel[1].sendUTF(JSON.stringify({
-                action: 'connect',
-                to_peer_id: channel[0].peerId,
-                initiator: true
-            }));
-        }
-        if (length === 3) {
-            channel[0].sendUTF(JSON.stringify({
-                action: 'connect',
-                to_peer_id: channel[2].peerId,
-                initiator: false
-            }));
-            channel[2].sendUTF(JSON.stringify({
-                action: 'connect',
-                to_peer_id: channel[0].peerId,
-                initiator: true
+                to_peer_id: channel[0].peerId
             }));
         }
 
