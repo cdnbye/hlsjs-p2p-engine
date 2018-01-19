@@ -1,4 +1,5 @@
 
+var count = 0;
 
 module.exports = function getPeerId() {
 
@@ -20,7 +21,8 @@ module.exports = function getPeerId() {
     // }
 
     // return  timestamp+tmp;
-    return  timestamp;
+    // return  timestamp;
+    return  ++count;
 
 
 }

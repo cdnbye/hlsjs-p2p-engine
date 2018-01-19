@@ -22,6 +22,7 @@
   "dependencies": {
     "buffer": "^5.0.8",
     "hls.js": "^0.8.9",
+    "reconnecting-websocket": "^3.2.2",
     "simple-peer": "^8.2.0",
     "ua-parser-js": "^0.7.17"
   },

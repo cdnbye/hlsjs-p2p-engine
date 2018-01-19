@@ -54,15 +54,32 @@ function onRequest(socket) {
         console.log('delete node: ' + websocket.peerId);
         // truncateChannels(websocket);                                 //将该节点从频道中删除
         let peerId = websocket.peerId;
+        let peer;
         for (let key in CHANNELS) {
             let channel = CHANNELS[key];
             if (channel.hasPeer(peerId)) {
+                peer = channel.getPeer(peerId);
                 channel.removePeer(peerId);
             }
         }
         for (let key in TOPOLOGY) {
             let topology = TOPOLOGY[key];
-            topology.deleteNode(peerId);
+            let parentPeerIds = topology.deleteNode(peer);
+            console.log(`delete node parentPeerIds [${parentPeerIds}]`);
+            if (peer && parentPeerIds.length) {
+                for (let node of peer.children) {
+                    let parentPeerId = parentPeerIds.shift();
+                    console.log(`connect ${node.peerId} to ${parentPeerId}`)
+                    if (parentPeerId === 'root') continue;
+
+                    let msg = {
+                        action: 'connect',
+                        to_peer_id: parentPeerId
+                    };
+                    node.send(msg);
+                }
+            }
+            console.log(JSON.stringify(topology.getGraph(), null, 2));
         }
     });
 }
@@ -82,22 +99,6 @@ function onMessage(message, websocket) {
             break;
 
     }
-
-    // if (message.enter)
-    // {
-    //     enterChannel(message, websocket);
-    //     console.log("peer enter channel: " + message.channel);
-    // }
-    // else if (message.open)
-    // {
-    //     onOpen(message, websocket);
-    //     console.log("onOpen");
-    // }
-    // else
-    // {
-    //     sendMessage(message, websocket);
-    //     //console.log("sendMessage");
-    // }
 }
 
 function handleSignal(message) {
@@ -111,22 +112,6 @@ function handleSignal(message) {
         };
         remotePeer.send(msg);
     }
-    // for (var i = 0; i < channel.length; i++) {
-    //     if (channel[i] && channel[i].peerId === message.to_peer_id) {
-    //         try {
-    //             //console.log('message.data' + message.data);
-    //             // console.log("sendMessageToPeer");
-    //             let msg = {
-    //                 action: 'signal',
-    //                 from_peer_id: message.peer_id,
-    //                 data: message.data
-    //             };
-    //             channel[i].sendUTF(JSON.stringify(msg));
-    //             break;
-    //         } catch(e) {
-    //         }
-    //     }
-    // }
 }
 
 function enterChannel(message, websocket) {
@@ -135,10 +120,10 @@ function enterChannel(message, websocket) {
     var peerId = peerIdGenerator();
     let peer = new Peer(peerId, websocket, message);
     websocket.peerId = peerId;
-    websocket.sendUTF(JSON.stringify({
+    peer.send({
         action: 'accept',
         peer_id: peerId
-    }));
+    });
 
     var channel = CHANNELS[message.channel];
 
@@ -146,42 +131,18 @@ function enterChannel(message, websocket) {
 
         channel.addPeer(peer);
 
-        //构造二叉拓扑结构
+
         let topology = TOPOLOGY[message.channel];
         let remotePeerId = topology.addNode(peer);
         console.log(`remotePeerId ${remotePeerId}`);
+        if (remotePeerId === 'root') return;
         let msg = {
             action: 'connect',
             to_peer_id: remotePeerId
         };
         peer.send(msg);
 
-        // let length = channel.peerNum;
-        // if (length === 2) {
-        //     channel[0].sendUTF(JSON.stringify({
-        //         action: 'connect',
-        //         to_peer_id: channel[1].peerId,
-        //         initiator: false
-        //     }));
-        //     channel[1].sendUTF(JSON.stringify({
-        //         action: 'connect',
-        //         to_peer_id: channel[0].peerId,
-        //         initiator: true
-        //     }));
-        // }
-        // if (length === 3) {
-        //     channel[0].sendUTF(JSON.stringify({
-        //         action: 'connect',
-        //         to_peer_id: channel[2].peerId,
-        //         initiator: false
-        //     }));
-        //     channel[2].sendUTF(JSON.stringify({
-        //         action: 'connect',
-        //         to_peer_id: channel[0].peerId,
-        //         initiator: true
-        //     }));
-        // }
-
+        console.log(JSON.stringify(topology.getGraph(), null, 2));
 
     } else {
 
@@ -190,34 +151,17 @@ function enterChannel(message, websocket) {
         channel.addPeer(peer);
         CHANNELS[message.channel] = channel;
 
-        let topology = new Topology();
+        //构造二叉拓扑结构
+        let topology = new Topology('BinaryTree');
         TOPOLOGY[message.channel] = topology;
+
+        //虚拟一个root节点
+        let root = new Peer('root', null, {});
+        topology.addNode(root);
+
         topology.addNode(peer);
     }
 
-}
-
-function swapArray(arr) {
-    var swapped = [],
-        length = arr.length;
-    for (var i = 0; i < length; i++) {
-        if (arr[i])
-            swapped[swapped.length] = arr[i];
-    }
-    return swapped;
-}
-
-function truncateChannels(websocket) {
-    for (var channel in CHANNELS) {
-        var _channel = CHANNELS[channel];
-        for (var i = 0; i < _channel.length; i++) {
-            if (_channel[i] == websocket)
-                delete _channel[i];
-        }
-        CHANNELS[channel] = swapArray(_channel);
-        if (CHANNELS && CHANNELS[channel] && !CHANNELS[channel].length)
-            delete CHANNELS[channel];
-    }
 }
 
 app.listen(3389);

@@ -5958,15 +5958,15 @@ var _p2pSignaler = __webpack_require__(34);
 
 var _p2pSignaler2 = _interopRequireDefault(_p2pSignaler);
 
-var _hybridLoader = __webpack_require__(37);
+var _hybridLoader = __webpack_require__(38);
 
 var _hybridLoader2 = _interopRequireDefault(_hybridLoader);
 
-var _bufferManager = __webpack_require__(39);
+var _bufferManager = __webpack_require__(40);
 
 var _bufferManager2 = _interopRequireDefault(_bufferManager);
 
-var _uaParserJs = __webpack_require__(40);
+var _uaParserJs = __webpack_require__(41);
 
 var _uaParserJs2 = _interopRequireDefault(_uaParserJs);
 
@@ -6169,15 +6169,15 @@ Object.defineProperty(exports, "__esModule", {
 
 //时间单位统一为秒
 var defaultP2PConfig = {
-    websocketAddr: 'ws://120.78.168.126:3389', //信令&调度服务器地址
-    websocketRetryDelay: 2, //发送数据重试时间间隔
+    wsAddr: 'ws://120.78.168.126:3389', //信令&调度服务器地址
+    wsMaxRetries: 10, //发送数据重试时间间隔
+    wsReconnectInterval: 5,
     p2pEnabled: true, //是否开启P2P，默认true
     dcKeepAliveInterval: 10, //datachannel多少秒发送一次keep-alive信息
     dcKeepAliveAckTimeout: 2, //datachannel接收keep-alive-ack信息的超时时间，超时则认为连接失败并主动关闭
     dcRequestTimeout: 2, //datachannel接收二进制数据的超时时间
     packetSize: 60 * 1024, //每次通过datachannel发送的包的大小
     maxBufSize: 1024 * 1024 * 100, //p2p缓存的最大数据量
-    live: true, //直播或点播
     loadTimeout: 5, //p2p下载的超时时间
     reportInterval: 30 //统计信息上报的时间间隔
 };
@@ -7527,6 +7527,10 @@ var _p2pScheduler = __webpack_require__(36);
 
 var _p2pScheduler2 = _interopRequireDefault(_p2pScheduler);
 
+var _reconnectingWebsocket = __webpack_require__(37);
+
+var _reconnectingWebsocket2 = _interopRequireDefault(_reconnectingWebsocket);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -7561,8 +7565,7 @@ var P2PSignaler = function (_EventEmitter) {
         _this.websocket = null;
 
         if (config.p2pEnabled) {
-            _this.websocket = new WebSocket(config.websocketAddr);
-            _this._init(_this.websocket, info);
+            _this.websocket = _this._initWebsocket(info);
         }
 
         return _this;
@@ -7583,19 +7586,27 @@ var P2PSignaler = function (_EventEmitter) {
                 action: 'leave'
             };
             this.send(msg);
+            this.websocket.close(1000, '', { keepClosed: true, fastClose: true });
         }
     }, {
         key: 'resumeP2P',
         value: function resumeP2P() {
             if (!this.connected) {
-                this.websocket = new WebSocket(this.config.websocketAddr);
-                this._init(this.websocket, this.browserInfo);
+                this.websocket = this._initWebsocket(this.browserInfo);
+                // this.websocket.connect();
             }
         }
     }, {
-        key: '_init',
-        value: function _init(websocket, info) {
+        key: '_initWebsocket',
+        value: function _initWebsocket(info) {
             var _this2 = this;
+
+            var wsOptions = {
+                maxRetries: this.config.wsMaxRetries,
+                minReconnectionDelay: this.config.wsReconnectInterval * 1000
+
+            };
+            var websocket = new _reconnectingWebsocket2.default(this.config.wsAddr, undefined, wsOptions);
 
             websocket.onopen = function () {
                 console.log('websocket connection opened with channel: ' + _this2.channel);
@@ -7616,17 +7627,6 @@ var P2PSignaler = function (_EventEmitter) {
 
             websocket.push = websocket.send;
             websocket.send = function (msg) {
-                if (websocket.readyState != 1) {
-                    console.log('websocket connection is not opened yet.');
-                    //重新连接
-                    websocket.close();
-                    _this2.websocket = new WebSocket(_this2.config.websocketAddr);
-                    _this2._init(_this2.websocket);
-
-                    return setTimeout(function () {
-                        websocket.send(msg);
-                    }, _this2.config.websocketRetryDelay * 1000);
-                }
                 var msgStr = JSON.stringify(Object.assign({ channel: _this2.channel }, msg));
                 console.log("send to websocket is " + msgStr);
                 websocket.push(msgStr);
@@ -7659,10 +7659,14 @@ var P2PSignaler = function (_EventEmitter) {
 
                 }
             };
-            websocket.onerror = websocket.onclose = function () {
+            websocket.onclose = function () {
                 //websocket断开时清除datachannel
+                console.warn('websocket closed');
+                _this2.connected = false;
                 _this2.scheduler.clearAllStreamers();
+                _this2.DCMap.clear();
             };
+            return websocket;
         }
     }, {
         key: '_handleSignal',
@@ -8329,6 +8333,228 @@ module.exports = exports['default'];
 
 "use strict";
 
+;
+;
+;
+var isWebSocket = function (constructor) {
+    return constructor && constructor.CLOSING === 2;
+};
+var isGlobalWebSocket = function () {
+    return typeof WebSocket !== 'undefined' && isWebSocket(WebSocket);
+};
+var getDefaultOptions = function () { return ({
+    constructor: isGlobalWebSocket() ? WebSocket : null,
+    maxReconnectionDelay: 10000,
+    minReconnectionDelay: 1500,
+    reconnectionDelayGrowFactor: 1.3,
+    connectionTimeout: 4000,
+    maxRetries: Infinity,
+    debug: false,
+}); };
+var bypassProperty = function (src, dst, name) {
+    Object.defineProperty(dst, name, {
+        get: function () { return src[name]; },
+        set: function (value) { src[name] = value; },
+        enumerable: true,
+        configurable: true,
+    });
+};
+var initReconnectionDelay = function (config) {
+    return (config.minReconnectionDelay + Math.random() * config.minReconnectionDelay);
+};
+var updateReconnectionDelay = function (config, previousDelay) {
+    var newDelay = previousDelay * config.reconnectionDelayGrowFactor;
+    return (newDelay > config.maxReconnectionDelay)
+        ? config.maxReconnectionDelay
+        : newDelay;
+};
+var LEVEL_0_EVENTS = ['onopen', 'onclose', 'onmessage', 'onerror'];
+var reassignEventListeners = function (ws, oldWs, listeners) {
+    Object.keys(listeners).forEach(function (type) {
+        listeners[type].forEach(function (_a) {
+            var listener = _a[0], options = _a[1];
+            ws.addEventListener(type, listener, options);
+        });
+    });
+    if (oldWs) {
+        LEVEL_0_EVENTS.forEach(function (name) {
+            ws[name] = oldWs[name];
+        });
+    }
+};
+var ReconnectingWebsocket = function (url, protocols, options) {
+    var _this = this;
+    if (options === void 0) { options = {}; }
+    var ws;
+    var connectingTimeout;
+    var reconnectDelay = 0;
+    var retriesCount = 0;
+    var shouldRetry = true;
+    var savedOnClose = null;
+    var listeners = {};
+    // require new to construct
+    if (!(this instanceof ReconnectingWebsocket)) {
+        throw new TypeError("Failed to construct 'ReconnectingWebSocket': Please use the 'new' operator");
+    }
+    // Set config. Not using `Object.assign` because of IE11
+    var config = getDefaultOptions();
+    Object.keys(config)
+        .filter(function (key) { return options.hasOwnProperty(key); })
+        .forEach(function (key) { return config[key] = options[key]; });
+    if (!isWebSocket(config.constructor)) {
+        throw new TypeError('Invalid WebSocket constructor. Set `options.constructor`');
+    }
+    var log = config.debug ? function () {
+        var params = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            params[_i] = arguments[_i];
+        }
+        return console.log.apply(console, ['RWS:'].concat(params));
+    } : function () { };
+    /**
+     * Not using dispatchEvent, otherwise we must use a DOM Event object
+     * Deferred because we want to handle the close event before this
+     */
+    var emitError = function (code, msg) { return setTimeout(function () {
+        var err = new Error(msg);
+        err.code = code;
+        if (Array.isArray(listeners.error)) {
+            listeners.error.forEach(function (_a) {
+                var fn = _a[0];
+                return fn(err);
+            });
+        }
+        if (ws.onerror) {
+            ws.onerror(err);
+        }
+    }, 0); };
+    var handleClose = function () {
+        log('handleClose', { shouldRetry: shouldRetry });
+        retriesCount++;
+        log('retries count:', retriesCount);
+        if (retriesCount > config.maxRetries) {
+            emitError('EHOSTDOWN', 'Too many failed connection attempts');
+            return;
+        }
+        if (!reconnectDelay) {
+            reconnectDelay = initReconnectionDelay(config);
+        }
+        else {
+            reconnectDelay = updateReconnectionDelay(config, reconnectDelay);
+        }
+        log('handleClose - reconnectDelay:', reconnectDelay);
+        if (shouldRetry) {
+            setTimeout(connect, reconnectDelay);
+        }
+    };
+    var connect = function () {
+        if (!shouldRetry) {
+            return;
+        }
+        log('connect');
+        var oldWs = ws;
+        var wsUrl = (typeof url === 'function') ? url() : url;
+        ws = new config.constructor(wsUrl, protocols);
+        connectingTimeout = setTimeout(function () {
+            log('timeout');
+            ws.close();
+            emitError('ETIMEDOUT', 'Connection timeout');
+        }, config.connectionTimeout);
+        log('bypass properties');
+        for (var key in ws) {
+            // @todo move to constant
+            if (['addEventListener', 'removeEventListener', 'close', 'send'].indexOf(key) < 0) {
+                bypassProperty(ws, _this, key);
+            }
+        }
+        ws.addEventListener('open', function () {
+            clearTimeout(connectingTimeout);
+            log('open');
+            reconnectDelay = initReconnectionDelay(config);
+            log('reconnectDelay:', reconnectDelay);
+            retriesCount = 0;
+        });
+        ws.addEventListener('close', handleClose);
+        reassignEventListeners(ws, oldWs, listeners);
+        // because when closing with fastClose=true, it is saved and set to null to avoid double calls
+        ws.onclose = ws.onclose || savedOnClose;
+        savedOnClose = null;
+    };
+    log('init');
+    connect();
+    this.close = function (code, reason, _a) {
+        if (code === void 0) { code = 1000; }
+        if (reason === void 0) { reason = ''; }
+        var _b = _a === void 0 ? {} : _a, _c = _b.keepClosed, keepClosed = _c === void 0 ? false : _c, _d = _b.fastClose, fastClose = _d === void 0 ? true : _d, _e = _b.delay, delay = _e === void 0 ? 0 : _e;
+        log('close - params:', { reason: reason, keepClosed: keepClosed, fastClose: fastClose, delay: delay, retriesCount: retriesCount, maxRetries: config.maxRetries });
+        shouldRetry = !keepClosed && retriesCount <= config.maxRetries;
+        if (delay) {
+            reconnectDelay = delay;
+        }
+        ws.close(code, reason);
+        if (fastClose) {
+            var fakeCloseEvent_1 = {
+                code: code,
+                reason: reason,
+                wasClean: true,
+            };
+            // execute close listeners soon with a fake closeEvent
+            // and remove them from the WS instance so they
+            // don't get fired on the real close.
+            handleClose();
+            ws.removeEventListener('close', handleClose);
+            // run and remove level2
+            if (Array.isArray(listeners.close)) {
+                listeners.close.forEach(function (_a) {
+                    var listener = _a[0], options = _a[1];
+                    listener(fakeCloseEvent_1);
+                    ws.removeEventListener('close', listener, options);
+                });
+            }
+            // run and remove level0
+            if (ws.onclose) {
+                savedOnClose = ws.onclose;
+                ws.onclose(fakeCloseEvent_1);
+                ws.onclose = null;
+            }
+        }
+    };
+    this.send = function (data) {
+        ws.send(data);
+    };
+    this.addEventListener = function (type, listener, options) {
+        if (Array.isArray(listeners[type])) {
+            if (!listeners[type].some(function (_a) {
+                var l = _a[0];
+                return l === listener;
+            })) {
+                listeners[type].push([listener, options]);
+            }
+        }
+        else {
+            listeners[type] = [[listener, options]];
+        }
+        ws.addEventListener(type, listener, options);
+    };
+    this.removeEventListener = function (type, listener, options) {
+        if (Array.isArray(listeners[type])) {
+            listeners[type] = listeners[type].filter(function (_a) {
+                var l = _a[0];
+                return l !== listener;
+            });
+        }
+        ws.removeEventListener(type, listener, options);
+    };
+};
+module.exports = ReconnectingWebsocket;
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -8340,7 +8566,7 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _xhrLoader = __webpack_require__(38);
+var _xhrLoader = __webpack_require__(39);
 
 var _xhrLoader2 = _interopRequireDefault(_xhrLoader);
 
@@ -8466,7 +8692,7 @@ exports.default = LoaderScheduler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8658,7 +8884,7 @@ exports.default = XhrLoader;
 module.exports = exports['default'];
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8812,7 +9038,7 @@ exports.default = BufferManager;
 module.exports = exports['default'];
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -9855,7 +10081,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
         exports.UAParser = UAParser;
     } else {
         // requirejs env (optional)
-        if ("function" === FUNC_TYPE && __webpack_require__(41)) {
+        if ("function" === FUNC_TYPE && __webpack_require__(42)) {
             !(__WEBPACK_AMD_DEFINE_RESULT__ = (function () {
                 return UAParser;
             }).call(exports, __webpack_require__, exports, module),
@@ -9891,7 +10117,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */

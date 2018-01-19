@@ -10,11 +10,8 @@
 
 - hls.js参数实验
 
-- signaler重连次数
-
 ## server
 
-- nodejs实现二叉树拓扑
-
 - 提供拓扑json接口
+
 

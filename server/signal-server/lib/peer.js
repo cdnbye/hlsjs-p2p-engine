@@ -47,7 +47,7 @@ class Peer {
     }
 
     send(msg) {
-        this.websocket.sendUTF(JSON.stringify(msg));
+        if (this.websocket) this.websocket.sendUTF(JSON.stringify(msg));
     }
 }
 

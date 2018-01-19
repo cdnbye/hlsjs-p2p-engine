@@ -25,11 +25,11 @@
             fragLoadingTimeOut: 4000,              // used by fragment-loader
         };
 
-        var p2pConfig = {websocketAddr: 'ws://localhost:3389/', reportInterval: 3600};
+        var p2pConfig = {wsAddr: 'ws://localhost:3389/', reportInterval: 3600};
 
         var hls = new Hls(hlsjsConfig);
 
-        new HlsPeerify(hls, p2pConfig);
+        var peerify = new HlsPeerify(hls, p2pConfig);
 
         hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
 //        hls.loadSource('https://video-dev.github.io/streams/test_001/stream.m3u8?a=123');
@@ -54,7 +54,12 @@
 //      }
         });
 
-
+        setTimeout(function () {
+            peerify.disableP2P();
+            setTimeout(function () {
+                peerify.enableP2P();
+            }, 10000)
+        }, 10000)
 
     }
 </script>
