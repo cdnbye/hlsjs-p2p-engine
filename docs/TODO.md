@@ -10,6 +10,10 @@
 
 - hls.js参数实验
 
+- release版替换协议关键字
+
+- negotiated
+
 ## server
 
 - 提供拓扑json接口

@@ -31,9 +31,10 @@
 
         var peerify = new HlsPeerify(hls, p2pConfig);
 
-        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
+//        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
 //        hls.loadSource('https://video-dev.github.io/streams/test_001/stream.m3u8?a=123');
-//        hls.loadSource('http://112.90.52.139/hls/test.m3u8');
+//        hls.loadSource('https://moeplayer.b0.upaiyun.com/dplayer/hls/hikarunara.m3u8');
+        hls.loadSource('https://apd-fa90e867c05bd24e1549827b3b7b689a.v.smtcdns.com/newsts.tc.qq.com/ADrgdoLCoum5fFyQsVLEXIXqPxiiFhZ5Rb5ptMfCXD-E/-v5XTvjTuGz8pY8BrpVdn9Xs1Rh4W6_Kv5iet6TXfy_JJpqvqLoiSImTLEhENfWz4jV9gn1klnggikzg44sIv8osDjSyF0aSqt6GKgyMRZ3CXxdbzDIRIJ6ogsxMNrt6KC516S60YesbwALCwDfzF-VnS_yPpP--/p0025mja8f1.321002.ts.m3u8?ver=4');
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
             hls.loadLevel = 0;
@@ -54,12 +55,6 @@
 //      }
         });
 
-        setTimeout(function () {
-            peerify.disableP2P();
-            setTimeout(function () {
-                peerify.enableP2P();
-            }, 10000)
-        }, 10000)
 
     }
 </script>

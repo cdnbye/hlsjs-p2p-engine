@@ -20,7 +20,7 @@ const uglifyJsOptions = {
     },
     output: {
         comments: false,  // remove all comments
-        preamble: "/* A p2p-based hls player via WebRTC data channel. @author XieTing <86755838@qq.com> <https://github.com/snowinszu> */"
+        preamble: "/* A P2P-CDN supporting hls player built on WebRTC Data Channels API. @author XieTing <86755838@qq.com> <https://github.com/snowinszu> */"
     }
 };
 
@@ -103,8 +103,8 @@ const multiConfig = [
             name: 'release-hls-peerify',
             entry: './lib/index.hls-peerify.js',
             output: {
-                filename: './hls-peerify.js',
-                path: path.resolve(__dirname),
+                filename: 'hls-peerify.min.js',
+                path: path.resolve(__dirname, 'dist'),
                 // publicPath: '/src/',
                 library: ['HlsPeerify'],
                 libraryTarget: 'umd'
@@ -116,7 +116,7 @@ const multiConfig = [
             entry: './peerify-hls.js',
             output: {
                 filename: 'peerify-hls-bundle.js',
-                path: path.resolve(__dirname),
+                path: path.resolve(__dirname, 'dist'),
                 // publicPath: '/dist/',
                 library: ['Hls'],
                 libraryTarget: 'umd'

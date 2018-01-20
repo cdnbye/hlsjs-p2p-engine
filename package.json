@@ -10,8 +10,8 @@
     "release-peerify-hls": "webpack --progress --env.release-peerify-hls",
     "test": "webpack --progress --env.test-bundle",
     "push_to_gitee": "git add . && git commit -m 'update' && git push",
-    "copy_html_to_remote": "scp -r ./demo/index.html root@120.78.168.126:/var/www/html/hls-frontend/demo",
-    "copy_dist_to_remote": "scp -r ./peerify-hls-bundle.js root@120.78.168.126:/var/www/html/hls-frontend"
+    "copy_demo_to_remote": "scp -r ./demo/* root@120.78.168.126:/var/www/html/hls-frontend/demo",
+    "copy_dist_to_remote": "scp -r ./dist/* root@120.78.168.126:/var/www/html/hls-frontend/dist"
   },
   "repository": {
     "type": "git",

@@ -14,12 +14,10 @@ if(HlsJS.isSupported()) {
     var hlsjsConfig = {
         // debug: true,
 //      pLoader : pLoader,
-    }
-
-    var p2pConfig = {
-        debug: true,
-        websocketAddr: 'ws://120.78.168.126:3389',
-        reportInterval: 36000,
+        p2pConfig: {
+            wsAddr: 'ws://localhost:3389/',
+            reportInterval: 36000,
+        }
     };
 
     // var hls = new Hlsjs(p2pConfig, hlsjsConfig);
