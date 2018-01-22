@@ -24,10 +24,10 @@ if(HlsJS.isSupported()) {
     var hls = new HlsJS(hlsjsConfig);
     // new HlsPeerify(hls, p2pConfig);
 
-    hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
+    // hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
 //        hls.loadSource('https://video-dev.github.io/streams/test_001/stream.m3u8');
 //        hls.loadSource('http://112.90.52.139/hls/test.m3u8');
-//     hls.loadSource('http://wowza.peer5.com/live/smil:bbb_abr.smil/chunklist_w794046364_b2204000.m3u8');
+    hls.loadSource('http://wowza.peer5.com/live/smil:bbb_abr.smil/chunklist_w794046364_b2204000.m3u8');
     hls.attachMedia(video);
     hls.on(HlsJS.Events.MANIFEST_PARSED,function(event, data) {
         hls.loadLevel = 0;

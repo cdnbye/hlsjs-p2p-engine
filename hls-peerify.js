@@ -2766,7 +2766,8 @@ exports.default = {
 
 
     //loader-scheduler
-    SEGMENT: 'segment'
+    SEGMENT: 'segment',
+    TRANSITION: "transition" //跃迁事件
 };
 module.exports = exports['default'];
 
@@ -6083,7 +6084,9 @@ var HlsPeerify = function (_EventEmitter) {
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_CHANGED, function (id, data) {
                 // log('FRAG_CHANGED: '+JSON.stringify(data.frag, null, 2));
                 log('FRAG_CHANGED: ' + data.frag.sn);
-                _this2.hlsjs.config.currPlay = data.frag.sn;
+                var sn = data.frag.sn;
+                _this2.hlsjs.config.currPlay = sn;
+                _this2.signaler.currentPlaySN = sn;
             });
 
             // this.hlsjs.on(this.hlsjs.constructor.Events.LEVEL_LOADED, (id, data) => {
@@ -6176,10 +6179,10 @@ var defaultP2PConfig = {
     dcKeepAliveInterval: 10, //datachannel多少秒发送一次keep-alive信息
     dcKeepAliveAckTimeout: 2, //datachannel接收keep-alive-ack信息的超时时间，超时则认为连接失败并主动关闭
     dcRequestTimeout: 2, //datachannel接收二进制数据的超时时间
-    packetSize: 60 * 1024, //每次通过datachannel发送的包的大小
-    maxBufSize: 1024 * 1024 * 100, //p2p缓存的最大数据量
+    packetSize: 16 * 1024, //每次通过datachannel发送的包的大小
+    maxBufSize: 1024 * 1024 * 50, //p2p缓存的最大数据量
     loadTimeout: 5, //p2p下载的超时时间
-    reportInterval: 30 //统计信息上报的时间间隔
+    reportInterval: 60 //统计信息上报的时间间隔
 };
 
 exports.defaultP2PConfig = defaultP2PConfig;
@@ -7568,6 +7571,7 @@ var P2PSignaler = function (_EventEmitter) {
             _this.websocket = _this._initWebsocket(info);
         }
 
+        _this._setupScheduler(_this.scheduler);
         return _this;
     }
 
@@ -7582,10 +7586,10 @@ var P2PSignaler = function (_EventEmitter) {
         key: 'stopP2P',
         value: function stopP2P() {
             this.scheduler.clearAllStreamers();
-            var msg = {
-                action: 'leave'
-            };
-            this.send(msg);
+            // let msg = {
+            //     action: 'leave'
+            // };
+            // this.send(msg);
             this.websocket.close(1000, '', { keepClosed: true, fastClose: true });
         }
     }, {
@@ -7593,13 +7597,32 @@ var P2PSignaler = function (_EventEmitter) {
         value: function resumeP2P() {
             if (!this.connected) {
                 this.websocket = this._initWebsocket(this.browserInfo);
-                // this.websocket.connect();
             }
+        }
+    }, {
+        key: '_setupScheduler',
+        value: function _setupScheduler(scheduler) {
+            var _this2 = this;
+
+            this.tranPending = false;
+
+            scheduler.on(_events4.default.TRANSITION, function () {
+                //监听跃迁请求
+
+                if (!_this2.tranPending) {
+                    //防止重复发送请求
+                    var msg = {
+                        action: 'transition'
+                    };
+                    _this2.send(msg);
+                    _this2.tranPending = true;
+                }
+            });
         }
     }, {
         key: '_initWebsocket',
         value: function _initWebsocket(info) {
-            var _this2 = this;
+            var _this3 = this;
 
             var wsOptions = {
                 maxRetries: this.config.wsMaxRetries,
@@ -7609,13 +7632,12 @@ var P2PSignaler = function (_EventEmitter) {
             var websocket = new _reconnectingWebsocket2.default(this.config.wsAddr, undefined, wsOptions);
 
             websocket.onopen = function () {
-                console.log('websocket connection opened with channel: ' + _this2.channel);
-                _this2.connected = true;
+                console.log('websocket connection opened with channel: ' + _this3.channel);
 
                 //发送进入频道请求
                 var msg = {
                     action: 'enter',
-                    channel: _this2.channel
+                    channel: _this3.channel
                 };
 
                 if (info) {
@@ -7627,7 +7649,7 @@ var P2PSignaler = function (_EventEmitter) {
 
             websocket.push = websocket.send;
             websocket.send = function (msg) {
-                var msgStr = JSON.stringify(Object.assign({ channel: _this2.channel }, msg));
+                var msgStr = JSON.stringify(Object.assign({ channel: _this3.channel, peer_id: _this3.peerId }, msg));
                 console.log("send to websocket is " + msgStr);
                 websocket.push(msgStr);
             };
@@ -7638,21 +7660,25 @@ var P2PSignaler = function (_EventEmitter) {
                 switch (action) {
                     case 'signal':
                         console.log('start _handleSignal');
-                        _this2._handleSignal(msg.from_peer_id, msg.data);
+                        _this3._handleSignal(msg.from_peer_id, msg.data);
                         break;
                     case 'connect':
                         console.log('start _handleConnect');
-                        _this2._createDatachannel(msg.to_peer_id, true);
+                        _this3._createDatachannel(msg.to_peer_id, true);
                         break;
                     case 'disconnect':
-
+                        _this3._handleDisconnectMsg(msg); //未实现
                         break;
                     case 'accept':
-                        _this2.peerId = msg.peer_id; //获取本端Id
+                        _this3.connected = true;
+                        _this3.peerId = msg.peer_id; //获取本端Id
+                        break;
+                    case 'transition':
+                        //跃迁
+                        _this3._handleTransitionMsg(msg);
                         break;
                     case 'reject':
-                        _this2.connected = false; //如果拒绝进入频道则不允许发消息
-                        _this2.websocket.close();
+                        _this3.stopP2P();
                         break;
                     default:
                         console.log('websocket unknown action ' + action);
@@ -7662,9 +7688,9 @@ var P2PSignaler = function (_EventEmitter) {
             websocket.onclose = function () {
                 //websocket断开时清除datachannel
                 console.warn('websocket closed');
-                _this2.connected = false;
-                _this2.scheduler.clearAllStreamers();
-                _this2.DCMap.clear();
+                _this3.connected = false;
+                _this3.scheduler.clearAllStreamers();
+                _this3.DCMap.clear();
             };
             return websocket;
         }
@@ -7680,6 +7706,19 @@ var P2PSignaler = function (_EventEmitter) {
             datachannel.receiveSignal(data);
         }
     }, {
+        key: '_handleDisconnectMsg',
+        value: function _handleDisconnectMsg(msg) {}
+    }, {
+        key: '_handleTransitionMsg',
+        value: function _handleTransitionMsg(msg) {
+            this.tranPending = false;
+            if (msg.success) {
+                //请求成功
+
+                this.scheduler.moveUpstreamsersToDown();
+            }
+        }
+    }, {
         key: '_createDatachannel',
         value: function _createDatachannel(remotePeerId, isInitiator) {
             var datachannel = new _dataChannel2.default(this.peerId, remotePeerId, isInitiator, this.config);
@@ -7690,25 +7729,25 @@ var P2PSignaler = function (_EventEmitter) {
     }, {
         key: '_setupDC',
         value: function _setupDC(datachannel) {
-            var _this3 = this;
+            var _this4 = this;
 
             datachannel.on('signal', function (data) {
                 var msg = {
                     action: 'signal',
-                    peer_id: _this3.peerId,
+                    peer_id: _this4.peerId,
                     to_peer_id: datachannel.remotePeerId,
                     data: data
                 };
-                _this3.websocket.send(msg);
+                _this4.websocket.send(msg);
             }).once('error', function () {
                 var msg = {
                     action: 'dc_failed',
                     dc_id: datachannel.channelId
                 };
-                _this3.websocket.send(msg);
+                _this4.websocket.send(msg);
                 console.log('datachannel error ' + datachannel.channelId);
-                _this3.scheduler.deleteDataChannel(datachannel);
-                _this3.DCMap.delete(datachannel.remotePeerId);
+                _this4.scheduler.deleteDataChannel(datachannel);
+                _this4.DCMap.delete(datachannel.remotePeerId);
                 datachannel.destroy();
             }).once(_events4.default.DC_CLOSE, function () {
 
@@ -7717,20 +7756,20 @@ var P2PSignaler = function (_EventEmitter) {
                     action: 'dc_closed',
                     dc_id: datachannel.channelId
                 };
-                _this3.websocket.send(msg);
-                _this3.scheduler.deleteDataChannel(datachannel);
-                _this3.DCMap.delete(datachannel.remotePeerId);
+                _this4.websocket.send(msg);
+                _this4.scheduler.deleteDataChannel(datachannel);
+                _this4.DCMap.delete(datachannel.remotePeerId);
                 datachannel.destroy();
             }).once(_events4.default.DC_OPEN, function () {
 
-                _this3.scheduler.addDataChannel(datachannel);
+                _this4.scheduler.addDataChannel(datachannel);
                 if (datachannel.isReceiver) {
                     //子节点发送已连接消息
                     var msg = {
                         action: 'dc_opened',
                         dc_id: datachannel.channelId
                     };
-                    _this3.websocket.send(msg);
+                    _this4.websocket.send(msg);
                 }
             });
         }
@@ -7739,6 +7778,11 @@ var P2PSignaler = function (_EventEmitter) {
         value: function destroy() {
             this.websocket.close();
             this.websocket = null;
+        }
+    }, {
+        key: 'currentPlaySN',
+        set: function set(sn) {
+            this.scheduler.currentPlaySN = sn;
         }
     }]);
 
@@ -7806,7 +7850,7 @@ var DataChannel = function (_EventEmitter) {
         _this.loading = false;
 
         _this._datachannel = new _simplePeer2.default({ initiator: isInitiator, objectMode: true });
-        _this.isReceiver = isInitiator; //主动发起连接的为数据接受者，用于标识本节点的类型
+        // this.isReceiver = isInitiator;                                           //主动发起连接的为数据接受者，用于标识本节点的类型
         _this._init(_this._datachannel);
         return _this;
     }
@@ -7905,6 +7949,11 @@ var DataChannel = function (_EventEmitter) {
                     this.loading = true;
                 }
             }
+        }
+    }, {
+        key: 'close',
+        value: function close() {
+            this.destroy();
         }
     }, {
         key: 'receiveSignal',
@@ -8032,6 +8081,10 @@ var P2PScheduler = function (_EventEmitter) {
         //标识当前下载
         _this.expectedSeg = null; //type {sn: number, relurl: string}
         _this.bufMgr = null;
+
+        //当前播放的sn
+        _this._currPlaySN = -1;
+        _this.leadingCounter = 0; //对播放慢于此节点的父节点进行计数
         return _this;
     }
 
@@ -8119,8 +8172,9 @@ var P2PScheduler = function (_EventEmitter) {
                         _this2._addSegToBuf(response);
                     }
                 }
+                _this2.leadingCounter = 0;
                 // log(`this.upstreamers.length ${this.upstreamers.length}`);
-            }).on(_events4.default.DC_REQUESTFAIL, function () {
+            }).on(_events4.default.DC_REQUESTFAIL, function (msg) {
                 //当请求的数据找不到时触发
                 if (_this2.requestTimeout) {
                     //如果还没有超时
@@ -8130,6 +8184,16 @@ var P2PScheduler = function (_EventEmitter) {
                         _this2.stats.retry++;
                         _this2._loadInternal();
                     }
+                }
+                var upStreamerCurr = msg.current; //父节点目前播放的sn
+                if (_this2._currPlaySN - upStreamerCurr >= 2) {
+                    _this2.leadingCounter++;
+                    if (_this2.leadingCounter === _this2.upstreamers.length) {
+                        //如果播放快于所有父节点
+                        _this2.emit(_events4.default.TRANSITION);
+                    }
+                } else {
+                    _this2.leadingCounter = 0;
                 }
             }).on(_events4.default.DC_BINARY, function () {
                 //接收到binary事件，用于tfirst
@@ -8144,6 +8208,7 @@ var P2PScheduler = function (_EventEmitter) {
             log('timeout while loading ' + this.context.url);
             this.callbacks.onTimeout(this.stats, this.context, null);
             this.requestTimeout = null;
+            this.leadingCounter = 0;
         }
     }, {
         key: '_addDownStreamer',
@@ -8200,7 +8265,7 @@ var P2PScheduler = function (_EventEmitter) {
                         var _response = {
                             event: 'LACK',
                             url: url,
-                            sn: sn
+                            current: _this3._currPlaySN
                         };
                         channel.send(JSON.stringify(_response));
                     }
@@ -8253,6 +8318,14 @@ var P2PScheduler = function (_EventEmitter) {
                     this.upstreamers.splice(_i2, 1);
                     return;
                 }
+            }
+        }
+    }, {
+        key: 'moveUpstreamsersToDown',
+        value: function moveUpstreamsersToDown() {
+            while (this.upstreamers.length > 0) {
+                var streamer = this.upstreamers.pop();
+                this.downstreamers.push(streamer);
             }
         }
     }, {
@@ -8318,6 +8391,11 @@ var P2PScheduler = function (_EventEmitter) {
         key: 'hasDownstreamer',
         get: function get() {
             return this.downstreamers.length > 0;
+        }
+    }, {
+        key: 'currentPlaySN',
+        set: function set(sn) {
+            this._currPlaySN = sn;
         }
     }]);
 
@@ -8902,6 +8980,8 @@ var _events2 = _interopRequireDefault(_events);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -8925,11 +9005,10 @@ var BufferManager = function (_EventEmitter) {
         sn: number
         relurl: string
         data: Buffer
-        size: number
+        size: string
          */
-        _this._segArray = []; //最新的数据加在最左端
+        _this._segPool = new Map(); //存放seg的Map
         _this._currBufSize = 0; //目前的buffer总大小
-        _this.urlSet = new Set(); //用于按url查找
         return _this;
     }
 
@@ -8937,92 +9016,34 @@ var BufferManager = function (_EventEmitter) {
         key: 'hasSegOfURL',
         value: function hasSegOfURL(url) {
             //防止重复加入seg
-            return this.urlSet.has(url);
+            return this._segPool.has(url);
         }
     }, {
         key: 'addSeg',
         value: function addSeg(seg) {
             log('add seg ' + seg.sn + ' url ' + seg.relurl + ' size ' + seg.data.byteLength);
-            this._segArray.unshift(seg);
-            this.urlSet.add(seg.relurl);
-            this._currBufSize += seg.size;
+            this._segPool.set(seg.relurl, seg);
+            // this.urlSet.add(seg.relurl);
+            this._currBufSize += parseInt(seg.size);
+            console.log('seg.size ' + seg.size + ' _currBufSize ' + this._currBufSize + ' maxBufSize ' + this.config.maxBufSize);
             while (this._currBufSize > this.config.maxBufSize) {
                 //去掉多余的数据
-                var lastSeg = this._segArray.pop();
-                this.urlSet.delete(lastSeg.relurl);
-                this._currBufSize -= lastSeg.size;
+                var lastSeg = [].concat(_toConsumableArray(this._segPool.values())).shift();
+                console.warn('pop seg ' + lastSeg.relurl);
+                this._segPool.delete(lastSeg.relurl);
+                this._currBufSize -= parseInt(lastSeg.size);
             }
         }
     }, {
         key: 'getSegByURL',
         value: function getSegByURL(relurl) {
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-                for (var _iterator = this._segArray[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var seg = _step.value;
-
-                    if (seg.relurl === relurl) {
-                        return seg;
-                    }
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
-                    }
-                } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
-            }
-
-            return null;
-        }
-    }, {
-        key: 'getSegBySN',
-        value: function getSegBySN(sn) {
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
-
-            try {
-                for (var _iterator2 = this._segArray[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var seg = _step2.value;
-
-                    if (seg.sn === sn) {
-                        return seg;
-                    }
-                }
-            } catch (err) {
-                _didIteratorError2 = true;
-                _iteratorError2 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                        _iterator2.return();
-                    }
-                } finally {
-                    if (_didIteratorError2) {
-                        throw _iteratorError2;
-                    }
-                }
-            }
-
-            return null;
+            return this._segPool.get(relurl);
         }
     }, {
         key: 'clear',
         value: function clear() {
-            this._segArray = [];
+            this._segPool.clear();
             this._currBufSize = 0;
-            this.urlSet.clear();
         }
     }, {
         key: 'currBufSize',

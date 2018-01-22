@@ -6,8 +6,6 @@
  *
  */
 
-
-
 var fs = require('fs');
 var peerIdGenerator = require('./lib/peerid-generator');
 var _static = require('node-static');

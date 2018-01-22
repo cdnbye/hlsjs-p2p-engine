@@ -45,7 +45,7 @@ datachannel KEEPALIVE-ACK
 {
     event: 'LACK'  
     url: string    //ts文件的url（相对url）
-    sn: number         //ts数据的播放序号
+    current: number         //当前播放序号
 }
 ```
 
@@ -133,6 +133,14 @@ datachannel 发生错误
 }
 ```
 
+### server ---> peer        发送断开连接命令给peer
+```javastript
+{
+    action: 'disconnect'           
+    to_peers: Array<string>            //断开连接的节点的Id数组
+}
+```
+
 ### server ---> peer        发送信令给peer
 ```javastript
 {
@@ -149,6 +157,21 @@ datachannel 发生错误
     level:   number              //平均level，用于调度
     cdn: number                  //cdn下载的流量大小（单位KB）
     p2p: number                  //p2p下载的流量大小（单位KB）
+}
+```
+
+### peer ---> server    请求成为父节点（跃迁2层）
+```javastript
+{
+    action: 'transition'         
+}
+```
+
+### server ---> peer    请求跃迁成功/失败
+```javastript
+{
+    action: 'transition'
+    success: boolean         //成功/失败
 }
 ```
 
