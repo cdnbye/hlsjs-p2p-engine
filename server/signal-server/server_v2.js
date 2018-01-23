@@ -95,8 +95,21 @@ function onMessage(message, websocket) {
         case 'signal':
             handleSignal(message);
             break;
+        case 'transition':
+            handleTransition(message, websocket);
+            break
 
     }
+}
+
+function handleTransition(message, websocket) {
+    const res = {
+        action: 'transition',
+        success: true
+    }
+    var channel = CHANNELS[message.channel];
+    const peerId = websocket.peerId;
+    channel.getPeer(peerId).send(res);
 }
 
 function handleSignal(message) {

@@ -2767,7 +2767,8 @@ exports.default = {
 
     //loader-scheduler
     SEGMENT: 'segment',
-    TRANSITION: "transition" //跃迁事件
+    TRANSITION: "transition", //跃迁事件
+    DISPLACE: 'displace'
 };
 module.exports = exports['default'];
 
@@ -7850,7 +7851,7 @@ var DataChannel = function (_EventEmitter) {
         _this.loading = false;
 
         _this._datachannel = new _simplePeer2.default({ initiator: isInitiator, objectMode: true });
-        // this.isReceiver = isInitiator;                                           //主动发起连接的为数据接受者，用于标识本节点的类型
+        _this.isReceiver = isInitiator; //主动发起连接的为数据接受者，用于标识本节点的类型
         _this._init(_this._datachannel);
         return _this;
     }
@@ -7908,6 +7909,9 @@ var DataChannel = function (_EventEmitter) {
                         case 'LACK':
                             _this2.loading = false;
                             _this2.emit(_events4.default.DC_REQUESTFAIL, msg);
+                            break;
+                        case 'DISPLACE':
+                            _this2.emit(_events4.default.DISPLACE);
                             break;
                         case 'CLOSE':
                             _this2.emit(_events4.default.DC_CLOSE);
@@ -8135,15 +8139,196 @@ var P2PScheduler = function (_EventEmitter) {
                 sn: this.context.frag.sn
             };
             peer.request(JSON.stringify(msg));
+            console.log('load ' + msg.url + ' from peer ' + peer.peerId + ' targetIdx ' + this.target);
         }
     }, {
         key: '_addUpStreamer',
         value: function _addUpStreamer(channel) {
-            var _this2 = this;
-
             this.upstreamers.push(channel);
 
             this._setupChannel(channel); //设置通用监听
+
+        }
+    }, {
+        key: '_loadtimeout',
+        value: function _loadtimeout() {
+            log('timeout while loading ' + this.context.url);
+            this.callbacks.onTimeout(this.stats, this.context, null);
+            this.requestTimeout = null;
+            this.leadingCounter = 0;
+        }
+    }, {
+        key: '_addDownStreamer',
+        value: function _addDownStreamer(channel) {
+            this.downstreamers.push(channel);
+
+            this._setupChannel(channel); //设置通用监听
+
+        }
+    }, {
+        key: '_dividePayload',
+        value: function _dividePayload(payload, packetSize, attachments, remainder) {
+            var bufArr = [];
+            if (remainder) {
+                var packet = void 0;
+                for (var i = 0; i < attachments - 1; i++) {
+                    packet = payload.slice(i * packetSize, (i + 1) * packetSize);
+                    bufArr.push(packet);
+                }
+                packet = payload.slice(payload.byteLength - remainder, payload.byteLength);
+                bufArr.push(packet);
+            } else {
+                var _packet = void 0;
+                for (var _i = 0; _i < attachments; _i++) {
+                    _packet = payload.slice(_i * packetSize, (_i + 1) * packetSize);
+                    bufArr.push(_packet);
+                }
+            }
+            return bufArr;
+        }
+    }, {
+        key: 'addDataChannel',
+        value: function addDataChannel(channel) {
+            if (channel.isReceiver) {
+                //分别存放父节点和子节点
+                this._addUpStreamer(channel);
+            } else {
+                this._addDownStreamer(channel);
+            }
+        }
+    }, {
+        key: 'deleteDataChannel',
+        value: function deleteDataChannel(channel) {
+            log('delete datachannel ' + channel.channelId);
+            for (var i = 0; i < this.downstreamers.length; ++i) {
+                if (this.downstreamers[i] === channel) {
+                    this.downstreamers.splice(i, 1);
+                    return;
+                }
+            }
+            for (var _i2 = 0; _i2 < this.upstreamers.length; ++_i2) {
+                if (this.upstreamers[_i2] === channel) {
+                    this.upstreamers.splice(_i2, 1);
+                    return;
+                }
+            }
+        }
+    }, {
+        key: 'moveUpstreamsersToDown',
+        value: function moveUpstreamsersToDown() {
+            var msg = {
+                event: 'DISPLACE'
+            };
+            while (this.upstreamers.length > 0) {
+                var streamer = this.upstreamers.pop();
+                streamer.isReceiver = !streamer.isReceiver;
+                this.downstreamers.push(streamer);
+                streamer.send(JSON.stringify(msg));
+            }
+        }
+    }, {
+        key: 'clearUpstreamers',
+        value: function clearUpstreamers() {
+            for (var i = 0; i < this.upstreamers.length; ++i) {
+                var streamer = this.upstreamers.pop();
+                var msg = {
+                    event: 'CLOSE'
+                };
+                streamer.send(JSON.stringify(msg));
+                streamer.destroy();
+            }
+        }
+    }, {
+        key: 'clearDownstreamers',
+        value: function clearDownstreamers() {
+            for (var i = 0; i < this.downstreamers.length; ++i) {
+                var streamer = this.downstreamers.pop();
+                var msg = {
+                    event: 'CLOSE'
+                };
+                streamer.send(JSON.stringify(msg));
+                streamer.destroy();
+            }
+        }
+    }, {
+        key: 'clearAllStreamers',
+        value: function clearAllStreamers() {
+            this.clearUpstreamers();
+            this.clearDownstreamers();
+        }
+    }, {
+        key: '_setupChannel',
+        value: function _setupChannel(channel) {
+            var _this2 = this;
+
+            // channel.once('close', () => {
+            //
+            //     log(`datachannel closed ${channel.channelId} `);
+            //     // this.emit(Events.SIG_DCCLOSED, datachannel);
+            //     this.deleteDataChannel(channel);
+            //     channel.destroy();
+            // })
+            channel.on(_events4.default.DC_REQUEST, function (msg) {
+                var sn = msg.sn,
+                    url = msg.url;
+
+                log('receive request sn ' + sn + ' url ' + url);
+                if (_this2.bufMgr) {
+                    var seg = void 0;
+                    if (_this2.bufMgr.hasSegOfURL(url)) {
+                        //首先根据url精确查找
+                        seg = _this2.bufMgr.getSegByURL(url);
+                    }
+                    if (seg) {
+                        log('bufMgr found seg sn ' + sn + ' url ' + seg.relurl);
+                        var payload = seg.data,
+                            //二进制数据
+                        dataSize = seg.size,
+                            //二进制数据大小
+                        packetSize = _this2.p2pConfig.packetSize,
+                            //每个数据包的大小
+                        remainder = 0,
+                            //最后一个包的大小
+                        attachments = 0; //分多少个包发
+                        if (dataSize % packetSize === 0) {
+                            attachments = dataSize / packetSize;
+                        } else {
+                            attachments = Math.floor(dataSize / packetSize) + 1;
+                            remainder = dataSize % packetSize;
+                        }
+                        var response = {
+                            event: 'BINARY',
+                            attachments: attachments,
+                            url: seg.relurl,
+                            sn: seg.sn,
+                            size: payload.byteLength
+                        };
+                        channel.send(JSON.stringify(response));
+                        var bufArr = _this2._dividePayload(payload, packetSize, attachments, remainder);
+                        for (var j = 0; j < bufArr.length; j++) {
+                            channel.send(bufArr[j]);
+                        }
+                        log('datachannel send binary data total size ' + payload.byteLength);
+                    } else {
+                        //缓存找不到请求的数据
+                        var _response = {
+                            event: 'LACK',
+                            url: url,
+                            current: _this2._currPlaySN
+                        };
+                        channel.send(JSON.stringify(_response));
+                    }
+                }
+            }).on(_events4.default.DISPLACE, function () {
+                //收到子节点要跃迁的事件
+                var channelId = channel.channelId;
+                channel.isReceiver = !channel.isReceiver;
+                _this2.downstreamers.splice(_this2.downstreamers.findIndex(function (item) {
+                    return item.channelId === channelId;
+                }), 1);
+                _this2.upstreamers.unshift(channel);
+                console.log('datachannel ' + channelId + ' displaced');
+            });
 
             channel.on(_events4.default.DC_RESPONSE, function (response) {
                 //response: {url: string, sn: number, payload: Buffer}
@@ -8201,174 +8386,6 @@ var P2PScheduler = function (_EventEmitter) {
                     _this2.stats.tfirst = Math.max(performance.now(), _this2.stats.trequest);
                 }
             });
-        }
-    }, {
-        key: '_loadtimeout',
-        value: function _loadtimeout() {
-            log('timeout while loading ' + this.context.url);
-            this.callbacks.onTimeout(this.stats, this.context, null);
-            this.requestTimeout = null;
-            this.leadingCounter = 0;
-        }
-    }, {
-        key: '_addDownStreamer',
-        value: function _addDownStreamer(channel) {
-            var _this3 = this;
-
-            this.downstreamers.push(channel);
-
-            this._setupChannel(channel); //设置通用监听
-
-            channel.on(_events4.default.DC_REQUEST, function (msg) {
-                var sn = msg.sn,
-                    url = msg.url;
-
-                log('receive request sn ' + sn + ' url ' + url);
-                if (_this3.bufMgr) {
-                    var seg = void 0;
-                    if (_this3.bufMgr.hasSegOfURL(url)) {
-                        //首先根据url精确查找
-                        seg = _this3.bufMgr.getSegByURL(url);
-                    }
-                    if (seg) {
-                        log('bufMgr found seg sn ' + sn + ' url ' + seg.relurl);
-                        var payload = seg.data,
-                            //二进制数据
-                        dataSize = seg.size,
-                            //二进制数据大小
-                        packetSize = _this3.p2pConfig.packetSize,
-                            //每个数据包的大小
-                        remainder = 0,
-                            //最后一个包的大小
-                        attachments = 0; //分多少个包发
-                        if (dataSize % packetSize === 0) {
-                            attachments = dataSize / packetSize;
-                        } else {
-                            attachments = Math.floor(dataSize / packetSize) + 1;
-                            remainder = dataSize % packetSize;
-                        }
-                        var response = {
-                            event: 'BINARY',
-                            attachments: attachments,
-                            url: seg.relurl,
-                            sn: seg.sn,
-                            size: payload.byteLength
-                        };
-                        channel.send(JSON.stringify(response));
-                        var bufArr = _this3._dividePayload(payload, packetSize, attachments, remainder);
-                        for (var j = 0; j < bufArr.length; j++) {
-                            channel.send(bufArr[j]);
-                        }
-                        log('datachannel send binary data total size ' + payload.byteLength);
-                    } else {
-                        //缓存找不到请求的数据
-                        var _response = {
-                            event: 'LACK',
-                            url: url,
-                            current: _this3._currPlaySN
-                        };
-                        channel.send(JSON.stringify(_response));
-                    }
-                }
-            });
-        }
-    }, {
-        key: '_dividePayload',
-        value: function _dividePayload(payload, packetSize, attachments, remainder) {
-            var bufArr = [];
-            if (remainder) {
-                var packet = void 0;
-                for (var i = 0; i < attachments - 1; i++) {
-                    packet = payload.slice(i * packetSize, (i + 1) * packetSize);
-                    bufArr.push(packet);
-                }
-                packet = payload.slice(payload.byteLength - remainder, payload.byteLength);
-                bufArr.push(packet);
-            } else {
-                var _packet = void 0;
-                for (var _i = 0; _i < attachments; _i++) {
-                    _packet = payload.slice(_i * packetSize, (_i + 1) * packetSize);
-                    bufArr.push(_packet);
-                }
-            }
-            return bufArr;
-        }
-    }, {
-        key: 'addDataChannel',
-        value: function addDataChannel(channel) {
-            if (channel.isReceiver) {
-                //分别存放父节点和子节点
-                this._addUpStreamer(channel);
-            } else {
-                this._addDownStreamer(channel);
-            }
-        }
-    }, {
-        key: 'deleteDataChannel',
-        value: function deleteDataChannel(channel) {
-            log('delete datachannel ' + channel.channelId);
-            for (var i = 0; i < this.downstreamers.length; ++i) {
-                if (this.downstreamers[i] === channel) {
-                    this.downstreamers.splice(i, 1);
-                    return;
-                }
-            }
-            for (var _i2 = 0; _i2 < this.upstreamers.length; ++_i2) {
-                if (this.upstreamers[_i2] === channel) {
-                    this.upstreamers.splice(_i2, 1);
-                    return;
-                }
-            }
-        }
-    }, {
-        key: 'moveUpstreamsersToDown',
-        value: function moveUpstreamsersToDown() {
-            while (this.upstreamers.length > 0) {
-                var streamer = this.upstreamers.pop();
-                this.downstreamers.push(streamer);
-            }
-        }
-    }, {
-        key: 'clearUpstreamers',
-        value: function clearUpstreamers() {
-            for (var i = 0; i < this.upstreamers.length; ++i) {
-                var streamer = this.upstreamers.pop();
-                var msg = {
-                    event: 'CLOSE'
-                };
-                streamer.send(JSON.stringify(msg));
-                streamer.destroy();
-            }
-        }
-    }, {
-        key: 'clearDownstreamers',
-        value: function clearDownstreamers() {
-            for (var i = 0; i < this.downstreamers.length; ++i) {
-                var streamer = this.downstreamers.pop();
-                var msg = {
-                    event: 'CLOSE'
-                };
-                streamer.send(JSON.stringify(msg));
-                streamer.destroy();
-            }
-        }
-    }, {
-        key: 'clearAllStreamers',
-        value: function clearAllStreamers() {
-            this.clearUpstreamers();
-            this.clearDownstreamers();
-        }
-    }, {
-        key: '_setupChannel',
-        value: function _setupChannel(channel) {
-
-            // channel.once('close', () => {
-            //
-            //     log(`datachannel closed ${channel.channelId} `);
-            //     // this.emit(Events.SIG_DCCLOSED, datachannel);
-            //     this.deleteDataChannel(channel);
-            //     channel.destroy();
-            // })
         }
     }, {
         key: '_addSegToBuf',

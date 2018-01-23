@@ -63,6 +63,13 @@ datachannel 发生错误
 }
 ```
 
+通知对方成为子节点
+```javastript       
+{
+    event: 'DISPLACE'  
+}
+```
+
 ## websocket传输协议
 
 ### peer ---> server    进入频道请求
