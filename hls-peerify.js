@@ -6029,6 +6029,9 @@ var HlsPeerify = function (_EventEmitter) {
         _this.cdnDownloaded = 0;
         _this.p2pDownloaded = 0;
         _this.reportIntervalId = window.setInterval(_this._statisticsReport.bind(_this), _this.config.reportInterval * 1000);
+        //streaming rate
+        _this.streamingRate = 0; //单位bps
+        _this.fragLoadedCounter = 0;
         return _this;
     }
 
@@ -6080,6 +6083,10 @@ var HlsPeerify = function (_EventEmitter) {
                     log('FRAG_LOADED ' + data.frag.sn + ' loadByP2P');
                     _this2.p2pDownloaded += data.frag.loaded;
                 }
+                //计算平均streaming rate
+                var bitrate = data.frag.loaded * 8 / data.frag.duration;
+                _this2.streamingRate = (_this2.streamingRate * _this2.fragLoadedCounter + bitrate) / ++_this2.fragLoadedCounter;
+                _this2.signaler.scheduler.streamingRate = Math.floor(_this2.streamingRate);
             });
 
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_CHANGED, function (id, data) {
@@ -6175,7 +6182,7 @@ Object.defineProperty(exports, "__esModule", {
 var defaultP2PConfig = {
     wsAddr: 'ws://120.78.168.126:3389', //信令&调度服务器地址
     wsMaxRetries: 10, //发送数据重试时间间隔
-    wsReconnectInterval: 5,
+    wsReconnectInterval: 5, //websocket重连时间间隔
     p2pEnabled: true, //是否开启P2P，默认true
     dcKeepAliveInterval: 10, //datachannel多少秒发送一次keep-alive信息
     dcKeepAliveAckTimeout: 2, //datachannel接收keep-alive-ack信息的超时时间，超时则认为连接失败并主动关闭
@@ -6183,7 +6190,10 @@ var defaultP2PConfig = {
     packetSize: 16 * 1024, //每次通过datachannel发送的包的大小
     maxBufSize: 1024 * 1024 * 50, //p2p缓存的最大数据量
     loadTimeout: 5, //p2p下载的超时时间
-    reportInterval: 60 //统计信息上报的时间间隔
+    reportInterval: 60, //统计信息上报的时间间隔
+    transitionCheckInterval: 30, //跃迁检查时间间隔
+    transitionTTL: 2 //跃迁的最大跳数
+
 };
 
 exports.defaultP2PConfig = defaultP2PConfig;
@@ -7573,6 +7583,9 @@ var P2PSignaler = function (_EventEmitter) {
         }
 
         _this._setupScheduler(_this.scheduler);
+
+        //fastmesh
+        _this.candidateParents = []; //候选父节点，最后的优先级最高
         return _this;
     }
 
@@ -7663,6 +7676,10 @@ var P2PSignaler = function (_EventEmitter) {
                         console.log('start _handleSignal');
                         _this3._handleSignal(msg.from_peer_id, msg.data);
                         break;
+                    case 'parents':
+                        console.log('receive parents');
+                        _this3._handleParentsMsg(msg.nodes);
+                        break;
                     case 'connect':
                         console.log('start _handleConnect');
                         _this3._createDatachannel(msg.to_peer_id, true);
@@ -7671,6 +7688,7 @@ var P2PSignaler = function (_EventEmitter) {
                         _this3._handleDisconnectMsg(msg); //未实现
                         break;
                     case 'accept':
+                        console.log('accept');
                         _this3.connected = true;
                         _this3.peerId = msg.peer_id; //获取本端Id
                         break;
@@ -7705,6 +7723,23 @@ var P2PSignaler = function (_EventEmitter) {
                 datachannel = this._createDatachannel(remotePeerId, false);
             }
             datachannel.receiveSignal(data);
+        }
+
+        /*
+         nodes: Array<Object<peer_id:string, ul_bw:number>>
+         */
+
+    }, {
+        key: '_handleParentsMsg',
+        value: function _handleParentsMsg(nodes) {
+            nodes.sort(function (a, b) {
+                return a.ul_bw < b.ul_bw;
+            }); //按上行带宽从小到大排序
+            if (nodes.length === 0) return;
+            this.candidateParents = nodes;
+            console.log('candidateParents: ' + JSON.stringify(this.candidateParents));
+            var parentId = this.candidateParents.pop().peer_id;
+            this._createDatachannel(parentId, true); //尝试与第一个连接
         }
     }, {
         key: '_handleDisconnectMsg',
@@ -7750,6 +7785,12 @@ var P2PSignaler = function (_EventEmitter) {
                 _this4.scheduler.deleteDataChannel(datachannel);
                 _this4.DCMap.delete(datachannel.remotePeerId);
                 datachannel.destroy();
+
+                if (_this4.candidateParents.length > 0) {
+                    //如果连接失败与剩余的尝试连接
+                    var parentId = _this4.candidateParents.pop().peer_id;
+                    _this4._createDatachannel(parentId, true);
+                }
             }).once(_events4.default.DC_CLOSE, function () {
 
                 console.log('datachannel closed ' + datachannel.channelId + ' ');
@@ -7772,6 +7813,7 @@ var P2PSignaler = function (_EventEmitter) {
                     };
                     _this4.websocket.send(msg);
                 }
+                _this4.candidateParents = []; //防止一段时间后连接上行带宽已发生变化
             });
         }
     }, {
@@ -7853,6 +7895,8 @@ var DataChannel = function (_EventEmitter) {
         _this._datachannel = new _simplePeer2.default({ initiator: isInitiator, objectMode: true });
         _this.isReceiver = isInitiator; //主动发起连接的为数据接受者，用于标识本节点的类型
         _this._init(_this._datachannel);
+
+        _this.streamingRate = 0;
         return _this;
     }
 
@@ -7904,6 +7948,7 @@ var DataChannel = function (_EventEmitter) {
                             _this2._prepareForBinary(msg.attachments, msg.url, msg.sn, msg.size);
                             break;
                         case 'REQUEST':
+                            if (msg.br) _this2.streamingRate = msg.br; //记录该datachannel的码率
                             _this2.emit(_events4.default.DC_REQUEST, msg);
                             break;
                         case 'LACK':
@@ -8089,6 +8134,11 @@ var P2PScheduler = function (_EventEmitter) {
         //当前播放的sn
         _this._currPlaySN = -1;
         _this.leadingCounter = 0; //对播放慢于此节点的父节点进行计数
+
+        _this.totalUploadBW = 1024 * 1024 * 4 * 8; //总上行带宽默认4Mbps
+        _this.residualBW = _this.totalUploadBW; //初始剩余带宽等于总上行带宽
+        _this.streamingRate = 0; //单位bps
+        _this.tranInspectorId = _this._setupTransInspector();
         return _this;
     }
 
@@ -8122,6 +8172,7 @@ var P2PScheduler = function (_EventEmitter) {
         key: 'destroy',
         value: function destroy() {
             log('p2pLoader destroy');
+            clearInterval(this.tranInspectorId);
         }
     }, {
         key: '_loadInternal',
@@ -8136,7 +8187,8 @@ var P2PScheduler = function (_EventEmitter) {
             var msg = {
                 event: 'REQUEST',
                 url: this.context.frag.relurl,
-                sn: this.context.frag.sn
+                sn: this.context.frag.sn,
+                br: this.streamingRate
             };
             peer.request(JSON.stringify(msg));
             console.log('load ' + msg.url + ' from peer ' + peer.peerId + ' targetIdx ' + this.target);
@@ -8144,7 +8196,7 @@ var P2PScheduler = function (_EventEmitter) {
     }, {
         key: '_addUpStreamer',
         value: function _addUpStreamer(channel) {
-            this.upstreamers.push(channel);
+            this.upstreamers.unshift(channel); //最新加的优先级最高
 
             this._setupChannel(channel); //设置通用监听
 
@@ -8166,27 +8218,6 @@ var P2PScheduler = function (_EventEmitter) {
 
         }
     }, {
-        key: '_dividePayload',
-        value: function _dividePayload(payload, packetSize, attachments, remainder) {
-            var bufArr = [];
-            if (remainder) {
-                var packet = void 0;
-                for (var i = 0; i < attachments - 1; i++) {
-                    packet = payload.slice(i * packetSize, (i + 1) * packetSize);
-                    bufArr.push(packet);
-                }
-                packet = payload.slice(payload.byteLength - remainder, payload.byteLength);
-                bufArr.push(packet);
-            } else {
-                var _packet = void 0;
-                for (var _i = 0; _i < attachments; _i++) {
-                    _packet = payload.slice(_i * packetSize, (_i + 1) * packetSize);
-                    bufArr.push(_packet);
-                }
-            }
-            return bufArr;
-        }
-    }, {
         key: 'addDataChannel',
         value: function addDataChannel(channel) {
             if (channel.isReceiver) {
@@ -8206,9 +8237,9 @@ var P2PScheduler = function (_EventEmitter) {
                     return;
                 }
             }
-            for (var _i2 = 0; _i2 < this.upstreamers.length; ++_i2) {
-                if (this.upstreamers[_i2] === channel) {
-                    this.upstreamers.splice(_i2, 1);
+            for (var _i = 0; _i < this.upstreamers.length; ++_i) {
+                if (this.upstreamers[_i] === channel) {
+                    this.upstreamers.splice(_i, 1);
                     return;
                 }
             }
@@ -8257,6 +8288,64 @@ var P2PScheduler = function (_EventEmitter) {
             this.clearDownstreamers();
         }
     }, {
+        key: 'broadcastToUpstreamers',
+        value: function broadcastToUpstreamers(msg) {
+            //向父节点广播
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = this.upstreamers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var streamer = _step.value;
+
+                    streamer.send(JSON.stringify(msg));
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+        }
+    }, {
+        key: 'broadcastToDownstreamers',
+        value: function broadcastToDownstreamers(msg) {
+            //向子节点广播
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+                for (var _iterator2 = this.downstreamers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var streamer = _step2.value;
+
+                    streamer.send(JSON.stringify(msg));
+                }
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
+                }
+            }
+        }
+    }, {
         key: '_setupChannel',
         value: function _setupChannel(channel) {
             var _this2 = this;
@@ -8268,6 +8357,8 @@ var P2PScheduler = function (_EventEmitter) {
             //     this.deleteDataChannel(channel);
             //     channel.destroy();
             // })
+
+            //upstreamer
             channel.on(_events4.default.DC_REQUEST, function (msg) {
                 var sn = msg.sn,
                     url = msg.url;
@@ -8304,7 +8395,7 @@ var P2PScheduler = function (_EventEmitter) {
                             size: payload.byteLength
                         };
                         channel.send(JSON.stringify(response));
-                        var bufArr = _this2._dividePayload(payload, packetSize, attachments, remainder);
+                        var bufArr = dividePayload(payload, packetSize, attachments, remainder);
                         for (var j = 0; j < bufArr.length; j++) {
                             channel.send(bufArr[j]);
                         }
@@ -8330,6 +8421,7 @@ var P2PScheduler = function (_EventEmitter) {
                 console.log('datachannel ' + channelId + ' displaced');
             });
 
+            //dowmstreamer
             channel.on(_events4.default.DC_RESPONSE, function (response) {
                 //response: {url: string, sn: number, payload: Buffer}
                 log('receive response sn ' + response.sn + ' url ' + response.url + ' size ' + response.data.byteLength + ' from ' + channel.remotePeerId);
@@ -8400,6 +8492,25 @@ var P2PScheduler = function (_EventEmitter) {
             this.bufMgr.addSeg(segment);
         }
     }, {
+        key: '_setupTransInspector',
+        value: function _setupTransInspector() {
+            var _this3 = this;
+
+            //定时检查是否需要跃迁
+            return window.setInterval(function () {
+                _this3.residualBW = _this3.totalUploadBW - _this3.uploadStreamingRate;
+                if (_this3.residualBW > _this3.totalUploadBW / 2) {
+                    //如果剩余带宽大于streaming rate
+                    var msg = {
+                        event: 'TRANSITION',
+                        ul_bw: _this3.totalUploadBW //总上行带宽（单位bps）
+                    };
+                    _this3.broadcastToUpstreamers(msg);
+                }
+                console.warn('residualBW: ' + _this3.residualBW);
+            }, this.p2pConfig.transitionCheckInterval * 1000);
+        }
+    }, {
         key: 'hasUpstreamer',
         get: function get() {
             return this.upstreamers.length > 0;
@@ -8410,6 +8521,38 @@ var P2PScheduler = function (_EventEmitter) {
             return this.downstreamers.length > 0;
         }
     }, {
+        key: 'uploadStreamingRate',
+        get: function get() {
+            //目前所有datachannel上行streaming rate
+            var br = 0;
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
+
+            try {
+                for (var _iterator3 = this.downstreamers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var channel = _step3.value;
+
+                    br += channel.streamingRate;
+                }
+            } catch (err) {
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
+                    }
+                } finally {
+                    if (_didIteratorError3) {
+                        throw _iteratorError3;
+                    }
+                }
+            }
+
+            return br;
+        }
+    }, {
         key: 'currentPlaySN',
         set: function set(sn) {
             this._currPlaySN = sn;
@@ -8418,6 +8561,26 @@ var P2PScheduler = function (_EventEmitter) {
 
     return P2PScheduler;
 }(_events2.default);
+
+function dividePayload(payload, packetSize, attachments, remainder) {
+    var bufArr = [];
+    if (remainder) {
+        var packet = void 0;
+        for (var i = 0; i < attachments - 1; i++) {
+            packet = payload.slice(i * packetSize, (i + 1) * packetSize);
+            bufArr.push(packet);
+        }
+        packet = payload.slice(payload.byteLength - remainder, payload.byteLength);
+        bufArr.push(packet);
+    } else {
+        var _packet = void 0;
+        for (var _i2 = 0; _i2 < attachments; _i2++) {
+            _packet = payload.slice(_i2 * packetSize, (_i2 + 1) * packetSize);
+            bufArr.push(_packet);
+        }
+    }
+    return bufArr;
+}
 
 exports.default = P2PScheduler;
 module.exports = exports['default'];

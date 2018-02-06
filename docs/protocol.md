@@ -25,6 +25,7 @@ datachannel KEEPALIVE-ACK
     event: 'REQUEST'   
     url: string             //ts数据的url（相对url）
     sn: number              //ts数据的播放序号
+    br: number              //码率
 }
 ```
 
@@ -70,6 +71,29 @@ datachannel 发生错误
 }
 ```
 
+向父节点发送跃迁请求
+```javastript       
+{
+    event: 'TRANSITION'
+    ul_bw: number             //总上行带宽（单位bps）
+    TTL: number
+    source_TTL: number        //原来的TTL(固定值)
+    from_peer_id: string      //本节点Id
+}
+```
+
+向子节点发送同意跃迁响应
+```javastript       
+{
+    event: 'GRANT'
+    delay: number             //source-to-end delay, 目前用level表示
+    TTL: number
+    parents: Array<peerId>       
+    from_peer_id: string     
+    to_peer_id: string
+}
+```
+
 ## websocket传输协议
 
 ### peer ---> server    进入频道请求
@@ -87,17 +111,18 @@ datachannel 发生错误
 ```javastript
 {
     action: 'accept'  
-    live: boolean                   //直播或点播    
+    mode: 'live'                   //直播或点播    
     peer_id: string                //本节点唯一标识
+    speed_test: string             //测速url
 }   
 ```
 
 ### peer ---> server    离开频道请求
-   ```javastript
-   {
-       action: 'leave'             
-   }
-   ```
+```javastript
+{
+   action: 'leave'             
+}
+```
 
 ### peer ---> server    发送信令给peer
 ```javastript
@@ -105,6 +130,14 @@ datachannel 发生错误
     action: 'signal'               
     to_peer_id: string            //对等端的Id
     data: string                  //需要传送的数据
+}
+```
+
+### peer ---> server    返回上行带宽
+```javastript
+{
+   action: 'ul_bw'
+   value: number            
 }
 ```
 
@@ -137,6 +170,22 @@ datachannel 发生错误
 {
     action: 'connect'           
     to_peer_id: string            //父节点的Id
+}
+```
+
+### server ---> peer        发送候选父节点给peer
+```javastript
+{
+    action: 'parents'           
+    nodes: Array<Object<peer_id:string, ul_bw:number>>
+}
+```
+
+###  peer ---> server       请求候选父节点
+```javastript
+{
+    action: 'get_parents'           
+    nodes: Array<Object<peer_id:string, ul_bw:number>>
 }
 ```
 

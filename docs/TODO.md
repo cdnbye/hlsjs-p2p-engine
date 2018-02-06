@@ -12,8 +12,6 @@
 
 - release版替换协议关键字
 
-- negotiated
-
 
 ## server
 
