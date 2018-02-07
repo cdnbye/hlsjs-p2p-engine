@@ -7838,6 +7838,15 @@ var P2PSignaler = function (_EventEmitter) {
                     //如果连接失败与剩余的尝试连接
                     var parentId = _this4.candidateParents.pop().peer_id;
                     _this4._createDatachannel(parentId, true);
+                } else {
+                    //中途连接错误
+                    //如果是这条channel的子节点并且没有父节点了则向服务器请求候选父节点
+                    if (datachannel.isReceiver && !_this4.scheduler.hasUpstreamer) {
+                        var _msg = {
+                            action: 'get_parents'
+                        };
+                        _this4.websocket.send(_msg);
+                    }
                 }
             }).once(_events4.default.DC_CLOSE, function () {
 
@@ -7849,6 +7858,15 @@ var P2PSignaler = function (_EventEmitter) {
                 _this4.websocket.send(msg);
                 _this4.scheduler.deleteDataChannel(datachannel);
                 _this4.DCMap.delete(datachannel.remotePeerId);
+
+                //如果是这条channel的子节点并且没有父节点了则向服务器请求候选父节点
+                if (datachannel.isReceiver && !_this4.scheduler.hasUpstreamer) {
+                    var _msg2 = {
+                        action: 'get_parents'
+                    };
+                    _this4.websocket.send(_msg2);
+                }
+
                 datachannel.destroy();
             }).once(_events4.default.DC_OPEN, function () {
 
@@ -8217,7 +8235,6 @@ var P2PScheduler = function (_EventEmitter) {
 
         //fastmesh
         _this.totalUploadBW = config.defaultUploadBW;
-        _this.residualBW = _this.totalUploadBW; //初始剩余带宽等于总上行带宽
         _this.streamingRate = 0; //单位bps
         if (config.transitionEnabled) _this.tranInspectorId = _this._setupTransInspector();
         _this.grantAncestors = []; //跃迁中候选的祖先节点
@@ -8657,7 +8674,6 @@ var P2PScheduler = function (_EventEmitter) {
 
             //定时检查是否需要跃迁
             return window.setInterval(function () {
-                _this3.residualBW = _this3.totalUploadBW - _this3.uploadStreamingRate;
                 if (_this3.residualBW > _this3.totalUploadBW / 2 && _this3.upstreamers.length) {
                     //如果剩余带宽大于streaming rate并且有父节点
                     var msg = {
@@ -8709,6 +8725,7 @@ var P2PScheduler = function (_EventEmitter) {
     }, {
         key: 'hasUpstreamer',
         get: function get() {
+            console.warn('upstreamers.length ' + this.upstreamers.length);
             return this.upstreamers.length > 0;
         }
     }, {
@@ -8717,9 +8734,8 @@ var P2PScheduler = function (_EventEmitter) {
             return this.downstreamers.length > 0;
         }
     }, {
-        key: 'uploadStreamingRate',
+        key: 'residualBW',
         get: function get() {
-            //目前所有datachannel上行streaming rate
             var br = 0;
             var _iteratorNormalCompletion4 = true;
             var _didIteratorError4 = false;
@@ -8746,7 +8762,7 @@ var P2PScheduler = function (_EventEmitter) {
                 }
             }
 
-            return br;
+            return this.totalUploadBW - br;
         }
     }, {
         key: 'currentPlaySN',

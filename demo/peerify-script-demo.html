@@ -25,7 +25,12 @@
             fragLoadingTimeOut: 4000,              // used by fragment-loader
         };
 
-        var p2pConfig = {wsAddr: 'ws://127.0.0.1:8080/ws?key=free', reportInterval: 3600, defaultUploadBW: 1024*1024*4/8+1};
+        var p2pConfig = {
+            wsAddr: 'ws://127.0.0.1:8080/ws?key=free',
+            reportInterval: 3600,
+            defaultUploadBW: 1024*1024*4/8+1,
+            transitionEnabled: false
+        };
 //        var p2pConfig = {reportInterval: 3600};
 
         var hls = new Hls(hlsjsConfig);

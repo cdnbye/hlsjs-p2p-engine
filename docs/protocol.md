@@ -173,21 +173,7 @@ datachannel 发生错误
 }
 ```
 
-### server ---> peer        发送候选父节点给peer
-```javastript
-{
-    action: 'parents'           
-    nodes: Array<Object<peer_id:string, ul_bw:number>>
-}
-```
 
-###  peer ---> server       请求候选父节点
-```javastript
-{
-    action: 'get_parents'           
-    nodes: Array<Object<peer_id:string, ul_bw:number>>
-}
-```
 
 ### server ---> peer        发送断开连接命令给peer
 ```javastript
@@ -231,7 +217,24 @@ datachannel 发生错误
 }
 ```
 
---fastmesh--
+---
+## fastmesh protocol
+
+### server ---> peer        发送候选父节点给peer
+```javastript
+{
+    action: 'parents'           
+    nodes: Array<Object<peer_id:string, ul_bw:number>>
+}
+```
+
+###  peer ---> server       请求候选父节点
+```javastript
+{
+    action: 'get_parents'           
+}
+```
+
 ### peer ---> server    跃迁成功后通知ancestor成为其子节点
 ```javastript
 {
