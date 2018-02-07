@@ -231,6 +231,24 @@ datachannel 发生错误
 }
 ```
 
+--fastmesh--
+### peer ---> server    跃迁成功后通知ancestor成为其子节点
+```javastript
+{
+    action: 'adopt'          
+    to_peer_id: string
+}
+```
+
+### server ---> peer    通知ancestor成为parentId子节点
+```javastript
+{
+    action: 'adopt'          
+    parentId: string                      
+}
+```
+
+
 ## server data model （live）
 
 ### Peer model
@@ -269,3 +287,4 @@ datachannel 发生错误
     type: string                      //"live", "vod"
 }
 ```
+
