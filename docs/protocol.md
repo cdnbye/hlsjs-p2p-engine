@@ -94,7 +94,7 @@ datachannel 发生错误
 }
 ```
 
-## websocket传输协议
+## websocket传输协议   
 
 ### peer ---> server    进入频道请求
 ```javastript
@@ -111,9 +111,9 @@ datachannel 发生错误
 ```javastript
 {
     action: 'accept'  
-    mode: 'live'                   //直播或点播    
     peer_id: string                //本节点唯一标识
     speed_test: string             //测速url
+    report_span: number            //上报统计信息的时间间隔             
 }   
 ```
 
@@ -121,15 +121,6 @@ datachannel 发生错误
 ```javastript
 {
    action: 'leave'             
-}
-```
-
-### peer ---> server    发送信令给peer
-```javastript
-{
-    action: 'signal'               
-    to_peer_id: string            //对等端的Id
-    data: string                  //需要传送的数据
 }
 ```
 
@@ -183,14 +174,6 @@ datachannel 发生错误
 }
 ```
 
-### server ---> peer        发送信令给peer
-```javastript
-{
-    action: 'signal'           
-    from_peer_id: string            //对等端的Id
-    data: string                    //需要传送的数据
-}
-```
 
 ### peer ---> server    定时上报统计信息
 ```javastript
@@ -199,6 +182,7 @@ datachannel 发生错误
     level:   number              //平均level，用于调度
     cdn: number                  //cdn下载的流量大小（单位KB）
     p2p: number                  //p2p下载的流量大小（单位KB）
+    residual_bw: number          //当前剩余上行带宽
 }
 ```
 
@@ -228,7 +212,7 @@ datachannel 发生错误
 }
 ```
 
-###  peer ---> server       请求候选父节点
+###  peer ---> server       请求候选父节点(需要在连接上信令后再发送)
 ```javastript
 {
     action: 'get_parents'           
@@ -251,43 +235,30 @@ datachannel 发生错误
 }
 ```
 
+## 信令服务器
 
-## server data model （live）
-
-### Peer model
+### peer ---> server
 ```javastript
 {
-    peerId: string
-    parents: Map<peerId, Peer>
-    children: Map<peerId, Peer>
-    parentNum: number
-    childNum: number
-    info: {
-        browser:   string              //浏览器名
-        device: string                //mobile 或 PC
-        os: string                    //操作系统
-        ISP: string                   //运营商
-        province: string                //省份
-        IP: string                   
-    }
-    CDN: number                       //cdn下载的数据量（KB）
-    P2P: number                       //p2p下载的数据量（KB）
-    level: number                     //平均level，用于调度
-    class: number                     //所属阶层（0，1，2，3……）
-    upBW: number                      //上行带宽
+    action: 'register'               
+    peer_id: string                          
+}
+```    
+
+### peer ---> server    发送信令给server
+```javastript
+{
+    action: 'signal'               
+    to_peer_id: string            //对等端的Id
+    data: string                  //需要传送的数据
 }
 ```
 
-### Channel model
+### server ---> peer        发送信令给peer
 ```javastript
 {
-    ID: string
-    nodes: Map<peerId, Peer>
-    filterClass:   //class-->ISP-->Prov-->level
-    CDN: number                       //cdn下载的数据量（KB）
-    P2P: number                       //p2p下载的数据量（KB）
-    host: string                      //域名
-    type: string                      //"live", "vod"
+    action: 'signal'           
+    from_peer_id: string            //对等端的Id
+    data: string                    //需要传送的数据
 }
 ```
-

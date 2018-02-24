@@ -6183,7 +6183,10 @@ Object.defineProperty(exports, "__esModule", {
 
 //时间单位统一为秒
 var defaultP2PConfig = {
-    wsAddr: 'ws://120.78.168.126:3389', //信令&调度服务器地址
+    key: 'free', //连接RP服务器的API key
+    mode: 'live', //播放的流媒体类别，分为‘live‘和‘vod’两种，默认live
+    wsSchedulerAddr: 'ws://120.78.168.126:3389', //调度服务器地址
+    wsSignalerAddr: 'ws://120.78.168.126:8081/ws', //信令服务器地址
     wsMaxRetries: 10, //发送数据重试时间间隔
     wsReconnectInterval: 5, //websocket重连时间间隔
     p2pEnabled: true, //是否开启P2P，默认true
@@ -6196,7 +6199,7 @@ var defaultP2PConfig = {
     reportInterval: 60, //统计信息上报的时间间隔
 
     transitionEnabled: true, //是否允许节点自动跃迁
-    transitionCheckInterval: 20, //跃迁检查时间间隔
+    transitionCheckInterval: 30, //跃迁检查时间间隔
     transitionTTL: 2, //跃迁的最大跳数
     transitionWaitTime: 5, //跃迁等待Grant响应的时间
     defaultUploadBW: 1024 * 1024 * 4 / 8, //总上行带宽默认4Mbps
@@ -7582,11 +7585,12 @@ var P2PSignaler = function (_EventEmitter) {
         _this.channel = channel; //频道
         _this.scheduler = new _p2pScheduler2.default(config);
         _this.DCMap = new Map(); //{key: channelId, value: DataChannnel}
-        console.log('connecting to :' + config.websocketAddr);
-        _this.websocket = null;
-
+        config.wsSchedulerAddr = config.wsSchedulerAddr + '?key=' + window.encodeURIComponent(config.key) + '&room=' + window.encodeURIComponent(channel) + '\n        &mode=' + window.encodeURIComponent(config.mode);
+        console.log('connecting to :' + config.wsSchedulerAddr);
+        _this.schedulerWs = null; //调度服务器ws
+        _this.signalerWs = null; //信令服务器ws
         if (config.p2pEnabled) {
-            _this.websocket = _this._initWebsocket(info);
+            _this.schedulerWs = _this._initSchedulerWs(info);
         }
 
         _this._setupScheduler(_this.scheduler);
@@ -7600,7 +7604,7 @@ var P2PSignaler = function (_EventEmitter) {
         key: 'send',
         value: function send(msg) {
             if (this.connected) {
-                this.websocket.send(msg);
+                this.schedulerWs.send(msg);
             }
         }
     }, {
@@ -7611,13 +7615,13 @@ var P2PSignaler = function (_EventEmitter) {
             //     action: 'leave'
             // };
             // this.send(msg);
-            this.websocket.close(1000, '', { keepClosed: true, fastClose: true });
+            this.schedulerWs.close(1000, '', { keepClosed: true, fastClose: true });
         }
     }, {
         key: 'resumeP2P',
         value: function resumeP2P() {
             if (!this.connected) {
-                this.websocket = this._initWebsocket(this.browserInfo);
+                this.schedulerWs = this._initSchedulerWs(this.browserInfo);
             }
         }
     }, {
@@ -7653,24 +7657,83 @@ var P2PSignaler = function (_EventEmitter) {
             });
         }
     }, {
-        key: '_initWebsocket',
-        value: function _initWebsocket(info) {
+        key: '_initSignalerWs',
+        value: function _initSignalerWs() {
             var _this3 = this;
+
+            var wsOptions = {
+                maxRetries: this.config.wsMaxRetries,
+                minReconnectionDelay: this.config.wsReconnectInterval * 1000
+            };
+            var queryStr = '?id=' + this.peerId;
+            var websocket = new _reconnectingWebsocket2.default(this.config.wsSignalerAddr + queryStr, undefined, wsOptions);
+            websocket.onopen = function () {
+                console.log('Signaler websocket connection opened');
+
+                //发送进入频道请求
+                // let req = {
+                //     action: 'register'
+                // };
+                //
+                // websocket.push(JSON.stringify(req));
+                _this3.connected = true;
+
+                //向scheduler websocket发送获取父节点信息
+                var msg = {
+                    action: 'get_parents'
+                };
+                _this3.schedulerWs.send(msg);
+            };
+
+            websocket.push = websocket.send;
+            websocket.send = function (msg) {
+                var msgStr = JSON.stringify(Object.assign({ peer_id: _this3.peerId }, msg));
+                console.log("send to websocket Signaler is " + msgStr);
+                websocket.push(msgStr);
+            };
+            websocket.onmessage = function (e) {
+                console.log('Signaler websocket on msg: ' + e.data);
+                var msg = JSON.parse(e.data);
+                var action = msg.action;
+                switch (action) {
+                    case 'signal':
+                        console.log('start _handleSignal');
+                        _this3._handleSignal(msg.from_peer_id, msg.data);
+                        break;
+                    case 'reject':
+                        _this3.stopP2P();
+                        break;
+                    default:
+                        console.log('Signaler websocket unknown action ' + action);
+
+                }
+            };
+            websocket.onclose = function () {
+                //websocket断开时清除datachannel
+                console.warn('Signaler websocket closed');
+                _this3.connected = false;
+            };
+            return websocket;
+        }
+    }, {
+        key: '_initSchedulerWs',
+        value: function _initSchedulerWs(info) {
+            var _this4 = this;
 
             var wsOptions = {
                 maxRetries: this.config.wsMaxRetries,
                 minReconnectionDelay: this.config.wsReconnectInterval * 1000
 
             };
-            var websocket = new _reconnectingWebsocket2.default(this.config.wsAddr, undefined, wsOptions);
+            var websocket = new _reconnectingWebsocket2.default(this.config.wsSchedulerAddr, undefined, wsOptions);
 
             websocket.onopen = function () {
-                console.log('websocket connection opened with channel: ' + _this3.channel);
+                console.log('websocket connection opened with channel: ' + _this4.channel);
 
                 //发送进入频道请求
                 var msg = {
                     action: 'enter',
-                    channel: _this3.channel
+                    channel: _this4.channel
                 };
 
                 if (info) {
@@ -7682,7 +7745,7 @@ var P2PSignaler = function (_EventEmitter) {
 
             websocket.push = websocket.send;
             websocket.send = function (msg) {
-                var msgStr = JSON.stringify(Object.assign({ channel: _this3.channel, peer_id: _this3.peerId }, msg));
+                var msgStr = JSON.stringify(Object.assign({ channel: _this4.channel, peer_id: _this4.peerId }, msg));
                 console.log("send to websocket is " + msgStr);
                 websocket.push(msgStr);
             };
@@ -7693,34 +7756,32 @@ var P2PSignaler = function (_EventEmitter) {
                 switch (action) {
                     case 'signal':
                         console.log('start _handleSignal');
-                        _this3._handleSignal(msg.from_peer_id, msg.data);
+                        _this4._handleSignal(msg.from_peer_id, msg.data);
                         break;
                     case 'parents':
                         console.log('receive parents');
-                        _this3._handleParentsMsg(msg.nodes);
+                        _this4._handleParentsMsg(msg.nodes);
                         break;
                     case 'connect':
                         console.log('start _handleConnect');
-                        _this3._createDatachannel(msg.to_peer_id, true);
+                        _this4._createDatachannel(msg.to_peer_id, true);
                         break;
                     case 'disconnect':
-                        _this3._handleDisconnectMsg(msg); //未实现
+                        _this4._handleDisconnectMsg(msg); //未实现
                         break;
                     case 'accept':
-                        console.log('accept');
-                        _this3.connected = true;
-                        _this3.scheduler.peerId = _this3.peerId = msg.peer_id; //获取本端Id
+                        _this4._handleAcceptMsg(msg);
                         break;
                     case 'transition':
                         //跃迁
-                        _this3._handleTransitionMsg(msg);
+                        _this4._handleTransitionMsg(msg);
                         break;
                     case 'adopt':
                         console.log('start _handledopt');
-                        _this3._handleAdoptMsg(msg);
+                        _this4._handleAdoptMsg(msg);
                         break;
                     case 'reject':
-                        _this3.stopP2P();
+                        _this4.stopP2P();
                         break;
                     default:
                         console.log('websocket unknown action ' + action);
@@ -7730,9 +7791,9 @@ var P2PSignaler = function (_EventEmitter) {
             websocket.onclose = function () {
                 //websocket断开时清除datachannel
                 console.warn('websocket closed');
-                _this3.connected = false;
-                _this3.scheduler.clearAllStreamers();
-                _this3.DCMap.clear();
+                _this4.connected = false;
+                _this4.scheduler.clearAllStreamers();
+                _this4.DCMap.clear();
             };
             return websocket;
         }
@@ -7775,6 +7836,13 @@ var P2PSignaler = function (_EventEmitter) {
         key: '_handleDisconnectMsg',
         value: function _handleDisconnectMsg(msg) {}
     }, {
+        key: '_handleAcceptMsg',
+        value: function _handleAcceptMsg(msg) {
+            console.log('accept');
+            this.scheduler.peerId = this.peerId = msg.peer_id; //获取本端Id
+            this.signalerWs = this._initSignalerWs();
+        }
+    }, {
         key: '_handleTransitionMsg',
         value: function _handleTransitionMsg(msg) {
             this.tranPending = false;
@@ -7800,7 +7868,7 @@ var P2PSignaler = function (_EventEmitter) {
                 action: 'adopt',
                 to_peer_id: remotePeerId
             };
-            this.websocket.send(adoptMsg);
+            this.schedulerWs.send(adoptMsg);
         }
     }, {
         key: '_createDatachannel',
@@ -7813,39 +7881,39 @@ var P2PSignaler = function (_EventEmitter) {
     }, {
         key: '_setupDC',
         value: function _setupDC(datachannel) {
-            var _this4 = this;
+            var _this5 = this;
 
             datachannel.on('signal', function (data) {
                 var msg = {
                     action: 'signal',
-                    peer_id: _this4.peerId,
+                    peer_id: _this5.peerId,
                     to_peer_id: datachannel.remotePeerId,
                     data: data
                 };
-                _this4.websocket.send(msg);
+                _this5.signalerWs.send(msg);
             }).once('error', function () {
                 var msg = {
                     action: 'dc_failed',
                     dc_id: datachannel.channelId
                 };
-                _this4.websocket.send(msg);
+                _this5.schedulerWs.send(msg);
                 console.log('datachannel error ' + datachannel.channelId);
-                _this4.scheduler.deleteDataChannel(datachannel);
-                _this4.DCMap.delete(datachannel.remotePeerId);
+                _this5.scheduler.deleteDataChannel(datachannel);
+                _this5.DCMap.delete(datachannel.remotePeerId);
                 datachannel.destroy();
 
-                if (_this4.candidateParents.length > 0) {
+                if (_this5.candidateParents.length > 0) {
                     //如果连接失败与剩余的尝试连接
-                    var parentId = _this4.candidateParents.pop().peer_id;
-                    _this4._createDatachannel(parentId, true);
+                    var parentId = _this5.candidateParents.pop().peer_id;
+                    _this5._createDatachannel(parentId, true);
                 } else {
                     //中途连接错误
                     //如果是这条channel的子节点并且没有父节点了则向服务器请求候选父节点
-                    if (datachannel.isReceiver && !_this4.scheduler.hasUpstreamer) {
+                    if (datachannel.isReceiver && !_this5.scheduler.hasUpstreamer) {
                         var _msg = {
                             action: 'get_parents'
                         };
-                        _this4.websocket.send(_msg);
+                        _this5.schedulerWs.send(_msg);
                     }
                 }
             }).once(_events4.default.DC_CLOSE, function () {
@@ -7855,53 +7923,55 @@ var P2PSignaler = function (_EventEmitter) {
                     action: 'dc_closed',
                     dc_id: datachannel.channelId
                 };
-                _this4.websocket.send(msg);
-                _this4.scheduler.deleteDataChannel(datachannel);
-                _this4.DCMap.delete(datachannel.remotePeerId);
+                _this5.schedulerWs.send(msg);
+                _this5.scheduler.deleteDataChannel(datachannel);
+                _this5.DCMap.delete(datachannel.remotePeerId);
 
                 //如果是这条channel的子节点并且没有父节点了则向服务器请求候选父节点
-                if (datachannel.isReceiver && !_this4.scheduler.hasUpstreamer) {
+                if (datachannel.isReceiver && !_this5.scheduler.hasUpstreamer) {
                     var _msg2 = {
                         action: 'get_parents'
                     };
-                    _this4.websocket.send(_msg2);
+                    _this5.schedulerWs.send(_msg2);
                 }
 
                 datachannel.destroy();
             }).once(_events4.default.DC_OPEN, function () {
 
-                if (_this4.scheduler.transitioning) {
+                if (_this5.scheduler.transitioning) {
                     //跃迁中
-                    _this4.scheduler.clearUpstreamers(); //与当前所有父节点断开p2p连接
-                    _this4.scheduler.transitioning = false; //跃迁成功
-                    if (_this4.scheduler.targetAncestorId) {
+                    _this5.scheduler.clearUpstreamers(); //与当前所有父节点断开p2p连接
+                    _this5.scheduler.transitioning = false; //跃迁成功
+                    if (_this5.scheduler.targetAncestorId) {
                         var adoptMsg = {
                             action: 'adopt',
-                            to_peer_id: _this4.scheduler.targetAncestorId
+                            to_peer_id: _this5.scheduler.targetAncestorId
                         };
-                        _this4.websocket.send(adoptMsg);
+                        _this5.schedulerWs.send(adoptMsg);
                     }
                 } else {
                     //从RP获取节点
-                    _this4.candidateParents = []; //防止一段时间后连接上行带宽已发生变化
+                    _this5.candidateParents = []; //防止一段时间后连接上行带宽已发生变化
                 }
 
-                _this4.scheduler.addDataChannel(datachannel);
+                _this5.scheduler.addDataChannel(datachannel);
                 if (datachannel.isReceiver) {
                     //子节点发送已连接消息
                     var msg = {
                         action: 'dc_opened',
                         dc_id: datachannel.channelId
                     };
-                    _this4.websocket.send(msg);
+                    _this5.schedulerWs.send(msg);
                 }
             });
         }
     }, {
         key: 'destroy',
         value: function destroy() {
-            this.websocket.close();
-            this.websocket = null;
+            this.schedulerWs.close();
+            this.signalerWs.close();
+            this.schedulerWs = null;
+            this.signalerWs = null;
         }
     }, {
         key: 'currentPlaySN',
@@ -8301,7 +8371,6 @@ var P2PScheduler = function (_EventEmitter) {
             this.upstreamers.unshift(channel); //最新加的优先级最高
 
             this._setupChannel(channel); //设置通用监听
-
         }
     }, {
         key: '_loadtimeout',
@@ -8725,7 +8794,6 @@ var P2PScheduler = function (_EventEmitter) {
     }, {
         key: 'hasUpstreamer',
         get: function get() {
-            console.warn('upstreamers.length ' + this.upstreamers.length);
             return this.upstreamers.length > 0;
         }
     }, {
