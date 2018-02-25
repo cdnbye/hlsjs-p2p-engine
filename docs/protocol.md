@@ -1,9 +1,6 @@
 ## datachannel传输协议
 
-### ts文件传输协议
-从 https://github.com/tomcartwrightuk/socket.io-p2p-parser 得到启发，当开始传输某个ts文件时，先传输一个json，告诉peer接下来的二进制文件分几片传，peer接收到这个信息后开辟相应的内存空间（buffer），接收到指定片数的二进制数据后拼接起来，形成完整的ts文件。
-
-datachannel KEEPALIVE
+### datachannel KEEPALIVE   （暂时未使用）
 ```javastript       
 {
     event: 'KEEPALIVE'
@@ -11,7 +8,7 @@ datachannel KEEPALIVE
 }
 ```
 
-datachannel KEEPALIVE-ACK
+### datachannel KEEPALIVE-ACK   （暂时未使用）
 ```javastript       
 {
     event: 'KEEPALIVE-ACK'
@@ -19,7 +16,7 @@ datachannel KEEPALIVE-ACK
 }
 ```
 
-请求数据
+### 请求数据 
 ```javastript       
 {
     event: 'REQUEST'   
@@ -29,7 +26,7 @@ datachannel KEEPALIVE-ACK
 }
 ```
 
-返回二进制数据头
+### 返回二进制数据头
 ```javastript       
 {
     event: 'BINARY'   
@@ -41,7 +38,7 @@ datachannel KEEPALIVE-ACK
 }
 ```
 
-未找到请求数据
+### 未找到请求数据
 ```javastript     
 {
     event: 'LACK'  
@@ -50,28 +47,30 @@ datachannel KEEPALIVE-ACK
 }
 ```
 
-关闭datachannel
+### 主动关闭datachannel
 ```javastript    
 {
     event: 'CLOSE' 
 }
 ```
 
-datachannel 发生错误
+### datachannel 发生错误
 ```javastript       
 {
     event: 'ERROR'  
 }
 ```
 
-通知对方成为子节点
+---fastmesh protocol--------------------------------
+
+### 通知对方成为子节点         
 ```javastript       
 {
     event: 'DISPLACE'  
 }
 ```
 
-向父节点发送跃迁请求
+### 向父节点发送跃迁请求
 ```javastript       
 {
     event: 'TRANSITION'
@@ -82,7 +81,7 @@ datachannel 发生错误
 }
 ```
 
-向子节点发送同意跃迁响应
+### 向子节点发送同意跃迁响应
 ```javastript       
 {
     event: 'GRANT'
@@ -103,7 +102,11 @@ datachannel 发生错误
     channel: string               //频道标识，目前是m3u0的url  
     browser:   string              //浏览器名
     device: string               //mobile 或 PC
-    os: string                    //操作系统          
+    os: string                    //操作系统 
+    
+    test: boolean                //测试模式
+    ISP: string                
+    province: string
 }
 ```
 
@@ -201,8 +204,8 @@ datachannel 发生错误
 }
 ```
 
----
-## fastmesh protocol
+
+---fastmesh protocol--------------------------------
 
 ### server ---> peer        发送候选父节点给peer
 ```javastript
