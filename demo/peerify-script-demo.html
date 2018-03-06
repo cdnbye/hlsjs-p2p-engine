@@ -25,22 +25,25 @@
             fragLoadingTimeOut: 4000,              // used by fragment-loader
         };
         var p2pConfig = {
-            key: 'free1',
+            key: 'free',
             wsSchedulerAddr: `ws://127.0.0.1:8080/ws`,
             wsSignalerAddr: 'ws://120.78.168.126:8081/ws',
-            reportInterval: 3600,
-            defaultUploadBW: 1024*1024*4/8+2,
-            transitionEnabled: true
+            reportInterval: 10,
+//            defaultUploadBW: 4194304,
+            defaultUploadBW: 4194304 + 10,
+            transitionEnabled: true,
+//            transitionEnabled: false,
+            maxParents: 2
         };
-//        var p2pConfig = {reportInterval: 3600};
 
         var hls = new Hls(hlsjsConfig);
 
-        var peerify = new HlsPeerify(hls, p2pConfig);
+        var p2pPlugin = new HlsPeerify(hls, p2pConfig);
 
-        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
+//        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
 //        hls.loadSource('https://video-dev.github.io/streams/test_001/stream.m3u8?a=123');
-//        hls.loadSource('https://moeplayer.b0.upaiyun.com/dplayer/hls/hikarunara.m3u8');
+        hls.loadSource('https://moeplayer.b0.upaiyun.com/dplayer/hls/hikarunara.m3u8');
+//        hls.loadSource('http://wowza.peer5.com/live/smil:bbb_abr.smil/chunklist_w794046364_b2204000.m3u8');
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
 

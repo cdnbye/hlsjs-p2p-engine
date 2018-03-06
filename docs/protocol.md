@@ -99,7 +99,8 @@
 ```javastript
 {
     action: 'enter'                
-    channel: string               //频道标识，目前是m3u0的url  
+    channel: string               //频道标识，目前是m3u0的url
+    ul_bw: number                 //初始设置的上行带宽
     browser:   string              //浏览器名
     device: string               //mobile 或 PC
     os: string                    //操作系统 
@@ -183,9 +184,14 @@
 {
     action: 'statistics'            
     level:   number              //平均level，用于调度
-    cdn: number                  //cdn下载的流量大小（单位KB）
+    source: number               //源站下载的流量大小（单位KB）
     p2p: number                  //p2p下载的流量大小（单位KB）
-    residual_bw: number          //当前剩余上行带宽
+    ul_srs: {                     //当前每个data channel上行streaming rate(单位bit/s)
+        map[string]number{
+            remotePeerId: sr
+        }
+    }
+    plr: number                  //当前丢包率
 }
 ```
 
@@ -238,30 +244,103 @@
 }
 ```
 
-## 信令服务器
+## 拓扑结构可视化协议
 
-### peer ---> server
+### 请求当前拓扑结构
 ```javastript
 {
-    action: 'register'               
-    peer_id: string                          
-}
-```    
-
-### peer ---> server    发送信令给server
-```javastript
-{
-    action: 'signal'               
-    to_peer_id: string            //对等端的Id
-    data: string                  //需要传送的数据
+    action: "get_topology"
 }
 ```
 
-### server ---> peer        发送信令给peer
+### 返回当前的拓扑结构
 ```javastript
 {
-    action: 'signal'           
-    from_peer_id: string            //对等端的Id
-    data: string                    //需要传送的数据
+    action: "topology"                   //刚建立连接时返回的整个拓扑结构
+    nodes: [
+        {
+            id: 1,
+            parents: [id1, id2...]
+            info: {
+                ISP: string,
+                country: string
+                province: string
+                city: string
+            }
+        },
+        {
+            id: 2,
+            parents: [id1, id2...]
+            info: {
+                ISP: string
+                country: string
+                province: string
+                city: string
+            }
+        }
+    ]
+}
+```
+
+### 新节点加入
+```javastript
+{
+    action: "join"              
+    node: {
+        id: 3
+        info: {
+            ISP: string
+            country: string
+            province: string
+            city: string
+            ul_bw: number
+        }
+    }
+}
+```
+
+### 旧节点离开
+```javastript
+{
+    action: "leave",                   
+    node: {
+        id: 1
+    }
+}
+```
+
+### 建立连接
+```javastript
+{
+    action: "connect",                   
+    edge: {
+        from: 1,                           //父节点
+        to: 2,                             //子节点
+    }
+}
+```
+
+### 断开连接
+```javastript
+{
+    action: "disconnect",                   
+    edge: {
+        from: 1,                           //父节点
+        to: 2,                             //子节点
+    }
+}
+```
+
+### 发送节点实时统计信息
+```javascript
+{
+   action: "statistics"
+   id: string
+   {
+       source: number              
+       p2p: number                  
+       ul_srs: map[string]number
+       plr: number 
+   }                 
 }
 ```
