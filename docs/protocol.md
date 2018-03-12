@@ -117,7 +117,8 @@
     action: 'accept'  
     peer_id: string                //本节点唯一标识
     speed_test: string             //测速url
-    report_span: number            //上报统计信息的时间间隔             
+    report_span: number            //上报统计信息的时间间隔
+    substreams: number             //分几个子流
 }   
 ```
 
@@ -136,11 +137,12 @@
 }
 ```
 
-### peer ---> server    datachannel建立成功
+### peer ---> server    datachannel建立成功(子节点发出，父节点不发)
 ```javastript
 {
     action: 'dc_opened'                
     dc_id: string            //datachannel的Id
+    substreams: number       //子流数量
 }
 ```
 
@@ -217,7 +219,7 @@
 ```javastript
 {
     action: 'parents'           
-    nodes: Array<Object<peer_id:string, ul_bw:number>>
+    nodes: Array<Object<peer_id:string, residual_bw:number>>
 }
 ```
 
@@ -257,10 +259,11 @@
 ```javastript
 {
     action: "topology"                   //刚建立连接时返回的整个拓扑结构
+    totalstreams: number
     nodes: [
         {
             id: 1,
-            parents: [id1, id2...]
+            parents: [{id:id1,substreams:2}, {id:id2,substreams:2}...]
             info: {
                 ISP: string,
                 country: string
@@ -270,7 +273,7 @@
         },
         {
             id: 2,
-            parents: [id1, id2...]
+            parents: [{id:id1,substreams:2}, {id:id2,substreams:2}...]
             info: {
                 ISP: string
                 country: string
@@ -293,7 +296,8 @@
             country: string
             province: string
             city: string
-            ul_bw: number
+            ul_bw: number,
+            substreams: number
         }
     }
 }
@@ -316,6 +320,7 @@
     edge: {
         from: 1,                           //父节点
         to: 2,                             //子节点
+        substreams: 2                      //子流数量
     }
 }
 ```
