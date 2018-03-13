@@ -28,10 +28,10 @@
             key: 'free',
             wsSchedulerAddr: `ws://127.0.0.1:8080/ws`,
             wsSignalerAddr: 'ws://120.78.168.126:8081/ws',
-            reportInterval: 10,
+            reportInterval: 3600,
 //            defaultUploadBW: 246440,
-            defaultUploadBW: 240000 + 100,
-//            defaultUploadBW: 246440 + 50*1024*8,
+//            defaultUploadBW: 240000 + 100,
+            defaultUploadBW: 246440/3*2,
             transitionEnabled: true,
 //            transitionEnabled: false
         };
@@ -40,10 +40,11 @@
 
         var p2pPlugin = new HlsPeerify(hls, p2pConfig);
 
-        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
+//        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
 //        hls.loadSource('https://video-dev.github.io/streams/test_001/stream.m3u8?a=123');
 //        hls.loadSource('https://moeplayer.b0.upaiyun.com/dplayer/hls/hikarunara.m3u8');
 //        hls.loadSource('http://wowza.peer5.com/live/smil:bbb_abr.smil/chunklist_w794046364_b2204000.m3u8');
+        hls.loadSource('http://112.90.52.139/hls/test.m3u8');
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
 

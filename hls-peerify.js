@@ -7762,7 +7762,7 @@ var P2PSignaler = function (_EventEmitter) {
                 var msg = {
                     action: 'enter',
                     channel: _this4.channel,
-                    ul_bw: _this4.config.defaultUploadBW
+                    ul_bw: Math.round(_this4.config.defaultUploadBW)
                 };
 
                 if (info) {
@@ -8026,7 +8026,8 @@ var P2PSignaler = function (_EventEmitter) {
                     var msg = {
                         action: 'dc_opened',
                         dc_id: datachannel.channelId,
-                        substreams: datachannel.copys
+                        substreams: datachannel.copys,
+                        stream_rate: _this5.scheduler.substreams.substreamRate
                     };
                     _this5.schedulerWs.send(msg);
                 }
@@ -8470,6 +8471,9 @@ var P2PScheduler = function (_EventEmitter) {
         value: function _addUpStreamer(channel) {
             // this.upstreamers.unshift(channel);                    //最新加的优先级最高
             this.upstreamers.push(channel);
+            //加入子流
+            console.warn(channel.remotePeerId + ' \u5B50\u6D41\u6570\u91CF ' + channel.copys);
+            this.substreams.addSubstreams(channel, channel.copys);
 
             this._setupChannel(channel); //设置通用监听
         }
@@ -8495,9 +8499,6 @@ var P2PScheduler = function (_EventEmitter) {
             if (channel.isReceiver) {
                 //分别存放父节点和子节点
                 this._addUpStreamer(channel);
-                //加入子流
-                console.warn(channel.remotePeerId + ' \u5B50\u6D41\u6570\u91CF ' + channel.copys);
-                this.substreams.addSubstreams(channel, channel.copys);
             } else {
                 this._addDownStreamer(channel);
             }
@@ -8534,6 +8535,7 @@ var P2PScheduler = function (_EventEmitter) {
                 this.downstreamers.push(streamer);
                 streamer.send(JSON.stringify(msg));
             }
+            this.substreams.clear();
         }
     }, {
         key: 'clearUpstreamers',
@@ -8595,11 +8597,13 @@ var P2PScheduler = function (_EventEmitter) {
                     return item.remotePeerId === streamer.remotePeerId;
                 }), 1);
                 this.downstreamers.push(streamer);
+                this.substreams.deleteSubstream(streamer.remotePeerId);
             } else {
                 this.downstreamers.splice(this.downstreamers.findIndex(function (item) {
                     return item.remotePeerId === streamer.remotePeerId;
                 }), 1);
                 this.upstreamers.unshift(streamer); //放在最优先位置
+                this.substreams.addSubstreams(streamer, 1);
             }
             streamer.isReceiver = !streamer.isReceiver;
             streamer.send(JSON.stringify(msg));
@@ -8744,6 +8748,7 @@ var P2PScheduler = function (_EventEmitter) {
                     return item.channelId === channelId;
                 }), 1);
                 _this2.upstreamers.unshift(channel);
+                _this2.substreams.addSubstreams(channel, 1);
                 console.log('datachannel ' + channel.channelId + ' displaced');
             }).on(_events4.default.DC_GRANT, function (msg) {
                 if (msg.to_peer_id === _this2.peerId) {

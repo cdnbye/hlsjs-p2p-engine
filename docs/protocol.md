@@ -143,6 +143,7 @@
     action: 'dc_opened'                
     dc_id: string            //datachannel的Id
     substreams: number       //子流数量
+    stream_rate: number      //每个子流的码率
 }
 ```
 
