@@ -6020,8 +6020,8 @@ var HlsPeerify = function (_EventEmitter) {
             _this._init(channel);
         } else {
             hlsjs.on(hlsjs.constructor.Events.MANIFEST_PARSED, function (event, data) {
-                console.warn('bitrate: ' + JSON.stringify(data.levels[0].bitrate, null, 1));
-                _this.bitrate = data.levels[0].bitrate; //获取固定码率，用于子流
+
+                // this.bitrate = data.levels[0].bitrate;                                                //获取固定码率，用于子流
                 var channel = hlsjs.url.split('?')[0];
                 _this._init(channel);
             });
@@ -6061,9 +6061,6 @@ var HlsPeerify = function (_EventEmitter) {
             this.bufMgr = new _bufferManager2.default(this.config);
             this.hlsjs.config.bufMgr = this.bufMgr;
 
-            //计算子流码率
-            this.signaler.scheduler.substreams.bitrate = this.bitrate;
-            // console.warn(`this.signaler.scheduler.substreams.subBitrate ${this.signaler.scheduler.substreams.subBitrate}`);
             //通过config向hybrid-loader导入p2p-scheduler
             this.hlsjs.config.p2pLoader = this.signaler.scheduler;
 
@@ -6094,7 +6091,10 @@ var HlsPeerify = function (_EventEmitter) {
                     _this2.p2pDownloaded += data.frag.loaded;
                 }
                 //计算平均streaming rate
-                // let bitrate = data.frag.loaded*8/data.frag.duration;
+                var bitrate = data.frag.loaded * 8 / data.frag.duration;
+                //计算子流码率
+                _this2.signaler.scheduler.substreams.bitrate = Math.round(bitrate);
+                console.warn('FRAG_LOADED bitrate ' + bitrate);
                 // this.streamingRate = (this.streamingRate*this.fragLoadedCounter + bitrate)/(++this.fragLoadedCounter);
                 // this.signaler.scheduler.streamingRate = Math.floor(this.streamingRate);
             });
