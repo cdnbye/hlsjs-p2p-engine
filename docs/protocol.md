@@ -29,7 +29,7 @@
 ### 返回二进制数据头
 ```javastript       
 {
-    event: 'BINARY'   
+    event: 'PIECE'   
     attachments：number    //接下来传输几个二进制包
     url: string    //ts文件的url（相对url）
     sn: number         //ts数据的播放序号
@@ -87,7 +87,7 @@
     event: 'GRANT'
     delay: number             //source-to-end delay, 目前用level表示
     TTL: number
-    parents: Array<peerId>       
+    parents: Array<{peer_id,substreams}>           
     from_peer_id: string     
     to_peer_id: string
 }
@@ -152,6 +152,8 @@
 {
     action: 'dc_closed'                
     dc_id: string            //datachannel的Id
+    substreams: number       //子流数量
+    stream_rate: number      //每个子流的码率
 }
 ```
 
@@ -189,7 +191,7 @@
     level:   number              //平均level，用于调度
     source: number               //源站下载的流量大小（单位KB）
     p2p: number                  //p2p下载的流量大小（单位KB）
-    ul_srs: {                     //当前每个data channel上行streaming rate(单位bit/s)
+    ul_srs: {                    暂时不用 //当前每个data channel上行streaming rate(单位bit/s)
         map[string]number{
             remotePeerId: sr
         }
@@ -243,11 +245,69 @@
 ```javastript
 {
     action: 'adopt'          
-    parentId: string                      
+    parent_id: string
+    residual_bw: number                      
 }
 ```
 
-## 拓扑结构可视化协议
+---bittorrent protocol--------------------------------
+
+### GET /announce (向tracker注册并请求peers)
+#### 参数
+```javastript
+{  
+    info_hash: string             //频道标识，目前是url的sha1值
+    browser:   string             //浏览器名
+    device: string                //mobile 或 PC
+    os: string                    //操作系统                      
+}
+```
+#### 返回
+```javastript
+{
+    peer_id: string                //节点的唯一ID   
+    report_span: number            //上报统计信息的时间间隔 
+    peers: [
+        {id: string}                         
+    ]
+}
+```
+
+### GET /get_peers (向tracker请求peers)
+#### 参数
+```javastript
+{  
+    info_hash: string              //频道标识，目前是url的sha1值
+    peer_id: string                //节点的唯一ID   
+}
+```
+#### 返回
+```javastript
+{
+    peers: [
+        {id: string}                         
+    ]
+}
+```
+
+### POST /stats (向tracker请求peers)
+#### 参数
+```javastript
+{  
+    info_hash: string             //频道标识，目前是url的sha1值
+    peer_id: string
+    source: number
+    p2p: number
+}
+```
+#### 返回
+```javastript
+{
+                         
+}
+```
+
+## fastmesh拓扑结构可视化协议
 
 ### 请求当前拓扑结构
 ```javastript
@@ -341,12 +401,17 @@
 ```javascript
 {
    action: "statistics"
-   id: string
-   {
+   result: {
        source: number              
-       p2p: number                  
-       ul_srs: map[string]number
-       plr: number 
-   }                 
+       p2p: number 
+   } 
+                   
+}
+```
+
+### 获取实时统计信息
+```javascript
+{
+    action: "get_stats"
 }
 ```

@@ -8,7 +8,7 @@ import Hlsjs from 'hls.js';
 
 let recommendedHlsjsConfig = {
     maxBufferSize: 0,
-    maxBufferLength: 20,
+    maxBufferLength: 30,
     liveSyncDuration: 30,
     fragLoadingTimeOut: 4000,              // used by fragment-loader
 };

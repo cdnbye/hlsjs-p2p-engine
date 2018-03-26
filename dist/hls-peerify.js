@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 22);
+/******/ 	return __webpack_require__(__webpack_require__.s = 18);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -681,8 +681,8 @@ var util = __webpack_require__(8);
 util.inherits = __webpack_require__(3);
 /*</replacement>*/
 
-var Readable = __webpack_require__(13);
-var Writable = __webpack_require__(16);
+var Readable = __webpack_require__(12);
+var Writable = __webpack_require__(15);
 
 util.inherits(Duplex, Readable);
 
@@ -774,26 +774,18 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = {
 
     //data-channel
-    DC_SIGNAL: 'SIGNAL',
-    DC_OPEN: 'OPEN',
-    DC_REQUEST: 'REQUEST',
-    DC_REQUESTFAIL: 'REQUEST_FAIL', //当请求的数据找不到时触发
-    DC_CLOSE: 'CLOSE',
-    DC_RESPONSE: 'RESPONSE',
-    DC_ERROR: 'ERROR',
-    DC_PIECE: "PIECE",
-    //---------------------------live---------------------------------------------------------
-    DC_TRANSITION: 'TRANSITION',
-    DC_GRANT: 'GRANT',
-    DC_LACK: "LACK",
-    DC_DISPLACE: "DISPLACE",
-    //---------------------------vod---------------------------------------------------------
-    DC_BITFIELD: "BITFIELD",
-    DC_CHOKE: "CHOKE",
-    DC_UNCHOKE: "UNCHOKE",
-    DC_INTERESTED: "INTERESTED",
-    DC_NOTINTERESTED: "NOT_INTERESTED",
-    DC_HAVE: "HAVE",
+    DC_SIGNAL: 'signal',
+    DC_OPEN: 'open',
+    DC_REQUEST: 'request',
+    DC_REQUESTFAIL: 'request_fail', //当请求的数据找不到时触发
+    DC_CLOSE: 'close',
+    DC_RESPONSE: 'response',
+    DC_ERROR: 'error',
+    DC_BINARY: 'binary',
+    DC_TRANSITION: 'transition',
+    DC_GRANT: 'grant',
+    //buffer-manager
+
 
     //loader-scheduler
     SEGMENT: 'segment',
@@ -801,7 +793,6 @@ exports.default = {
     DISPLACE: 'displace',
     CONNECT: 'connect', //建立data channel
     ADOPT: 'adopt'
-
 };
 module.exports = exports['default'];
 
@@ -820,9 +811,9 @@ module.exports = exports['default'];
 
 
 
-var base64 = __webpack_require__(26)
-var ieee754 = __webpack_require__(27)
-var isArray = __webpack_require__(12)
+var base64 = __webpack_require__(20)
+var ieee754 = __webpack_require__(21)
+var isArray = __webpack_require__(11)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -2839,57 +2830,13 @@ function nextTick(fn, arg1, arg2, arg3) {
 /* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.config = exports.HybridLoader = exports.RPClient = undefined;
-
-var _rpClient = __webpack_require__(24);
-
-var _rpClient2 = _interopRequireDefault(_rpClient);
-
-var _hybridLoader = __webpack_require__(43);
-
-var _hybridLoader2 = _interopRequireDefault(_hybridLoader);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Created by xieting on 2018/3/26.
- */
-
-var config = {
-    wsSchedulerAddr: 'ws://120.78.168.126:3389', //调度服务器地址
-    transitionEnabled: true, //是否允许节点自动跃迁
-    transitionCheckInterval: 30, //跃迁检查时间间隔
-    transitionTTL: 2, //跃迁的最大跳数
-    transitionWaitTime: 5, //跃迁等待Grant响应的时间
-
-    defaultUploadBW: 1024 * 1024 * 4 / 8, //总上行带宽默认4Mbps
-    maxTransitionTries: 1, //最大跃迁次数（跃迁失败也算一次）
-    maxGetParentsTries: 3, //获取父节点的最大尝试次数(不包含ws连上后的请求)
-
-    defaultSubstreams: 3 //默认子流数量
-};
-
-exports.RPClient = _rpClient2.default;
-exports.HybridLoader = _hybridLoader2.default;
-exports.config = config;
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
 /* WEBPACK VAR INJECTION */(function(Buffer) {module.exports = Peer
 
-var debug = __webpack_require__(28)('simple-peer')
-var getBrowserRTC = __webpack_require__(31)
+var debug = __webpack_require__(22)('simple-peer')
+var getBrowserRTC = __webpack_require__(25)
 var inherits = __webpack_require__(3)
-var randombytes = __webpack_require__(32)
-var stream = __webpack_require__(33)
+var randombytes = __webpack_require__(26)
+var stream = __webpack_require__(27)
 
 var MAX_BUFFERED_AMOUNT = 64 * 1024
 
@@ -3707,7 +3654,7 @@ function noop () {}
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6).Buffer))
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -3718,7 +3665,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3753,7 +3700,7 @@ var processNextTick = __webpack_require__(9);
 module.exports = Readable;
 
 /*<replacement>*/
-var isArray = __webpack_require__(12);
+var isArray = __webpack_require__(11);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -3771,7 +3718,7 @@ var EElistenerCount = function (emitter, type) {
 /*</replacement>*/
 
 /*<replacement>*/
-var Stream = __webpack_require__(14);
+var Stream = __webpack_require__(13);
 /*</replacement>*/
 
 // TODO(bmeurer): Change this back to const once hole checks are
@@ -3793,7 +3740,7 @@ util.inherits = __webpack_require__(3);
 /*</replacement>*/
 
 /*<replacement>*/
-var debugUtil = __webpack_require__(34);
+var debugUtil = __webpack_require__(28);
 var debug = void 0;
 if (debugUtil && debugUtil.debuglog) {
   debug = debugUtil.debuglog('stream');
@@ -3802,8 +3749,8 @@ if (debugUtil && debugUtil.debuglog) {
 }
 /*</replacement>*/
 
-var BufferList = __webpack_require__(35);
-var destroyImpl = __webpack_require__(15);
+var BufferList = __webpack_require__(29);
+var destroyImpl = __webpack_require__(14);
 var StringDecoder;
 
 util.inherits(Readable, Stream);
@@ -3886,7 +3833,7 @@ function ReadableState(options, stream) {
   this.decoder = null;
   this.encoding = null;
   if (options.encoding) {
-    if (!StringDecoder) StringDecoder = __webpack_require__(17).StringDecoder;
+    if (!StringDecoder) StringDecoder = __webpack_require__(16).StringDecoder;
     this.decoder = new StringDecoder(options.encoding);
     this.encoding = options.encoding;
   }
@@ -4042,7 +3989,7 @@ Readable.prototype.isPaused = function () {
 
 // backwards compatibility.
 Readable.prototype.setEncoding = function (enc) {
-  if (!StringDecoder) StringDecoder = __webpack_require__(17).StringDecoder;
+  if (!StringDecoder) StringDecoder = __webpack_require__(16).StringDecoder;
   this._readableState.decoder = new StringDecoder(enc);
   this._readableState.encoding = enc;
   return this;
@@ -4732,14 +4679,14 @@ function indexOf(xs, x) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(2)))
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(0).EventEmitter;
 
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4817,7 +4764,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4893,12 +4840,12 @@ util.inherits = __webpack_require__(3);
 
 /*<replacement>*/
 var internalUtil = {
-  deprecate: __webpack_require__(38)
+  deprecate: __webpack_require__(32)
 };
 /*</replacement>*/
 
 /*<replacement>*/
-var Stream = __webpack_require__(14);
+var Stream = __webpack_require__(13);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -4912,7 +4859,7 @@ function _isUint8Array(obj) {
 }
 /*</replacement>*/
 
-var destroyImpl = __webpack_require__(15);
+var destroyImpl = __webpack_require__(14);
 
 util.inherits(Writable, Stream);
 
@@ -5485,10 +5432,10 @@ Writable.prototype._destroy = function (err, cb) {
   this.end();
   cb(err);
 };
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(36).setImmediate, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(30).setImmediate, __webpack_require__(1)))
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5766,7 +5713,7 @@ function simpleEnd(buf) {
 }
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5986,455 +5933,7 @@ function done(stream, er, data) {
 }
 
 /***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-;
-;
-;
-var isWebSocket = function (constructor) {
-    return constructor && constructor.CLOSING === 2;
-};
-var isGlobalWebSocket = function () {
-    return typeof WebSocket !== 'undefined' && isWebSocket(WebSocket);
-};
-var getDefaultOptions = function () { return ({
-    constructor: isGlobalWebSocket() ? WebSocket : null,
-    maxReconnectionDelay: 10000,
-    minReconnectionDelay: 1500,
-    reconnectionDelayGrowFactor: 1.3,
-    connectionTimeout: 4000,
-    maxRetries: Infinity,
-    debug: false,
-}); };
-var bypassProperty = function (src, dst, name) {
-    Object.defineProperty(dst, name, {
-        get: function () { return src[name]; },
-        set: function (value) { src[name] = value; },
-        enumerable: true,
-        configurable: true,
-    });
-};
-var initReconnectionDelay = function (config) {
-    return (config.minReconnectionDelay + Math.random() * config.minReconnectionDelay);
-};
-var updateReconnectionDelay = function (config, previousDelay) {
-    var newDelay = previousDelay * config.reconnectionDelayGrowFactor;
-    return (newDelay > config.maxReconnectionDelay)
-        ? config.maxReconnectionDelay
-        : newDelay;
-};
-var LEVEL_0_EVENTS = ['onopen', 'onclose', 'onmessage', 'onerror'];
-var reassignEventListeners = function (ws, oldWs, listeners) {
-    Object.keys(listeners).forEach(function (type) {
-        listeners[type].forEach(function (_a) {
-            var listener = _a[0], options = _a[1];
-            ws.addEventListener(type, listener, options);
-        });
-    });
-    if (oldWs) {
-        LEVEL_0_EVENTS.forEach(function (name) {
-            ws[name] = oldWs[name];
-        });
-    }
-};
-var ReconnectingWebsocket = function (url, protocols, options) {
-    var _this = this;
-    if (options === void 0) { options = {}; }
-    var ws;
-    var connectingTimeout;
-    var reconnectDelay = 0;
-    var retriesCount = 0;
-    var shouldRetry = true;
-    var savedOnClose = null;
-    var listeners = {};
-    // require new to construct
-    if (!(this instanceof ReconnectingWebsocket)) {
-        throw new TypeError("Failed to construct 'ReconnectingWebSocket': Please use the 'new' operator");
-    }
-    // Set config. Not using `Object.assign` because of IE11
-    var config = getDefaultOptions();
-    Object.keys(config)
-        .filter(function (key) { return options.hasOwnProperty(key); })
-        .forEach(function (key) { return config[key] = options[key]; });
-    if (!isWebSocket(config.constructor)) {
-        throw new TypeError('Invalid WebSocket constructor. Set `options.constructor`');
-    }
-    var log = config.debug ? function () {
-        var params = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            params[_i] = arguments[_i];
-        }
-        return console.log.apply(console, ['RWS:'].concat(params));
-    } : function () { };
-    /**
-     * Not using dispatchEvent, otherwise we must use a DOM Event object
-     * Deferred because we want to handle the close event before this
-     */
-    var emitError = function (code, msg) { return setTimeout(function () {
-        var err = new Error(msg);
-        err.code = code;
-        if (Array.isArray(listeners.error)) {
-            listeners.error.forEach(function (_a) {
-                var fn = _a[0];
-                return fn(err);
-            });
-        }
-        if (ws.onerror) {
-            ws.onerror(err);
-        }
-    }, 0); };
-    var handleClose = function () {
-        log('handleClose', { shouldRetry: shouldRetry });
-        retriesCount++;
-        log('retries count:', retriesCount);
-        if (retriesCount > config.maxRetries) {
-            emitError('EHOSTDOWN', 'Too many failed connection attempts');
-            return;
-        }
-        if (!reconnectDelay) {
-            reconnectDelay = initReconnectionDelay(config);
-        }
-        else {
-            reconnectDelay = updateReconnectionDelay(config, reconnectDelay);
-        }
-        log('handleClose - reconnectDelay:', reconnectDelay);
-        if (shouldRetry) {
-            setTimeout(connect, reconnectDelay);
-        }
-    };
-    var connect = function () {
-        if (!shouldRetry) {
-            return;
-        }
-        log('connect');
-        var oldWs = ws;
-        var wsUrl = (typeof url === 'function') ? url() : url;
-        ws = new config.constructor(wsUrl, protocols);
-        connectingTimeout = setTimeout(function () {
-            log('timeout');
-            ws.close();
-            emitError('ETIMEDOUT', 'Connection timeout');
-        }, config.connectionTimeout);
-        log('bypass properties');
-        for (var key in ws) {
-            // @todo move to constant
-            if (['addEventListener', 'removeEventListener', 'close', 'send'].indexOf(key) < 0) {
-                bypassProperty(ws, _this, key);
-            }
-        }
-        ws.addEventListener('open', function () {
-            clearTimeout(connectingTimeout);
-            log('open');
-            reconnectDelay = initReconnectionDelay(config);
-            log('reconnectDelay:', reconnectDelay);
-            retriesCount = 0;
-        });
-        ws.addEventListener('close', handleClose);
-        reassignEventListeners(ws, oldWs, listeners);
-        // because when closing with fastClose=true, it is saved and set to null to avoid double calls
-        ws.onclose = ws.onclose || savedOnClose;
-        savedOnClose = null;
-    };
-    log('init');
-    connect();
-    this.close = function (code, reason, _a) {
-        if (code === void 0) { code = 1000; }
-        if (reason === void 0) { reason = ''; }
-        var _b = _a === void 0 ? {} : _a, _c = _b.keepClosed, keepClosed = _c === void 0 ? false : _c, _d = _b.fastClose, fastClose = _d === void 0 ? true : _d, _e = _b.delay, delay = _e === void 0 ? 0 : _e;
-        log('close - params:', { reason: reason, keepClosed: keepClosed, fastClose: fastClose, delay: delay, retriesCount: retriesCount, maxRetries: config.maxRetries });
-        shouldRetry = !keepClosed && retriesCount <= config.maxRetries;
-        if (delay) {
-            reconnectDelay = delay;
-        }
-        ws.close(code, reason);
-        if (fastClose) {
-            var fakeCloseEvent_1 = {
-                code: code,
-                reason: reason,
-                wasClean: true,
-            };
-            // execute close listeners soon with a fake closeEvent
-            // and remove them from the WS instance so they
-            // don't get fired on the real close.
-            handleClose();
-            ws.removeEventListener('close', handleClose);
-            // run and remove level2
-            if (Array.isArray(listeners.close)) {
-                listeners.close.forEach(function (_a) {
-                    var listener = _a[0], options = _a[1];
-                    listener(fakeCloseEvent_1);
-                    ws.removeEventListener('close', listener, options);
-                });
-            }
-            // run and remove level0
-            if (ws.onclose) {
-                savedOnClose = ws.onclose;
-                ws.onclose(fakeCloseEvent_1);
-                ws.onclose = null;
-            }
-        }
-    };
-    this.send = function (data) {
-        ws.send(data);
-    };
-    this.addEventListener = function (type, listener, options) {
-        if (Array.isArray(listeners[type])) {
-            if (!listeners[type].some(function (_a) {
-                var l = _a[0];
-                return l === listener;
-            })) {
-                listeners[type].push([listener, options]);
-            }
-        }
-        else {
-            listeners[type] = [[listener, options]];
-        }
-        ws.addEventListener(type, listener, options);
-    };
-    this.removeEventListener = function (type, listener, options) {
-        if (Array.isArray(listeners[type])) {
-            listeners[type] = listeners[type].filter(function (_a) {
-                var l = _a[0];
-                return l !== listener;
-            });
-        }
-        ws.removeEventListener(type, listener, options);
-    };
-};
-module.exports = ReconnectingWebsocket;
-
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/**
- * XHR based logger
- */
-
-var XhrLoader = function () {
-    function XhrLoader(config) {
-        _classCallCheck(this, XhrLoader);
-
-        if (config && config.xhrSetup) {
-            this.xhrSetup = config.xhrSetup;
-        }
-    }
-
-    _createClass(XhrLoader, [{
-        key: 'destroy',
-        value: function destroy() {
-            this.abort();
-            this.loader = null;
-        }
-    }, {
-        key: 'abort',
-        value: function abort() {
-            var loader = this.loader;
-            if (loader && loader.readyState !== 4) {
-                this.stats.aborted = true;
-                loader.abort();
-            }
-
-            window.clearTimeout(this.requestTimeout);
-            this.requestTimeout = null;
-            window.clearTimeout(this.retryTimeout);
-            this.retryTimeout = null;
-        }
-    }, {
-        key: 'load',
-        value: function load(context, config, callbacks) {
-            this.context = context;
-            this.config = config;
-            this.callbacks = callbacks;
-            this.stats = { trequest: performance.now(), retry: 0 };
-            this.retryDelay = config.retryDelay;
-            this.loadInternal();
-        }
-    }, {
-        key: 'loadInternal',
-        value: function loadInternal() {
-            var xhr,
-                context = this.context;
-            xhr = this.loader = new XMLHttpRequest();
-
-            var stats = this.stats;
-            stats.tfirst = 0;
-            stats.loaded = 0;
-            var xhrSetup = this.xhrSetup;
-
-            try {
-                if (xhrSetup) {
-                    try {
-                        xhrSetup(xhr, context.url);
-                    } catch (e) {
-                        // fix xhrSetup: (xhr, url) => {xhr.setRequestHeader("Content-Language", "test");}
-                        // not working, as xhr.setRequestHeader expects xhr.readyState === OPEN
-                        xhr.open('GET', context.url, true);
-                        xhrSetup(xhr, context.url);
-                    }
-                }
-                if (!xhr.readyState) {
-                    xhr.open('GET', context.url, true);
-                }
-            } catch (e) {
-                // IE11 throws an exception on xhr.open if attempting to access an HTTP resource over HTTPS
-                this.callbacks.onError({ code: xhr.status, text: e.message }, context, xhr);
-                return;
-            }
-
-            if (context.rangeEnd) {
-                xhr.setRequestHeader('Range', 'bytes=' + context.rangeStart + '-' + (context.rangeEnd - 1));
-            }
-            xhr.onreadystatechange = this.readystatechange.bind(this);
-            xhr.onprogress = this.loadprogress.bind(this);
-            xhr.responseType = context.responseType;
-
-            // setup timeout before we perform request
-            this.requestTimeout = window.setTimeout(this.loadtimeout.bind(this), this.config.timeout);
-            xhr.send();
-        }
-    }, {
-        key: 'readystatechange',
-        value: function readystatechange(event) {
-            var xhr = event.currentTarget,
-                readyState = xhr.readyState,
-                stats = this.stats,
-                context = this.context,
-                config = this.config;
-
-            // don't proceed if xhr has been aborted
-            if (stats.aborted) {
-                return;
-            }
-
-            // >= HEADERS_RECEIVED
-            if (readyState >= 2) {
-                // clear xhr timeout and rearm it if readyState less than 4
-                window.clearTimeout(this.requestTimeout);
-                if (stats.tfirst === 0) {
-                    stats.tfirst = Math.max(performance.now(), stats.trequest);
-                }
-                if (readyState === 4) {
-                    var status = xhr.status;
-                    // http status between 200 to 299 are all successful
-                    if (status >= 200 && status < 300) {
-                        stats.tload = Math.max(stats.tfirst, performance.now());
-                        var data = void 0,
-                            len = void 0;
-                        if (context.responseType === 'arraybuffer') {
-                            data = xhr.response;
-                            len = data.byteLength;
-                        } else {
-                            data = xhr.responseText;
-                            len = data.length;
-                        }
-                        stats.loaded = stats.total = len;
-                        var response = { url: xhr.responseURL, data: data };
-                        this.callbacks.onSuccess(response, stats, context, xhr);
-                    } else {
-                        // if max nb of retries reached or if http status between 400 and 499 (such error cannot be recovered, retrying is useless), return error
-                        if (stats.retry >= config.maxRetry || status >= 400 && status < 499) {
-                            // logger.error(`${status} while loading ${context.url}` );
-                            this.callbacks.onError({ code: status, text: xhr.statusText }, context, xhr);
-                        } else {
-                            // retry
-                            // logger.warn(`${status} while loading ${context.url}, retrying in ${this.retryDelay}...`);
-                            // aborts and resets internal state
-                            this.destroy();
-                            // schedule retry
-                            this.retryTimeout = window.setTimeout(this.loadInternal.bind(this), this.retryDelay);
-                            // set exponential backoff
-                            this.retryDelay = Math.min(2 * this.retryDelay, config.maxRetryDelay);
-                            stats.retry++;
-                        }
-                    }
-                } else {
-                    // readyState >= 2 AND readyState !==4 (readyState = HEADERS_RECEIVED || LOADING) rearm timeout as xhr not finished yet
-                    this.requestTimeout = window.setTimeout(this.loadtimeout.bind(this), config.timeout);
-                }
-            }
-        }
-    }, {
-        key: 'loadtimeout',
-        value: function loadtimeout() {
-            // logger.warn(`timeout while loading ${this.context.url}` );
-            this.callbacks.onTimeout(this.stats, this.context, null);
-        }
-    }, {
-        key: 'loadprogress',
-        value: function loadprogress(event) {
-            var xhr = event.currentTarget,
-                stats = this.stats;
-
-            stats.loaded = event.loaded;
-            if (event.lengthComputable) {
-                stats.total = event.total;
-            }
-            var onProgress = this.callbacks.onProgress;
-            if (onProgress) {
-                // third arg is to provide on progress data
-                onProgress(stats, this.context, null, xhr);
-            }
-        }
-    }]);
-
-    return XhrLoader;
-}();
-
-exports.default = XhrLoader;
-module.exports = exports['default'];
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.config = exports.FragLoader = exports.Tracker = undefined;
-
-var _btTracker = __webpack_require__(44);
-
-var _btTracker2 = _interopRequireDefault(_btTracker);
-
-var _fragLoader = __webpack_require__(48);
-
-var _fragLoader2 = _interopRequireDefault(_fragLoader);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Created by xieting on 2018/3/26.
- */
-
-var config = {
-    announce: "" //tracker服务器地址
-};
-
-exports.Tracker = _btTracker2.default;
-exports.FragLoader = _fragLoader2.default;
-exports.config = config;
-
-/***/ }),
-/* 22 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6454,23 +5953,25 @@ var _events3 = __webpack_require__(0);
 
 var _events4 = _interopRequireDefault(_events3);
 
-var _config = __webpack_require__(23);
+var _config = __webpack_require__(19);
 
-var _config2 = _interopRequireDefault(_config);
-
-var _simplePeer = __webpack_require__(11);
+var _simplePeer = __webpack_require__(10);
 
 var _simplePeer2 = _interopRequireDefault(_simplePeer);
 
-var _fastmesh = __webpack_require__(10);
+var _p2pSignaler = __webpack_require__(34);
 
-var _bittorrent = __webpack_require__(21);
+var _p2pSignaler2 = _interopRequireDefault(_p2pSignaler);
 
-var _bufferManager = __webpack_require__(49);
+var _hybridLoader = __webpack_require__(39);
+
+var _hybridLoader2 = _interopRequireDefault(_hybridLoader);
+
+var _bufferManager = __webpack_require__(41);
 
 var _bufferManager2 = _interopRequireDefault(_bufferManager);
 
-var _uaParserJs = __webpack_require__(50);
+var _uaParserJs = __webpack_require__(42);
 
 var _uaParserJs2 = _interopRequireDefault(_uaParserJs);
 
@@ -6507,8 +6008,8 @@ var HlsPeerify = function (_EventEmitter) {
 
         var _this = _possibleConstructorReturn(this, (HlsPeerify.__proto__ || Object.getPrototypeOf(HlsPeerify)).call(this));
 
-        _this.config = Object.assign({}, _config2.default, p2pConfig);
-        console.warn('' + JSON.stringify(_this.config, null, 1));
+        _this.config = Object.assign({}, _config.defaultP2PConfig, p2pConfig);
+
         _this.hlsjs = hlsjs;
         _this.p2pEnabled = _this.config.disableP2P === false ? false : true; //默认开启P2P
 
@@ -6553,31 +6054,23 @@ var HlsPeerify = function (_EventEmitter) {
                 os: uaParserResult.os.name
             };
 
-            this.hlsjs.config.p2pEnabled = this.p2pEnabled;
+            //实例化信令
+            this.signaler = new _p2pSignaler2.default(channel, this.config, browserInfo);
+
             //实例化BufferManager
             this.bufMgr = new _bufferManager2.default(this.config);
             this.hlsjs.config.bufMgr = this.bufMgr;
 
-            if (this.config.mode === 'live') {
-                //直播模式，采用fastmesh算法
-                //实例化RP服务器
-                this.signaler = new _fastmesh.RPClient(channel, this.config, browserInfo);
+            //通过config向hybrid-loader导入p2p-scheduler
+            this.hlsjs.config.p2pLoader = this.signaler.scheduler;
 
-                //通过config向hybrid-loader导入p2p-scheduler
-                this.hlsjs.config.p2pLoader = this.signaler.scheduler;
+            //向hybrid-loader导入buffer-manager
+            this.hlsjs.config.p2pLoader.bufMgr = this.bufMgr;
 
-                //向hybrid-loader导入buffer-manager
-                this.hlsjs.config.p2pLoader.bufMgr = this.bufMgr;
+            //替换fLoader
+            this.hlsjs.config.fLoader = _hybridLoader2.default;
 
-                //替换fLoader
-                this.hlsjs.config.fLoader = _fastmesh.HybridLoader;
-            } else if (this.config.mode === 'vod') {
-                //点播模式。采用BT算法
-                //实例化tracker服务器
-                this.signaler = new _bittorrent.Tracker(channel, this.config, browserInfo);
-                //替换fLoader
-                this.hlsjs.config.fLoader = _bittorrent.FragLoader;
-            }
+            this.hlsjs.config.p2pEnabled = this.p2pEnabled;
 
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADING, function (id, data) {
                 // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
@@ -6587,7 +6080,6 @@ var HlsPeerify = function (_EventEmitter) {
                 _this2.averageLevel = (_this2.averageLevel * _this2.levelCounter + data.frag.level) / ++_this2.levelCounter;
             });
 
-            this.signalTried = false; //防止重复连接ws
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADED, function (id, data) {
                 _this2.hlsjs.config.currLoaded = data.frag.sn;
                 _this2.hlsjs.config.currLoadedDuration = data.frag.duration;
@@ -6598,16 +6090,15 @@ var HlsPeerify = function (_EventEmitter) {
                     log('FRAG_LOADED ' + data.frag.sn + ' loadByP2P');
                     _this2.p2pDownloaded += data.frag.loaded;
                 }
-                if (!_this2.signalTried && !_this2.signaler.connected && _this2.config.p2pEnabled) {
+                if (!_this2.signaler.connected && _this2.config.p2pEnabled) {
 
-                    //用一个ts的大小和时长来代表平均streaming rate
+                    //计算平均streaming rate
                     var bitrate = data.frag.loaded * 8 / data.frag.duration;
                     //计算子流码率
-                    _this2.signaler.scheduler.bitrate = Math.round(bitrate);
+                    _this2.signaler.scheduler.substreams.bitrate = Math.round(bitrate);
                     console.warn('FRAG_LOADED bitrate ' + bitrate);
 
                     _this2.signaler.resumeP2P();
-                    _this2.signalTried = true;
                 }
                 // this.streamingRate = (this.streamingRate*this.fragLoadedCounter + bitrate)/(++this.fragLoadedCounter);
                 // this.signaler.scheduler.streamingRate = Math.floor(this.streamingRate);
@@ -6700,7 +6191,7 @@ exports.default = HlsPeerify;
 module.exports = exports['default'];
 
 /***/ }),
-/* 23 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6709,21 +6200,18 @@ module.exports = exports['default'];
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _fastmesh = __webpack_require__(10);
-
-var _bittorrent = __webpack_require__(21);
-
-//时间单位统一为秒
 /**
  * Created by xieting on 2018/1/3.
  */
+
+//时间单位统一为秒
 var defaultP2PConfig = {
     key: 'free', //连接RP服务器的API key
-    mode: 'vod', //播放的流媒体类别，分为‘live‘和‘vod’两种，默认vod
+    mode: 'live', //播放的流媒体类别，分为‘live‘和‘vod’两种，默认live
 
+    wsSchedulerAddr: 'ws://120.78.168.126:3389', //调度服务器地址
     wsSignalerAddr: 'ws://120.78.168.126:8081/ws', //信令服务器地址
-    wsMaxRetries: 3, //发送数据重试次数
+    wsMaxRetries: 10, //发送数据重试时间间隔
     wsReconnectInterval: 5, //websocket重连时间间隔
 
     p2pEnabled: true, //是否开启P2P，默认true
@@ -6735,27 +6223,1338 @@ var defaultP2PConfig = {
     packetSize: 16 * 1024, //每次通过datachannel发送的包的大小
     maxBufSize: 1024 * 1024 * 50, //p2p缓存的最大数据量
     loadTimeout: 5, //p2p下载的超时时间
-    reportInterval: 60 //统计信息上报的时间间隔
+    reportInterval: 60, //统计信息上报的时间间隔
 
+    transitionEnabled: true, //是否允许节点自动跃迁
+    transitionCheckInterval: 30, //跃迁检查时间间隔
+    transitionTTL: 2, //跃迁的最大跳数
+    transitionWaitTime: 5, //跃迁等待Grant响应的时间
+
+    defaultUploadBW: 1024 * 1024 * 4 / 8, //总上行带宽默认4Mbps
+    maxTransitionTries: 1, //最大跃迁次数（跃迁失败也算一次）
+    maxGetParentsTries: 3, //获取父节点的最大尝试次数(不包含ws连上后的请求)
+
+    defaultSubstreams: 2 //默认子流数量
 };
-// let liveConfig = require('./live/fastmesh').config || {};
+
+exports.defaultP2PConfig = defaultP2PConfig;
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 
 
-var p2pConfig = void 0;
+exports.byteLength = byteLength
+exports.toByteArray = toByteArray
+exports.fromByteArray = fromByteArray
 
-if (false) {
-    p2pConfig = Object.assign(defaultP2PConfig, _bittorrent.config);
-} else if (false) {
-    p2pConfig = Object.assign(defaultP2PConfig, _fastmesh.config);
-} else {
-    p2pConfig = Object.assign(defaultP2PConfig, _fastmesh.config, _bittorrent.config);
+var lookup = []
+var revLookup = []
+var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
+
+var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+for (var i = 0, len = code.length; i < len; ++i) {
+  lookup[i] = code[i]
+  revLookup[code.charCodeAt(i)] = i
 }
 
-exports.default = p2pConfig;
-module.exports = exports['default'];
+revLookup['-'.charCodeAt(0)] = 62
+revLookup['_'.charCodeAt(0)] = 63
+
+function placeHoldersCount (b64) {
+  var len = b64.length
+  if (len % 4 > 0) {
+    throw new Error('Invalid string. Length must be a multiple of 4')
+  }
+
+  // the number of equal signs (place holders)
+  // if there are two placeholders, than the two characters before it
+  // represent one byte
+  // if there is only one, then the three characters before it represent 2 bytes
+  // this is just a cheap hack to not do indexOf twice
+  return b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
+}
+
+function byteLength (b64) {
+  // base64 is 4/3 + up to two characters of the original data
+  return (b64.length * 3 / 4) - placeHoldersCount(b64)
+}
+
+function toByteArray (b64) {
+  var i, l, tmp, placeHolders, arr
+  var len = b64.length
+  placeHolders = placeHoldersCount(b64)
+
+  arr = new Arr((len * 3 / 4) - placeHolders)
+
+  // if there are placeholders, only get up to the last complete 4 chars
+  l = placeHolders > 0 ? len - 4 : len
+
+  var L = 0
+
+  for (i = 0; i < l; i += 4) {
+    tmp = (revLookup[b64.charCodeAt(i)] << 18) | (revLookup[b64.charCodeAt(i + 1)] << 12) | (revLookup[b64.charCodeAt(i + 2)] << 6) | revLookup[b64.charCodeAt(i + 3)]
+    arr[L++] = (tmp >> 16) & 0xFF
+    arr[L++] = (tmp >> 8) & 0xFF
+    arr[L++] = tmp & 0xFF
+  }
+
+  if (placeHolders === 2) {
+    tmp = (revLookup[b64.charCodeAt(i)] << 2) | (revLookup[b64.charCodeAt(i + 1)] >> 4)
+    arr[L++] = tmp & 0xFF
+  } else if (placeHolders === 1) {
+    tmp = (revLookup[b64.charCodeAt(i)] << 10) | (revLookup[b64.charCodeAt(i + 1)] << 4) | (revLookup[b64.charCodeAt(i + 2)] >> 2)
+    arr[L++] = (tmp >> 8) & 0xFF
+    arr[L++] = tmp & 0xFF
+  }
+
+  return arr
+}
+
+function tripletToBase64 (num) {
+  return lookup[num >> 18 & 0x3F] + lookup[num >> 12 & 0x3F] + lookup[num >> 6 & 0x3F] + lookup[num & 0x3F]
+}
+
+function encodeChunk (uint8, start, end) {
+  var tmp
+  var output = []
+  for (var i = start; i < end; i += 3) {
+    tmp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
+    output.push(tripletToBase64(tmp))
+  }
+  return output.join('')
+}
+
+function fromByteArray (uint8) {
+  var tmp
+  var len = uint8.length
+  var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
+  var output = ''
+  var parts = []
+  var maxChunkLength = 16383 // must be multiple of 3
+
+  // go through the array every three bytes, we'll deal with trailing stuff later
+  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
+    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
+  }
+
+  // pad the end with zeros, but make sure to not forget the extra bytes
+  if (extraBytes === 1) {
+    tmp = uint8[len - 1]
+    output += lookup[tmp >> 2]
+    output += lookup[(tmp << 4) & 0x3F]
+    output += '=='
+  } else if (extraBytes === 2) {
+    tmp = (uint8[len - 2] << 8) + (uint8[len - 1])
+    output += lookup[tmp >> 10]
+    output += lookup[(tmp >> 4) & 0x3F]
+    output += lookup[(tmp << 2) & 0x3F]
+    output += '='
+  }
+
+  parts.push(output)
+
+  return parts.join('')
+}
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports) {
+
+exports.read = function (buffer, offset, isLE, mLen, nBytes) {
+  var e, m
+  var eLen = nBytes * 8 - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var nBits = -7
+  var i = isLE ? (nBytes - 1) : 0
+  var d = isLE ? -1 : 1
+  var s = buffer[offset + i]
+
+  i += d
+
+  e = s & ((1 << (-nBits)) - 1)
+  s >>= (-nBits)
+  nBits += eLen
+  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+  m = e & ((1 << (-nBits)) - 1)
+  e >>= (-nBits)
+  nBits += mLen
+  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+  if (e === 0) {
+    e = 1 - eBias
+  } else if (e === eMax) {
+    return m ? NaN : ((s ? -1 : 1) * Infinity)
+  } else {
+    m = m + Math.pow(2, mLen)
+    e = e - eBias
+  }
+  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
+}
+
+exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
+  var e, m, c
+  var eLen = nBytes * 8 - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
+  var i = isLE ? 0 : (nBytes - 1)
+  var d = isLE ? 1 : -1
+  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
+
+  value = Math.abs(value)
+
+  if (isNaN(value) || value === Infinity) {
+    m = isNaN(value) ? 1 : 0
+    e = eMax
+  } else {
+    e = Math.floor(Math.log(value) / Math.LN2)
+    if (value * (c = Math.pow(2, -e)) < 1) {
+      e--
+      c *= 2
+    }
+    if (e + eBias >= 1) {
+      value += rt / c
+    } else {
+      value += rt * Math.pow(2, 1 - eBias)
+    }
+    if (value * c >= 2) {
+      e++
+      c /= 2
+    }
+
+    if (e + eBias >= eMax) {
+      m = 0
+      e = eMax
+    } else if (e + eBias >= 1) {
+      m = (value * c - 1) * Math.pow(2, mLen)
+      e = e + eBias
+    } else {
+      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
+      e = 0
+    }
+  }
+
+  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
+
+  e = (e << mLen) | m
+  eLen += mLen
+  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
+
+  buffer[offset + i - d] |= s * 128
+}
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(process) {/**
+ * This is the web browser implementation of `debug()`.
+ *
+ * Expose `debug()` as the module.
+ */
+
+exports = module.exports = __webpack_require__(23);
+exports.log = log;
+exports.formatArgs = formatArgs;
+exports.save = save;
+exports.load = load;
+exports.useColors = useColors;
+exports.storage = 'undefined' != typeof chrome
+               && 'undefined' != typeof chrome.storage
+                  ? chrome.storage.local
+                  : localstorage();
+
+/**
+ * Colors.
+ */
+
+exports.colors = [
+  'lightseagreen',
+  'forestgreen',
+  'goldenrod',
+  'dodgerblue',
+  'darkorchid',
+  'crimson'
+];
+
+/**
+ * Currently only WebKit-based Web Inspectors, Firefox >= v31,
+ * and the Firebug extension (any Firefox version) are known
+ * to support "%c" CSS customizations.
+ *
+ * TODO: add a `localStorage` variable to explicitly enable/disable colors
+ */
+
+function useColors() {
+  // NB: In an Electron preload script, document will be defined but not fully
+  // initialized. Since we know we're in Chrome, we'll just detect this case
+  // explicitly
+  if (typeof window !== 'undefined' && window.process && window.process.type === 'renderer') {
+    return true;
+  }
+
+  // is webkit? http://stackoverflow.com/a/16459606/376773
+  // document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
+  return (typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance) ||
+    // is firebug? http://stackoverflow.com/a/398120/376773
+    (typeof window !== 'undefined' && window.console && (window.console.firebug || (window.console.exception && window.console.table))) ||
+    // is firefox >= v31?
+    // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
+    (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31) ||
+    // double check webkit in userAgent just in case we are in a worker
+    (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/));
+}
+
+/**
+ * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
+ */
+
+exports.formatters.j = function(v) {
+  try {
+    return JSON.stringify(v);
+  } catch (err) {
+    return '[UnexpectedJSONParseError]: ' + err.message;
+  }
+};
+
+
+/**
+ * Colorize log arguments if enabled.
+ *
+ * @api public
+ */
+
+function formatArgs(args) {
+  var useColors = this.useColors;
+
+  args[0] = (useColors ? '%c' : '')
+    + this.namespace
+    + (useColors ? ' %c' : ' ')
+    + args[0]
+    + (useColors ? '%c ' : ' ')
+    + '+' + exports.humanize(this.diff);
+
+  if (!useColors) return;
+
+  var c = 'color: ' + this.color;
+  args.splice(1, 0, c, 'color: inherit')
+
+  // the final "%c" is somewhat tricky, because there could be other
+  // arguments passed either before or after the %c, so we need to
+  // figure out the correct index to insert the CSS into
+  var index = 0;
+  var lastC = 0;
+  args[0].replace(/%[a-zA-Z%]/g, function(match) {
+    if ('%%' === match) return;
+    index++;
+    if ('%c' === match) {
+      // we only are interested in the *last* %c
+      // (the user may have provided their own)
+      lastC = index;
+    }
+  });
+
+  args.splice(lastC, 0, c);
+}
+
+/**
+ * Invokes `console.log()` when available.
+ * No-op when `console.log` is not a "function".
+ *
+ * @api public
+ */
+
+function log() {
+  // this hackery is required for IE8/9, where
+  // the `console.log` function doesn't have 'apply'
+  return 'object' === typeof console
+    && console.log
+    && Function.prototype.apply.call(console.log, console, arguments);
+}
+
+/**
+ * Save `namespaces`.
+ *
+ * @param {String} namespaces
+ * @api private
+ */
+
+function save(namespaces) {
+  try {
+    if (null == namespaces) {
+      exports.storage.removeItem('debug');
+    } else {
+      exports.storage.debug = namespaces;
+    }
+  } catch(e) {}
+}
+
+/**
+ * Load `namespaces`.
+ *
+ * @return {String} returns the previously persisted debug modes
+ * @api private
+ */
+
+function load() {
+  var r;
+  try {
+    r = exports.storage.debug;
+  } catch(e) {}
+
+  // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
+  if (!r && typeof process !== 'undefined' && 'env' in process) {
+    r = process.env.DEBUG;
+  }
+
+  return r;
+}
+
+/**
+ * Enable namespaces listed in `localStorage.debug` initially.
+ */
+
+exports.enable(load());
+
+/**
+ * Localstorage attempts to return the localstorage.
+ *
+ * This is necessary because safari throws
+ * when a user disables cookies/localstorage
+ * and you attempt to access it.
+ *
+ * @return {LocalStorage}
+ * @api private
+ */
+
+function localstorage() {
+  try {
+    return window.localStorage;
+  } catch (e) {}
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+/**
+ * This is the common logic for both the Node.js and web browser
+ * implementations of `debug()`.
+ *
+ * Expose `debug()` as the module.
+ */
+
+exports = module.exports = createDebug.debug = createDebug['default'] = createDebug;
+exports.coerce = coerce;
+exports.disable = disable;
+exports.enable = enable;
+exports.enabled = enabled;
+exports.humanize = __webpack_require__(24);
+
+/**
+ * The currently active debug mode names, and names to skip.
+ */
+
+exports.names = [];
+exports.skips = [];
+
+/**
+ * Map of special "%n" handling functions, for the debug "format" argument.
+ *
+ * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
+ */
+
+exports.formatters = {};
+
+/**
+ * Previous log timestamp.
+ */
+
+var prevTime;
+
+/**
+ * Select a color.
+ * @param {String} namespace
+ * @return {Number}
+ * @api private
+ */
+
+function selectColor(namespace) {
+  var hash = 0, i;
+
+  for (i in namespace) {
+    hash  = ((hash << 5) - hash) + namespace.charCodeAt(i);
+    hash |= 0; // Convert to 32bit integer
+  }
+
+  return exports.colors[Math.abs(hash) % exports.colors.length];
+}
+
+/**
+ * Create a debugger with the given `namespace`.
+ *
+ * @param {String} namespace
+ * @return {Function}
+ * @api public
+ */
+
+function createDebug(namespace) {
+
+  function debug() {
+    // disabled?
+    if (!debug.enabled) return;
+
+    var self = debug;
+
+    // set `diff` timestamp
+    var curr = +new Date();
+    var ms = curr - (prevTime || curr);
+    self.diff = ms;
+    self.prev = prevTime;
+    self.curr = curr;
+    prevTime = curr;
+
+    // turn the `arguments` into a proper Array
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+
+    args[0] = exports.coerce(args[0]);
+
+    if ('string' !== typeof args[0]) {
+      // anything else let's inspect with %O
+      args.unshift('%O');
+    }
+
+    // apply any `formatters` transformations
+    var index = 0;
+    args[0] = args[0].replace(/%([a-zA-Z%])/g, function(match, format) {
+      // if we encounter an escaped % then don't increase the array index
+      if (match === '%%') return match;
+      index++;
+      var formatter = exports.formatters[format];
+      if ('function' === typeof formatter) {
+        var val = args[index];
+        match = formatter.call(self, val);
+
+        // now we need to remove `args[index]` since it's inlined in the `format`
+        args.splice(index, 1);
+        index--;
+      }
+      return match;
+    });
+
+    // apply env-specific formatting (colors, etc.)
+    exports.formatArgs.call(self, args);
+
+    var logFn = debug.log || exports.log || console.log.bind(console);
+    logFn.apply(self, args);
+  }
+
+  debug.namespace = namespace;
+  debug.enabled = exports.enabled(namespace);
+  debug.useColors = exports.useColors();
+  debug.color = selectColor(namespace);
+
+  // env-specific initialization logic for debug instances
+  if ('function' === typeof exports.init) {
+    exports.init(debug);
+  }
+
+  return debug;
+}
+
+/**
+ * Enables a debug mode by namespaces. This can include modes
+ * separated by a colon and wildcards.
+ *
+ * @param {String} namespaces
+ * @api public
+ */
+
+function enable(namespaces) {
+  exports.save(namespaces);
+
+  exports.names = [];
+  exports.skips = [];
+
+  var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
+  var len = split.length;
+
+  for (var i = 0; i < len; i++) {
+    if (!split[i]) continue; // ignore empty strings
+    namespaces = split[i].replace(/\*/g, '.*?');
+    if (namespaces[0] === '-') {
+      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+    } else {
+      exports.names.push(new RegExp('^' + namespaces + '$'));
+    }
+  }
+}
+
+/**
+ * Disable debug output.
+ *
+ * @api public
+ */
+
+function disable() {
+  exports.enable('');
+}
+
+/**
+ * Returns true if the given mode name is enabled, false otherwise.
+ *
+ * @param {String} name
+ * @return {Boolean}
+ * @api public
+ */
+
+function enabled(name) {
+  var i, len;
+  for (i = 0, len = exports.skips.length; i < len; i++) {
+    if (exports.skips[i].test(name)) {
+      return false;
+    }
+  }
+  for (i = 0, len = exports.names.length; i < len; i++) {
+    if (exports.names[i].test(name)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Coerce `val`.
+ *
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api private
+ */
+
+function coerce(val) {
+  if (val instanceof Error) return val.stack || val.message;
+  return val;
+}
+
 
 /***/ }),
 /* 24 */
+/***/ (function(module, exports) {
+
+/**
+ * Helpers.
+ */
+
+var s = 1000;
+var m = s * 60;
+var h = m * 60;
+var d = h * 24;
+var y = d * 365.25;
+
+/**
+ * Parse or format the given `val`.
+ *
+ * Options:
+ *
+ *  - `long` verbose formatting [false]
+ *
+ * @param {String|Number} val
+ * @param {Object} [options]
+ * @throws {Error} throw an error if val is not a non-empty string or a number
+ * @return {String|Number}
+ * @api public
+ */
+
+module.exports = function(val, options) {
+  options = options || {};
+  var type = typeof val;
+  if (type === 'string' && val.length > 0) {
+    return parse(val);
+  } else if (type === 'number' && isNaN(val) === false) {
+    return options.long ? fmtLong(val) : fmtShort(val);
+  }
+  throw new Error(
+    'val is not a non-empty string or a valid number. val=' +
+      JSON.stringify(val)
+  );
+};
+
+/**
+ * Parse the given `str` and return milliseconds.
+ *
+ * @param {String} str
+ * @return {Number}
+ * @api private
+ */
+
+function parse(str) {
+  str = String(str);
+  if (str.length > 100) {
+    return;
+  }
+  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(
+    str
+  );
+  if (!match) {
+    return;
+  }
+  var n = parseFloat(match[1]);
+  var type = (match[2] || 'ms').toLowerCase();
+  switch (type) {
+    case 'years':
+    case 'year':
+    case 'yrs':
+    case 'yr':
+    case 'y':
+      return n * y;
+    case 'days':
+    case 'day':
+    case 'd':
+      return n * d;
+    case 'hours':
+    case 'hour':
+    case 'hrs':
+    case 'hr':
+    case 'h':
+      return n * h;
+    case 'minutes':
+    case 'minute':
+    case 'mins':
+    case 'min':
+    case 'm':
+      return n * m;
+    case 'seconds':
+    case 'second':
+    case 'secs':
+    case 'sec':
+    case 's':
+      return n * s;
+    case 'milliseconds':
+    case 'millisecond':
+    case 'msecs':
+    case 'msec':
+    case 'ms':
+      return n;
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Short format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtShort(ms) {
+  if (ms >= d) {
+    return Math.round(ms / d) + 'd';
+  }
+  if (ms >= h) {
+    return Math.round(ms / h) + 'h';
+  }
+  if (ms >= m) {
+    return Math.round(ms / m) + 'm';
+  }
+  if (ms >= s) {
+    return Math.round(ms / s) + 's';
+  }
+  return ms + 'ms';
+}
+
+/**
+ * Long format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtLong(ms) {
+  return plural(ms, d, 'day') ||
+    plural(ms, h, 'hour') ||
+    plural(ms, m, 'minute') ||
+    plural(ms, s, 'second') ||
+    ms + ' ms';
+}
+
+/**
+ * Pluralization helper.
+ */
+
+function plural(ms, n, name) {
+  if (ms < n) {
+    return;
+  }
+  if (ms < n * 1.5) {
+    return Math.floor(ms / n) + ' ' + name;
+  }
+  return Math.ceil(ms / n) + ' ' + name + 's';
+}
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports) {
+
+// originally pulled out of simple-peer
+
+module.exports = function getBrowserRTC () {
+  if (typeof window === 'undefined') return null
+  var wrtc = {
+    RTCPeerConnection: window.RTCPeerConnection || window.mozRTCPeerConnection ||
+      window.webkitRTCPeerConnection,
+    RTCSessionDescription: window.RTCSessionDescription ||
+      window.mozRTCSessionDescription || window.webkitRTCSessionDescription,
+    RTCIceCandidate: window.RTCIceCandidate || window.mozRTCIceCandidate ||
+      window.webkitRTCIceCandidate
+  }
+  if (!wrtc.RTCPeerConnection) return null
+  return wrtc
+}
+
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global, process) {
+
+function oldBrowser () {
+  throw new Error('secure random number generation not supported by this browser\nuse chrome, FireFox or Internet Explorer 11')
+}
+
+var Buffer = __webpack_require__(7).Buffer
+var crypto = global.crypto || global.msCrypto
+
+if (crypto && crypto.getRandomValues) {
+  module.exports = randomBytes
+} else {
+  module.exports = oldBrowser
+}
+
+function randomBytes (size, cb) {
+  // phantomjs needs to throw
+  if (size > 65536) throw new Error('requested too many random bytes')
+  // in case browserify  isn't using the Uint8Array version
+  var rawBytes = new global.Uint8Array(size)
+
+  // This will not work in older browsers.
+  // See https://developer.mozilla.org/en-US/docs/Web/API/window.crypto.getRandomValues
+  if (size > 0) {  // getRandomValues fails on IE if size == 0
+    crypto.getRandomValues(rawBytes)
+  }
+
+  // XXX: phantomjs doesn't like a buffer being passed here
+  var bytes = Buffer.from(rawBytes.buffer)
+
+  if (typeof cb === 'function') {
+    return process.nextTick(function () {
+      cb(null, bytes)
+    })
+  }
+
+  return bytes
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(2)))
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(12);
+exports.Stream = exports;
+exports.Readable = exports;
+exports.Writable = __webpack_require__(15);
+exports.Duplex = __webpack_require__(4);
+exports.Transform = __webpack_require__(17);
+exports.PassThrough = __webpack_require__(33);
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports) {
+
+/* (ignored) */
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/*<replacement>*/
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Buffer = __webpack_require__(7).Buffer;
+/*</replacement>*/
+
+function copyBuffer(src, target, offset) {
+  src.copy(target, offset);
+}
+
+module.exports = function () {
+  function BufferList() {
+    _classCallCheck(this, BufferList);
+
+    this.head = null;
+    this.tail = null;
+    this.length = 0;
+  }
+
+  BufferList.prototype.push = function push(v) {
+    var entry = { data: v, next: null };
+    if (this.length > 0) this.tail.next = entry;else this.head = entry;
+    this.tail = entry;
+    ++this.length;
+  };
+
+  BufferList.prototype.unshift = function unshift(v) {
+    var entry = { data: v, next: this.head };
+    if (this.length === 0) this.tail = entry;
+    this.head = entry;
+    ++this.length;
+  };
+
+  BufferList.prototype.shift = function shift() {
+    if (this.length === 0) return;
+    var ret = this.head.data;
+    if (this.length === 1) this.head = this.tail = null;else this.head = this.head.next;
+    --this.length;
+    return ret;
+  };
+
+  BufferList.prototype.clear = function clear() {
+    this.head = this.tail = null;
+    this.length = 0;
+  };
+
+  BufferList.prototype.join = function join(s) {
+    if (this.length === 0) return '';
+    var p = this.head;
+    var ret = '' + p.data;
+    while (p = p.next) {
+      ret += s + p.data;
+    }return ret;
+  };
+
+  BufferList.prototype.concat = function concat(n) {
+    if (this.length === 0) return Buffer.alloc(0);
+    if (this.length === 1) return this.head.data;
+    var ret = Buffer.allocUnsafe(n >>> 0);
+    var p = this.head;
+    var i = 0;
+    while (p) {
+      copyBuffer(p.data, ret, i);
+      i += p.data.length;
+      p = p.next;
+    }
+    return ret;
+  };
+
+  return BufferList;
+}();
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var apply = Function.prototype.apply;
+
+// DOM APIs, for completeness
+
+exports.setTimeout = function() {
+  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+};
+exports.setInterval = function() {
+  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+};
+exports.clearTimeout =
+exports.clearInterval = function(timeout) {
+  if (timeout) {
+    timeout.close();
+  }
+};
+
+function Timeout(id, clearFn) {
+  this._id = id;
+  this._clearFn = clearFn;
+}
+Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+Timeout.prototype.close = function() {
+  this._clearFn.call(window, this._id);
+};
+
+// Does not start the time, just sets up the members needed.
+exports.enroll = function(item, msecs) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = msecs;
+};
+
+exports.unenroll = function(item) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = -1;
+};
+
+exports._unrefActive = exports.active = function(item) {
+  clearTimeout(item._idleTimeoutId);
+
+  var msecs = item._idleTimeout;
+  if (msecs >= 0) {
+    item._idleTimeoutId = setTimeout(function onTimeout() {
+      if (item._onTimeout)
+        item._onTimeout();
+    }, msecs);
+  }
+};
+
+// setimmediate attaches itself to the global object
+__webpack_require__(31);
+exports.setImmediate = setImmediate;
+exports.clearImmediate = clearImmediate;
+
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
+    "use strict";
+
+    if (global.setImmediate) {
+        return;
+    }
+
+    var nextHandle = 1; // Spec says greater than zero
+    var tasksByHandle = {};
+    var currentlyRunningATask = false;
+    var doc = global.document;
+    var registerImmediate;
+
+    function setImmediate(callback) {
+      // Callback can either be a function or a string
+      if (typeof callback !== "function") {
+        callback = new Function("" + callback);
+      }
+      // Copy function arguments
+      var args = new Array(arguments.length - 1);
+      for (var i = 0; i < args.length; i++) {
+          args[i] = arguments[i + 1];
+      }
+      // Store and register the task
+      var task = { callback: callback, args: args };
+      tasksByHandle[nextHandle] = task;
+      registerImmediate(nextHandle);
+      return nextHandle++;
+    }
+
+    function clearImmediate(handle) {
+        delete tasksByHandle[handle];
+    }
+
+    function run(task) {
+        var callback = task.callback;
+        var args = task.args;
+        switch (args.length) {
+        case 0:
+            callback();
+            break;
+        case 1:
+            callback(args[0]);
+            break;
+        case 2:
+            callback(args[0], args[1]);
+            break;
+        case 3:
+            callback(args[0], args[1], args[2]);
+            break;
+        default:
+            callback.apply(undefined, args);
+            break;
+        }
+    }
+
+    function runIfPresent(handle) {
+        // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
+        // So if we're currently running a task, we'll need to delay this invocation.
+        if (currentlyRunningATask) {
+            // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
+            // "too much recursion" error.
+            setTimeout(runIfPresent, 0, handle);
+        } else {
+            var task = tasksByHandle[handle];
+            if (task) {
+                currentlyRunningATask = true;
+                try {
+                    run(task);
+                } finally {
+                    clearImmediate(handle);
+                    currentlyRunningATask = false;
+                }
+            }
+        }
+    }
+
+    function installNextTickImplementation() {
+        registerImmediate = function(handle) {
+            process.nextTick(function () { runIfPresent(handle); });
+        };
+    }
+
+    function canUsePostMessage() {
+        // The test against `importScripts` prevents this implementation from being installed inside a web worker,
+        // where `global.postMessage` means something completely different and can't be used for this purpose.
+        if (global.postMessage && !global.importScripts) {
+            var postMessageIsAsynchronous = true;
+            var oldOnMessage = global.onmessage;
+            global.onmessage = function() {
+                postMessageIsAsynchronous = false;
+            };
+            global.postMessage("", "*");
+            global.onmessage = oldOnMessage;
+            return postMessageIsAsynchronous;
+        }
+    }
+
+    function installPostMessageImplementation() {
+        // Installs an event handler on `global` for the `message` event: see
+        // * https://developer.mozilla.org/en/DOM/window.postMessage
+        // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
+
+        var messagePrefix = "setImmediate$" + Math.random() + "$";
+        var onGlobalMessage = function(event) {
+            if (event.source === global &&
+                typeof event.data === "string" &&
+                event.data.indexOf(messagePrefix) === 0) {
+                runIfPresent(+event.data.slice(messagePrefix.length));
+            }
+        };
+
+        if (global.addEventListener) {
+            global.addEventListener("message", onGlobalMessage, false);
+        } else {
+            global.attachEvent("onmessage", onGlobalMessage);
+        }
+
+        registerImmediate = function(handle) {
+            global.postMessage(messagePrefix + handle, "*");
+        };
+    }
+
+    function installMessageChannelImplementation() {
+        var channel = new MessageChannel();
+        channel.port1.onmessage = function(event) {
+            var handle = event.data;
+            runIfPresent(handle);
+        };
+
+        registerImmediate = function(handle) {
+            channel.port2.postMessage(handle);
+        };
+    }
+
+    function installReadyStateChangeImplementation() {
+        var html = doc.documentElement;
+        registerImmediate = function(handle) {
+            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
+            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
+            var script = doc.createElement("script");
+            script.onreadystatechange = function () {
+                runIfPresent(handle);
+                script.onreadystatechange = null;
+                html.removeChild(script);
+                script = null;
+            };
+            html.appendChild(script);
+        };
+    }
+
+    function installSetTimeoutImplementation() {
+        registerImmediate = function(handle) {
+            setTimeout(runIfPresent, 0, handle);
+        };
+    }
+
+    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
+    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
+    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
+
+    // Don't get fooled by e.g. browserify environments.
+    if ({}.toString.call(global.process) === "[object process]") {
+        // For Node.js before 0.9
+        installNextTickImplementation();
+
+    } else if (canUsePostMessage()) {
+        // For non-IE10 modern browsers
+        installPostMessageImplementation();
+
+    } else if (global.MessageChannel) {
+        // For web workers, where supported
+        installMessageChannelImplementation();
+
+    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
+        // For IE 6–8
+        installReadyStateChangeImplementation();
+
+    } else {
+        // For older browsers
+        installSetTimeoutImplementation();
+    }
+
+    attachTo.setImmediate = setImmediate;
+    attachTo.clearImmediate = clearImmediate;
+}(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(2)))
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {
+/**
+ * Module exports.
+ */
+
+module.exports = deprecate;
+
+/**
+ * Mark that a method should not be used.
+ * Returns a modified function which warns once by default.
+ *
+ * If `localStorage.noDeprecation = true` is set, then it is a no-op.
+ *
+ * If `localStorage.throwDeprecation = true` is set, then deprecated functions
+ * will throw an Error when invoked.
+ *
+ * If `localStorage.traceDeprecation = true` is set, then deprecated functions
+ * will invoke `console.trace()` instead of `console.error()`.
+ *
+ * @param {Function} fn - the function to deprecate
+ * @param {String} msg - the string to print to the console when `fn` is invoked
+ * @returns {Function} a new "deprecated" version of `fn`
+ * @api public
+ */
+
+function deprecate (fn, msg) {
+  if (config('noDeprecation')) {
+    return fn;
+  }
+
+  var warned = false;
+  function deprecated() {
+    if (!warned) {
+      if (config('throwDeprecation')) {
+        throw new Error(msg);
+      } else if (config('traceDeprecation')) {
+        console.trace(msg);
+      } else {
+        console.warn(msg);
+      }
+      warned = true;
+    }
+    return fn.apply(this, arguments);
+  }
+
+  return deprecated;
+}
+
+/**
+ * Checks `localStorage` for boolean values for the given `name`.
+ *
+ * @param {String} name
+ * @returns {Boolean}
+ * @api private
+ */
+
+function config (name) {
+  // accessing global.localStorage can trigger a DOMException in sandboxed iframes
+  try {
+    if (!global.localStorage) return false;
+  } catch (_) {
+    return false;
+  }
+  var val = global.localStorage[name];
+  if (null == val) return false;
+  return String(val).toLowerCase() === 'true';
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// a passthrough stream.
+// basically just the most minimal sort of Transform stream.
+// Every written chunk gets output as-is.
+
+
+
+module.exports = PassThrough;
+
+var Transform = __webpack_require__(17);
+
+/*<replacement>*/
+var util = __webpack_require__(8);
+util.inherits = __webpack_require__(3);
+/*</replacement>*/
+
+util.inherits(PassThrough, Transform);
+
+function PassThrough(options) {
+  if (!(this instanceof PassThrough)) return new PassThrough(options);
+
+  Transform.call(this, options);
+}
+
+PassThrough.prototype._transform = function (chunk, encoding, cb) {
+  cb(null, chunk);
+};
+
+/***/ }),
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6775,21 +7574,17 @@ var _events3 = __webpack_require__(5);
 
 var _events4 = _interopRequireDefault(_events3);
 
-var _dataChannel = __webpack_require__(25);
+var _dataChannel = __webpack_require__(35);
 
 var _dataChannel2 = _interopRequireDefault(_dataChannel);
 
-var _p2pScheduler = __webpack_require__(40);
+var _p2pScheduler = __webpack_require__(36);
 
 var _p2pScheduler2 = _interopRequireDefault(_p2pScheduler);
 
-var _reconnectingWebsocket = __webpack_require__(19);
+var _reconnectingWebsocket = __webpack_require__(38);
 
 var _reconnectingWebsocket2 = _interopRequireDefault(_reconnectingWebsocket);
-
-var _signalClient = __webpack_require__(42);
-
-var _signalClient2 = _interopRequireDefault(_signalClient);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -6904,8 +7699,15 @@ var P2PSignaler = function (_EventEmitter) {
         value: function _initSignalerWs() {
             var _this3 = this;
 
-            var websocket = new _signalClient2.default(this.peerId, this.config);
+            var wsOptions = {
+                maxRetries: this.config.wsMaxRetries,
+                minReconnectionDelay: this.config.wsReconnectInterval * 1000
+            };
+            var queryStr = '?id=' + this.peerId;
+            var websocket = new _reconnectingWebsocket2.default(this.config.wsSignalerAddr + queryStr, undefined, wsOptions);
             websocket.onopen = function () {
+                console.log('Signaler websocket connection opened');
+
                 //发送进入频道请求
                 // let req = {
                 //     action: 'register'
@@ -6923,7 +7725,20 @@ var P2PSignaler = function (_EventEmitter) {
                 }
             };
 
+            websocket.push = websocket.send;
+            websocket.send = function (msg) {
+                var msgStr = JSON.stringify(Object.assign({ peer_id: _this3.peerId }, msg));
+                console.log("send to websocket Signaler is " + msgStr);
+                if (websocket.readyState !== 1) {
+                    console.warn('websocket connection is not opened yet.');
+                    return setTimeout(function () {
+                        websocket.send(data);
+                    }, 1000);
+                }
+                websocket.push(msgStr);
+            };
             websocket.onmessage = function (e) {
+                console.log('Signaler websocket on msg: ' + e.data);
                 var msg = JSON.parse(e.data);
                 var action = msg.action;
                 switch (action) {
@@ -6941,6 +7756,7 @@ var P2PSignaler = function (_EventEmitter) {
             };
             websocket.onclose = function () {
                 //websocket断开时清除datachannel
+                console.warn('Signaler websocket closed');
                 _this3.connected = false;
             };
             return websocket;
@@ -7179,9 +7995,15 @@ var P2PSignaler = function (_EventEmitter) {
         value: function _setupDC(datachannel) {
             var _this6 = this;
 
-            datachannel.on(_events4.default.DC_SIGNAL, function (data) {
-                _this6.signalerWs.sendSignal(datachannel.remotePeerId, data);
-            }).once(_events4.default.DC_ERROR, function () {
+            datachannel.on('signal', function (data) {
+                var msg = {
+                    action: 'signal',
+                    peer_id: _this6.peerId,
+                    to_peer_id: datachannel.remotePeerId,
+                    data: data
+                };
+                _this6.signalerWs.send(msg);
+            }).once('error', function () {
                 var msg = {
                     action: 'dc_failed',
                     dc_id: datachannel.channelId
@@ -7295,7 +8117,7 @@ exports.default = P2PSignaler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 25 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7307,7 +8129,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _simplePeer = __webpack_require__(11);
+var _simplePeer = __webpack_require__(10);
 
 var _simplePeer2 = _interopRequireDefault(_simplePeer);
 
@@ -7405,30 +8227,30 @@ var DataChannel = function (_EventEmitter) {
                         // case 'KEEPALIVE-ACK':
                         //     this._handleKeepAliveAck(msg);
                         //     break;
-                        case _events4.default.DC_PIECE:
-                            _this2.emit(_events4.default.DC_PIECE);
+                        case 'BINARY':
+                            _this2.emit(_events4.default.DC_BINARY);
                             _this2._prepareForBinary(msg.attachments, msg.url, msg.sn, msg.size);
                             break;
-                        case _events4.default.DC_REQUEST:
+                        case 'REQUEST':
                             // if (msg.br) this.streamingRate = msg.br;                       //记录该datachannel的码率(改成实时调整)
                             _this2.emit(_events4.default.DC_REQUEST, msg);
                             break;
-                        case _events4.default.DC_LACK:
+                        case 'LACK':
                             _this2.loading = false;
                             _this2.emit(_events4.default.DC_REQUESTFAIL, msg);
                             break;
-                        case _events4.default.DC_DISPLACE:
+                        case 'DISPLACE':
                             //通知对方成为子节点
                             _this2.emit(_events4.default.DISPLACE, msg);
                             break;
-                        case _events4.default.DC_CLOSE:
+                        case 'CLOSE':
                             _this2.emit(_events4.default.DC_CLOSE);
                             break;
-                        case _events4.default.DC_TRANSITION:
+                        case 'TRANSITION':
                             //子节点的跃迁请求
                             _this2.emit(_events4.default.DC_TRANSITION, msg);
                             break;
-                        case _events4.default.DC_GRANT:
+                        case 'GRANT':
                             //收到GRANT信息后首先判断是否发给自己的，否则如果TTL>0则继续向子节点广播
                             _this2._handleGrant(msg);
                             break;
@@ -7441,7 +8263,7 @@ var DataChannel = function (_EventEmitter) {
                     _this2.bufArr.push(data);
                     _this2.remainAttachments--;
                     if (_this2.remainAttachments === 0) {
-                        _this2._handleBinaryData();
+                        _this2._handleBanaryData();
                     }
                 }
             });
@@ -7462,7 +8284,7 @@ var DataChannel = function (_EventEmitter) {
         value: function requestData(relurl) {
             //由于需要阻塞下载数据，因此request请求用新的API
             var msg = {
-                event: _events4.default.DC_REQUEST,
+                event: 'REQUEST',
                 url: relurl
             };
             if (this._datachannel && this._datachannel.connected) {
@@ -7514,9 +8336,9 @@ var DataChannel = function (_EventEmitter) {
             this.expectedSize = expectedSize;
         }
     }, {
-        key: '_handleBinaryData',
-        value: function _handleBinaryData() {
-            log('datachannel _handleBinaryData');
+        key: '_handleBanaryData',
+        value: function _handleBanaryData() {
+            log('datachannel _handleBanaryData');
             var payload = Buffer.concat(this.bufArr);
             if (payload.byteLength == this.expectedSize) {
                 //校验数据
@@ -7582,1321 +8404,7 @@ exports.default = DataChannel;
 module.exports = exports['default'];
 
 /***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-exports.byteLength = byteLength
-exports.toByteArray = toByteArray
-exports.fromByteArray = fromByteArray
-
-var lookup = []
-var revLookup = []
-var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
-
-var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-for (var i = 0, len = code.length; i < len; ++i) {
-  lookup[i] = code[i]
-  revLookup[code.charCodeAt(i)] = i
-}
-
-revLookup['-'.charCodeAt(0)] = 62
-revLookup['_'.charCodeAt(0)] = 63
-
-function placeHoldersCount (b64) {
-  var len = b64.length
-  if (len % 4 > 0) {
-    throw new Error('Invalid string. Length must be a multiple of 4')
-  }
-
-  // the number of equal signs (place holders)
-  // if there are two placeholders, than the two characters before it
-  // represent one byte
-  // if there is only one, then the three characters before it represent 2 bytes
-  // this is just a cheap hack to not do indexOf twice
-  return b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
-}
-
-function byteLength (b64) {
-  // base64 is 4/3 + up to two characters of the original data
-  return (b64.length * 3 / 4) - placeHoldersCount(b64)
-}
-
-function toByteArray (b64) {
-  var i, l, tmp, placeHolders, arr
-  var len = b64.length
-  placeHolders = placeHoldersCount(b64)
-
-  arr = new Arr((len * 3 / 4) - placeHolders)
-
-  // if there are placeholders, only get up to the last complete 4 chars
-  l = placeHolders > 0 ? len - 4 : len
-
-  var L = 0
-
-  for (i = 0; i < l; i += 4) {
-    tmp = (revLookup[b64.charCodeAt(i)] << 18) | (revLookup[b64.charCodeAt(i + 1)] << 12) | (revLookup[b64.charCodeAt(i + 2)] << 6) | revLookup[b64.charCodeAt(i + 3)]
-    arr[L++] = (tmp >> 16) & 0xFF
-    arr[L++] = (tmp >> 8) & 0xFF
-    arr[L++] = tmp & 0xFF
-  }
-
-  if (placeHolders === 2) {
-    tmp = (revLookup[b64.charCodeAt(i)] << 2) | (revLookup[b64.charCodeAt(i + 1)] >> 4)
-    arr[L++] = tmp & 0xFF
-  } else if (placeHolders === 1) {
-    tmp = (revLookup[b64.charCodeAt(i)] << 10) | (revLookup[b64.charCodeAt(i + 1)] << 4) | (revLookup[b64.charCodeAt(i + 2)] >> 2)
-    arr[L++] = (tmp >> 8) & 0xFF
-    arr[L++] = tmp & 0xFF
-  }
-
-  return arr
-}
-
-function tripletToBase64 (num) {
-  return lookup[num >> 18 & 0x3F] + lookup[num >> 12 & 0x3F] + lookup[num >> 6 & 0x3F] + lookup[num & 0x3F]
-}
-
-function encodeChunk (uint8, start, end) {
-  var tmp
-  var output = []
-  for (var i = start; i < end; i += 3) {
-    tmp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
-    output.push(tripletToBase64(tmp))
-  }
-  return output.join('')
-}
-
-function fromByteArray (uint8) {
-  var tmp
-  var len = uint8.length
-  var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
-  var output = ''
-  var parts = []
-  var maxChunkLength = 16383 // must be multiple of 3
-
-  // go through the array every three bytes, we'll deal with trailing stuff later
-  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
-    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
-  }
-
-  // pad the end with zeros, but make sure to not forget the extra bytes
-  if (extraBytes === 1) {
-    tmp = uint8[len - 1]
-    output += lookup[tmp >> 2]
-    output += lookup[(tmp << 4) & 0x3F]
-    output += '=='
-  } else if (extraBytes === 2) {
-    tmp = (uint8[len - 2] << 8) + (uint8[len - 1])
-    output += lookup[tmp >> 10]
-    output += lookup[(tmp >> 4) & 0x3F]
-    output += lookup[(tmp << 2) & 0x3F]
-    output += '='
-  }
-
-  parts.push(output)
-
-  return parts.join('')
-}
-
-
-/***/ }),
-/* 27 */
-/***/ (function(module, exports) {
-
-exports.read = function (buffer, offset, isLE, mLen, nBytes) {
-  var e, m
-  var eLen = nBytes * 8 - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var nBits = -7
-  var i = isLE ? (nBytes - 1) : 0
-  var d = isLE ? -1 : 1
-  var s = buffer[offset + i]
-
-  i += d
-
-  e = s & ((1 << (-nBits)) - 1)
-  s >>= (-nBits)
-  nBits += eLen
-  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
-
-  m = e & ((1 << (-nBits)) - 1)
-  e >>= (-nBits)
-  nBits += mLen
-  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
-
-  if (e === 0) {
-    e = 1 - eBias
-  } else if (e === eMax) {
-    return m ? NaN : ((s ? -1 : 1) * Infinity)
-  } else {
-    m = m + Math.pow(2, mLen)
-    e = e - eBias
-  }
-  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
-}
-
-exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
-  var e, m, c
-  var eLen = nBytes * 8 - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
-  var i = isLE ? 0 : (nBytes - 1)
-  var d = isLE ? 1 : -1
-  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
-
-  value = Math.abs(value)
-
-  if (isNaN(value) || value === Infinity) {
-    m = isNaN(value) ? 1 : 0
-    e = eMax
-  } else {
-    e = Math.floor(Math.log(value) / Math.LN2)
-    if (value * (c = Math.pow(2, -e)) < 1) {
-      e--
-      c *= 2
-    }
-    if (e + eBias >= 1) {
-      value += rt / c
-    } else {
-      value += rt * Math.pow(2, 1 - eBias)
-    }
-    if (value * c >= 2) {
-      e++
-      c /= 2
-    }
-
-    if (e + eBias >= eMax) {
-      m = 0
-      e = eMax
-    } else if (e + eBias >= 1) {
-      m = (value * c - 1) * Math.pow(2, mLen)
-      e = e + eBias
-    } else {
-      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
-      e = 0
-    }
-  }
-
-  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
-
-  e = (e << mLen) | m
-  eLen += mLen
-  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
-
-  buffer[offset + i - d] |= s * 128
-}
-
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(process) {/**
- * This is the web browser implementation of `debug()`.
- *
- * Expose `debug()` as the module.
- */
-
-exports = module.exports = __webpack_require__(29);
-exports.log = log;
-exports.formatArgs = formatArgs;
-exports.save = save;
-exports.load = load;
-exports.useColors = useColors;
-exports.storage = 'undefined' != typeof chrome
-               && 'undefined' != typeof chrome.storage
-                  ? chrome.storage.local
-                  : localstorage();
-
-/**
- * Colors.
- */
-
-exports.colors = [
-  'lightseagreen',
-  'forestgreen',
-  'goldenrod',
-  'dodgerblue',
-  'darkorchid',
-  'crimson'
-];
-
-/**
- * Currently only WebKit-based Web Inspectors, Firefox >= v31,
- * and the Firebug extension (any Firefox version) are known
- * to support "%c" CSS customizations.
- *
- * TODO: add a `localStorage` variable to explicitly enable/disable colors
- */
-
-function useColors() {
-  // NB: In an Electron preload script, document will be defined but not fully
-  // initialized. Since we know we're in Chrome, we'll just detect this case
-  // explicitly
-  if (typeof window !== 'undefined' && window.process && window.process.type === 'renderer') {
-    return true;
-  }
-
-  // is webkit? http://stackoverflow.com/a/16459606/376773
-  // document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
-  return (typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance) ||
-    // is firebug? http://stackoverflow.com/a/398120/376773
-    (typeof window !== 'undefined' && window.console && (window.console.firebug || (window.console.exception && window.console.table))) ||
-    // is firefox >= v31?
-    // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-    (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31) ||
-    // double check webkit in userAgent just in case we are in a worker
-    (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/));
-}
-
-/**
- * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
- */
-
-exports.formatters.j = function(v) {
-  try {
-    return JSON.stringify(v);
-  } catch (err) {
-    return '[UnexpectedJSONParseError]: ' + err.message;
-  }
-};
-
-
-/**
- * Colorize log arguments if enabled.
- *
- * @api public
- */
-
-function formatArgs(args) {
-  var useColors = this.useColors;
-
-  args[0] = (useColors ? '%c' : '')
-    + this.namespace
-    + (useColors ? ' %c' : ' ')
-    + args[0]
-    + (useColors ? '%c ' : ' ')
-    + '+' + exports.humanize(this.diff);
-
-  if (!useColors) return;
-
-  var c = 'color: ' + this.color;
-  args.splice(1, 0, c, 'color: inherit')
-
-  // the final "%c" is somewhat tricky, because there could be other
-  // arguments passed either before or after the %c, so we need to
-  // figure out the correct index to insert the CSS into
-  var index = 0;
-  var lastC = 0;
-  args[0].replace(/%[a-zA-Z%]/g, function(match) {
-    if ('%%' === match) return;
-    index++;
-    if ('%c' === match) {
-      // we only are interested in the *last* %c
-      // (the user may have provided their own)
-      lastC = index;
-    }
-  });
-
-  args.splice(lastC, 0, c);
-}
-
-/**
- * Invokes `console.log()` when available.
- * No-op when `console.log` is not a "function".
- *
- * @api public
- */
-
-function log() {
-  // this hackery is required for IE8/9, where
-  // the `console.log` function doesn't have 'apply'
-  return 'object' === typeof console
-    && console.log
-    && Function.prototype.apply.call(console.log, console, arguments);
-}
-
-/**
- * Save `namespaces`.
- *
- * @param {String} namespaces
- * @api private
- */
-
-function save(namespaces) {
-  try {
-    if (null == namespaces) {
-      exports.storage.removeItem('debug');
-    } else {
-      exports.storage.debug = namespaces;
-    }
-  } catch(e) {}
-}
-
-/**
- * Load `namespaces`.
- *
- * @return {String} returns the previously persisted debug modes
- * @api private
- */
-
-function load() {
-  var r;
-  try {
-    r = exports.storage.debug;
-  } catch(e) {}
-
-  // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
-  if (!r && typeof process !== 'undefined' && 'env' in process) {
-    r = process.env.DEBUG;
-  }
-
-  return r;
-}
-
-/**
- * Enable namespaces listed in `localStorage.debug` initially.
- */
-
-exports.enable(load());
-
-/**
- * Localstorage attempts to return the localstorage.
- *
- * This is necessary because safari throws
- * when a user disables cookies/localstorage
- * and you attempt to access it.
- *
- * @return {LocalStorage}
- * @api private
- */
-
-function localstorage() {
-  try {
-    return window.localStorage;
-  } catch (e) {}
-}
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-
-/**
- * This is the common logic for both the Node.js and web browser
- * implementations of `debug()`.
- *
- * Expose `debug()` as the module.
- */
-
-exports = module.exports = createDebug.debug = createDebug['default'] = createDebug;
-exports.coerce = coerce;
-exports.disable = disable;
-exports.enable = enable;
-exports.enabled = enabled;
-exports.humanize = __webpack_require__(30);
-
-/**
- * The currently active debug mode names, and names to skip.
- */
-
-exports.names = [];
-exports.skips = [];
-
-/**
- * Map of special "%n" handling functions, for the debug "format" argument.
- *
- * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
- */
-
-exports.formatters = {};
-
-/**
- * Previous log timestamp.
- */
-
-var prevTime;
-
-/**
- * Select a color.
- * @param {String} namespace
- * @return {Number}
- * @api private
- */
-
-function selectColor(namespace) {
-  var hash = 0, i;
-
-  for (i in namespace) {
-    hash  = ((hash << 5) - hash) + namespace.charCodeAt(i);
-    hash |= 0; // Convert to 32bit integer
-  }
-
-  return exports.colors[Math.abs(hash) % exports.colors.length];
-}
-
-/**
- * Create a debugger with the given `namespace`.
- *
- * @param {String} namespace
- * @return {Function}
- * @api public
- */
-
-function createDebug(namespace) {
-
-  function debug() {
-    // disabled?
-    if (!debug.enabled) return;
-
-    var self = debug;
-
-    // set `diff` timestamp
-    var curr = +new Date();
-    var ms = curr - (prevTime || curr);
-    self.diff = ms;
-    self.prev = prevTime;
-    self.curr = curr;
-    prevTime = curr;
-
-    // turn the `arguments` into a proper Array
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
-    }
-
-    args[0] = exports.coerce(args[0]);
-
-    if ('string' !== typeof args[0]) {
-      // anything else let's inspect with %O
-      args.unshift('%O');
-    }
-
-    // apply any `formatters` transformations
-    var index = 0;
-    args[0] = args[0].replace(/%([a-zA-Z%])/g, function(match, format) {
-      // if we encounter an escaped % then don't increase the array index
-      if (match === '%%') return match;
-      index++;
-      var formatter = exports.formatters[format];
-      if ('function' === typeof formatter) {
-        var val = args[index];
-        match = formatter.call(self, val);
-
-        // now we need to remove `args[index]` since it's inlined in the `format`
-        args.splice(index, 1);
-        index--;
-      }
-      return match;
-    });
-
-    // apply env-specific formatting (colors, etc.)
-    exports.formatArgs.call(self, args);
-
-    var logFn = debug.log || exports.log || console.log.bind(console);
-    logFn.apply(self, args);
-  }
-
-  debug.namespace = namespace;
-  debug.enabled = exports.enabled(namespace);
-  debug.useColors = exports.useColors();
-  debug.color = selectColor(namespace);
-
-  // env-specific initialization logic for debug instances
-  if ('function' === typeof exports.init) {
-    exports.init(debug);
-  }
-
-  return debug;
-}
-
-/**
- * Enables a debug mode by namespaces. This can include modes
- * separated by a colon and wildcards.
- *
- * @param {String} namespaces
- * @api public
- */
-
-function enable(namespaces) {
-  exports.save(namespaces);
-
-  exports.names = [];
-  exports.skips = [];
-
-  var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
-  var len = split.length;
-
-  for (var i = 0; i < len; i++) {
-    if (!split[i]) continue; // ignore empty strings
-    namespaces = split[i].replace(/\*/g, '.*?');
-    if (namespaces[0] === '-') {
-      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-    } else {
-      exports.names.push(new RegExp('^' + namespaces + '$'));
-    }
-  }
-}
-
-/**
- * Disable debug output.
- *
- * @api public
- */
-
-function disable() {
-  exports.enable('');
-}
-
-/**
- * Returns true if the given mode name is enabled, false otherwise.
- *
- * @param {String} name
- * @return {Boolean}
- * @api public
- */
-
-function enabled(name) {
-  var i, len;
-  for (i = 0, len = exports.skips.length; i < len; i++) {
-    if (exports.skips[i].test(name)) {
-      return false;
-    }
-  }
-  for (i = 0, len = exports.names.length; i < len; i++) {
-    if (exports.names[i].test(name)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Coerce `val`.
- *
- * @param {Mixed} val
- * @return {Mixed}
- * @api private
- */
-
-function coerce(val) {
-  if (val instanceof Error) return val.stack || val.message;
-  return val;
-}
-
-
-/***/ }),
-/* 30 */
-/***/ (function(module, exports) {
-
-/**
- * Helpers.
- */
-
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var y = d * 365.25;
-
-/**
- * Parse or format the given `val`.
- *
- * Options:
- *
- *  - `long` verbose formatting [false]
- *
- * @param {String|Number} val
- * @param {Object} [options]
- * @throws {Error} throw an error if val is not a non-empty string or a number
- * @return {String|Number}
- * @api public
- */
-
-module.exports = function(val, options) {
-  options = options || {};
-  var type = typeof val;
-  if (type === 'string' && val.length > 0) {
-    return parse(val);
-  } else if (type === 'number' && isNaN(val) === false) {
-    return options.long ? fmtLong(val) : fmtShort(val);
-  }
-  throw new Error(
-    'val is not a non-empty string or a valid number. val=' +
-      JSON.stringify(val)
-  );
-};
-
-/**
- * Parse the given `str` and return milliseconds.
- *
- * @param {String} str
- * @return {Number}
- * @api private
- */
-
-function parse(str) {
-  str = String(str);
-  if (str.length > 100) {
-    return;
-  }
-  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(
-    str
-  );
-  if (!match) {
-    return;
-  }
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
-  switch (type) {
-    case 'years':
-    case 'year':
-    case 'yrs':
-    case 'yr':
-    case 'y':
-      return n * y;
-    case 'days':
-    case 'day':
-    case 'd':
-      return n * d;
-    case 'hours':
-    case 'hour':
-    case 'hrs':
-    case 'hr':
-    case 'h':
-      return n * h;
-    case 'minutes':
-    case 'minute':
-    case 'mins':
-    case 'min':
-    case 'm':
-      return n * m;
-    case 'seconds':
-    case 'second':
-    case 'secs':
-    case 'sec':
-    case 's':
-      return n * s;
-    case 'milliseconds':
-    case 'millisecond':
-    case 'msecs':
-    case 'msec':
-    case 'ms':
-      return n;
-    default:
-      return undefined;
-  }
-}
-
-/**
- * Short format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtShort(ms) {
-  if (ms >= d) {
-    return Math.round(ms / d) + 'd';
-  }
-  if (ms >= h) {
-    return Math.round(ms / h) + 'h';
-  }
-  if (ms >= m) {
-    return Math.round(ms / m) + 'm';
-  }
-  if (ms >= s) {
-    return Math.round(ms / s) + 's';
-  }
-  return ms + 'ms';
-}
-
-/**
- * Long format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtLong(ms) {
-  return plural(ms, d, 'day') ||
-    plural(ms, h, 'hour') ||
-    plural(ms, m, 'minute') ||
-    plural(ms, s, 'second') ||
-    ms + ' ms';
-}
-
-/**
- * Pluralization helper.
- */
-
-function plural(ms, n, name) {
-  if (ms < n) {
-    return;
-  }
-  if (ms < n * 1.5) {
-    return Math.floor(ms / n) + ' ' + name;
-  }
-  return Math.ceil(ms / n) + ' ' + name + 's';
-}
-
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports) {
-
-// originally pulled out of simple-peer
-
-module.exports = function getBrowserRTC () {
-  if (typeof window === 'undefined') return null
-  var wrtc = {
-    RTCPeerConnection: window.RTCPeerConnection || window.mozRTCPeerConnection ||
-      window.webkitRTCPeerConnection,
-    RTCSessionDescription: window.RTCSessionDescription ||
-      window.mozRTCSessionDescription || window.webkitRTCSessionDescription,
-    RTCIceCandidate: window.RTCIceCandidate || window.mozRTCIceCandidate ||
-      window.webkitRTCIceCandidate
-  }
-  if (!wrtc.RTCPeerConnection) return null
-  return wrtc
-}
-
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(global, process) {
-
-function oldBrowser () {
-  throw new Error('secure random number generation not supported by this browser\nuse chrome, FireFox or Internet Explorer 11')
-}
-
-var Buffer = __webpack_require__(7).Buffer
-var crypto = global.crypto || global.msCrypto
-
-if (crypto && crypto.getRandomValues) {
-  module.exports = randomBytes
-} else {
-  module.exports = oldBrowser
-}
-
-function randomBytes (size, cb) {
-  // phantomjs needs to throw
-  if (size > 65536) throw new Error('requested too many random bytes')
-  // in case browserify  isn't using the Uint8Array version
-  var rawBytes = new global.Uint8Array(size)
-
-  // This will not work in older browsers.
-  // See https://developer.mozilla.org/en-US/docs/Web/API/window.crypto.getRandomValues
-  if (size > 0) {  // getRandomValues fails on IE if size == 0
-    crypto.getRandomValues(rawBytes)
-  }
-
-  // XXX: phantomjs doesn't like a buffer being passed here
-  var bytes = Buffer.from(rawBytes.buffer)
-
-  if (typeof cb === 'function') {
-    return process.nextTick(function () {
-      cb(null, bytes)
-    })
-  }
-
-  return bytes
-}
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(2)))
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(13);
-exports.Stream = exports;
-exports.Readable = exports;
-exports.Writable = __webpack_require__(16);
-exports.Duplex = __webpack_require__(4);
-exports.Transform = __webpack_require__(18);
-exports.PassThrough = __webpack_require__(39);
-
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports) {
-
-/* (ignored) */
-
-/***/ }),
-/* 35 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/*<replacement>*/
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Buffer = __webpack_require__(7).Buffer;
-/*</replacement>*/
-
-function copyBuffer(src, target, offset) {
-  src.copy(target, offset);
-}
-
-module.exports = function () {
-  function BufferList() {
-    _classCallCheck(this, BufferList);
-
-    this.head = null;
-    this.tail = null;
-    this.length = 0;
-  }
-
-  BufferList.prototype.push = function push(v) {
-    var entry = { data: v, next: null };
-    if (this.length > 0) this.tail.next = entry;else this.head = entry;
-    this.tail = entry;
-    ++this.length;
-  };
-
-  BufferList.prototype.unshift = function unshift(v) {
-    var entry = { data: v, next: this.head };
-    if (this.length === 0) this.tail = entry;
-    this.head = entry;
-    ++this.length;
-  };
-
-  BufferList.prototype.shift = function shift() {
-    if (this.length === 0) return;
-    var ret = this.head.data;
-    if (this.length === 1) this.head = this.tail = null;else this.head = this.head.next;
-    --this.length;
-    return ret;
-  };
-
-  BufferList.prototype.clear = function clear() {
-    this.head = this.tail = null;
-    this.length = 0;
-  };
-
-  BufferList.prototype.join = function join(s) {
-    if (this.length === 0) return '';
-    var p = this.head;
-    var ret = '' + p.data;
-    while (p = p.next) {
-      ret += s + p.data;
-    }return ret;
-  };
-
-  BufferList.prototype.concat = function concat(n) {
-    if (this.length === 0) return Buffer.alloc(0);
-    if (this.length === 1) return this.head.data;
-    var ret = Buffer.allocUnsafe(n >>> 0);
-    var p = this.head;
-    var i = 0;
-    while (p) {
-      copyBuffer(p.data, ret, i);
-      i += p.data.length;
-      p = p.next;
-    }
-    return ret;
-  };
-
-  return BufferList;
-}();
-
-/***/ }),
 /* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var apply = Function.prototype.apply;
-
-// DOM APIs, for completeness
-
-exports.setTimeout = function() {
-  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
-};
-exports.setInterval = function() {
-  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
-};
-exports.clearTimeout =
-exports.clearInterval = function(timeout) {
-  if (timeout) {
-    timeout.close();
-  }
-};
-
-function Timeout(id, clearFn) {
-  this._id = id;
-  this._clearFn = clearFn;
-}
-Timeout.prototype.unref = Timeout.prototype.ref = function() {};
-Timeout.prototype.close = function() {
-  this._clearFn.call(window, this._id);
-};
-
-// Does not start the time, just sets up the members needed.
-exports.enroll = function(item, msecs) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = msecs;
-};
-
-exports.unenroll = function(item) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = -1;
-};
-
-exports._unrefActive = exports.active = function(item) {
-  clearTimeout(item._idleTimeoutId);
-
-  var msecs = item._idleTimeout;
-  if (msecs >= 0) {
-    item._idleTimeoutId = setTimeout(function onTimeout() {
-      if (item._onTimeout)
-        item._onTimeout();
-    }, msecs);
-  }
-};
-
-// setimmediate attaches itself to the global object
-__webpack_require__(37);
-exports.setImmediate = setImmediate;
-exports.clearImmediate = clearImmediate;
-
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
-    "use strict";
-
-    if (global.setImmediate) {
-        return;
-    }
-
-    var nextHandle = 1; // Spec says greater than zero
-    var tasksByHandle = {};
-    var currentlyRunningATask = false;
-    var doc = global.document;
-    var registerImmediate;
-
-    function setImmediate(callback) {
-      // Callback can either be a function or a string
-      if (typeof callback !== "function") {
-        callback = new Function("" + callback);
-      }
-      // Copy function arguments
-      var args = new Array(arguments.length - 1);
-      for (var i = 0; i < args.length; i++) {
-          args[i] = arguments[i + 1];
-      }
-      // Store and register the task
-      var task = { callback: callback, args: args };
-      tasksByHandle[nextHandle] = task;
-      registerImmediate(nextHandle);
-      return nextHandle++;
-    }
-
-    function clearImmediate(handle) {
-        delete tasksByHandle[handle];
-    }
-
-    function run(task) {
-        var callback = task.callback;
-        var args = task.args;
-        switch (args.length) {
-        case 0:
-            callback();
-            break;
-        case 1:
-            callback(args[0]);
-            break;
-        case 2:
-            callback(args[0], args[1]);
-            break;
-        case 3:
-            callback(args[0], args[1], args[2]);
-            break;
-        default:
-            callback.apply(undefined, args);
-            break;
-        }
-    }
-
-    function runIfPresent(handle) {
-        // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
-        // So if we're currently running a task, we'll need to delay this invocation.
-        if (currentlyRunningATask) {
-            // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
-            // "too much recursion" error.
-            setTimeout(runIfPresent, 0, handle);
-        } else {
-            var task = tasksByHandle[handle];
-            if (task) {
-                currentlyRunningATask = true;
-                try {
-                    run(task);
-                } finally {
-                    clearImmediate(handle);
-                    currentlyRunningATask = false;
-                }
-            }
-        }
-    }
-
-    function installNextTickImplementation() {
-        registerImmediate = function(handle) {
-            process.nextTick(function () { runIfPresent(handle); });
-        };
-    }
-
-    function canUsePostMessage() {
-        // The test against `importScripts` prevents this implementation from being installed inside a web worker,
-        // where `global.postMessage` means something completely different and can't be used for this purpose.
-        if (global.postMessage && !global.importScripts) {
-            var postMessageIsAsynchronous = true;
-            var oldOnMessage = global.onmessage;
-            global.onmessage = function() {
-                postMessageIsAsynchronous = false;
-            };
-            global.postMessage("", "*");
-            global.onmessage = oldOnMessage;
-            return postMessageIsAsynchronous;
-        }
-    }
-
-    function installPostMessageImplementation() {
-        // Installs an event handler on `global` for the `message` event: see
-        // * https://developer.mozilla.org/en/DOM/window.postMessage
-        // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
-
-        var messagePrefix = "setImmediate$" + Math.random() + "$";
-        var onGlobalMessage = function(event) {
-            if (event.source === global &&
-                typeof event.data === "string" &&
-                event.data.indexOf(messagePrefix) === 0) {
-                runIfPresent(+event.data.slice(messagePrefix.length));
-            }
-        };
-
-        if (global.addEventListener) {
-            global.addEventListener("message", onGlobalMessage, false);
-        } else {
-            global.attachEvent("onmessage", onGlobalMessage);
-        }
-
-        registerImmediate = function(handle) {
-            global.postMessage(messagePrefix + handle, "*");
-        };
-    }
-
-    function installMessageChannelImplementation() {
-        var channel = new MessageChannel();
-        channel.port1.onmessage = function(event) {
-            var handle = event.data;
-            runIfPresent(handle);
-        };
-
-        registerImmediate = function(handle) {
-            channel.port2.postMessage(handle);
-        };
-    }
-
-    function installReadyStateChangeImplementation() {
-        var html = doc.documentElement;
-        registerImmediate = function(handle) {
-            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
-            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-            var script = doc.createElement("script");
-            script.onreadystatechange = function () {
-                runIfPresent(handle);
-                script.onreadystatechange = null;
-                html.removeChild(script);
-                script = null;
-            };
-            html.appendChild(script);
-        };
-    }
-
-    function installSetTimeoutImplementation() {
-        registerImmediate = function(handle) {
-            setTimeout(runIfPresent, 0, handle);
-        };
-    }
-
-    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
-    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
-    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
-
-    // Don't get fooled by e.g. browserify environments.
-    if ({}.toString.call(global.process) === "[object process]") {
-        // For Node.js before 0.9
-        installNextTickImplementation();
-
-    } else if (canUsePostMessage()) {
-        // For non-IE10 modern browsers
-        installPostMessageImplementation();
-
-    } else if (global.MessageChannel) {
-        // For web workers, where supported
-        installMessageChannelImplementation();
-
-    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
-        // For IE 6–8
-        installReadyStateChangeImplementation();
-
-    } else {
-        // For older browsers
-        installSetTimeoutImplementation();
-    }
-
-    attachTo.setImmediate = setImmediate;
-    attachTo.clearImmediate = clearImmediate;
-}(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(2)))
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {
-/**
- * Module exports.
- */
-
-module.exports = deprecate;
-
-/**
- * Mark that a method should not be used.
- * Returns a modified function which warns once by default.
- *
- * If `localStorage.noDeprecation = true` is set, then it is a no-op.
- *
- * If `localStorage.throwDeprecation = true` is set, then deprecated functions
- * will throw an Error when invoked.
- *
- * If `localStorage.traceDeprecation = true` is set, then deprecated functions
- * will invoke `console.trace()` instead of `console.error()`.
- *
- * @param {Function} fn - the function to deprecate
- * @param {String} msg - the string to print to the console when `fn` is invoked
- * @returns {Function} a new "deprecated" version of `fn`
- * @api public
- */
-
-function deprecate (fn, msg) {
-  if (config('noDeprecation')) {
-    return fn;
-  }
-
-  var warned = false;
-  function deprecated() {
-    if (!warned) {
-      if (config('throwDeprecation')) {
-        throw new Error(msg);
-      } else if (config('traceDeprecation')) {
-        console.trace(msg);
-      } else {
-        console.warn(msg);
-      }
-      warned = true;
-    }
-    return fn.apply(this, arguments);
-  }
-
-  return deprecated;
-}
-
-/**
- * Checks `localStorage` for boolean values for the given `name`.
- *
- * @param {String} name
- * @returns {Boolean}
- * @api private
- */
-
-function config (name) {
-  // accessing global.localStorage can trigger a DOMException in sandboxed iframes
-  try {
-    if (!global.localStorage) return false;
-  } catch (_) {
-    return false;
-  }
-  var val = global.localStorage[name];
-  if (null == val) return false;
-  return String(val).toLowerCase() === 'true';
-}
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
-
-/***/ }),
-/* 39 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// a passthrough stream.
-// basically just the most minimal sort of Transform stream.
-// Every written chunk gets output as-is.
-
-
-
-module.exports = PassThrough;
-
-var Transform = __webpack_require__(18);
-
-/*<replacement>*/
-var util = __webpack_require__(8);
-util.inherits = __webpack_require__(3);
-/*</replacement>*/
-
-util.inherits(PassThrough, Transform);
-
-function PassThrough(options) {
-  if (!(this instanceof PassThrough)) return new PassThrough(options);
-
-  Transform.call(this, options);
-}
-
-PassThrough.prototype._transform = function (chunk, encoding, cb) {
-  cb(null, chunk);
-};
-
-/***/ }),
-/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8916,7 +8424,7 @@ var _events3 = __webpack_require__(5);
 
 var _events4 = _interopRequireDefault(_events3);
 
-var _substreams = __webpack_require__(41);
+var _substreams = __webpack_require__(37);
 
 var _substreams2 = _interopRequireDefault(_substreams);
 
@@ -9062,32 +8570,25 @@ var P2PScheduler = function (_EventEmitter) {
             log('delete datachannel ' + channel.channelId);
             if (channel.isReceiver) {
                 this.substreams.deleteSubstream(channel.remotePeerId);
-                this.upstreamers = this.upstreamers.filter(function (c) {
-                    return c !== channel;
-                });
-            } else {
-                this.downstreamers = this.downstreamers.filter(function (c) {
-                    return c !== channel;
-                });
             }
-            // for (let i=0;i<this.downstreamers.length;++i){
-            //     if (this.downstreamers[i] === channel) {
-            //         this.downstreamers.splice(i, 1);
-            //         return;
-            //     }
-            // }
-            // for (let i=0;i<this.upstreamers.length;++i){
-            //     if (this.upstreamers[i] === channel) {
-            //         this.upstreamers.splice(i, 1);
-            //         return;
-            //     }
-            // }
+            for (var i = 0; i < this.downstreamers.length; ++i) {
+                if (this.downstreamers[i] === channel) {
+                    this.downstreamers.splice(i, 1);
+                    return;
+                }
+            }
+            for (var _i = 0; _i < this.upstreamers.length; ++_i) {
+                if (this.upstreamers[_i] === channel) {
+                    this.upstreamers.splice(_i, 1);
+                    return;
+                }
+            }
         }
     }, {
         key: 'moveUpstreamsersToDown',
         value: function moveUpstreamsersToDown() {
             var msg = {
-                event: _events4.default.DC_DISPLACE
+                event: 'DISPLACE'
             };
             while (this.upstreamers.length > 0) {
                 var streamer = this.upstreamers.pop();
@@ -9109,7 +8610,7 @@ var P2PScheduler = function (_EventEmitter) {
                     var streamer = _step.value;
 
                     var msg = {
-                        event: _events4.default.DC_CLOSE
+                        event: 'CLOSE'
                     };
                     streamer.send(JSON.stringify(msg));
                     streamer.destroy();
@@ -9138,7 +8639,7 @@ var P2PScheduler = function (_EventEmitter) {
             for (var i = 0; i < this.downstreamers.length; ++i) {
                 var streamer = this.downstreamers.pop();
                 var msg = {
-                    event: _events4.default.DC_CLOSE
+                    event: 'CLOSE'
                 };
                 streamer.send(JSON.stringify(msg));
                 streamer.destroy();
@@ -9149,22 +8650,20 @@ var P2PScheduler = function (_EventEmitter) {
         value: function exchangeWithStreamser(streamer) {
             //与streamer交换位置
             var msg = {
-                event: _events4.default.DC_DISPLACE
+                event: 'DISPLACE'
             };
             if (streamer.isReceiver) {
                 //交换的对象是父节点
-                // this.upstreamers.splice(this.upstreamers.findIndex(item => item.remotePeerId === streamer.remotePeerId), 1);
-                this.upstreamers = this.upstreamers.filter(function (item) {
-                    return item.remotePeerId !== streamer.remotePeerId;
-                });
+                this.upstreamers.splice(this.upstreamers.findIndex(function (item) {
+                    return item.remotePeerId === streamer.remotePeerId;
+                }), 1);
                 this.downstreamers.push(streamer);
                 this.substreams.deleteSubstream(streamer.remotePeerId);
                 msg.substreams = streamer.copys; //先前有多少子流，交换后保持一致
             } else {
-                // this.downstreamers.splice(this.downstreamers.findIndex(item => item.remotePeerId === streamer.remotePeerId), 1);
-                this.downstreamers = this.downstreamers.filter(function (item) {
-                    return item.remotePeerId !== streamer.remotePeerId;
-                });
+                this.downstreamers.splice(this.downstreamers.findIndex(function (item) {
+                    return item.remotePeerId === streamer.remotePeerId;
+                }), 1);
                 this.upstreamers.unshift(streamer); //放在最优先位置
                 this.substreams.addSubstreams(streamer, 1);
             }
@@ -9278,7 +8777,7 @@ var P2PScheduler = function (_EventEmitter) {
                             remainder = dataSize % packetSize;
                         }
                         var response = {
-                            event: _events4.default.DC_PIECE,
+                            event: 'BINARY',
                             attachments: attachments,
                             url: seg.relurl,
                             sn: seg.sn,
@@ -9296,7 +8795,7 @@ var P2PScheduler = function (_EventEmitter) {
                     } else {
                         //缓存找不到请求的数据
                         var _response = {
-                            event: _events4.default.DC_LACK,
+                            event: 'LACK',
                             url: url,
                             current: _this2._currPlaySN
                         };
@@ -9307,10 +8806,9 @@ var P2PScheduler = function (_EventEmitter) {
                 //收到子节点要跃迁的事件
                 var channelId = channel.channelId;
                 channel.isReceiver = !channel.isReceiver;
-                // this.downstreamers.splice(this.downstreamers.findIndex(item => item.channelId === channelId), 1);
-                _this2.downstreamers = _this2.downstreamers.filter(function (item) {
-                    return item.channelId !== channelId;
-                });
+                _this2.downstreamers.splice(_this2.downstreamers.findIndex(function (item) {
+                    return item.channelId === channelId;
+                }), 1);
                 _this2.upstreamers.unshift(channel);
                 _this2.substreams.addSubstreams(channel, msg.substreams);
                 console.log('datachannel ' + channelId + ' displaced');
@@ -9373,7 +8871,7 @@ var P2PScheduler = function (_EventEmitter) {
                 //     this.leadingCounter = 0;
                 // }
 
-            }).on(_events4.default.DC_PIECE, function () {
+            }).on(_events4.default.DC_BINARY, function () {
                 //接收到binary事件，用于tfirst
                 if (!_this2.stats.tfirst) {
                     _this2.stats.tfirst = Math.max(performance.now(), _this2.stats.trequest);
@@ -9415,7 +8913,7 @@ var P2PScheduler = function (_EventEmitter) {
                         }
 
                         var resp = {
-                            event: _events4.default.DC_GRANT,
+                            event: 'GRANT',
                             delay: 0, //待修改
                             TTL: msg.source_TTL - msg.TTL,
                             parents: parents,
@@ -9449,7 +8947,7 @@ var P2PScheduler = function (_EventEmitter) {
                 if (_this3.residualBW > _this3.totalUploadBW / 2 && _this3.upstreamers.length) {
                     //如果剩余带宽大于streaming rate并且有父节点  TODO
                     var msg = {
-                        event: _events4.default.DC_TRANSITION,
+                        event: 'TRANSITION',
                         ul_bw: _this3.totalUploadBW, //总上行带宽（单位bps）
                         TTL: _this3.p2pConfig.transitionTTL,
                         source_TTL: _this3.p2pConfig.transitionTTL,
@@ -9548,11 +9046,6 @@ var P2PScheduler = function (_EventEmitter) {
         set: function set(sn) {
             this._currPlaySN = sn;
         }
-    }, {
-        key: 'bitrate',
-        set: function set(br) {
-            this.substreams.bitrate = br;
-        }
     }]);
 
     return P2PScheduler;
@@ -9570,8 +9063,8 @@ function dividePayload(payload, packetSize, attachments, remainder) {
         bufArr.push(packet);
     } else {
         var _packet = void 0;
-        for (var _i = 0; _i < attachments; _i++) {
-            _packet = payload.slice(_i * packetSize, (_i + 1) * packetSize);
+        for (var _i2 = 0; _i2 < attachments; _i2++) {
+            _packet = payload.slice(_i2 * packetSize, (_i2 + 1) * packetSize);
             bufArr.push(_packet);
         }
     }
@@ -9582,7 +9075,7 @@ exports.default = P2PScheduler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 41 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9656,22 +9149,42 @@ var Substreams = function (_EventEmitter) {
         value: function addSubstreams(stream, copys) {
             for (var i = 0; i < copys; ++i) {
                 if (this.streams.length >= this.totalStreams) break;
+                console.warn('this.streams.push ' + stream.remotePeerId);
                 this.streams.push(stream);
             }
         }
     }, {
         key: 'deleteSubstream',
         value: function deleteSubstream(id) {
-            // let newStreams = [];
-            // for (let stream of this.streams) {
-            //     if (stream.remotePeerId !== id) {
-            //         newStreams.push(stream);
-            //     }
-            // }
-            // this.streams = newStreams;
-            this.streams = this.streams.filter(function (stream) {
-                return stream.remotePeerId !== id;
-            });
+            var newStreams = [];
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = this.streams[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var stream = _step.value;
+
+                    if (stream.remotePeerId !== id) {
+                        newStreams.push(stream);
+                    }
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
+            this.streams = newStreams;
         }
     }, {
         key: 'needMoreStreams',
@@ -9714,124 +9227,229 @@ exports.default = Substreams;
 module.exports = exports['default'];
 
 /***/ }),
-/* 42 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _events = __webpack_require__(0);
-
-var _events2 = _interopRequireDefault(_events);
-
-var _reconnectingWebsocket = __webpack_require__(19);
-
-var _reconnectingWebsocket2 = _interopRequireDefault(_reconnectingWebsocket);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Created by xieting on 2018/3/23.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-var SignalClient = function (_EventEmitter) {
-    _inherits(SignalClient, _EventEmitter);
-
-    function SignalClient(peerId, config) {
-        _classCallCheck(this, SignalClient);
-
-        var _this = _possibleConstructorReturn(this, (SignalClient.__proto__ || Object.getPrototypeOf(SignalClient)).call(this));
-
-        _this.peerId = peerId;
-        _this.config = config;
-        _this.connected = false;
-        _this._ws = _this._init(peerId);
-        return _this;
+;
+;
+;
+var isWebSocket = function (constructor) {
+    return constructor && constructor.CLOSING === 2;
+};
+var isGlobalWebSocket = function () {
+    return typeof WebSocket !== 'undefined' && isWebSocket(WebSocket);
+};
+var getDefaultOptions = function () { return ({
+    constructor: isGlobalWebSocket() ? WebSocket : null,
+    maxReconnectionDelay: 10000,
+    minReconnectionDelay: 1500,
+    reconnectionDelayGrowFactor: 1.3,
+    connectionTimeout: 4000,
+    maxRetries: Infinity,
+    debug: false,
+}); };
+var bypassProperty = function (src, dst, name) {
+    Object.defineProperty(dst, name, {
+        get: function () { return src[name]; },
+        set: function (value) { src[name] = value; },
+        enumerable: true,
+        configurable: true,
+    });
+};
+var initReconnectionDelay = function (config) {
+    return (config.minReconnectionDelay + Math.random() * config.minReconnectionDelay);
+};
+var updateReconnectionDelay = function (config, previousDelay) {
+    var newDelay = previousDelay * config.reconnectionDelayGrowFactor;
+    return (newDelay > config.maxReconnectionDelay)
+        ? config.maxReconnectionDelay
+        : newDelay;
+};
+var LEVEL_0_EVENTS = ['onopen', 'onclose', 'onmessage', 'onerror'];
+var reassignEventListeners = function (ws, oldWs, listeners) {
+    Object.keys(listeners).forEach(function (type) {
+        listeners[type].forEach(function (_a) {
+            var listener = _a[0], options = _a[1];
+            ws.addEventListener(type, listener, options);
+        });
+    });
+    if (oldWs) {
+        LEVEL_0_EVENTS.forEach(function (name) {
+            ws[name] = oldWs[name];
+        });
     }
-
-    _createClass(SignalClient, [{
-        key: '_init',
-        value: function _init(id) {
-            var _this2 = this;
-
-            var wsOptions = {
-                maxRetries: this.config.wsMaxRetries,
-                minReconnectionDelay: this.config.wsReconnectInterval * 1000
-            };
-            var queryStr = '?id=' + id;
-            var websocket = new _reconnectingWebsocket2.default(this.config.wsSignalerAddr + queryStr, undefined, wsOptions);
-            websocket.onopen = function () {
-                console.log('Signaler websocket connection opened');
-
-                _this2.connected = true;
-                if (_this2.onopen) _this2.onopen();
-            };
-
-            websocket.push = websocket.send;
-            websocket.send = function (msg) {
-                var msgStr = JSON.stringify(Object.assign({ peer_id: id }, msg));
-                if (websocket.readyState !== 1) {
-                    console.warn('websocket connection is not opened yet.');
-                    return setTimeout(function () {
-                        websocket.send(data);
-                    }, 1000);
-                }
-                websocket.push(msgStr);
-            };
-            websocket.onmessage = function (e) {
-
-                if (_this2.onmessage) _this2.onmessage(e);
-            };
-            websocket.onclose = function () {
-                //websocket断开时清除datachannel
-                console.warn('Signaler websocket closed');
-                if (_this2.onclose) _this2.onclose();
-                _this2.connected = false;
-            };
-            return websocket;
+};
+var ReconnectingWebsocket = function (url, protocols, options) {
+    var _this = this;
+    if (options === void 0) { options = {}; }
+    var ws;
+    var connectingTimeout;
+    var reconnectDelay = 0;
+    var retriesCount = 0;
+    var shouldRetry = true;
+    var savedOnClose = null;
+    var listeners = {};
+    // require new to construct
+    if (!(this instanceof ReconnectingWebsocket)) {
+        throw new TypeError("Failed to construct 'ReconnectingWebSocket': Please use the 'new' operator");
+    }
+    // Set config. Not using `Object.assign` because of IE11
+    var config = getDefaultOptions();
+    Object.keys(config)
+        .filter(function (key) { return options.hasOwnProperty(key); })
+        .forEach(function (key) { return config[key] = options[key]; });
+    if (!isWebSocket(config.constructor)) {
+        throw new TypeError('Invalid WebSocket constructor. Set `options.constructor`');
+    }
+    var log = config.debug ? function () {
+        var params = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            params[_i] = arguments[_i];
         }
-    }, {
-        key: 'sendSignal',
-        value: function sendSignal(remotePeerId, data) {
-            var msg = {
-                action: 'signal',
-                peer_id: this.peerId,
-                to_peer_id: remotePeerId,
-                data: data
+        return console.log.apply(console, ['RWS:'].concat(params));
+    } : function () { };
+    /**
+     * Not using dispatchEvent, otherwise we must use a DOM Event object
+     * Deferred because we want to handle the close event before this
+     */
+    var emitError = function (code, msg) { return setTimeout(function () {
+        var err = new Error(msg);
+        err.code = code;
+        if (Array.isArray(listeners.error)) {
+            listeners.error.forEach(function (_a) {
+                var fn = _a[0];
+                return fn(err);
+            });
+        }
+        if (ws.onerror) {
+            ws.onerror(err);
+        }
+    }, 0); };
+    var handleClose = function () {
+        log('handleClose', { shouldRetry: shouldRetry });
+        retriesCount++;
+        log('retries count:', retriesCount);
+        if (retriesCount > config.maxRetries) {
+            emitError('EHOSTDOWN', 'Too many failed connection attempts');
+            return;
+        }
+        if (!reconnectDelay) {
+            reconnectDelay = initReconnectionDelay(config);
+        }
+        else {
+            reconnectDelay = updateReconnectionDelay(config, reconnectDelay);
+        }
+        log('handleClose - reconnectDelay:', reconnectDelay);
+        if (shouldRetry) {
+            setTimeout(connect, reconnectDelay);
+        }
+    };
+    var connect = function () {
+        if (!shouldRetry) {
+            return;
+        }
+        log('connect');
+        var oldWs = ws;
+        var wsUrl = (typeof url === 'function') ? url() : url;
+        ws = new config.constructor(wsUrl, protocols);
+        connectingTimeout = setTimeout(function () {
+            log('timeout');
+            ws.close();
+            emitError('ETIMEDOUT', 'Connection timeout');
+        }, config.connectionTimeout);
+        log('bypass properties');
+        for (var key in ws) {
+            // @todo move to constant
+            if (['addEventListener', 'removeEventListener', 'close', 'send'].indexOf(key) < 0) {
+                bypassProperty(ws, _this, key);
+            }
+        }
+        ws.addEventListener('open', function () {
+            clearTimeout(connectingTimeout);
+            log('open');
+            reconnectDelay = initReconnectionDelay(config);
+            log('reconnectDelay:', reconnectDelay);
+            retriesCount = 0;
+        });
+        ws.addEventListener('close', handleClose);
+        reassignEventListeners(ws, oldWs, listeners);
+        // because when closing with fastClose=true, it is saved and set to null to avoid double calls
+        ws.onclose = ws.onclose || savedOnClose;
+        savedOnClose = null;
+    };
+    log('init');
+    connect();
+    this.close = function (code, reason, _a) {
+        if (code === void 0) { code = 1000; }
+        if (reason === void 0) { reason = ''; }
+        var _b = _a === void 0 ? {} : _a, _c = _b.keepClosed, keepClosed = _c === void 0 ? false : _c, _d = _b.fastClose, fastClose = _d === void 0 ? true : _d, _e = _b.delay, delay = _e === void 0 ? 0 : _e;
+        log('close - params:', { reason: reason, keepClosed: keepClosed, fastClose: fastClose, delay: delay, retriesCount: retriesCount, maxRetries: config.maxRetries });
+        shouldRetry = !keepClosed && retriesCount <= config.maxRetries;
+        if (delay) {
+            reconnectDelay = delay;
+        }
+        ws.close(code, reason);
+        if (fastClose) {
+            var fakeCloseEvent_1 = {
+                code: code,
+                reason: reason,
+                wasClean: true,
             };
-            this.send(msg);
+            // execute close listeners soon with a fake closeEvent
+            // and remove them from the WS instance so they
+            // don't get fired on the real close.
+            handleClose();
+            ws.removeEventListener('close', handleClose);
+            // run and remove level2
+            if (Array.isArray(listeners.close)) {
+                listeners.close.forEach(function (_a) {
+                    var listener = _a[0], options = _a[1];
+                    listener(fakeCloseEvent_1);
+                    ws.removeEventListener('close', listener, options);
+                });
+            }
+            // run and remove level0
+            if (ws.onclose) {
+                savedOnClose = ws.onclose;
+                ws.onclose(fakeCloseEvent_1);
+                ws.onclose = null;
+            }
         }
-    }, {
-        key: 'send',
-        value: function send(msg) {
-            this._ws.send(msg);
+    };
+    this.send = function (data) {
+        ws.send(data);
+    };
+    this.addEventListener = function (type, listener, options) {
+        if (Array.isArray(listeners[type])) {
+            if (!listeners[type].some(function (_a) {
+                var l = _a[0];
+                return l === listener;
+            })) {
+                listeners[type].push([listener, options]);
+            }
         }
-    }, {
-        key: 'close',
-        value: function close() {
-            this._ws.close();
-            this._ws = null;
+        else {
+            listeners[type] = [[listener, options]];
         }
-    }]);
+        ws.addEventListener(type, listener, options);
+    };
+    this.removeEventListener = function (type, listener, options) {
+        if (Array.isArray(listeners[type])) {
+            listeners[type] = listeners[type].filter(function (_a) {
+                var l = _a[0];
+                return l !== listener;
+            });
+        }
+        ws.removeEventListener(type, listener, options);
+    };
+};
+module.exports = ReconnectingWebsocket;
 
-    return SignalClient;
-}(_events2.default);
-
-exports.default = SignalClient;
-module.exports = exports['default'];
 
 /***/ }),
-/* 43 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9847,7 +9465,7 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _xhrLoader = __webpack_require__(20);
+var _xhrLoader = __webpack_require__(40);
 
 var _xhrLoader2 = _interopRequireDefault(_xhrLoader);
 
@@ -9863,6 +9481,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 // import Events from './events';
 
+
+// import Buffer from 'buffer';
+var Buffer = __webpack_require__(6).Buffer;
 
 var log = console.log;
 
@@ -9902,7 +9523,7 @@ var LoaderScheduler = function (_EventEmitter) {
         }
 
         /*
-          在urgent情况下用http请求，非urgent情况下用p2p请求。
+          首先从缓存中寻找请求的seg，如果缓存中找不到则在urgent情况下用http请求，非urgent情况下用p2p请求。
          */
 
     }, {
@@ -9911,7 +9532,6 @@ var LoaderScheduler = function (_EventEmitter) {
             var _this2 = this;
 
             var frag = context.frag;
-            // console.warn(`${JSON.stringify(frag)}`)
             this.loadByP2P = frag.sn - this.currPlay > 1 && frag.sn - this.currLoaded == 1 && this.currLoaded - this.currPlay >= 1 && this.p2pLoader.hasUpstreamer;
             log('loading ' + frag.sn + ' loaded ' + this.currLoaded + ' play ' + this.currPlay + ' loaded by ' + (this.loadByP2P ? 'P2P' : 'HTTP'));
 
@@ -9928,7 +9548,7 @@ var LoaderScheduler = function (_EventEmitter) {
             var onSuccess = callbacks.onSuccess;
             callbacks.onSuccess = function (response, stats, context) {
                 if (_this2.bufMgr && !_this2.bufMgr.hasSegOfURL(frag.relurl)) {
-                    _this2.bufMgr.copyAndAddSeg(response.data, frag.relurl, frag.sn);
+                    _this2._copyFrag(response.data, frag.relurl, frag.sn);
                 }
                 onSuccess(response, stats, context);
             };
@@ -9945,6 +9565,24 @@ var LoaderScheduler = function (_EventEmitter) {
             };
             this.loader.load(context, config, callbacks);
         }
+    }, {
+        key: '_copyFrag',
+        value: function _copyFrag(data, url, sn) {
+            var payloadBuf = Buffer.from(data);
+            var byteLength = payloadBuf.byteLength;
+            var targetBuffer = new Buffer(byteLength);
+            payloadBuf.copy(targetBuffer);
+
+            var segment = {
+                sn: sn,
+                relurl: url,
+                data: targetBuffer,
+                size: byteLength
+            };
+
+            this.bufMgr.addSeg(segment);
+            // this.emit(Events.SEGMENT, segment);
+        }
     }]);
 
     return LoaderScheduler;
@@ -9954,7 +9592,7 @@ exports.default = LoaderScheduler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 44 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9966,1234 +9604,187 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _events = __webpack_require__(0);
-
-var _events2 = _interopRequireDefault(_events);
-
-var _btScheduler = __webpack_require__(45);
-
-var _btScheduler2 = _interopRequireDefault(_btScheduler);
-
-var _simpleSha = __webpack_require__(46);
-
-var _simpleSha2 = _interopRequireDefault(_simpleSha);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Created by xieting on 2018/3/23.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-var BTTracker = function (_EventEmitter) {
-    _inherits(BTTracker, _EventEmitter);
-
-    function BTTracker(channel, config, info) {
-        _classCallCheck(this, BTTracker);
-
-        var _this = _possibleConstructorReturn(this, (BTTracker.__proto__ || Object.getPrototypeOf(BTTracker)).call(this));
-
-        _this.config = config;
-        _this.browserInfo = info;
-        _this.connected = false;
-        _this.channel = channel;
-        _this.scheduler = new _btScheduler2.default(config);
-        _this.DCMap = new Map(); //{key: remotePeerId, value: DataChannnel}
-        _this.failedDCMap = new Map(); //{key: remotePeerId, value: boolean}
-        config.announce = config.announce + '?key=' + window.encodeURIComponent(config.key) + '&room=' + window.encodeURIComponent(channel) + '&mode=' + window.encodeURIComponent(config.mode);
-        console.log('connecting to :' + config.announce);
-        _this.signalerWs = null; //信令服务器ws
-
-
-        _this._setupScheduler(_this.scheduler);
-        return _this;
-    }
-
-    _createClass(BTTracker, [{
-        key: '_setupScheduler',
-        value: function _setupScheduler(scheduler) {}
-    }, {
-        key: 'send',
-        value: function send(msg) {}
-    }, {
-        key: 'resumeP2P',
-        value: function resumeP2P() {}
-    }, {
-        key: 'currentPlaySN',
-        set: function set(sn) {}
-    }]);
-
-    return BTTracker;
-}(_events2.default);
-
-exports.default = BTTracker;
-module.exports = exports['default'];
-
-/***/ }),
-/* 45 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _events = __webpack_require__(0);
-
-var _events2 = _interopRequireDefault(_events);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Created by xieting on 2018/3/23.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-var BTScheduler = function (_EventEmitter) {
-    _inherits(BTScheduler, _EventEmitter);
-
-    function BTScheduler(config) {
-        _classCallCheck(this, BTScheduler);
-
-        return _possibleConstructorReturn(this, (BTScheduler.__proto__ || Object.getPrototypeOf(BTScheduler)).call(this));
-    }
-
-    return BTScheduler;
-}(_events2.default);
-
-exports.default = BTScheduler;
-module.exports = exports['default'];
-
-/***/ }),
-/* 46 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var Rusha = __webpack_require__(47)
-
-var rusha = new Rusha
-var scope = typeof window !== 'undefined' ? window : self
-var crypto = scope.crypto || scope.msCrypto || {}
-var subtle = crypto.subtle || crypto.webkitSubtle
-
-function sha1sync (buf) {
-  return rusha.digest(buf)
-}
-
-// Browsers throw if they lack support for an algorithm.
-// Promise will be rejected on non-secure origins. (http://goo.gl/lq4gCo)
-try {
-  subtle.digest({ name: 'sha-1' }, new Uint8Array).catch(function () {
-    subtle = false
-  })
-} catch (err) { subtle = false }
-
-function sha1 (buf, cb) {
-  if (!subtle) {
-    // Use Rusha
-    setTimeout(cb, 0, sha1sync(buf))
-    return
-  }
-
-  if (typeof buf === 'string') {
-    buf = uint8array(buf)
-  }
-
-  subtle.digest({ name: 'sha-1' }, buf)
-    .then(function succeed (result) {
-      cb(hex(new Uint8Array(result)))
-    },
-    function fail (error) {
-      cb(sha1sync(buf))
-    })
-}
-
-function uint8array (s) {
-  var l = s.length
-  var array = new Uint8Array(l)
-  for (var i = 0; i < l; i++) {
-    array[i] = s.charCodeAt(i)
-  }
-  return array
-}
-
-function hex (buf) {
-  var l = buf.length
-  var chars = []
-  for (var i = 0; i < l; i++) {
-    var bite = buf[i]
-    chars.push((bite >>> 4).toString(16))
-    chars.push((bite & 0x0f).toString(16))
-  }
-  return chars.join('')
-}
-
-module.exports = sha1
-module.exports.sync = sha1sync
-
-
-/***/ }),
-/* 47 */
-/***/ (function(module, exports, __webpack_require__) {
-
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(true)
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else if(typeof exports === 'object')
-		exports["Rusha"] = factory();
-	else
-		root["Rusha"] = factory();
-})(typeof self !== 'undefined' ? self : this, function() {
-return /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/* eslint-env commonjs, browser */
-
-var RushaCore = __webpack_require__(5);
-
-var _require = __webpack_require__(1),
-    toHex = _require.toHex,
-    ceilHeapSize = _require.ceilHeapSize;
-
-var conv = __webpack_require__(6);
-
-// Calculate the length of buffer that the sha1 routine uses
-// including the padding.
-var padlen = function (len) {
-  for (len += 9; len % 64 > 0; len += 1) {}
-  return len;
-};
-
-var padZeroes = function (bin, len) {
-  var h8 = new Uint8Array(bin.buffer);
-  var om = len % 4,
-      align = len - om;
-  switch (om) {
-    case 0:
-      h8[align + 3] = 0;
-    case 1:
-      h8[align + 2] = 0;
-    case 2:
-      h8[align + 1] = 0;
-    case 3:
-      h8[align + 0] = 0;
-  }
-  for (var i = (len >> 2) + 1; i < bin.length; i++) {
-    bin[i] = 0;
-  }
-};
-
-var padData = function (bin, chunkLen, msgLen) {
-  bin[chunkLen >> 2] |= 0x80 << 24 - (chunkLen % 4 << 3);
-  // To support msgLen >= 2 GiB, use a float division when computing the
-  // high 32-bits of the big-endian message length in bits.
-  bin[((chunkLen >> 2) + 2 & ~0x0f) + 14] = msgLen / (1 << 29) | 0;
-  bin[((chunkLen >> 2) + 2 & ~0x0f) + 15] = msgLen << 3;
-};
-
-var getRawDigest = function (heap, padMaxChunkLen) {
-  var io = new Int32Array(heap, padMaxChunkLen + 320, 5);
-  var out = new Int32Array(5);
-  var arr = new DataView(out.buffer);
-  arr.setInt32(0, io[0], false);
-  arr.setInt32(4, io[1], false);
-  arr.setInt32(8, io[2], false);
-  arr.setInt32(12, io[3], false);
-  arr.setInt32(16, io[4], false);
-  return out;
-};
-
-var Rusha = function () {
-  function Rusha(chunkSize) {
-    _classCallCheck(this, Rusha);
-
-    chunkSize = chunkSize || 64 * 1024;
-    if (chunkSize % 64 > 0) {
-      throw new Error('Chunk size must be a multiple of 128 bit');
-    }
-    this._offset = 0;
-    this._maxChunkLen = chunkSize;
-    this._padMaxChunkLen = padlen(chunkSize);
-    // The size of the heap is the sum of:
-    // 1. The padded input message size
-    // 2. The extended space the algorithm needs (320 byte)
-    // 3. The 160 bit state the algoritm uses
-    this._heap = new ArrayBuffer(ceilHeapSize(this._padMaxChunkLen + 320 + 20));
-    this._h32 = new Int32Array(this._heap);
-    this._h8 = new Int8Array(this._heap);
-    this._core = new RushaCore({ Int32Array: Int32Array }, {}, this._heap);
-  }
-
-  Rusha.prototype._initState = function _initState(heap, padMsgLen) {
-    this._offset = 0;
-    var io = new Int32Array(heap, padMsgLen + 320, 5);
-    io[0] = 1732584193;
-    io[1] = -271733879;
-    io[2] = -1732584194;
-    io[3] = 271733878;
-    io[4] = -1009589776;
-  };
-
-  Rusha.prototype._padChunk = function _padChunk(chunkLen, msgLen) {
-    var padChunkLen = padlen(chunkLen);
-    var view = new Int32Array(this._heap, 0, padChunkLen >> 2);
-    padZeroes(view, chunkLen);
-    padData(view, chunkLen, msgLen);
-    return padChunkLen;
-  };
-
-  Rusha.prototype._write = function _write(data, chunkOffset, chunkLen, off) {
-    conv(data, this._h8, this._h32, chunkOffset, chunkLen, off || 0);
-  };
-
-  Rusha.prototype._coreCall = function _coreCall(data, chunkOffset, chunkLen, msgLen, finalize) {
-    var padChunkLen = chunkLen;
-    this._write(data, chunkOffset, chunkLen);
-    if (finalize) {
-      padChunkLen = this._padChunk(chunkLen, msgLen);
-    }
-    this._core.hash(padChunkLen, this._padMaxChunkLen);
-  };
-
-  Rusha.prototype.rawDigest = function rawDigest(str) {
-    var msgLen = str.byteLength || str.length || str.size || 0;
-    this._initState(this._heap, this._padMaxChunkLen);
-    var chunkOffset = 0,
-        chunkLen = this._maxChunkLen;
-    for (chunkOffset = 0; msgLen > chunkOffset + chunkLen; chunkOffset += chunkLen) {
-      this._coreCall(str, chunkOffset, chunkLen, msgLen, false);
-    }
-    this._coreCall(str, chunkOffset, msgLen - chunkOffset, msgLen, true);
-    return getRawDigest(this._heap, this._padMaxChunkLen);
-  };
-
-  Rusha.prototype.digest = function digest(str) {
-    return toHex(this.rawDigest(str).buffer);
-  };
-
-  Rusha.prototype.digestFromString = function digestFromString(str) {
-    return this.digest(str);
-  };
-
-  Rusha.prototype.digestFromBuffer = function digestFromBuffer(str) {
-    return this.digest(str);
-  };
-
-  Rusha.prototype.digestFromArrayBuffer = function digestFromArrayBuffer(str) {
-    return this.digest(str);
-  };
-
-  Rusha.prototype.resetState = function resetState() {
-    this._initState(this._heap, this._padMaxChunkLen);
-    return this;
-  };
-
-  Rusha.prototype.append = function append(chunk) {
-    var chunkOffset = 0;
-    var chunkLen = chunk.byteLength || chunk.length || chunk.size || 0;
-    var turnOffset = this._offset % this._maxChunkLen;
-    var inputLen = void 0;
-
-    this._offset += chunkLen;
-    while (chunkOffset < chunkLen) {
-      inputLen = Math.min(chunkLen - chunkOffset, this._maxChunkLen - turnOffset);
-      this._write(chunk, chunkOffset, inputLen, turnOffset);
-      turnOffset += inputLen;
-      chunkOffset += inputLen;
-      if (turnOffset === this._maxChunkLen) {
-        this._core.hash(this._maxChunkLen, this._padMaxChunkLen);
-        turnOffset = 0;
-      }
-    }
-    return this;
-  };
-
-  Rusha.prototype.getState = function getState() {
-    var turnOffset = this._offset % this._maxChunkLen;
-    var heap = void 0;
-    if (!turnOffset) {
-      var io = new Int32Array(this._heap, this._padMaxChunkLen + 320, 5);
-      heap = io.buffer.slice(io.byteOffset, io.byteOffset + io.byteLength);
-    } else {
-      heap = this._heap.slice(0);
-    }
-    return {
-      offset: this._offset,
-      heap: heap
-    };
-  };
-
-  Rusha.prototype.setState = function setState(state) {
-    this._offset = state.offset;
-    if (state.heap.byteLength === 20) {
-      var io = new Int32Array(this._heap, this._padMaxChunkLen + 320, 5);
-      io.set(new Int32Array(state.heap));
-    } else {
-      this._h32.set(new Int32Array(state.heap));
-    }
-    return this;
-  };
-
-  Rusha.prototype.rawEnd = function rawEnd() {
-    var msgLen = this._offset;
-    var chunkLen = msgLen % this._maxChunkLen;
-    var padChunkLen = this._padChunk(chunkLen, msgLen);
-    this._core.hash(padChunkLen, this._padMaxChunkLen);
-    var result = getRawDigest(this._heap, this._padMaxChunkLen);
-    this._initState(this._heap, this._padMaxChunkLen);
-    return result;
-  };
-
-  Rusha.prototype.end = function end() {
-    return toHex(this.rawEnd().buffer);
-  };
-
-  return Rusha;
-}();
-
-module.exports = Rusha;
-module.exports._core = RushaCore;
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports) {
-
-/* eslint-env commonjs, browser */
-
-//
-// toHex
-//
-
-var precomputedHex = new Array(256);
-for (var i = 0; i < 256; i++) {
-  precomputedHex[i] = (i < 0x10 ? '0' : '') + i.toString(16);
-}
-
-module.exports.toHex = function (arrayBuffer) {
-  var binarray = new Uint8Array(arrayBuffer);
-  var res = new Array(arrayBuffer.byteLength);
-  for (var _i = 0; _i < res.length; _i++) {
-    res[_i] = precomputedHex[binarray[_i]];
-  }
-  return res.join('');
-};
-
-//
-// ceilHeapSize
-//
-
-module.exports.ceilHeapSize = function (v) {
-  // The asm.js spec says:
-  // The heap object's byteLength must be either
-  // 2^n for n in [12, 24) or 2^24 * n for n ≥ 1.
-  // Also, byteLengths smaller than 2^16 are deprecated.
-  var p = 0;
-  // If v is smaller than 2^16, the smallest possible solution
-  // is 2^16.
-  if (v <= 65536) return 65536;
-  // If v < 2^24, we round up to 2^n,
-  // otherwise we round up to 2^24 * n.
-  if (v < 16777216) {
-    for (p = 1; p < v; p = p << 1) {}
-  } else {
-    for (p = 16777216; p < v; p += 16777216) {}
-  }
-  return p;
-};
-
-//
-// isDedicatedWorkerScope
-//
-
-module.exports.isDedicatedWorkerScope = function (self) {
-  var isRunningInWorker = 'WorkerGlobalScope' in self && self instanceof self.WorkerGlobalScope;
-  var isRunningInSharedWorker = 'SharedWorkerGlobalScope' in self && self instanceof self.SharedWorkerGlobalScope;
-  var isRunningInServiceWorker = 'ServiceWorkerGlobalScope' in self && self instanceof self.ServiceWorkerGlobalScope;
-
-  // Detects whether we run inside a dedicated worker or not.
-  //
-  // We can't just check for `DedicatedWorkerGlobalScope`, since IE11
-  // has a bug where it only supports `WorkerGlobalScope`.
-  //
-  // Therefore, we consider us as running inside a dedicated worker
-  // when we are running inside a worker, but not in a shared or service worker.
-  //
-  // When new types of workers are introduced, we will need to adjust this code.
-  return isRunningInWorker && !isRunningInSharedWorker && !isRunningInServiceWorker;
-};
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* eslint-env commonjs, worker */
-
-module.exports = function () {
-  var Rusha = __webpack_require__(0);
-
-  var hashData = function (hasher, data, cb) {
-    try {
-      return cb(null, hasher.digest(data));
-    } catch (e) {
-      return cb(e);
-    }
-  };
-
-  var hashFile = function (hasher, readTotal, blockSize, file, cb) {
-    var reader = new self.FileReader();
-    reader.onloadend = function onloadend() {
-      if (reader.error) {
-        return cb(reader.error);
-      }
-      var buffer = reader.result;
-      readTotal += reader.result.byteLength;
-      try {
-        hasher.append(buffer);
-      } catch (e) {
-        cb(e);
-        return;
-      }
-      if (readTotal < file.size) {
-        hashFile(hasher, readTotal, blockSize, file, cb);
-      } else {
-        cb(null, hasher.end());
-      }
-    };
-    reader.readAsArrayBuffer(file.slice(readTotal, readTotal + blockSize));
-  };
-
-  var workerBehaviourEnabled = true;
-
-  self.onmessage = function (event) {
-    if (!workerBehaviourEnabled) {
-      return;
-    }
-
-    var data = event.data.data,
-        file = event.data.file,
-        id = event.data.id;
-    if (typeof id === 'undefined') return;
-    if (!file && !data) return;
-    var blockSize = event.data.blockSize || 4 * 1024 * 1024;
-    var hasher = new Rusha(blockSize);
-    hasher.resetState();
-    var done = function (err, hash) {
-      if (!err) {
-        self.postMessage({ id: id, hash: hash });
-      } else {
-        self.postMessage({ id: id, error: err.name });
-      }
-    };
-    if (data) hashData(hasher, data, done);
-    if (file) hashFile(hasher, 0, blockSize, file, done);
-  };
-
-  return function () {
-    workerBehaviourEnabled = false;
-  };
-};
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* eslint-env commonjs, browser */
-
-var work = __webpack_require__(4);
-var Rusha = __webpack_require__(0);
-var createHash = __webpack_require__(7);
-var runWorker = __webpack_require__(2);
-
-var _require = __webpack_require__(1),
-    isDedicatedWorkerScope = _require.isDedicatedWorkerScope;
-
-var isRunningInDedicatedWorker = typeof self !== 'undefined' && isDedicatedWorkerScope(self);
-
-Rusha.disableWorkerBehaviour = isRunningInDedicatedWorker ? runWorker() : function () {};
-
-Rusha.createWorker = function () {
-  var worker = work(/*require.resolve*/(2));
-  var terminate = worker.terminate;
-  worker.terminate = function () {
-    URL.revokeObjectURL(worker.objectURL);
-    terminate.call(worker);
-  };
-  return worker;
-};
-
-Rusha.createHash = createHash;
-
-module.exports = Rusha;
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-function webpackBootstrapFunc (modules) {
-/******/  // The module cache
-/******/  var installedModules = {};
-
-/******/  // The require function
-/******/  function __webpack_require__(moduleId) {
-
-/******/    // Check if module is in cache
-/******/    if(installedModules[moduleId])
-/******/      return installedModules[moduleId].exports;
-
-/******/    // Create a new module (and put it into the cache)
-/******/    var module = installedModules[moduleId] = {
-/******/      i: moduleId,
-/******/      l: false,
-/******/      exports: {}
-/******/    };
-
-/******/    // Execute the module function
-/******/    modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-
-/******/    // Flag the module as loaded
-/******/    module.l = true;
-
-/******/    // Return the exports of the module
-/******/    return module.exports;
-/******/  }
-
-/******/  // expose the modules object (__webpack_modules__)
-/******/  __webpack_require__.m = modules;
-
-/******/  // expose the module cache
-/******/  __webpack_require__.c = installedModules;
-
-/******/  // identity function for calling harmony imports with the correct context
-/******/  __webpack_require__.i = function(value) { return value; };
-
-/******/  // define getter function for harmony exports
-/******/  __webpack_require__.d = function(exports, name, getter) {
-/******/    if(!__webpack_require__.o(exports, name)) {
-/******/      Object.defineProperty(exports, name, {
-/******/        configurable: false,
-/******/        enumerable: true,
-/******/        get: getter
-/******/      });
-/******/    }
-/******/  };
-
-/******/  // define __esModule on exports
-/******/  __webpack_require__.r = function(exports) {
-/******/    Object.defineProperty(exports, '__esModule', { value: true });
-/******/  };
-
-/******/  // getDefaultExport function for compatibility with non-harmony modules
-/******/  __webpack_require__.n = function(module) {
-/******/    var getter = module && module.__esModule ?
-/******/      function getDefault() { return module['default']; } :
-/******/      function getModuleExports() { return module; };
-/******/    __webpack_require__.d(getter, 'a', getter);
-/******/    return getter;
-/******/  };
-
-/******/  // Object.prototype.hasOwnProperty.call
-/******/  __webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-
-/******/  // __webpack_public_path__
-/******/  __webpack_require__.p = "/";
-
-/******/  // on error function for async loading
-/******/  __webpack_require__.oe = function(err) { console.error(err); throw err; };
-
-  var f = __webpack_require__(__webpack_require__.s = ENTRY_MODULE)
-  return f.default || f // try to call default if defined to also support babel esmodule exports
-}
-
-var moduleNameReqExp = '[\\.|\\-|\\+|\\w|\/|@]+'
-var dependencyRegExp = '\\((\/\\*.*?\\*\/)?\s?.*?(' + moduleNameReqExp + ').*?\\)' // additional chars when output.pathinfo is true
-
-// http://stackoverflow.com/a/2593661/130442
-function quoteRegExp (str) {
-  return (str + '').replace(/[.?*+^$[\]\\(){}|-]/g, '\\$&')
-}
-
-function getModuleDependencies (sources, module, queueName) {
-  var retval = {}
-  retval[queueName] = []
-
-  var fnString = module.toString()
-  var wrapperSignature = fnString.match(/^function\s?\(\w+,\s*\w+,\s*(\w+)\)/)
-  if (!wrapperSignature) return retval
-  var webpackRequireName = wrapperSignature[1]
-
-  // main bundle deps
-  var re = new RegExp('(\\\\n|\\W)' + quoteRegExp(webpackRequireName) + dependencyRegExp, 'g')
-  var match
-  while ((match = re.exec(fnString))) {
-    if (match[3] === 'dll-reference') continue
-    retval[queueName].push(match[3])
-  }
-
-  // dll deps
-  re = new RegExp('\\(' + quoteRegExp(webpackRequireName) + '\\("(dll-reference\\s(' + moduleNameReqExp + '))"\\)\\)' + dependencyRegExp, 'g')
-  while ((match = re.exec(fnString))) {
-    if (!sources[match[2]]) {
-      retval[queueName].push(match[1])
-      sources[match[2]] = __webpack_require__(match[1]).m
-    }
-    retval[match[2]] = retval[match[2]] || []
-    retval[match[2]].push(match[4])
-  }
-
-  return retval
-}
-
-function hasValuesInQueues (queues) {
-  var keys = Object.keys(queues)
-  return keys.reduce(function (hasValues, key) {
-    return hasValues || queues[key].length > 0
-  }, false)
-}
-
-function getRequiredModules (sources, moduleId) {
-  var modulesQueue = {
-    main: [moduleId]
-  }
-  var requiredModules = {
-    main: []
-  }
-  var seenModules = {
-    main: {}
-  }
-
-  while (hasValuesInQueues(modulesQueue)) {
-    var queues = Object.keys(modulesQueue)
-    for (var i = 0; i < queues.length; i++) {
-      var queueName = queues[i]
-      var queue = modulesQueue[queueName]
-      var moduleToCheck = queue.pop()
-      seenModules[queueName] = seenModules[queueName] || {}
-      if (seenModules[queueName][moduleToCheck] || !sources[queueName][moduleToCheck]) continue
-      seenModules[queueName][moduleToCheck] = true
-      requiredModules[queueName] = requiredModules[queueName] || []
-      requiredModules[queueName].push(moduleToCheck)
-      var newModules = getModuleDependencies(sources, sources[queueName][moduleToCheck], queueName)
-      var newModulesKeys = Object.keys(newModules)
-      for (var j = 0; j < newModulesKeys.length; j++) {
-        modulesQueue[newModulesKeys[j]] = modulesQueue[newModulesKeys[j]] || []
-        modulesQueue[newModulesKeys[j]] = modulesQueue[newModulesKeys[j]].concat(newModules[newModulesKeys[j]])
-      }
-    }
-  }
-
-  return requiredModules
-}
-
-module.exports = function (moduleId, options) {
-  options = options || {}
-  var sources = {
-    main: __webpack_require__.m
-  }
-
-  var requiredModules = options.all ? { main: Object.keys(sources) } : getRequiredModules(sources, moduleId)
-
-  var src = ''
-
-  Object.keys(requiredModules).filter(function (m) { return m !== 'main' }).forEach(function (module) {
-    var entryModule = 0
-    while (requiredModules[module][entryModule]) {
-      entryModule++
-    }
-    requiredModules[module].push(entryModule)
-    sources[module][entryModule] = '(function(module, exports, __webpack_require__) { module.exports = __webpack_require__; })'
-    src = src + 'var ' + module + ' = (' + webpackBootstrapFunc.toString().replace('ENTRY_MODULE', JSON.stringify(entryModule)) + ')({' + requiredModules[module].map(function (id) { return '' + JSON.stringify(id) + ': ' + sources[module][id].toString() }).join(',') + '});\n'
-  })
-
-  src = src + '(' + webpackBootstrapFunc.toString().replace('ENTRY_MODULE', JSON.stringify(moduleId)) + ')({' + requiredModules.main.map(function (id) { return '' + JSON.stringify(id) + ': ' + sources.main[id].toString() }).join(',') + '})(self);'
-
-  var blob = new window.Blob([src], { type: 'text/javascript' })
-  if (options.bare) { return blob }
-
-  var URL = window.URL || window.webkitURL || window.mozURL || window.msURL
-
-  var workerUrl = URL.createObjectURL(blob)
-  var worker = new window.Worker(workerUrl)
-  worker.objectURL = workerUrl
-
-  return worker
-}
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports) {
-
-// The low-level RushCore module provides the heart of Rusha,
-// a high-speed sha1 implementation working on an Int32Array heap.
-// At first glance, the implementation seems complicated, however
-// with the SHA1 spec at hand, it is obvious this almost a textbook
-// implementation that has a few functions hand-inlined and a few loops
-// hand-unrolled.
-module.exports = function RushaCore(stdlib$846, foreign$847, heap$848) {
-    'use asm';
-    var H$849 = new stdlib$846.Int32Array(heap$848);
-    function hash$850(k$851, x$852) {
-        // k in bytes
-        k$851 = k$851 | 0;
-        x$852 = x$852 | 0;
-        var i$853 = 0, j$854 = 0, y0$855 = 0, z0$856 = 0, y1$857 = 0, z1$858 = 0, y2$859 = 0, z2$860 = 0, y3$861 = 0, z3$862 = 0, y4$863 = 0, z4$864 = 0, t0$865 = 0, t1$866 = 0;
-        y0$855 = H$849[x$852 + 320 >> 2] | 0;
-        y1$857 = H$849[x$852 + 324 >> 2] | 0;
-        y2$859 = H$849[x$852 + 328 >> 2] | 0;
-        y3$861 = H$849[x$852 + 332 >> 2] | 0;
-        y4$863 = H$849[x$852 + 336 >> 2] | 0;
-        for (i$853 = 0; (i$853 | 0) < (k$851 | 0); i$853 = i$853 + 64 | 0) {
-            z0$856 = y0$855;
-            z1$858 = y1$857;
-            z2$860 = y2$859;
-            z3$862 = y3$861;
-            z4$864 = y4$863;
-            for (j$854 = 0; (j$854 | 0) < 64; j$854 = j$854 + 4 | 0) {
-                t1$866 = H$849[i$853 + j$854 >> 2] | 0;
-                t0$865 = ((y0$855 << 5 | y0$855 >>> 27) + (y1$857 & y2$859 | ~y1$857 & y3$861) | 0) + ((t1$866 + y4$863 | 0) + 1518500249 | 0) | 0;
-                y4$863 = y3$861;
-                y3$861 = y2$859;
-                y2$859 = y1$857 << 30 | y1$857 >>> 2;
-                y1$857 = y0$855;
-                y0$855 = t0$865;
-                H$849[k$851 + j$854 >> 2] = t1$866;
-            }
-            for (j$854 = k$851 + 64 | 0; (j$854 | 0) < (k$851 + 80 | 0); j$854 = j$854 + 4 | 0) {
-                t1$866 = (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) << 1 | (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) >>> 31;
-                t0$865 = ((y0$855 << 5 | y0$855 >>> 27) + (y1$857 & y2$859 | ~y1$857 & y3$861) | 0) + ((t1$866 + y4$863 | 0) + 1518500249 | 0) | 0;
-                y4$863 = y3$861;
-                y3$861 = y2$859;
-                y2$859 = y1$857 << 30 | y1$857 >>> 2;
-                y1$857 = y0$855;
-                y0$855 = t0$865;
-                H$849[j$854 >> 2] = t1$866;
-            }
-            for (j$854 = k$851 + 80 | 0; (j$854 | 0) < (k$851 + 160 | 0); j$854 = j$854 + 4 | 0) {
-                t1$866 = (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) << 1 | (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) >>> 31;
-                t0$865 = ((y0$855 << 5 | y0$855 >>> 27) + (y1$857 ^ y2$859 ^ y3$861) | 0) + ((t1$866 + y4$863 | 0) + 1859775393 | 0) | 0;
-                y4$863 = y3$861;
-                y3$861 = y2$859;
-                y2$859 = y1$857 << 30 | y1$857 >>> 2;
-                y1$857 = y0$855;
-                y0$855 = t0$865;
-                H$849[j$854 >> 2] = t1$866;
-            }
-            for (j$854 = k$851 + 160 | 0; (j$854 | 0) < (k$851 + 240 | 0); j$854 = j$854 + 4 | 0) {
-                t1$866 = (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) << 1 | (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) >>> 31;
-                t0$865 = ((y0$855 << 5 | y0$855 >>> 27) + (y1$857 & y2$859 | y1$857 & y3$861 | y2$859 & y3$861) | 0) + ((t1$866 + y4$863 | 0) - 1894007588 | 0) | 0;
-                y4$863 = y3$861;
-                y3$861 = y2$859;
-                y2$859 = y1$857 << 30 | y1$857 >>> 2;
-                y1$857 = y0$855;
-                y0$855 = t0$865;
-                H$849[j$854 >> 2] = t1$866;
-            }
-            for (j$854 = k$851 + 240 | 0; (j$854 | 0) < (k$851 + 320 | 0); j$854 = j$854 + 4 | 0) {
-                t1$866 = (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) << 1 | (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) >>> 31;
-                t0$865 = ((y0$855 << 5 | y0$855 >>> 27) + (y1$857 ^ y2$859 ^ y3$861) | 0) + ((t1$866 + y4$863 | 0) - 899497514 | 0) | 0;
-                y4$863 = y3$861;
-                y3$861 = y2$859;
-                y2$859 = y1$857 << 30 | y1$857 >>> 2;
-                y1$857 = y0$855;
-                y0$855 = t0$865;
-                H$849[j$854 >> 2] = t1$866;
-            }
-            y0$855 = y0$855 + z0$856 | 0;
-            y1$857 = y1$857 + z1$858 | 0;
-            y2$859 = y2$859 + z2$860 | 0;
-            y3$861 = y3$861 + z3$862 | 0;
-            y4$863 = y4$863 + z4$864 | 0;
+/**
+ * XHR based logger
+ */
+
+var XhrLoader = function () {
+    function XhrLoader(config) {
+        _classCallCheck(this, XhrLoader);
+
+        if (config && config.xhrSetup) {
+            this.xhrSetup = config.xhrSetup;
         }
-        H$849[x$852 + 320 >> 2] = y0$855;
-        H$849[x$852 + 324 >> 2] = y1$857;
-        H$849[x$852 + 328 >> 2] = y2$859;
-        H$849[x$852 + 332 >> 2] = y3$861;
-        H$849[x$852 + 336 >> 2] = y4$863;
-    }
-    return { hash: hash$850 };
-};
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports) {
-
-var _this = this;
-
-/* eslint-env commonjs, browser */
-
-var reader = void 0;
-if (typeof self !== 'undefined' && typeof self.FileReaderSync !== 'undefined') {
-  reader = new self.FileReaderSync();
-}
-
-// Convert a binary string and write it to the heap.
-// A binary string is expected to only contain char codes < 256.
-var convStr = function (str, H8, H32, start, len, off) {
-  var i = void 0,
-      om = off % 4,
-      lm = (len + om) % 4,
-      j = len - lm;
-  switch (om) {
-    case 0:
-      H8[off] = str.charCodeAt(start + 3);
-    case 1:
-      H8[off + 1 - (om << 1) | 0] = str.charCodeAt(start + 2);
-    case 2:
-      H8[off + 2 - (om << 1) | 0] = str.charCodeAt(start + 1);
-    case 3:
-      H8[off + 3 - (om << 1) | 0] = str.charCodeAt(start);
-  }
-  if (len < lm + (4 - om)) {
-    return;
-  }
-  for (i = 4 - om; i < j; i = i + 4 | 0) {
-    H32[off + i >> 2] = str.charCodeAt(start + i) << 24 | str.charCodeAt(start + i + 1) << 16 | str.charCodeAt(start + i + 2) << 8 | str.charCodeAt(start + i + 3);
-  }
-  switch (lm) {
-    case 3:
-      H8[off + j + 1 | 0] = str.charCodeAt(start + j + 2);
-    case 2:
-      H8[off + j + 2 | 0] = str.charCodeAt(start + j + 1);
-    case 1:
-      H8[off + j + 3 | 0] = str.charCodeAt(start + j);
-  }
-};
-
-// Convert a buffer or array and write it to the heap.
-// The buffer or array is expected to only contain elements < 256.
-var convBuf = function (buf, H8, H32, start, len, off) {
-  var i = void 0,
-      om = off % 4,
-      lm = (len + om) % 4,
-      j = len - lm;
-  switch (om) {
-    case 0:
-      H8[off] = buf[start + 3];
-    case 1:
-      H8[off + 1 - (om << 1) | 0] = buf[start + 2];
-    case 2:
-      H8[off + 2 - (om << 1) | 0] = buf[start + 1];
-    case 3:
-      H8[off + 3 - (om << 1) | 0] = buf[start];
-  }
-  if (len < lm + (4 - om)) {
-    return;
-  }
-  for (i = 4 - om; i < j; i = i + 4 | 0) {
-    H32[off + i >> 2 | 0] = buf[start + i] << 24 | buf[start + i + 1] << 16 | buf[start + i + 2] << 8 | buf[start + i + 3];
-  }
-  switch (lm) {
-    case 3:
-      H8[off + j + 1 | 0] = buf[start + j + 2];
-    case 2:
-      H8[off + j + 2 | 0] = buf[start + j + 1];
-    case 1:
-      H8[off + j + 3 | 0] = buf[start + j];
-  }
-};
-
-var convBlob = function (blob, H8, H32, start, len, off) {
-  var i = void 0,
-      om = off % 4,
-      lm = (len + om) % 4,
-      j = len - lm;
-  var buf = new Uint8Array(reader.readAsArrayBuffer(blob.slice(start, start + len)));
-  switch (om) {
-    case 0:
-      H8[off] = buf[3];
-    case 1:
-      H8[off + 1 - (om << 1) | 0] = buf[2];
-    case 2:
-      H8[off + 2 - (om << 1) | 0] = buf[1];
-    case 3:
-      H8[off + 3 - (om << 1) | 0] = buf[0];
-  }
-  if (len < lm + (4 - om)) {
-    return;
-  }
-  for (i = 4 - om; i < j; i = i + 4 | 0) {
-    H32[off + i >> 2 | 0] = buf[i] << 24 | buf[i + 1] << 16 | buf[i + 2] << 8 | buf[i + 3];
-  }
-  switch (lm) {
-    case 3:
-      H8[off + j + 1 | 0] = buf[j + 2];
-    case 2:
-      H8[off + j + 2 | 0] = buf[j + 1];
-    case 1:
-      H8[off + j + 3 | 0] = buf[j];
-  }
-};
-
-module.exports = function (data, H8, H32, start, len, off) {
-  if (typeof data === 'string') {
-    return convStr(data, H8, H32, start, len, off);
-  }
-  if (data instanceof Array) {
-    return convBuf(data, H8, H32, start, len, off);
-  }
-  // Safely doing a Buffer check using "this" to avoid Buffer polyfill to be included in the dist
-  if (_this && _this.Buffer && _this.Buffer.isBuffer(data)) {
-    return convBuf(data, H8, H32, start, len, off);
-  }
-  if (data instanceof ArrayBuffer) {
-    return convBuf(new Uint8Array(data), H8, H32, start, len, off);
-  }
-  if (data.buffer instanceof ArrayBuffer) {
-    return convBuf(new Uint8Array(data.buffer, data.byteOffset, data.byteLength), H8, H32, start, len, off);
-  }
-  if (data instanceof Blob) {
-    return convBlob(data, H8, H32, start, len, off);
-  }
-  throw new Error('Unsupported data type.');
-};
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/* eslint-env commonjs, browser */
-
-var Rusha = __webpack_require__(0);
-
-var _require = __webpack_require__(1),
-    toHex = _require.toHex;
-
-var Hash = function () {
-  function Hash() {
-    _classCallCheck(this, Hash);
-
-    this._rusha = new Rusha();
-    this._rusha.resetState();
-  }
-
-  Hash.prototype.update = function update(data) {
-    this._rusha.append(data);
-    return this;
-  };
-
-  Hash.prototype.digest = function digest(encoding) {
-    var digest = this._rusha.rawEnd().buffer;
-    if (!encoding) {
-      return digest;
-    }
-    if (encoding === 'hex') {
-      return toHex(digest);
-    }
-    throw new Error('unsupported digest encoding');
-  };
-
-  return Hash;
-}();
-
-module.exports = function () {
-  return new Hash();
-};
-
-/***/ })
-/******/ ]);
-});
-
-/***/ }),
-/* 48 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _events = __webpack_require__(0);
-
-var _events2 = _interopRequireDefault(_events);
-
-var _xhrLoader = __webpack_require__(20);
-
-var _xhrLoader2 = _interopRequireDefault(_xhrLoader);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Created by xieting on 2018/3/23.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-// import Events from './events';
-
-
-// import Buffer from 'buffer';
-
-var log = console.log;
-
-var FragLoader = function (_EventEmitter) {
-    _inherits(FragLoader, _EventEmitter);
-
-    function FragLoader(config) {
-        _classCallCheck(this, FragLoader);
-
-        //denoted by sn
-        var _this = _possibleConstructorReturn(this, (FragLoader.__proto__ || Object.getPrototypeOf(FragLoader)).call(this));
-
-        _this.currLoaded = config.currLoaded;
-        _this.currLoadedDuration = config.currLoadedDuration; //最新下载的块的时长
-        _this.currPlay = config.currPlay;
-
-        _this.bufMgr = config.bufMgr;
-        _this.xhrLoader = new _xhrLoader2.default(config);
-        _this.p2pEnabled = config.p2pEnabled;
-        return _this;
     }
 
-    _createClass(FragLoader, [{
+    _createClass(XhrLoader, [{
         key: 'destroy',
         value: function destroy() {
             this.abort();
+            this.loader = null;
         }
     }, {
         key: 'abort',
         value: function abort() {
-            this.xhrLoader.abort();
+            var loader = this.loader;
+            if (loader && loader.readyState !== 4) {
+                this.stats.aborted = true;
+                loader.abort();
+            }
+
+            window.clearTimeout(this.requestTimeout);
+            this.requestTimeout = null;
+            window.clearTimeout(this.retryTimeout);
+            this.retryTimeout = null;
         }
-
-        /*
-         首先从缓存中寻找请求的seg，如果缓存中找不到则用http请求。
-         */
-
     }, {
         key: 'load',
         value: function load(context, config, callbacks) {
-            var _this2 = this;
+            this.context = context;
+            this.config = config;
+            this.callbacks = callbacks;
+            this.stats = { trequest: performance.now(), retry: 0 };
+            this.retryDelay = config.retryDelay;
+            this.loadInternal();
+        }
+    }, {
+        key: 'loadInternal',
+        value: function loadInternal() {
+            var xhr,
+                context = this.context;
+            xhr = this.loader = new XMLHttpRequest();
 
-            var frag = context.frag;
-            if (this.bufMgr.hasSegOfURL(frag.relurl)) {
-                //如果命中缓存
-                console.warn('bufMgr found seg sn ' + frag.sn + ' url ' + frag.relurl);
-                var seg = this.bufMgr.getSegByURL(frag.relurl);
-                var response = { url: context.url, data: seg.data },
-                    trequest = void 0,
-                    tfirst = void 0,
-                    tload = void 0,
-                    loaded = void 0,
-                    total = void 0;
-                trequest = performance.now();
-                tfirst = tload = trequest + 50;
-                loaded = total = seg.size;
-                var stats = { trequest: trequest, tfirst: tfirst, tload: tload, loaded: loaded, total: total, retry: 0 };
-                // console.warn(`bufMgr onSuccess ${JSON.stringify(this.bufMgr.tmp.data.byteLength, null, 1)}  ${JSON.stringify(stats, null, 1)} ${JSON.stringify(context, null, 1)}`)
-                window.setTimeout(function () {
-                    //必须是异步回调
-                    callbacks.onSuccess(response, stats, context);
-                }, 50);
-            } else {
-                //否则用http下载
-                log('xhrLoader load ' + frag.relurl + ' at ' + frag.sn);
-                this.loader = this.xhrLoader;
-                context.frag.loadByXhr = true;
-                var onSuccess = callbacks.onSuccess;
-                callbacks.onSuccess = function (response, stats, context) {
-                    if (!_this2.bufMgr.hasSegOfURL(frag.relurl)) {
-                        _this2.bufMgr.copyAndAddSeg(response.data, frag.relurl, frag.sn);
+            var stats = this.stats;
+            stats.tfirst = 0;
+            stats.loaded = 0;
+            var xhrSetup = this.xhrSetup;
+
+            try {
+                if (xhrSetup) {
+                    try {
+                        xhrSetup(xhr, context.url);
+                    } catch (e) {
+                        // fix xhrSetup: (xhr, url) => {xhr.setRequestHeader("Content-Language", "test");}
+                        // not working, as xhr.setRequestHeader expects xhr.readyState === OPEN
+                        xhr.open('GET', context.url, true);
+                        xhrSetup(xhr, context.url);
                     }
-                    onSuccess(response, stats, context);
-                };
-                this.xhrLoader.load(context, config, callbacks);
+                }
+                if (!xhr.readyState) {
+                    xhr.open('GET', context.url, true);
+                }
+            } catch (e) {
+                // IE11 throws an exception on xhr.open if attempting to access an HTTP resource over HTTPS
+                this.callbacks.onError({ code: xhr.status, text: e.message }, context, xhr);
+                return;
+            }
+
+            if (context.rangeEnd) {
+                xhr.setRequestHeader('Range', 'bytes=' + context.rangeStart + '-' + (context.rangeEnd - 1));
+            }
+            xhr.onreadystatechange = this.readystatechange.bind(this);
+            xhr.onprogress = this.loadprogress.bind(this);
+            xhr.responseType = context.responseType;
+
+            // setup timeout before we perform request
+            this.requestTimeout = window.setTimeout(this.loadtimeout.bind(this), this.config.timeout);
+            xhr.send();
+        }
+    }, {
+        key: 'readystatechange',
+        value: function readystatechange(event) {
+            var xhr = event.currentTarget,
+                readyState = xhr.readyState,
+                stats = this.stats,
+                context = this.context,
+                config = this.config;
+
+            // don't proceed if xhr has been aborted
+            if (stats.aborted) {
+                return;
+            }
+
+            // >= HEADERS_RECEIVED
+            if (readyState >= 2) {
+                // clear xhr timeout and rearm it if readyState less than 4
+                window.clearTimeout(this.requestTimeout);
+                if (stats.tfirst === 0) {
+                    stats.tfirst = Math.max(performance.now(), stats.trequest);
+                }
+                if (readyState === 4) {
+                    var status = xhr.status;
+                    // http status between 200 to 299 are all successful
+                    if (status >= 200 && status < 300) {
+                        stats.tload = Math.max(stats.tfirst, performance.now());
+                        var data = void 0,
+                            len = void 0;
+                        if (context.responseType === 'arraybuffer') {
+                            data = xhr.response;
+                            len = data.byteLength;
+                        } else {
+                            data = xhr.responseText;
+                            len = data.length;
+                        }
+                        stats.loaded = stats.total = len;
+                        var response = { url: xhr.responseURL, data: data };
+                        this.callbacks.onSuccess(response, stats, context, xhr);
+                    } else {
+                        // if max nb of retries reached or if http status between 400 and 499 (such error cannot be recovered, retrying is useless), return error
+                        if (stats.retry >= config.maxRetry || status >= 400 && status < 499) {
+                            // logger.error(`${status} while loading ${context.url}` );
+                            this.callbacks.onError({ code: status, text: xhr.statusText }, context, xhr);
+                        } else {
+                            // retry
+                            // logger.warn(`${status} while loading ${context.url}, retrying in ${this.retryDelay}...`);
+                            // aborts and resets internal state
+                            this.destroy();
+                            // schedule retry
+                            this.retryTimeout = window.setTimeout(this.loadInternal.bind(this), this.retryDelay);
+                            // set exponential backoff
+                            this.retryDelay = Math.min(2 * this.retryDelay, config.maxRetryDelay);
+                            stats.retry++;
+                        }
+                    }
+                } else {
+                    // readyState >= 2 AND readyState !==4 (readyState = HEADERS_RECEIVED || LOADING) rearm timeout as xhr not finished yet
+                    this.requestTimeout = window.setTimeout(this.loadtimeout.bind(this), config.timeout);
+                }
+            }
+        }
+    }, {
+        key: 'loadtimeout',
+        value: function loadtimeout() {
+            // logger.warn(`timeout while loading ${this.context.url}` );
+            this.callbacks.onTimeout(this.stats, this.context, null);
+        }
+    }, {
+        key: 'loadprogress',
+        value: function loadprogress(event) {
+            var xhr = event.currentTarget,
+                stats = this.stats;
+
+            stats.loaded = event.loaded;
+            if (event.lengthComputable) {
+                stats.total = event.total;
+            }
+            var onProgress = this.callbacks.onProgress;
+            if (onProgress) {
+                // third arg is to provide on progress data
+                onProgress(stats, this.context, null, xhr);
             }
         }
     }]);
 
-    return FragLoader;
-}(_events2.default);
+    return XhrLoader;
+}();
 
-exports.default = FragLoader;
+exports.default = XhrLoader;
 module.exports = exports['default'];
 
 /***/ }),
-/* 49 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11220,8 +9811,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * Created by xieting on 2018/1/9.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
-
-var Buffer = __webpack_require__(6).Buffer;
 
 var log = console.log;
 
@@ -11250,23 +9839,6 @@ var BufferManager = function (_EventEmitter) {
         value: function hasSegOfURL(url) {
             //防止重复加入seg
             return this._segPool.has(url);
-        }
-    }, {
-        key: 'copyAndAddSeg',
-        value: function copyAndAddSeg(data, url, sn) {
-            var payloadBuf = Buffer.from(data);
-            var byteLength = payloadBuf.byteLength;
-            var targetBuffer = new Buffer(byteLength);
-            payloadBuf.copy(targetBuffer);
-
-            var segment = {
-                sn: sn,
-                relurl: url,
-                data: targetBuffer,
-                size: byteLength
-            };
-
-            this.addSeg(segment);
         }
     }, {
         key: 'addSeg',
@@ -11309,7 +9881,7 @@ exports.default = BufferManager;
 module.exports = exports['default'];
 
 /***/ }),
-/* 50 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -12352,7 +10924,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
         exports.UAParser = UAParser;
     } else {
         // requirejs env (optional)
-        if ("function" === FUNC_TYPE && __webpack_require__(51)) {
+        if ("function" === FUNC_TYPE && __webpack_require__(43)) {
             !(__WEBPACK_AMD_DEFINE_RESULT__ = (function () {
                 return UAParser;
             }).call(exports, __webpack_require__, exports, module),
@@ -12388,7 +10960,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
-/* 51 */
+/* 43 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */

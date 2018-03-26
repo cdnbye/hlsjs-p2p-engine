@@ -30,30 +30,51 @@
 //
 // console.log(a)
 
-var a = 5;
-var b = 0;
+// var a = 5;
+// var b = 0;
+//
+// function ff() {
+//     let i = 5;
+//     let t = 0;
+//     setInterval(function () {
+//         b = t/i;
+//         t = 0;
+//     }, i*1000);
+//     return v => {
+//         t += v;
+//     }
+// }
+//
+// let fff = ff();
+// fff(10)
+// setTimeout(function () {
+//     fff(2)
+// },2000)
+// setTimeout(function () {
+//     console.log(b)
+//     fff(10)
+//     setTimeout(function () {
+//         console.log(b)
+//     },6000)
+// },6000)
 
-function ff() {
-    let i = 5;
-    let t = 0;
-    setInterval(function () {
-        b = t/i;
-        t = 0;
-    }, i*1000);
-    return v => {
-        t += v;
-    }
-}
+let a = {
+    i:1
+},
+    b = {i:2};
+let channel = a;
+this.downstreamers = [a,b];
 
-let fff = ff();
-fff(10)
-setTimeout(function () {
-    fff(2)
-},2000)
-setTimeout(function () {
-    console.log(b)
-    fff(10)
-    setTimeout(function () {
-        console.log(b)
-    },6000)
-},6000)
+
+// for (let i=0;i<this.downstreamers.length;++i){
+//     if (this.downstreamers[i] === channel) {
+//         this.downstreamers.splice(i, 1);
+//     }
+// }
+
+this.downstreamers = this.downstreamers.filter(i=>i!==channel)
+
+console.log(this.downstreamers)
+
+var sha1 = require('simple-sha1')
+console.log(sha1.sync('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8'))

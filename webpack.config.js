@@ -41,12 +41,12 @@ const commonConfig = {
     }
 };
 
-function getPluginsForConfig(minify = false) {
+function getPluginsForConfig(minify = false, type) {
     // common plugins.
     const plugins = [
         new webpack.optimize.OccurrenceOrderPlugin(),
         new webpack.optimize.ModuleConcatenationPlugin(),
-        new webpack.DefinePlugin(getConstantsForConfig())
+        new webpack.DefinePlugin(getConstantsForConfig(type))
     ];
 
     if (minify) {
@@ -63,11 +63,30 @@ function getPluginsForConfig(minify = false) {
     return plugins;
 }
 
-function getConstantsForConfig() {
+function getConstantsForConfig(type) {                                             //嵌入全局变量
 
     return {
-        __VERSION__: JSON.stringify(pkgJson.version)
+        __VERSION__: JSON.stringify(pkgJson.version),
+        __EXCLUDE_LIVE__: type === 'vod',
+        __EXCLUDE_VOD__: type === 'live'
     };
+}
+
+function getAliasesForLightDist(target = 'vod') {
+    let aliases = {};
+
+    if (target === 'vod') {
+        aliases = Object.assign({}, aliases, {
+            './live/fastmesh': './empty.js'
+        });
+    } else if (target === 'live') {
+        aliases = Object.assign({}, aliases, {
+            './vod/bittorrent': './empty.js'
+        });
+    }
+
+
+    return aliases;
 }
 
 const multiConfig = [
@@ -110,6 +129,36 @@ const multiConfig = [
                 libraryTarget: 'umd'
             },
             plugins: getPluginsForConfig(true)
+        },
+        {
+            name: 'release-hls-peerify-vod',
+            entry: './lib/index.hls-peerify.js',
+            output: {
+               filename: 'hls-peerify-vod.min.js',
+               path: path.resolve(__dirname, 'dist'),
+                // publicPath: '/src/',
+               library: ['HlsPeerify'],
+               libraryTarget: 'umd'
+            },
+            resolve: {
+                alias: getAliasesForLightDist('vod')
+            },
+            plugins: getPluginsForConfig(true, 'vod')
+         },
+        {
+            name: 'release-hls-peerify-live',
+            entry: './lib/index.hls-peerify.js',
+            output: {
+                filename: 'hls-peerify-live.min.js',
+                path: path.resolve(__dirname, 'dist'),
+                // publicPath: '/src/',
+                library: ['HlsPeerify'],
+                libraryTarget: 'umd'
+            },
+            resolve: {
+                alias: getAliasesForLightDist('live')
+            },
+            plugins: getPluginsForConfig(true, 'live')
         },
         {
             name: 'release-peerify-hls',

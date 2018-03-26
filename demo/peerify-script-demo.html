@@ -6,7 +6,8 @@
 </head>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <!--<script src="../dist/hls-peerify.js"></script>-->
-<script src="../hls-peerify.js"></script>
+<!--<script src="../hls-peerify.js"></script>-->
+<script src="../dist/hls-peerify-vod.min.js"></script>
 <body>
 <video id="video" controls></video>
 <script>
@@ -19,32 +20,36 @@
 
         var hlsjsConfig = {
 
-            maxBufferSize: 0,
-            maxBufferLength: 30,
-            liveSyncDuration: 30,
-            fragLoadingTimeOut: 4000,              // used by fragment-loader
+//            maxBufferSize: 0,
+//            maxBufferLength: 30,
+//            liveSyncDuration: 60,
+//            fragLoadingTimeOut: 4000,              // used by fragment-loader
         };
         var p2pConfig = {
             key: 'free',
+//            mode: 'live',
+//            wsSchedulerAddr: `ws://211.159.220.166:8080/ws`,
             wsSchedulerAddr: `ws://127.0.0.1:8080/ws`,
             wsSignalerAddr: 'ws://120.78.168.126:8081/ws',
-            reportInterval: 3600,
+            reportInterval: 30,
 //            defaultUploadBW: 2561241,
 //            defaultUploadBW: 2561241 + 100,
-            defaultUploadBW: 2561241/3*2,
+//            defaultUploadBW: 853290*3+1000,
+            defaultUploadBW: 798032/3*5+100,
             transitionEnabled: true,
-//            transitionEnabled: false
+//            transitionEnabled: false,
+            transitionCheckInterval: 30
         };
 
         var hls = new Hls(hlsjsConfig);
 
         var p2pPlugin = new HlsPeerify(hls, p2pConfig);
 
-//        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
+        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
 //        hls.loadSource('https://video-dev.github.io/streams/test_001/stream.m3u8?a=123');
 //        hls.loadSource('https://moeplayer.b0.upaiyun.com/dplayer/hls/hikarunara.m3u8');
 //        hls.loadSource('http://wowza.peer5.com/live/smil:bbb_abr.smil/chunklist_w794046364_b2204000.m3u8');
-        hls.loadSource('http://112.90.52.139/hls/test.m3u8');
+//        hls.loadSource('http://112.90.52.139/hls/pear.m3u8');
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
 
@@ -56,7 +61,9 @@
             var errorType = data.type;
             var errorDetails = data.details;
             var errorFatal = data.fatal;
+            console.warn('error errorType:'+errorType);
             console.warn('error details:'+errorDetails);
+            console.warn('error errorFatal:'+errorFatal);
 //      switch(data.details) {
 //        case hls.ErrorDetails.FRAG_LOAD_ERROR:
 //          // ....

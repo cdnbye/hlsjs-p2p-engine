@@ -7,6 +7,8 @@
     "build-hls-peerify": "webpack --progress --env.build-hls-peerify",
     "bundle-peerify-hls": "webpack --progress --env.bundle-peerify-hls",
     "release-hls-peerify": "webpack --progress --env.release-hls-peerify",
+    "release-hls-peerify-vod": "webpack --progress --env.release-hls-peerify-vod",
+    "release-hls-peerify-live": "webpack --progress --env.release-hls-peerify-live",
     "release-peerify-hls": "webpack --progress --env.release-peerify-hls",
     "test": "webpack --progress --env.test-bundle",
     "push_to_gitee": "git add . && git commit -m 'update' && git push",
@@ -24,6 +26,7 @@
     "hls.js": "^0.8.9",
     "reconnecting-websocket": "^3.2.2",
     "simple-peer": "^8.2.0",
+    "simple-sha1": "^2.1.0",
     "ua-parser-js": "^0.7.17"
   },
   "devDependencies": {

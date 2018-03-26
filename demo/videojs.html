@@ -23,13 +23,17 @@
 <script src="http://vjs.zencdn.net/5.19.2/video.js"></script>
 <script src="../dist/videojs-contrib-hlsjs.min.js"></script>
 <script src="../dist/hls-peerify.min.js"></script>
+<!--<script src="../dist/hls-peerify.js"></script>-->
+<!--<script src="../hls-peerify.js"></script>-->
 <body>
 <div id="main">
     <video id="player" class="video-js vjs-default-skin" height="360" width="640" controls preload="none">
         <!--<source src="http://wowza.peer5.com/live/smil:bbb_abr.smil/chunklist_w794046364_b2204000.m3u8"-->
                 <!--type="application/x-mpegURL"/>-->
-        <source src="http://112.90.52.139/hls/test.m3u8"
+        <source src="http://112.90.52.139/hls/pear.m3u8"
                 type="application/x-mpegURL"/>
+        <!--<source src="https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8"-->
+                <!--type="application/x-mpegURL"/>-->
     </video>
     <table class="table table-hover" style="border: 0; margin: 0">
         <thead>
@@ -73,9 +77,9 @@
         autoplay: true,
         html5: {
             hlsjsConfig: {
-                maxBufferSize: 0,
-                maxBufferLength: 30,
-                liveSyncDuration: 30,
+//                maxBufferSize: 0,
+//                maxBufferLength: 30,
+//                liveSyncDurationCount: 10,
 //                liveSyncDurationCount: 5,
                 fragLoadingTimeOut: 4000,              // used by fragment-loader
             }
@@ -83,11 +87,23 @@
     });
 
     var p2pConfig = {
-        reportInterval: 3600
+        key: 'free',
+//        wsSchedulerAddr: `ws://211.159.220.166:8080/ws`,
+        wsSchedulerAddr: `ws://127.0.0.1:8080/ws`,
+        wsSignalerAddr: 'ws://120.78.168.126:8081/ws',
+        reportInterval: 30,
+//            defaultUploadBW: 2561241,
+//            defaultUploadBW: 2561241 + 100,
+//            defaultUploadBW: 853290*3+1000,
+        defaultUploadBW: 798032/3*5,
+//            transitionEnabled: true,
+        transitionEnabled: false,
+        transitionCheckInterval: 90
     };
     new HlsPeerify(player.tech_.sourceHandler_.hls, p2pConfig);
 
     player.tech_.on(Hls.Events.MANIFEST_LOADED, function (e) {
+        player.tech_.sourceHandler_.hls.loadLevel = 0;
         cpm.downloadresult.classList.remove('sr-only');
     });
 
