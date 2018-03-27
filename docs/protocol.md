@@ -266,7 +266,7 @@
 ```javastript
 {
     peer_id: string                //节点的唯一ID   
-    report_span: number            //上报统计信息的时间间隔 
+    report_interval: number        //上报统计信息的时间间隔 
     peers: [
         {id: string}                         
     ]
@@ -306,6 +306,19 @@
                          
 }
 ```
+### GET /heartbeat 
+#### 参数
+```javastript
+{  
+    info_hash: string             //频道标识，目前是url的sha1值
+    peer_id: string
+}
+```
+#### 返回
+```javastript
+{
+                     
+}
 
 ## fastmesh拓扑结构可视化协议
 
