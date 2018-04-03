@@ -47,6 +47,11 @@
 {  
     info_hash: string             //频道标识，目前是url的sha1值
     peer_id: string
+}
+```
+#### Body
+```javastript
+{  
     source: number
     p2p: number
     conns: number                 //连接的peer数量
