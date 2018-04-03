@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 22);
+/******/ 	return __webpack_require__(__webpack_require__.s = 25);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -383,430 +383,6 @@ function isUndefined(arg) {
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports) {
-
-if (typeof Object.create === 'function') {
-  // implementation from standard node.js 'util' module
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    ctor.prototype = Object.create(superCtor.prototype, {
-      constructor: {
-        value: ctor,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-  };
-} else {
-  // old school shim for old browsers
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    var TempCtor = function () {}
-    TempCtor.prototype = superCtor.prototype
-    ctor.prototype = new TempCtor()
-    ctor.prototype.constructor = ctor
-  }
-}
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// a duplex stream is just a stream that is both readable and writable.
-// Since JS doesn't have multiple prototypal inheritance, this class
-// prototypally inherits from Readable, and then parasitically from
-// Writable.
-
-
-
-/*<replacement>*/
-
-var processNextTick = __webpack_require__(9);
-/*</replacement>*/
-
-/*<replacement>*/
-var objectKeys = Object.keys || function (obj) {
-  var keys = [];
-  for (var key in obj) {
-    keys.push(key);
-  }return keys;
-};
-/*</replacement>*/
-
-module.exports = Duplex;
-
-/*<replacement>*/
-var util = __webpack_require__(8);
-util.inherits = __webpack_require__(3);
-/*</replacement>*/
-
-var Readable = __webpack_require__(13);
-var Writable = __webpack_require__(16);
-
-util.inherits(Duplex, Readable);
-
-var keys = objectKeys(Writable.prototype);
-for (var v = 0; v < keys.length; v++) {
-  var method = keys[v];
-  if (!Duplex.prototype[method]) Duplex.prototype[method] = Writable.prototype[method];
-}
-
-function Duplex(options) {
-  if (!(this instanceof Duplex)) return new Duplex(options);
-
-  Readable.call(this, options);
-  Writable.call(this, options);
-
-  if (options && options.readable === false) this.readable = false;
-
-  if (options && options.writable === false) this.writable = false;
-
-  this.allowHalfOpen = true;
-  if (options && options.allowHalfOpen === false) this.allowHalfOpen = false;
-
-  this.once('end', onend);
-}
-
-// the no-half-open enforcer
-function onend() {
-  // if we allow half-open state, or if the writable side ended,
-  // then we're ok.
-  if (this.allowHalfOpen || this._writableState.ended) return;
-
-  // no more data can be written.
-  // But allow more writes to happen in this tick.
-  processNextTick(onEndNT, this);
-}
-
-function onEndNT(self) {
-  self.end();
-}
-
-Object.defineProperty(Duplex.prototype, 'destroyed', {
-  get: function () {
-    if (this._readableState === undefined || this._writableState === undefined) {
-      return false;
-    }
-    return this._readableState.destroyed && this._writableState.destroyed;
-  },
-  set: function (value) {
-    // we ignore the value if the stream
-    // has not been initialized yet
-    if (this._readableState === undefined || this._writableState === undefined) {
-      return;
-    }
-
-    // backward compatibility, the user is explicitly
-    // managing destroyed
-    this._readableState.destroyed = value;
-    this._writableState.destroyed = value;
-  }
-});
-
-Duplex.prototype._destroy = function (err, cb) {
-  this.push(null);
-  this.end();
-
-  processNextTick(cb, err);
-};
-
-function forEach(xs, f) {
-  for (var i = 0, l = xs.length; i < l; i++) {
-    f(xs[i], i);
-  }
-}
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-/**
- * Created by xieting on 2018/1/9.
- */
-
-exports.default = {
-
-    //data-channel
-    DC_SIGNAL: 'SIGNAL',
-    DC_OPEN: 'OPEN',
-    DC_REQUEST: 'REQUEST',
-    DC_REQUESTFAIL: 'REQUEST_FAIL', //当请求的数据找不到时触发
-    DC_CLOSE: 'CLOSE',
-    DC_RESPONSE: 'RESPONSE',
-    DC_ERROR: 'ERROR',
-    DC_PIECE: "PIECE",
-    //---------------------------live---------------------------------------------------------
-    DC_TRANSITION: 'TRANSITION',
-    DC_GRANT: 'GRANT',
-    DC_LACK: "LACK",
-    DC_DISPLACE: "DISPLACE",
-    //---------------------------vod---------------------------------------------------------
-    DC_BITFIELD: "BITFIELD",
-    DC_CHOKE: "CHOKE",
-    DC_UNCHOKE: "UNCHOKE",
-    DC_INTERESTED: "INTERESTED",
-    DC_NOTINTERESTED: "NOT_INTERESTED",
-    DC_HAVE: "HAVE",
-
-    //loader-scheduler
-    SEGMENT: 'segment',
-    TRANSITION: "transition", //跃迁事件
-    DISPLACE: 'displace',
-    CONNECT: 'connect', //建立data channel
-    ADOPT: 'adopt'
-
-};
-module.exports = exports['default'];
-
-/***/ }),
-/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -820,8 +396,8 @@ module.exports = exports['default'];
 
 
 
-var base64 = __webpack_require__(26)
-var ieee754 = __webpack_require__(27)
+var base64 = __webpack_require__(29)
+var ieee754 = __webpack_require__(30)
 var isArray = __webpack_require__(12)
 
 exports.Buffer = Buffer
@@ -2600,14 +2176,440 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+  };
+} else {
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    var TempCtor = function () {}
+    TempCtor.prototype = superCtor.prototype
+    ctor.prototype = new TempCtor()
+    ctor.prototype.constructor = ctor
+  }
+}
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// a duplex stream is just a stream that is both readable and writable.
+// Since JS doesn't have multiple prototypal inheritance, this class
+// prototypally inherits from Readable, and then parasitically from
+// Writable.
+
+
+
+/*<replacement>*/
+
+var processNextTick = __webpack_require__(9);
+/*</replacement>*/
+
+/*<replacement>*/
+var objectKeys = Object.keys || function (obj) {
+  var keys = [];
+  for (var key in obj) {
+    keys.push(key);
+  }return keys;
+};
+/*</replacement>*/
+
+module.exports = Duplex;
+
+/*<replacement>*/
+var util = __webpack_require__(8);
+util.inherits = __webpack_require__(4);
+/*</replacement>*/
+
+var Readable = __webpack_require__(13);
+var Writable = __webpack_require__(16);
+
+util.inherits(Duplex, Readable);
+
+var keys = objectKeys(Writable.prototype);
+for (var v = 0; v < keys.length; v++) {
+  var method = keys[v];
+  if (!Duplex.prototype[method]) Duplex.prototype[method] = Writable.prototype[method];
+}
+
+function Duplex(options) {
+  if (!(this instanceof Duplex)) return new Duplex(options);
+
+  Readable.call(this, options);
+  Writable.call(this, options);
+
+  if (options && options.readable === false) this.readable = false;
+
+  if (options && options.writable === false) this.writable = false;
+
+  this.allowHalfOpen = true;
+  if (options && options.allowHalfOpen === false) this.allowHalfOpen = false;
+
+  this.once('end', onend);
+}
+
+// the no-half-open enforcer
+function onend() {
+  // if we allow half-open state, or if the writable side ended,
+  // then we're ok.
+  if (this.allowHalfOpen || this._writableState.ended) return;
+
+  // no more data can be written.
+  // But allow more writes to happen in this tick.
+  processNextTick(onEndNT, this);
+}
+
+function onEndNT(self) {
+  self.end();
+}
+
+Object.defineProperty(Duplex.prototype, 'destroyed', {
+  get: function () {
+    if (this._readableState === undefined || this._writableState === undefined) {
+      return false;
+    }
+    return this._readableState.destroyed && this._writableState.destroyed;
+  },
+  set: function (value) {
+    // we ignore the value if the stream
+    // has not been initialized yet
+    if (this._readableState === undefined || this._writableState === undefined) {
+      return;
+    }
+
+    // backward compatibility, the user is explicitly
+    // managing destroyed
+    this._readableState.destroyed = value;
+    this._writableState.destroyed = value;
+  }
+});
+
+Duplex.prototype._destroy = function (err, cb) {
+  this.push(null);
+  this.end();
+
+  processNextTick(cb, err);
+};
+
+function forEach(xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+/**
+ * Created by xieting on 2018/1/9.
+ */
+
+exports.default = {
+
+    //data-channel
+    DC_SIGNAL: 'SIGNAL',
+    DC_OPEN: 'OPEN',
+    DC_REQUEST: 'REQUEST',
+    DC_REQUESTFAIL: 'REQUEST_FAIL', //当请求的数据找不到时触发
+    DC_CLOSE: 'CLOSE',
+    DC_RESPONSE: 'RESPONSE',
+    DC_ERROR: 'ERROR',
+    DC_PIECE: "PIECE",
+    DC_TIMEOUT: "TIMEOUT",
+    DC_PIECE_ACK: "PIECE_ACK",
+    //---------------------------live---------------------------------------------------------
+    DC_TRANSITION: 'TRANSITION',
+    DC_GRANT: 'GRANT',
+    DC_LACK: "LACK",
+    DC_DISPLACE: "DISPLACE",
+    //---------------------------vod---------------------------------------------------------
+    DC_BITFIELD: "BITFIELD",
+    DC_CHOKE: "CHOKE",
+    DC_UNCHOKE: "UNCHOKE",
+    DC_INTERESTED: "INTERESTED",
+    DC_NOTINTERESTED: "NOT_INTERESTED",
+    DC_HAVE: "HAVE",
+
+    //loader-scheduler
+    SEGMENT: 'segment',
+    TRANSITION: "transition", //跃迁事件
+    DISPLACE: 'displace',
+    CONNECT: 'connect', //建立data channel
+    ADOPT: 'adopt'
+
+};
+module.exports = exports['default'];
 
 /***/ }),
 /* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-disable node/no-deprecated-api */
-var buffer = __webpack_require__(6)
+var buffer = __webpack_require__(1)
 var Buffer = buffer.Buffer
 
 // alternative to using Object.keys for old browsers
@@ -2782,7 +2784,7 @@ function objectToString(o) {
   return Object.prototype.toString.call(o);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6).Buffer))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1).Buffer))
 
 /***/ }),
 /* 9 */
@@ -2833,63 +2835,19 @@ function nextTick(fn, arg1, arg2, arg3) {
   }
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
 /* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.config = exports.HybridLoader = exports.RPClient = undefined;
-
-var _rpClient = __webpack_require__(24);
-
-var _rpClient2 = _interopRequireDefault(_rpClient);
-
-var _hybridLoader = __webpack_require__(43);
-
-var _hybridLoader2 = _interopRequireDefault(_hybridLoader);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Created by xieting on 2018/3/26.
- */
-
-var config = {
-    wsSchedulerAddr: 'ws://120.78.168.126:3389', //调度服务器地址
-    transitionEnabled: true, //是否允许节点自动跃迁
-    transitionCheckInterval: 30, //跃迁检查时间间隔
-    transitionTTL: 2, //跃迁的最大跳数
-    transitionWaitTime: 5, //跃迁等待Grant响应的时间
-
-    defaultUploadBW: 1024 * 1024 * 4 / 8, //总上行带宽默认4Mbps
-    maxTransitionTries: 1, //最大跃迁次数（跃迁失败也算一次）
-    maxGetParentsTries: 3, //获取父节点的最大尝试次数(不包含ws连上后的请求)
-
-    defaultSubstreams: 3 //默认子流数量
-};
-
-exports.RPClient = _rpClient2.default;
-exports.HybridLoader = _hybridLoader2.default;
-exports.config = config;
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
 /* WEBPACK VAR INJECTION */(function(Buffer) {module.exports = Peer
 
-var debug = __webpack_require__(28)('simple-peer')
-var getBrowserRTC = __webpack_require__(31)
-var inherits = __webpack_require__(3)
-var randombytes = __webpack_require__(32)
-var stream = __webpack_require__(33)
+var debug = __webpack_require__(31)('simple-peer')
+var getBrowserRTC = __webpack_require__(34)
+var inherits = __webpack_require__(4)
+var randombytes = __webpack_require__(35)
+var stream = __webpack_require__(36)
 
 var MAX_BUFFERED_AMOUNT = 64 * 1024
 
@@ -3704,7 +3662,51 @@ Peer.prototype._transformConstraints = function (constraints) {
 
 function noop () {}
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6).Buffer))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1).Buffer))
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.config = exports.HybridLoader = exports.RPClient = undefined;
+
+var _rpClient = __webpack_require__(27);
+
+var _rpClient2 = _interopRequireDefault(_rpClient);
+
+var _hybridLoader = __webpack_require__(45);
+
+var _hybridLoader2 = _interopRequireDefault(_hybridLoader);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Created by xieting on 2018/3/26.
+ */
+
+var config = {
+    wsSchedulerAddr: 'ws://120.78.168.126:3389', //调度服务器地址
+    transitionEnabled: true, //是否允许节点自动跃迁
+    transitionCheckInterval: 30, //跃迁检查时间间隔
+    transitionTTL: 2, //跃迁的最大跳数
+    transitionWaitTime: 5, //跃迁等待Grant响应的时间
+
+    defaultUploadBW: 1024 * 1024 * 4 / 8, //总上行带宽默认4Mbps
+    maxTransitionTries: 1, //最大跃迁次数（跃迁失败也算一次）
+    maxGetParentsTries: 3, //获取父节点的最大尝试次数(不包含ws连上后的请求)
+
+    defaultSubstreams: 3 //默认子流数量
+};
+
+exports.RPClient = _rpClient2.default;
+exports.HybridLoader = _hybridLoader2.default;
+exports.config = config;
 
 /***/ }),
 /* 12 */
@@ -3789,11 +3791,11 @@ function _isUint8Array(obj) {
 
 /*<replacement>*/
 var util = __webpack_require__(8);
-util.inherits = __webpack_require__(3);
+util.inherits = __webpack_require__(4);
 /*</replacement>*/
 
 /*<replacement>*/
-var debugUtil = __webpack_require__(34);
+var debugUtil = __webpack_require__(37);
 var debug = void 0;
 if (debugUtil && debugUtil.debuglog) {
   debug = debugUtil.debuglog('stream');
@@ -3802,7 +3804,7 @@ if (debugUtil && debugUtil.debuglog) {
 }
 /*</replacement>*/
 
-var BufferList = __webpack_require__(35);
+var BufferList = __webpack_require__(38);
 var destroyImpl = __webpack_require__(15);
 var StringDecoder;
 
@@ -3825,7 +3827,7 @@ function prependListener(emitter, event, fn) {
 }
 
 function ReadableState(options, stream) {
-  Duplex = Duplex || __webpack_require__(4);
+  Duplex = Duplex || __webpack_require__(5);
 
   options = options || {};
 
@@ -3893,7 +3895,7 @@ function ReadableState(options, stream) {
 }
 
 function Readable(options) {
-  Duplex = Duplex || __webpack_require__(4);
+  Duplex = Duplex || __webpack_require__(5);
 
   if (!(this instanceof Readable)) return new Readable(options);
 
@@ -4729,7 +4731,7 @@ function indexOf(xs, x) {
   }
   return -1;
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(3)))
 
 /***/ }),
 /* 14 */
@@ -4888,12 +4890,12 @@ Writable.WritableState = WritableState;
 
 /*<replacement>*/
 var util = __webpack_require__(8);
-util.inherits = __webpack_require__(3);
+util.inherits = __webpack_require__(4);
 /*</replacement>*/
 
 /*<replacement>*/
 var internalUtil = {
-  deprecate: __webpack_require__(38)
+  deprecate: __webpack_require__(41)
 };
 /*</replacement>*/
 
@@ -4919,7 +4921,7 @@ util.inherits(Writable, Stream);
 function nop() {}
 
 function WritableState(options, stream) {
-  Duplex = Duplex || __webpack_require__(4);
+  Duplex = Duplex || __webpack_require__(5);
 
   options = options || {};
 
@@ -5059,7 +5061,7 @@ if (typeof Symbol === 'function' && Symbol.hasInstance && typeof Function.protot
 }
 
 function Writable(options) {
-  Duplex = Duplex || __webpack_require__(4);
+  Duplex = Duplex || __webpack_require__(5);
 
   // Writable ctor is applied to Duplexes, too.
   // `realHasInstance` is necessary because using plain `instanceof`
@@ -5485,7 +5487,7 @@ Writable.prototype._destroy = function (err, cb) {
   this.end();
   cb(err);
 };
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(36).setImmediate, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(39).setImmediate, __webpack_require__(2)))
 
 /***/ }),
 /* 17 */
@@ -5837,11 +5839,11 @@ function simpleEnd(buf) {
 
 module.exports = Transform;
 
-var Duplex = __webpack_require__(4);
+var Duplex = __webpack_require__(5);
 
 /*<replacement>*/
 var util = __webpack_require__(8);
-util.inherits = __webpack_require__(3);
+util.inherits = __webpack_require__(4);
 /*</replacement>*/
 
 util.inherits(Transform, Duplex);
@@ -6220,6 +6222,123 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _events = __webpack_require__(0);
+
+var _events2 = _interopRequireDefault(_events);
+
+var _reconnectingWebsocket = __webpack_require__(19);
+
+var _reconnectingWebsocket2 = _interopRequireDefault(_reconnectingWebsocket);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Created by xieting on 2018/3/23.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+var SignalClient = function (_EventEmitter) {
+    _inherits(SignalClient, _EventEmitter);
+
+    function SignalClient(peerId, config) {
+        _classCallCheck(this, SignalClient);
+
+        var _this = _possibleConstructorReturn(this, (SignalClient.__proto__ || Object.getPrototypeOf(SignalClient)).call(this));
+
+        _this.peerId = peerId;
+        _this.config = config;
+        _this.connected = false;
+        _this._ws = _this._init(peerId);
+        return _this;
+    }
+
+    _createClass(SignalClient, [{
+        key: '_init',
+        value: function _init(id) {
+            var _this2 = this;
+
+            var wsOptions = {
+                maxRetries: this.config.wsMaxRetries,
+                minReconnectionDelay: this.config.wsReconnectInterval * 1000
+            };
+            var queryStr = '?id=' + id;
+            var websocket = new _reconnectingWebsocket2.default(this.config.wsSignalerAddr + queryStr, undefined, wsOptions);
+            websocket.onopen = function () {
+                console.log('Signaler websocket connection opened');
+
+                _this2.connected = true;
+                if (_this2.onopen) _this2.onopen();
+            };
+
+            websocket.push = websocket.send;
+            websocket.send = function (msg) {
+                var msgStr = JSON.stringify(Object.assign({ peer_id: id }, msg));
+                if (websocket.readyState !== 1) {
+                    console.warn('websocket connection is not opened yet.');
+                    return setTimeout(function () {
+                        websocket.send(msg);
+                    }, 1000);
+                }
+                websocket.push(msgStr);
+            };
+            websocket.onmessage = function (e) {
+
+                if (_this2.onmessage) _this2.onmessage(e);
+            };
+            websocket.onclose = function () {
+                //websocket断开时清除datachannel
+                console.warn('Signaler websocket closed');
+                if (_this2.onclose) _this2.onclose();
+                _this2.connected = false;
+            };
+            return websocket;
+        }
+    }, {
+        key: 'sendSignal',
+        value: function sendSignal(remotePeerId, data) {
+            var msg = {
+                action: 'signal',
+                peer_id: this.peerId,
+                to_peer_id: remotePeerId,
+                data: data
+            };
+            this.send(msg);
+        }
+    }, {
+        key: 'send',
+        value: function send(msg) {
+            this._ws.send(msg);
+        }
+    }, {
+        key: 'close',
+        value: function close() {
+            this._ws.close();
+            this._ws = null;
+        }
+    }]);
+
+    return SignalClient;
+}(_events2.default);
+
+exports.default = SignalClient;
+module.exports = exports['default'];
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
@@ -6400,7 +6519,7 @@ exports.default = XhrLoader;
 module.exports = exports['default'];
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6411,11 +6530,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.config = exports.FragLoader = exports.Tracker = undefined;
 
-var _btTracker = __webpack_require__(44);
+var _btTracker = __webpack_require__(46);
 
 var _btTracker2 = _interopRequireDefault(_btTracker);
 
-var _fragLoader = __webpack_require__(48);
+var _fragLoader = __webpack_require__(52);
 
 var _fragLoader2 = _interopRequireDefault(_fragLoader);
 
@@ -6426,7 +6545,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 var config = {
-    announce: "" //tracker服务器地址
+    announce: "http://127.0.0.1:8080", //tracker服务器地址
+    neighbours: 4, //连接的节点数量
+    urgentOffset: 3 //播放点的后多少个buffer为urgent
 };
 
 exports.Tracker = _btTracker2.default;
@@ -6434,7 +6555,80 @@ exports.FragLoader = _fragLoader2.default;
 exports.config = config;
 
 /***/ }),
-/* 22 */
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Fetcher = exports.Events = exports.DataChannel = undefined;
+
+var _datachannel = __webpack_require__(48);
+
+var _datachannel2 = _interopRequireDefault(_datachannel);
+
+var _events = __webpack_require__(24);
+
+var _events2 = _interopRequireDefault(_events);
+
+var _fetcher = __webpack_require__(49);
+
+var _fetcher2 = _interopRequireDefault(_fetcher);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.DataChannel = _datachannel2.default;
+exports.Events = _events2.default;
+exports.Fetcher = _fetcher2.default; /**
+                                      * Created by xieting on 2018/4/3.
+                                      */
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+/**
+ * Created by xieting on 2018/4/3.
+ */
+
+exports.default = {
+    //data-channel
+    DC_SIGNAL: 'SIGNAL',
+    DC_OPEN: 'OPEN',
+    DC_REQUEST: 'REQUEST',
+    DC_REQUESTFAIL: 'REQUEST_FAIL', //当请求的数据找不到时触发
+    DC_CLOSE: 'CLOSE',
+    DC_RESPONSE: 'RESPONSE',
+    DC_ERROR: 'ERROR',
+    DC_PIECE: "PIECE",
+    DC_TIMEOUT: "TIMEOUT",
+    DC_PIECE_ACK: "PIECE_ACK",
+    //---------------------------live---------------------------------------------------------
+    DC_TRANSITION: 'TRANSITION',
+    DC_GRANT: 'GRANT',
+    DC_LACK: "LACK",
+    DC_DISPLACE: "DISPLACE",
+    //---------------------------vod---------------------------------------------------------
+    DC_BITFIELD: "BITFIELD",
+    DC_CHOKE: "CHOKE",
+    DC_UNCHOKE: "UNCHOKE",
+    DC_INTERESTED: "INTERESTED",
+    DC_NOTINTERESTED: "NOT_INTERESTED",
+    DC_HAVE: "HAVE"
+};
+module.exports = exports['default'];
+
+/***/ }),
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6446,7 +6640,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _events = __webpack_require__(5);
+var _events = __webpack_require__(6);
 
 var _events2 = _interopRequireDefault(_events);
 
@@ -6454,23 +6648,23 @@ var _events3 = __webpack_require__(0);
 
 var _events4 = _interopRequireDefault(_events3);
 
-var _config = __webpack_require__(23);
+var _config = __webpack_require__(26);
 
 var _config2 = _interopRequireDefault(_config);
 
-var _simplePeer = __webpack_require__(11);
+var _simplePeer = __webpack_require__(10);
 
 var _simplePeer2 = _interopRequireDefault(_simplePeer);
 
-var _fastmesh = __webpack_require__(10);
+var _fastmesh = __webpack_require__(11);
 
-var _bittorrent = __webpack_require__(21);
+var _bittorrent = __webpack_require__(22);
 
-var _bufferManager = __webpack_require__(49);
+var _bufferManager = __webpack_require__(53);
 
 var _bufferManager2 = _interopRequireDefault(_bufferManager);
 
-var _uaParserJs = __webpack_require__(50);
+var _uaParserJs = __webpack_require__(54);
 
 var _uaParserJs2 = _interopRequireDefault(_uaParserJs);
 
@@ -6508,23 +6702,17 @@ var HlsPeerify = function (_EventEmitter) {
         var _this = _possibleConstructorReturn(this, (HlsPeerify.__proto__ || Object.getPrototypeOf(HlsPeerify)).call(this));
 
         _this.config = Object.assign({}, _config2.default, p2pConfig);
-        console.warn('' + JSON.stringify(_this.config, null, 1));
         _this.hlsjs = hlsjs;
         _this.p2pEnabled = _this.config.disableP2P === false ? false : true; //默认开启P2P
 
         hlsjs.config.currLoaded = hlsjs.config.currPlay = 0;
 
-        if (hlsjs.url) {
+        hlsjs.on(hlsjs.constructor.Events.MANIFEST_PARSED, function (event, data) {
+
+            // this.bitrate = data.levels[0].bitrate;                                                //获取固定码率，用于子流
             var channel = hlsjs.url.split('?')[0];
             _this._init(channel);
-        } else {
-            hlsjs.on(hlsjs.constructor.Events.MANIFEST_PARSED, function (event, data) {
-
-                // this.bitrate = data.levels[0].bitrate;                                                //获取固定码率，用于子流
-                var channel = hlsjs.url.split('?')[0];
-                _this._init(channel);
-            });
-        }
+        });
 
         //level上报
         _this.levelCounter = 0;
@@ -6575,6 +6763,7 @@ var HlsPeerify = function (_EventEmitter) {
                 //点播模式。采用BT算法
                 //实例化tracker服务器
                 this.signaler = new _bittorrent.Tracker(channel, this.config, browserInfo);
+                this.signaler.scheduler.bufMgr = this.bufMgr;
                 //替换fLoader
                 this.hlsjs.config.fLoader = _bittorrent.FragLoader;
             }
@@ -6582,14 +6771,16 @@ var HlsPeerify = function (_EventEmitter) {
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADING, function (id, data) {
                 // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
                 log('FRAG_LOADING: ' + data.frag.sn);
-
+                _this2.signaler.currentLoadingSN = data.frag.sn;
                 //level统计
                 _this2.averageLevel = (_this2.averageLevel * _this2.levelCounter + data.frag.level) / ++_this2.levelCounter;
             });
 
             this.signalTried = false; //防止重复连接ws
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADED, function (id, data) {
-                _this2.hlsjs.config.currLoaded = data.frag.sn;
+                var sn = data.frag.sn;
+                _this2.hlsjs.config.currLoaded = sn;
+                _this2.signaler.currentLoadedSN = sn; //用于BT算法
                 _this2.hlsjs.config.currLoadedDuration = data.frag.duration;
                 if (data.frag.loadByXhr) {
                     log('FRAG_LOADED ' + data.frag.sn + ' loadByXhr');
@@ -6599,7 +6790,6 @@ var HlsPeerify = function (_EventEmitter) {
                     _this2.p2pDownloaded += data.frag.loaded;
                 }
                 if (!_this2.signalTried && !_this2.signaler.connected && _this2.config.p2pEnabled) {
-
                     //用一个ts的大小和时长来代表平均streaming rate
                     var bitrate = data.frag.loaded * 8 / data.frag.duration;
                     //计算子流码率
@@ -6700,7 +6890,7 @@ exports.default = HlsPeerify;
 module.exports = exports['default'];
 
 /***/ }),
-/* 23 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6710,9 +6900,9 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _fastmesh = __webpack_require__(10);
+var _fastmesh = __webpack_require__(11);
 
-var _bittorrent = __webpack_require__(21);
+var _bittorrent = __webpack_require__(22);
 
 //时间单位统一为秒
 /**
@@ -6730,7 +6920,8 @@ var defaultP2PConfig = {
 
     dcKeepAliveInterval: 10, //datachannel多少秒发送一次keep-alive信息
     dcKeepAliveAckTimeout: 2, //datachannel接收keep-alive-ack信息的超时时间，超时则认为连接失败并主动关闭
-    dcRequestTimeout: 2, //datachannel接收二进制数据的超时时间
+    dcRequestTimeout: 3, //datachannel接收二进制数据的超时时间
+    dcUploadTimeout: 3, //datachannel上传二进制数据的超时时间
 
     packetSize: 16 * 1024, //每次通过datachannel发送的包的大小
     maxBufSize: 1024 * 1024 * 50, //p2p缓存的最大数据量
@@ -6738,8 +6929,6 @@ var defaultP2PConfig = {
     reportInterval: 60 //统计信息上报的时间间隔
 
 };
-// let liveConfig = require('./live/fastmesh').config || {};
-
 
 var p2pConfig = void 0;
 
@@ -6755,7 +6944,7 @@ exports.default = p2pConfig;
 module.exports = exports['default'];
 
 /***/ }),
-/* 24 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6771,15 +6960,15 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _events3 = __webpack_require__(5);
+var _events3 = __webpack_require__(6);
 
 var _events4 = _interopRequireDefault(_events3);
 
-var _dataChannel = __webpack_require__(25);
+var _dataChannel = __webpack_require__(28);
 
 var _dataChannel2 = _interopRequireDefault(_dataChannel);
 
-var _p2pScheduler = __webpack_require__(40);
+var _p2pScheduler = __webpack_require__(43);
 
 var _p2pScheduler2 = _interopRequireDefault(_p2pScheduler);
 
@@ -6787,7 +6976,7 @@ var _reconnectingWebsocket = __webpack_require__(19);
 
 var _reconnectingWebsocket2 = _interopRequireDefault(_reconnectingWebsocket);
 
-var _signalClient = __webpack_require__(42);
+var _signalClient = __webpack_require__(20);
 
 var _signalClient2 = _interopRequireDefault(_signalClient);
 
@@ -6906,14 +7095,7 @@ var P2PSignaler = function (_EventEmitter) {
 
             var websocket = new _signalClient2.default(this.peerId, this.config);
             websocket.onopen = function () {
-                //发送进入频道请求
-                // let req = {
-                //     action: 'register'
-                // };
-                //
-                // websocket.push(JSON.stringify(req));
                 _this3.connected = true;
-
                 //向scheduler websocket发送获取父节点信息
                 var msg = {
                     action: 'get_parents'
@@ -7286,6 +7468,9 @@ var P2PSignaler = function (_EventEmitter) {
         set: function set(sn) {
             this.scheduler.currentPlaySN = sn;
         }
+    }, {
+        key: 'currentLoadedSN',
+        set: function set(sn) {}
     }]);
 
     return P2PSignaler;
@@ -7295,7 +7480,7 @@ exports.default = P2PSignaler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 25 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7307,7 +7492,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _simplePeer = __webpack_require__(11);
+var _simplePeer = __webpack_require__(10);
 
 var _simplePeer2 = _interopRequireDefault(_simplePeer);
 
@@ -7315,7 +7500,7 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _events3 = __webpack_require__(5);
+var _events3 = __webpack_require__(6);
 
 var _events4 = _interopRequireDefault(_events3);
 
@@ -7329,7 +7514,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * Created by xieting on 2018/1/4.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 
-var Buffer = __webpack_require__(6).Buffer;
+var Buffer = __webpack_require__(1).Buffer;
 
 var log = console.log;
 
@@ -7346,6 +7531,7 @@ var DataChannel = function (_EventEmitter) {
         _this.channelId = isInitiator ? peerId + '-' + remotePeerId : remotePeerId + '-' + peerId; //标识该channel
         // console.warn(`this.channelId ${this.channelId}`);
         _this.connected = false;
+        _this.msgQueue = [];
 
         //下载控制
         _this.queue = []; //下载队列
@@ -7380,6 +7566,11 @@ var DataChannel = function (_EventEmitter) {
             datachannel.once('connect', function () {
                 log('datachannel CONNECTED to ' + _this2.remotePeerId);
                 _this2.emit(_events4.default.DC_OPEN);
+                //发送消息队列中的消息
+                while (_this2.msgQueue.length > 0) {
+                    var msg = _this2.msgQueue.shift();
+                    _this2.emit(msg.event, msg);
+                }
                 // if (this.isReceiver) {
                 //     this.keepAliveInterval = window.setInterval(() => {                      //数据接收者每隔一段时间发送keep-alive信息
                 //         let msg = {
@@ -7397,6 +7588,11 @@ var DataChannel = function (_EventEmitter) {
                     log('datachannel receive string: ' + data + 'from ' + _this2.remotePeerId);
 
                     var msg = JSON.parse(data);
+                    //如果还没连接，则先保存在消息队列中
+                    if (!_this2.connected) {
+                        _this2.msgQueue.push(msg);
+                        return;
+                    }
                     var event = msg.event;
                     switch (event) {
                         // case 'KEEPALIVE':
@@ -7432,6 +7628,15 @@ var DataChannel = function (_EventEmitter) {
                             //收到GRANT信息后首先判断是否发给自己的，否则如果TTL>0则继续向子节点广播
                             _this2._handleGrant(msg);
                             break;
+                        case _events4.default.DC_BITFIELD:
+                            _this2.emit(_events4.default.DC_BITFIELD, msg);
+                            break;
+                        case _events4.default.DC_HAVE:
+                            _this2.emit(_events4.default.DC_HAVE, msg);
+                            break;
+                        case _events4.default.DC_GET_BITFIELD:
+                            _this2.emit(_events4.default.DC_GET_BITFIELD);
+                            break;
                         default:
 
                     }
@@ -7449,6 +7654,11 @@ var DataChannel = function (_EventEmitter) {
             datachannel.once('close', function () {
                 _this2.emit(_events4.default.DC_CLOSE);
             });
+        }
+    }, {
+        key: 'sendJson',
+        value: function sendJson(json) {
+            this.send(JSON.stringify(json));
         }
     }, {
         key: 'send',
@@ -7473,6 +7683,19 @@ var DataChannel = function (_EventEmitter) {
                     this.loading = true;
                 }
             }
+        }
+    }, {
+        key: 'requestDataBySN',
+        value: function requestDataBySN(sn) {
+            var urgent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+            //用于BT算法
+            var msg = {
+                event: _events4.default.DC_REQUEST,
+                sn: sn, //ts数据的播放序号
+                urgent: urgent //是否紧急
+            };
+            this.loading = true;
+            this.sendJson(msg);
         }
     }, {
         key: 'close',
@@ -7582,7 +7805,7 @@ exports.default = DataChannel;
 module.exports = exports['default'];
 
 /***/ }),
-/* 26 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7703,7 +7926,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 27 */
+/* 30 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -7793,7 +8016,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 28 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {/**
@@ -7802,7 +8025,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
  * Expose `debug()` as the module.
  */
 
-exports = module.exports = __webpack_require__(29);
+exports = module.exports = __webpack_require__(32);
 exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
@@ -7982,10 +8205,10 @@ function localstorage() {
   } catch (e) {}
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
-/* 29 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -8001,7 +8224,7 @@ exports.coerce = coerce;
 exports.disable = disable;
 exports.enable = enable;
 exports.enabled = enabled;
-exports.humanize = __webpack_require__(30);
+exports.humanize = __webpack_require__(33);
 
 /**
  * The currently active debug mode names, and names to skip.
@@ -8193,7 +8416,7 @@ function coerce(val) {
 
 
 /***/ }),
-/* 30 */
+/* 33 */
 /***/ (function(module, exports) {
 
 /**
@@ -8351,7 +8574,7 @@ function plural(ms, n, name) {
 
 
 /***/ }),
-/* 31 */
+/* 34 */
 /***/ (function(module, exports) {
 
 // originally pulled out of simple-peer
@@ -8372,7 +8595,7 @@ module.exports = function getBrowserRTC () {
 
 
 /***/ }),
-/* 32 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8415,29 +8638,29 @@ function randomBytes (size, cb) {
   return bytes
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(3)))
 
 /***/ }),
-/* 33 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13);
 exports.Stream = exports;
 exports.Readable = exports;
 exports.Writable = __webpack_require__(16);
-exports.Duplex = __webpack_require__(4);
+exports.Duplex = __webpack_require__(5);
 exports.Transform = __webpack_require__(18);
-exports.PassThrough = __webpack_require__(39);
+exports.PassThrough = __webpack_require__(42);
 
 
 /***/ }),
-/* 34 */
+/* 37 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 35 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8517,7 +8740,7 @@ module.exports = function () {
 }();
 
 /***/ }),
-/* 36 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var apply = Function.prototype.apply;
@@ -8570,13 +8793,13 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(37);
+__webpack_require__(40);
 exports.setImmediate = setImmediate;
 exports.clearImmediate = clearImmediate;
 
 
 /***/ }),
-/* 37 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -8766,10 +8989,10 @@ exports.clearImmediate = clearImmediate;
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(3)))
 
 /***/ }),
-/* 38 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {
@@ -8840,10 +9063,10 @@ function config (name) {
   return String(val).toLowerCase() === 'true';
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
-/* 39 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8880,7 +9103,7 @@ var Transform = __webpack_require__(18);
 
 /*<replacement>*/
 var util = __webpack_require__(8);
-util.inherits = __webpack_require__(3);
+util.inherits = __webpack_require__(4);
 /*</replacement>*/
 
 util.inherits(PassThrough, Transform);
@@ -8896,7 +9119,7 @@ PassThrough.prototype._transform = function (chunk, encoding, cb) {
 };
 
 /***/ }),
-/* 40 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8912,11 +9135,11 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _events3 = __webpack_require__(5);
+var _events3 = __webpack_require__(6);
 
 var _events4 = _interopRequireDefault(_events3);
 
-var _substreams = __webpack_require__(41);
+var _substreams = __webpack_require__(44);
 
 var _substreams2 = _interopRequireDefault(_substreams);
 
@@ -9346,7 +9569,7 @@ var P2PScheduler = function (_EventEmitter) {
                 } else {
                     //不是目前request的则保存到buffer-manager
                     if (_this2.bufMgr && !_this2.bufMgr.hasSegOfURL(response.url)) {
-                        _this2._addSegToBuf(response);
+                        _this2.bufMgr.addBuffer(response.sn, response.url, response.data);
                     }
                 }
                 // this.leadingCounter = 0;
@@ -9374,7 +9597,7 @@ var P2PScheduler = function (_EventEmitter) {
                 // }
 
             }).on(_events4.default.DC_PIECE, function () {
-                //接收到binary事件，用于tfirst
+                //接收到piece事件，用于tfirst
                 if (!_this2.stats.tfirst) {
                     _this2.stats.tfirst = Math.max(performance.now(), _this2.stats.trequest);
                 }
@@ -9426,18 +9649,6 @@ var P2PScheduler = function (_EventEmitter) {
                     }
                 }
             });
-        }
-    }, {
-        key: '_addSegToBuf',
-        value: function _addSegToBuf(response) {
-            log('_addSegToBuf sn ' + response.sn + ' relurl ' + response.relurl);
-            var segment = {
-                sn: response.sn,
-                relurl: response.relurl,
-                data: response.data,
-                size: response.data.byteLength
-            };
-            this.bufMgr.addSeg(segment);
         }
     }, {
         key: '_setupTransInspector',
@@ -9582,7 +9793,7 @@ exports.default = P2PScheduler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 41 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9598,7 +9809,7 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _events3 = __webpack_require__(5);
+var _events3 = __webpack_require__(6);
 
 var _events4 = _interopRequireDefault(_events3);
 
@@ -9714,7 +9925,7 @@ exports.default = Substreams;
 module.exports = exports['default'];
 
 /***/ }),
-/* 42 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9730,124 +9941,7 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _reconnectingWebsocket = __webpack_require__(19);
-
-var _reconnectingWebsocket2 = _interopRequireDefault(_reconnectingWebsocket);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Created by xieting on 2018/3/23.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-var SignalClient = function (_EventEmitter) {
-    _inherits(SignalClient, _EventEmitter);
-
-    function SignalClient(peerId, config) {
-        _classCallCheck(this, SignalClient);
-
-        var _this = _possibleConstructorReturn(this, (SignalClient.__proto__ || Object.getPrototypeOf(SignalClient)).call(this));
-
-        _this.peerId = peerId;
-        _this.config = config;
-        _this.connected = false;
-        _this._ws = _this._init(peerId);
-        return _this;
-    }
-
-    _createClass(SignalClient, [{
-        key: '_init',
-        value: function _init(id) {
-            var _this2 = this;
-
-            var wsOptions = {
-                maxRetries: this.config.wsMaxRetries,
-                minReconnectionDelay: this.config.wsReconnectInterval * 1000
-            };
-            var queryStr = '?id=' + id;
-            var websocket = new _reconnectingWebsocket2.default(this.config.wsSignalerAddr + queryStr, undefined, wsOptions);
-            websocket.onopen = function () {
-                console.log('Signaler websocket connection opened');
-
-                _this2.connected = true;
-                if (_this2.onopen) _this2.onopen();
-            };
-
-            websocket.push = websocket.send;
-            websocket.send = function (msg) {
-                var msgStr = JSON.stringify(Object.assign({ peer_id: id }, msg));
-                if (websocket.readyState !== 1) {
-                    console.warn('websocket connection is not opened yet.');
-                    return setTimeout(function () {
-                        websocket.send(data);
-                    }, 1000);
-                }
-                websocket.push(msgStr);
-            };
-            websocket.onmessage = function (e) {
-
-                if (_this2.onmessage) _this2.onmessage(e);
-            };
-            websocket.onclose = function () {
-                //websocket断开时清除datachannel
-                console.warn('Signaler websocket closed');
-                if (_this2.onclose) _this2.onclose();
-                _this2.connected = false;
-            };
-            return websocket;
-        }
-    }, {
-        key: 'sendSignal',
-        value: function sendSignal(remotePeerId, data) {
-            var msg = {
-                action: 'signal',
-                peer_id: this.peerId,
-                to_peer_id: remotePeerId,
-                data: data
-            };
-            this.send(msg);
-        }
-    }, {
-        key: 'send',
-        value: function send(msg) {
-            this._ws.send(msg);
-        }
-    }, {
-        key: 'close',
-        value: function close() {
-            this._ws.close();
-            this._ws = null;
-        }
-    }]);
-
-    return SignalClient;
-}(_events2.default);
-
-exports.default = SignalClient;
-module.exports = exports['default'];
-
-/***/ }),
-/* 43 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _events = __webpack_require__(0);
-
-var _events2 = _interopRequireDefault(_events);
-
-var _xhrLoader = __webpack_require__(20);
+var _xhrLoader = __webpack_require__(21);
 
 var _xhrLoader2 = _interopRequireDefault(_xhrLoader);
 
@@ -9928,7 +10022,7 @@ var LoaderScheduler = function (_EventEmitter) {
             var onSuccess = callbacks.onSuccess;
             callbacks.onSuccess = function (response, stats, context) {
                 if (_this2.bufMgr && !_this2.bufMgr.hasSegOfURL(frag.relurl)) {
-                    _this2.bufMgr.copyAndAddSeg(response.data, frag.relurl, frag.sn);
+                    _this2.bufMgr.copyAndAddBuffer(response.data, frag.relurl, frag.sn);
                 }
                 onSuccess(response, stats, context);
             };
@@ -9954,7 +10048,7 @@ exports.default = LoaderScheduler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9970,15 +10064,23 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _btScheduler = __webpack_require__(45);
+var _btScheduler = __webpack_require__(47);
 
 var _btScheduler2 = _interopRequireDefault(_btScheduler);
 
-var _simpleSha = __webpack_require__(46);
+var _simpleSha = __webpack_require__(50);
 
 var _simpleSha2 = _interopRequireDefault(_simpleSha);
 
+var _signalClient = __webpack_require__(20);
+
+var _signalClient2 = _interopRequireDefault(_signalClient);
+
+var _pear = __webpack_require__(23);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -9999,31 +10101,247 @@ var BTTracker = function (_EventEmitter) {
         _this.config = config;
         _this.browserInfo = info;
         _this.connected = false;
-        _this.channel = channel;
         _this.scheduler = new _btScheduler2.default(config);
-        _this.DCMap = new Map(); //{key: remotePeerId, value: DataChannnel}
-        _this.failedDCMap = new Map(); //{key: remotePeerId, value: boolean}
-        config.announce = config.announce + '?key=' + window.encodeURIComponent(config.key) + '&room=' + window.encodeURIComponent(channel) + '&mode=' + window.encodeURIComponent(config.mode);
-        console.log('connecting to :' + config.announce);
+        _this.DCMap = new Map(); //{key: remotePeerId, value: DataChannnel} 目前已经建立连接或正在建立连接的dc
+        _this.failedDCMap = new Map(); //{key: remotePeerId, value: boolean} 建立连接失败的dc
         _this.signalerWs = null; //信令服务器ws
-
+        _this.heartbeatInterval = 30;
+        //tracker request API
+        _this.fetcher = new _pear.Fetcher(config.key, _simpleSha2.default.sync(channel), config.announce);
+        var queryStr = '?key=' + window.encodeURIComponent(config.key) + '&info_hash=' + _simpleSha2.default.sync(channel);
+        _this.announceURL = config.announce + '/announce/' + queryStr;
+        _this.heartbeatURL = config.announce + '/heartbeat/' + queryStr;
+        _this.getPeersURL = config.announce + '/get_peers/' + queryStr;
+        _this.statsURL = config.announce + '/stats/' + queryStr;
+        /*
+        peers: Array<Object{id:string}>
+         */
+        _this.peers = [];
 
         _this._setupScheduler(_this.scheduler);
         return _this;
     }
 
     _createClass(BTTracker, [{
-        key: '_setupScheduler',
-        value: function _setupScheduler(scheduler) {}
-    }, {
         key: 'send',
         value: function send(msg) {}
     }, {
         key: 'resumeP2P',
-        value: function resumeP2P() {}
+        value: function resumeP2P() {
+            var _this2 = this;
+
+            this.fetcher.btAnnounce().then(function (json) {
+                console.warn('announceURL response ' + JSON.stringify(json));
+                _this2.peerId = json.peer_id;
+                _this2.heartbeatInterval = json.heartbeat_interval;
+                _this2.reportInterval = json.report_interval;
+                _this2.signalerWs = _this2._initSignalerWs(); //连上tracker后开始连接信令服务器
+                _this2._handlePeers(json.peers);
+            }).catch(function (err) {});
+        }
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            window.clearInterval(this.heartbeater);
+            this.heartbeater = null;
+        }
+    }, {
+        key: '_handlePeers',
+        value: function _handlePeers(peers) {
+            var _this3 = this;
+
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = peers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var peer = _step.value;
+
+                    this.peers.push({
+                        id: peer.id
+                    });
+                }
+                //过滤掉已经连接的节点和连接失败的节点
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
+            this.peers = this.peers.filter(function (node) {
+                var _arr = [].concat(_toConsumableArray(_this3.DCMap.keys()), _toConsumableArray(_this3.failedDCMap.keys()));
+
+                for (var _i = 0; _i < _arr.length; _i++) {
+                    var peerId = _arr[_i];
+                    if (node.id === peerId) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+    }, {
+        key: '_tryConnectToPeer',
+        value: function _tryConnectToPeer() {
+            if (this.peers.length === 0) return;
+            var remotePeerId = this.peers.pop().id;
+            console.warn('_tryConnectToPeer ' + remotePeerId);
+            var datachannel = new _pear.DataChannel(this.peerId, remotePeerId, true, this.config);
+            this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
+            this._setupDC(datachannel);
+        }
+    }, {
+        key: '_setupDC',
+        value: function _setupDC(datachannel) {
+            var _this4 = this;
+
+            datachannel.on(_pear.Events.DC_SIGNAL, function (data) {
+                _this4.signalerWs.sendSignal(datachannel.remotePeerId, data);
+                //启动定时器，如果指定时间对方没有响应则连接下一个
+                if (!_this4.signalTimer) {
+                    _this4.signalTimer = window.setTimeout(function () {
+                        _this4.DCMap.delete(datachannel.remotePeerId);
+                        _this4.failedDCMap.set(datachannel.remotePeerId, true); //记录失败的连接
+                        console.warn(datachannel.remotePeerId + ' signaling timeout');
+                        _this4.signalTimer = null;
+                        _this4._tryConnectToPeer();
+                    }, 2000);
+                }
+            }).once(_pear.Events.DC_ERROR, function () {
+                console.log('datachannel error ' + datachannel.channelId);
+                _this4.scheduler.deletePeer(datachannel);
+                _this4.DCMap.delete(datachannel.remotePeerId);
+                _this4.failedDCMap.set(datachannel.remotePeerId, true); //记录失败的连接
+                _this4._tryConnectToPeer();
+                datachannel.destroy();
+
+                _this4._requestMorePeers();
+            }).once(_pear.Events.DC_CLOSE, function () {
+
+                console.warn('datachannel closed ' + datachannel.channelId + ' ');
+                _this4.scheduler.deletePeer(datachannel);
+                _this4.DCMap.delete(datachannel.remotePeerId);
+
+                _this4._tryConnectToPeer();
+
+                datachannel.destroy();
+
+                _this4._requestMorePeers();
+            }).once(_pear.Events.DC_OPEN, function () {
+
+                _this4.scheduler.addPeer(datachannel);
+                datachannel.connected = true;
+
+                //如果dc数量不够则继续尝试连接
+                if (_this4.DCMap.size < _this4.config.neighbours) {
+                    _this4._tryConnectToPeer();
+                }
+            });
+        }
+    }, {
+        key: '_initSignalerWs',
+        value: function _initSignalerWs() {
+            var _this5 = this;
+
+            var websocket = new _signalClient2.default(this.peerId, this.config);
+            websocket.onopen = function () {
+                _this5.connected = true;
+                _this5._heartbeat(); //开始发送心跳包
+                _this5._tryConnectToPeer();
+            };
+
+            websocket.onmessage = function (e) {
+                var msg = JSON.parse(e.data);
+                var action = msg.action;
+                switch (action) {
+                    case 'signal':
+                        console.log('start _handleSignal');
+                        window.clearTimeout(_this5.signalTimer); //接收到信令后清除定时器
+                        _this5.signalTimer = null;
+                        _this5._handleSignal(msg.from_peer_id, msg.data);
+                        break;
+                    case 'reject':
+                        _this5.stopP2P();
+                        break;
+                    default:
+                        console.log('Signaler websocket unknown action ' + action);
+
+                }
+            };
+            websocket.onclose = function () {
+                //websocket断开时清除datachannel
+                _this5.connected = false;
+                _this5.destroy();
+            };
+            return websocket;
+        }
+    }, {
+        key: '_handleSignal',
+        value: function _handleSignal(remotePeerId, data) {
+            var datachannel = this.DCMap.get(remotePeerId);
+            if (datachannel && datachannel.connected) {
+                console.warn('datachannel had connected, signal ignored');
+                return;
+            }
+            if (!datachannel) {
+                //收到子节点连接请求
+                console.log('receive child node connection request');
+                datachannel = new _pear.DataChannel(this.peerId, remotePeerId, false, this.config);
+                this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
+                this._setupDC(datachannel);
+            }
+            datachannel.receiveSignal(data);
+        }
+    }, {
+        key: '_setupScheduler',
+        value: function _setupScheduler(s) {}
+    }, {
+        key: '_heartbeat',
+        value: function _heartbeat() {
+            var _this6 = this;
+
+            this.heartbeater = window.setInterval(function () {
+                _this6.fetcher.btHeartbeat();
+            }, this.heartbeatInterval * 1000);
+        }
+    }, {
+        key: '_requestMorePeers',
+        value: function _requestMorePeers() {
+            var _this7 = this;
+
+            if (this.scheduler.peerMap.size <= Math.floor(this.config.neighbours / 2)) {
+                this.fetcher.btGetPeers().then(function (json) {
+                    console.warn('_requestMorePeers ' + JSON.stringify(json));
+                    _this7._handlePeers(json.peers);
+                    _this7._tryConnectToPeer();
+                });
+            }
+        }
     }, {
         key: 'currentPlaySN',
-        set: function set(sn) {}
+        set: function set(sn) {
+            this.scheduler.addPlaySN(sn);
+        }
+    }, {
+        key: 'currentLoadingSN',
+        set: function set(sn) {
+            this.scheduler.addLoadingSN(sn);
+        }
+    }, {
+        key: 'currentLoadedSN',
+        set: function set(sn) {
+            this.scheduler.addLoadedSN(sn); //更新bitmap
+        }
     }]);
 
     return BTTracker;
@@ -10033,7 +10351,7 @@ exports.default = BTTracker;
 module.exports = exports['default'];
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10043,11 +10361,17 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
+var _pear = __webpack_require__(23);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -10063,8 +10387,261 @@ var BTScheduler = function (_EventEmitter) {
     function BTScheduler(config) {
         _classCallCheck(this, BTScheduler);
 
-        return _possibleConstructorReturn(this, (BTScheduler.__proto__ || Object.getPrototypeOf(BTScheduler)).call(this));
+        var _this = _possibleConstructorReturn(this, (BTScheduler.__proto__ || Object.getPrototypeOf(BTScheduler)).call(this));
+
+        _this.config = config;
+        _this.bufMgr = null;
+        _this.peerMap = new Map(); // remotePeerId -> dc
+        _this.bitset = new Set(); //本节点的bitfield
+        _this.bitCounts = new Map(); //记录peers的每个buffer的总和，用于BT的rearest first策略  index -> count
+
+        return _this;
     }
+
+    _createClass(BTScheduler, [{
+        key: 'addLoadedSN',
+        value: function addLoadedSN(sn) {
+            this.bitset.add(sn); //在bitset中记录
+            if (this.bitCounts.has(sn)) {
+                this.bitCounts.delete(sn); //在bitCounts清除，防止重复下载
+            }
+            if (this.peerMap.size > 0) {
+                var msg = {
+                    event: _pear.Events.DC_HAVE,
+                    sn: sn
+                };
+                this._broadcastToPeers(msg);
+            }
+        }
+    }, {
+        key: 'addLoadingSN',
+        value: function addLoadingSN(sn) {
+            //防止下载hls.js正在下载的sn
+            this.loadingSN = sn;
+        }
+    }, {
+        key: 'addPlaySN',
+        value: function addPlaySN(sn) {
+            if (!this.hasPeers) return;
+            var requested = [];
+            for (var idx = sn + 1; idx <= sn + this.config.urgentOffset + 1; idx++) {
+                if (!this.bitset.has(idx) && idx !== this.loadingSN && this.bitCounts.has(idx)) {
+                    //如果这个块没有缓存并且peers有
+                    var _iteratorNormalCompletion = true;
+                    var _didIteratorError = false;
+                    var _iteratorError = undefined;
+
+                    try {
+                        for (var _iterator = this.peerMap.values()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                            var peer = _step.value;
+                            //找到拥有这个块并且空闲的peer
+                            if (peer.downloading === false && peer.bitset.has(idx)) {
+                                peer.requestDataBySN(idx, true);
+                                console.warn('request urgent ' + idx + ' from peer ' + peer.remotePeerId);
+                                requested.push(idx);
+                                break;
+                            }
+                        }
+                    } catch (err) {
+                        _didIteratorError = true;
+                        _iteratorError = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion && _iterator.return) {
+                                _iterator.return();
+                            }
+                        } finally {
+                            if (_didIteratorError) {
+                                throw _iteratorError;
+                            }
+                        }
+                    }
+                }
+            }
+            //检查是否有空闲的节点，有的话采用rearest first策略下载
+            var idlePeers = this._getIdlePeer();
+            if (idlePeers.length === 0 || this.bitCounts.size === 0) return;
+            var sortedArr = [].concat(_toConsumableArray(this.bitCounts.entries())).sort(function (item1, item2) {
+                return item1[1] < item2[1];
+            });
+            if (sortedArr.length === 0) return;
+            //每次只下载一个rearest块
+            var rearest = sortedArr.pop()[0];
+            while (rearest === this.loadingSN || requested.includes(rearest)) {
+                //排除掉loading的和requested的
+                if (sortedArr.length === 0) return;
+                rearest = sortedArr.pop()[0];
+            }
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+                for (var _iterator2 = idlePeers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var _peer = _step2.value;
+
+                    if (_peer.bitset.has(rearest)) {
+                        _peer.requestDataBySN(rearest, false);
+                        console.warn('request rearest ' + rearest + ' from peer ' + _peer.remotePeerId);
+                        break;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
+                }
+            }
+        }
+    }, {
+        key: 'deletePeer',
+        value: function deletePeer(dc) {
+            var _this2 = this;
+
+            if (this.peerMap.has(dc.remotePeerId)) {
+                dc.bitset.forEach(function (value) {
+                    _this2._decreBitCounts(value);
+                });
+                this.peerMap.delete(dc.remotePeerId);
+            }
+        }
+    }, {
+        key: 'addPeer',
+        value: function addPeer(dc) {
+            console.warn('add peer ' + dc.remotePeerId);
+            this.peerMap.set(dc.remotePeerId, dc);
+            this._setupDC(dc);
+            dc.sendJson({ //向peer发送bitfield
+                event: _pear.Events.DC_BITFIELD,
+                field: Array.from(this.bitset)
+            });
+        }
+    }, {
+        key: '_setupDC',
+        value: function _setupDC(dc) {
+            var _this3 = this;
+
+            dc.on(_pear.Events.DC_BITFIELD, function (msg) {
+                if (!msg.field) return;
+                var bitset = new Set(msg.field);
+                dc.bitset = bitset;
+                msg.field.forEach(function (value) {
+                    if (!_this3.bitset.has(value)) {
+                        //防止重复下载
+                        _this3._increBitCounts(value);
+                    }
+                });
+            }).on(_pear.Events.DC_HAVE, function (msg) {
+                if (!msg.sn) return;
+                var sn = msg.sn;
+                dc.bitset.add(sn);
+                if (!_this3.bitset.has(sn)) {
+                    //防止重复下载
+                    _this3._increBitCounts(sn);
+                }
+            }).on(_pear.Events.DC_PIECE, function () {//接收到piece事件，即二进制包头
+
+            }).on(_pear.Events.DC_RESPONSE, function (response) {
+                //接收到完整二进制数据
+                _this3.bufMgr.addBuffer(response.sn, response.url, response.data);
+                _this3.addLoadedSN(response.sn);
+            }).on(_pear.Events.DC_REQUEST, function (msg) {
+                var url = _this3.bufMgr.getURLbySN(msg.sn);
+                if (url && _this3.bufMgr.hasSegOfURL(url)) {
+                    var seg = _this3.bufMgr.getSegByURL(url);
+                    dc.sendBuffer(msg.sn, seg.relurl, seg.data);
+                }
+            }).on(_pear.Events.DC_TIMEOUT, function () {
+                console.warn('DC_TIMEOUT');
+            });
+        }
+    }, {
+        key: '_broadcastToPeers',
+        value: function _broadcastToPeers(msg) {
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
+
+            try {
+                for (var _iterator3 = this.peerMap.values()[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var peer = _step3.value;
+
+                    peer.sendJson(msg);
+                }
+            } catch (err) {
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
+                    }
+                } finally {
+                    if (_didIteratorError3) {
+                        throw _iteratorError3;
+                    }
+                }
+            }
+        }
+    }, {
+        key: '_getIdlePeer',
+        value: function _getIdlePeer() {
+            return [].concat(_toConsumableArray(this.peerMap.values())).filter(function (peer) {
+                return peer.downloading === false;
+            });
+        }
+
+        /*
+         _sendNextReq() {                                                 //每个周期向所有peers发送sendReqQueue的下一个req
+         if (this.peerMap.size === 0) return;
+         for (let peer of this.peerMap.values()) {
+         if (this.sendReqQueue.length === 0) return;
+         if (peer.loading === true) continue;
+         let req = this.sendReqQueue.pop();
+         while (this.bitmap.has(req.sn) ) {
+         if (this.sendReqQueue.length === 0) return;
+         req = this.sendReqQueue.pop();
+         }
+         peer.requestDataBySN(req.sn, req.urgent);
+         }
+         }
+         */
+
+    }, {
+        key: '_decreBitCounts',
+        value: function _decreBitCounts(index) {
+            if (this.bitCounts.has(index)) {
+                var last = this.bitCounts.get(index);
+                this.bitCounts.set(index, last - 1);
+                if (this.bitCounts.get(index) === 0) {
+                    this.bitCounts.delete(index);
+                }
+            }
+        }
+    }, {
+        key: '_increBitCounts',
+        value: function _increBitCounts(index) {
+            if (!this.bitCounts.has(index)) {
+                this.bitCounts.set(index, 1);
+            } else {
+                var last = this.bitCounts.get(index);
+                this.bitCounts.set(index, last + 1);
+            }
+        }
+    }, {
+        key: 'hasPeers',
+        get: function get() {
+            return this.peerMap.size > 0;
+        }
+    }]);
 
     return BTScheduler;
 }(_events2.default);
@@ -10073,10 +10650,474 @@ exports.default = BTScheduler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 46 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Rusha = __webpack_require__(47)
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _simplePeer = __webpack_require__(10);
+
+var _simplePeer2 = _interopRequireDefault(_simplePeer);
+
+var _events = __webpack_require__(0);
+
+var _events2 = _interopRequireDefault(_events);
+
+var _events3 = __webpack_require__(24);
+
+var _events4 = _interopRequireDefault(_events3);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Created by xieting on 2018/4/2.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+var Buffer = __webpack_require__(1).Buffer;
+
+var log = console.log;
+
+var DataChannel = function (_EventEmitter) {
+    _inherits(DataChannel, _EventEmitter);
+
+    function DataChannel(peerId, remotePeerId, isInitiator, config) {
+        _classCallCheck(this, DataChannel);
+
+        var _this = _possibleConstructorReturn(this, (DataChannel.__proto__ || Object.getPrototypeOf(DataChannel)).call(this));
+
+        _this.config = config;
+        _this.remotePeerId = remotePeerId;
+        _this.channelId = isInitiator ? peerId + '-' + remotePeerId : remotePeerId + '-' + peerId; //标识该channel
+        // console.warn(`this.channelId ${this.channelId}`);
+        _this.connected = false;
+        _this.msgQueue = [];
+
+        //下载控制
+        _this.rcvdReqQueue = []; //接收到的请求的队列    队列末尾优先级最高
+        _this.downloading = false;
+        _this.uploading = false;
+
+        _this._datachannel = new _simplePeer2.default({ initiator: isInitiator, objectMode: true });
+        _this.isReceiver = isInitiator; //主动发起连接的为数据接受者，用于标识本节点的类型
+        _this._init(_this._datachannel);
+
+        //fastmesh
+        _this.streamingRate = 0; //单位bit/s
+        //记录发送的数据量，用于计算streaming rate
+        _this.recordSended = _this._adjustStreamingRate(10);
+        return _this;
+    }
+
+    _createClass(DataChannel, [{
+        key: '_init',
+        value: function _init(datachannel) {
+            var _this2 = this;
+
+            datachannel.on('error', function (err) {
+                log('datachannel error', err);
+                _this2.emit(_events4.default.DC_ERROR);
+            });
+
+            datachannel.on('signal', function (data) {
+                // log('SIGNAL', JSON.stringify(data));
+                _this2.emit(_events4.default.DC_SIGNAL, data);
+            });
+
+            datachannel.once('connect', function () {
+                log('datachannel CONNECTED to ' + _this2.remotePeerId);
+                _this2.emit(_events4.default.DC_OPEN);
+                //发送消息队列中的消息
+                while (_this2.msgQueue.length > 0) {
+                    var msg = _this2.msgQueue.shift();
+                    _this2.emit(msg.event, msg);
+                }
+            });
+
+            datachannel.on('data', function (data) {
+                if (typeof data === 'string') {
+                    log('datachannel receive string: ' + data + 'from ' + _this2.remotePeerId);
+
+                    var msg = JSON.parse(data);
+                    //如果还没连接，则先保存在消息队列中
+                    if (!_this2.connected) {
+                        _this2.msgQueue.push(msg);
+                        return;
+                    }
+                    var event = msg.event;
+                    switch (event) {
+                        // case 'KEEPALIVE':
+                        //     this._handleKeepAlive(msg);
+                        //     break;
+                        // case 'KEEPALIVE-ACK':
+                        //     this._handleKeepAliveAck(msg);
+                        //     break;
+                        case _events4.default.DC_PIECE:
+                            _this2.emit(_events4.default.DC_PIECE);
+                            _this2._prepareForBinary(msg.attachments, msg.url, msg.sn, msg.size);
+                            break;
+                        case _events4.default.DC_REQUEST:
+                            _this2._handleRequestMsg(msg);
+                            break;
+                        case _events4.default.DC_LACK:
+                            _this2.downloading = false;
+                            _this2.emit(_events4.default.DC_REQUESTFAIL, msg);
+                            break;
+                        case _events4.default.DC_DISPLACE:
+                            //通知对方成为子节点
+                            _this2.emit(_events4.default.DISPLACE, msg);
+                            break;
+                        case _events4.default.DC_CLOSE:
+                            _this2.emit(_events4.default.DC_CLOSE);
+                            break;
+                        case _events4.default.DC_TRANSITION:
+                            //子节点的跃迁请求
+                            _this2.emit(_events4.default.DC_TRANSITION, msg);
+                            break;
+                        case _events4.default.DC_GRANT:
+                            //收到GRANT信息后首先判断是否发给自己的，否则如果TTL>0则继续向子节点广播
+                            _this2._handleGrant(msg);
+                            break;
+                        case _events4.default.DC_BITFIELD:
+                            _this2.emit(_events4.default.DC_BITFIELD, msg);
+                            break;
+                        case _events4.default.DC_HAVE:
+                            _this2.emit(_events4.default.DC_HAVE, msg);
+                            break;
+                        case _events4.default.DC_PIECE_ACK:
+                            _this2._handlePieceAck();
+                            break;
+                        default:
+
+                    }
+                } else if (data instanceof Buffer) {
+                    //binary data
+                    // log(`datachannel receive binary data size ${data.byteLength}`);
+                    _this2.bufArr.push(data);
+                    _this2.remainAttachments--;
+                    if (_this2.remainAttachments === 0) {
+                        window.clearTimeout(_this2.requestTimeout); //清除定时器
+                        _this2.requestTimeout = null;
+                        _this2.sendJson({ //发送给peer确认信息
+                            event: _events4.default.DC_PIECE_ACK,
+                            sn: _this2.bufSN,
+                            url: _this2.bufUrl
+                        });
+                        _this2._handleBinaryData();
+                    }
+                }
+            });
+
+            datachannel.once('close', function () {
+                _this2.emit(_events4.default.DC_CLOSE);
+            });
+        }
+    }, {
+        key: 'sendJson',
+        value: function sendJson(json) {
+            this.send(JSON.stringify(json));
+        }
+    }, {
+        key: 'send',
+        value: function send(data) {
+            if (this._datachannel && this._datachannel.connected) {
+                this._datachannel.send(data);
+            }
+        }
+    }, {
+        key: 'sendBuffer',
+        value: function sendBuffer(sn, url, payload) {
+            this.uploading = true;
+            //开始计时
+            this.uploadTimeout = window.setTimeout(this._uploadtimeout.bind(this), this.config.dcUploadTimeout * 1000);
+
+            var dataSize = payload.byteLength,
+                //二进制数据大小
+            packetSize = this.config.packetSize,
+                //每个数据包的大小
+            remainder = 0,
+                //最后一个包的大小
+            attachments = 0; //分多少个包发
+            if (dataSize % packetSize === 0) {
+                attachments = dataSize / packetSize;
+            } else {
+                attachments = Math.floor(dataSize / packetSize) + 1;
+                remainder = dataSize % packetSize;
+            }
+            var response = {
+                event: _events4.default.DC_PIECE,
+                attachments: attachments,
+                url: url,
+                sn: sn,
+                size: dataSize
+            };
+            this.sendJson(response);
+            var bufArr = dividePayload(payload, packetSize, attachments, remainder);
+            for (var j = 0; j < bufArr.length; j++) {
+                this.send(bufArr[j]);
+            }
+            //记录streaming rate
+            this.recordSended(dataSize);
+        }
+    }, {
+        key: 'requestDataByURL',
+        value: function requestDataByURL(relurl) {
+            //由于需要阻塞下载数据，因此request请求用新的API
+            var msg = {
+                event: _events4.default.DC_REQUEST,
+                url: relurl
+            };
+            this.downloading = true;
+            this.sendJson(msg);
+            //开始计时
+            this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), this.config.dcRequestTimeout * 1000);
+        }
+    }, {
+        key: 'requestDataBySN',
+        value: function requestDataBySN(sn) {
+            var urgent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+            //用于BT算法
+            var msg = {
+                event: _events4.default.DC_REQUEST,
+                sn: sn, //ts数据的播放序号
+                urgent: urgent //是否紧急
+            };
+            this.downloading = true;
+            this.sendJson(msg);
+            //开始计时
+            this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), this.config.dcRequestTimeout * 1000);
+        }
+    }, {
+        key: 'close',
+        value: function close() {
+            this.destroy();
+        }
+    }, {
+        key: 'receiveSignal',
+        value: function receiveSignal(data) {
+            log('datachannel receive siganl ' + JSON.stringify(data));
+            this._datachannel.signal(data);
+        }
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            // window.clearInterval(this.keepAliveInterval);
+            // this.keepAliveInterval = null;
+            // window.clearTimeout(this.keepAliveAckTimeout);
+            // this.keepAliveAckTimeout = null;
+            window.clearInterval(this.adjustSRInterval);
+            this._datachannel.removeAllListeners();
+            this.removeAllListeners();
+            this._datachannel.destroy();
+        }
+    }, {
+        key: '_handleRequestMsg',
+        value: function _handleRequestMsg(msg) {
+            if (this.rcvdReqQueue.length > 0) {
+                if (msg.urgent) {
+                    this.rcvdReqQueue.push(msg.sn); //urgent的放在队列末尾
+                } else {
+                    this.rcvdReqQueue.unshift(msg.sn);
+                }
+            } else {
+                this.emit(_events4.default.DC_REQUEST, msg);
+            }
+        }
+    }, {
+        key: '_handlePieceAck',
+        value: function _handlePieceAck() {
+            this.uploading = false;
+            window.clearTimeout(this.uploadTimeout);
+            this.uploadTimeout = null;
+            if (this.rcvdReqQueue.length > 0) {
+                var sn = this.rcvdReqQueue.pop();
+                this.emit(_events4.default.DC_REQUEST, { sn: sn });
+            }
+        }
+    }, {
+        key: '_prepareForBinary',
+        value: function _prepareForBinary(attachments, url, sn, expectedSize) {
+            this.bufArr = [];
+            this.remainAttachments = attachments;
+            this.bufUrl = url;
+            this.bufSN = sn;
+            this.expectedSize = expectedSize;
+        }
+    }, {
+        key: '_handleBinaryData',
+        value: function _handleBinaryData() {
+            log('datachannel _handleBinaryData');
+            var payload = Buffer.concat(this.bufArr);
+            if (payload.byteLength == this.expectedSize) {
+                //校验数据
+                this.emit(_events4.default.DC_RESPONSE, { url: this.bufUrl, sn: this.bufSN, data: payload });
+            }
+            this.bufUrl = '';
+            this.bufArr = [];
+            this.expectedSize = -1;
+
+            this.downloading = false;
+        }
+    }, {
+        key: '_handleGrant',
+        value: function _handleGrant(msg) {
+            if (msg.TTL > 0) {
+                this.emit(_events4.default.DC_GRANT, msg);
+            }
+        }
+    }, {
+        key: '_adjustStreamingRate',
+        value: function _adjustStreamingRate(interval) {
+            var _this3 = this;
+
+            //每隔一段时间计算streaming rate，单位bit/s
+            var sended = 0;
+            this.adjustSRInterval = window.setInterval(function () {
+                _this3.streamingRate = Math.round(sended * 8 / interval);
+                sended = 0;
+                // console.warn(`streamingRate ${this.streamingRate/8/1024}KB/s`);
+            }, interval * 1000);
+            return function (increment) {
+                sended += increment;
+            };
+        }
+    }, {
+        key: '_loadtimeout',
+        value: function _loadtimeout() {
+            //下载超时
+            log('datachannel timeout while downloading');
+            this.emit(_events4.default.DC_TIMEOUT);
+            this.requestTimeout = null;
+            this.downloading = false;
+        }
+    }, {
+        key: '_uploadtimeout',
+        value: function _uploadtimeout() {
+            //上传超时
+            log('datachannel timeout while uploading');
+            this.uploading = false;
+            if (this.rcvdReqQueue.length > 0) {
+                var sn = this.rcvdReqQueue.pop();
+                this.emit(_events4.default.DC_REQUEST, { sn: sn });
+            }
+        }
+    }]);
+
+    return DataChannel;
+}(_events2.default);
+
+function dividePayload(payload, packetSize, attachments, remainder) {
+    var bufArr = [];
+    if (remainder) {
+        var packet = void 0;
+        for (var i = 0; i < attachments - 1; i++) {
+            packet = payload.slice(i * packetSize, (i + 1) * packetSize);
+            bufArr.push(packet);
+        }
+        packet = payload.slice(payload.byteLength - remainder, payload.byteLength);
+        bufArr.push(packet);
+    } else {
+        var _packet = void 0;
+        for (var _i = 0; _i < attachments; _i++) {
+            _packet = payload.slice(_i * packetSize, (_i + 1) * packetSize);
+            bufArr.push(_packet);
+        }
+    }
+    return bufArr;
+}
+
+exports.default = DataChannel;
+module.exports = exports['default'];
+
+/***/ }),
+/* 49 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/**
+ * Created by xieting on 2018/4/3.
+ */
+
+var Fetcher = function () {
+    function Fetcher(key, room, baseUrl) {
+        _classCallCheck(this, Fetcher);
+
+        var queryStr = '?key=' + window.encodeURIComponent(key) + '&info_hash=' + room;
+        this.announceURL = baseUrl + '/announce/' + queryStr;
+        this.heartbeatURL = baseUrl + '/heartbeat/' + queryStr;
+        this.getPeersURL = baseUrl + '/get_peers/' + queryStr;
+        this.statsURL = baseUrl + '/stats/' + queryStr;
+    }
+
+    _createClass(Fetcher, [{
+        key: 'btAnnounce',
+        value: function btAnnounce() {
+            var _this = this;
+
+            return new Promise(function (resolve, reject) {
+                fetch(_this.announceURL).then(function (response) {
+                    return response.json();
+                }).then(function (json) {
+                    _this.peerId = json.peer_id; //保存peerId
+                    resolve(json);
+                }).catch(function (err) {
+                    reject(err);
+                });
+            });
+        }
+    }, {
+        key: 'btHeartbeat',
+        value: function btHeartbeat() {
+            fetch(this.heartbeatURL + ('&peer_id=' + this.peerId)).then(function (response) {}).catch(function (err) {});
+        }
+    }, {
+        key: 'btGetPeers',
+        value: function btGetPeers() {
+            var _this2 = this;
+
+            return new Promise(function (resolve, reject) {
+                fetch(_this2.getPeersURL + ('&peer_id=' + _this2.peerId)).then(function (response) {
+                    return response.json();
+                }).then(function (json) {
+                    resolve(json);
+                }).catch(function (err) {
+                    reject(err);
+                });
+            });
+        }
+    }]);
+
+    return Fetcher;
+}();
+
+exports.default = Fetcher;
+module.exports = exports['default'];
+
+/***/ }),
+/* 50 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Rusha = __webpack_require__(51)
 
 var rusha = new Rusha
 var scope = typeof window !== 'undefined' ? window : self
@@ -10140,7 +11181,7 @@ module.exports.sync = sha1sync
 
 
 /***/ }),
-/* 47 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -11073,7 +12114,7 @@ module.exports = function () {
 });
 
 /***/ }),
-/* 48 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11089,7 +12130,7 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _xhrLoader = __webpack_require__(20);
+var _xhrLoader = __webpack_require__(21);
 
 var _xhrLoader2 = _interopRequireDefault(_xhrLoader);
 
@@ -11177,7 +12218,7 @@ var FragLoader = function (_EventEmitter) {
                 var onSuccess = callbacks.onSuccess;
                 callbacks.onSuccess = function (response, stats, context) {
                     if (!_this2.bufMgr.hasSegOfURL(frag.relurl)) {
-                        _this2.bufMgr.copyAndAddSeg(response.data, frag.relurl, frag.sn);
+                        _this2.bufMgr.copyAndAddBuffer(response.data, frag.relurl, frag.sn);
                     }
                     onSuccess(response, stats, context);
                 };
@@ -11193,7 +12234,7 @@ exports.default = FragLoader;
 module.exports = exports['default'];
 
 /***/ }),
-/* 49 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11221,7 +12262,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * Created by xieting on 2018/1/9.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 
-var Buffer = __webpack_require__(6).Buffer;
+var Buffer = __webpack_require__(1).Buffer;
 
 var log = console.log;
 
@@ -11240,8 +12281,9 @@ var BufferManager = function (_EventEmitter) {
         data: Buffer
         size: string
          */
-        _this._segPool = new Map(); //存放seg的Map
+        _this._segPool = new Map(); //存放seg的Map            relurl -> segment
         _this._currBufSize = 0; //目前的buffer总大小
+        _this.sn2Url = new Map(); //以sn查找relurl      sn -> relurl
         return _this;
     }
 
@@ -11252,8 +12294,9 @@ var BufferManager = function (_EventEmitter) {
             return this._segPool.has(url);
         }
     }, {
-        key: 'copyAndAddSeg',
-        value: function copyAndAddSeg(data, url, sn) {
+        key: 'copyAndAddBuffer',
+        value: function copyAndAddBuffer(data, url, sn) {
+            //先复制再缓存
             var payloadBuf = Buffer.from(data);
             var byteLength = payloadBuf.byteLength;
             var targetBuffer = new Buffer(byteLength);
@@ -11267,6 +12310,21 @@ var BufferManager = function (_EventEmitter) {
             };
 
             this.addSeg(segment);
+            this.sn2Url.set(sn, url);
+        }
+    }, {
+        key: 'addBuffer',
+        value: function addBuffer(sn, url, buf) {
+            //直接缓存
+            log('addBuffer sn ' + sn + ' relurl ' + url);
+            var segment = {
+                sn: sn,
+                relurl: url,
+                data: buf,
+                size: buf.byteLength
+            };
+            this.addSeg(segment);
+            this.sn2Url.set(sn, url);
         }
     }, {
         key: 'addSeg',
@@ -11281,6 +12339,7 @@ var BufferManager = function (_EventEmitter) {
                 var lastSeg = [].concat(_toConsumableArray(this._segPool.values())).shift();
                 console.warn('pop seg ' + lastSeg.relurl);
                 this._segPool.delete(lastSeg.relurl);
+                this.sn2Url.delete(lastSeg.sn);
                 this._currBufSize -= parseInt(lastSeg.size);
             }
         }
@@ -11290,9 +12349,15 @@ var BufferManager = function (_EventEmitter) {
             return this._segPool.get(relurl);
         }
     }, {
+        key: 'getURLbySN',
+        value: function getURLbySN(sn) {
+            return this.sn2Url.get(sn);
+        }
+    }, {
         key: 'clear',
         value: function clear() {
             this._segPool.clear();
+            this.sn2Url.clear();
             this._currBufSize = 0;
         }
     }, {
@@ -11309,7 +12374,7 @@ exports.default = BufferManager;
 module.exports = exports['default'];
 
 /***/ }),
-/* 50 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -12352,7 +13417,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
         exports.UAParser = UAParser;
     } else {
         // requirejs env (optional)
-        if ("function" === FUNC_TYPE && __webpack_require__(51)) {
+        if ("function" === FUNC_TYPE && __webpack_require__(55)) {
             !(__WEBPACK_AMD_DEFINE_RESULT__ = (function () {
                 return UAParser;
             }).call(exports, __webpack_require__, exports, module),
@@ -12388,7 +13453,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
-/* 51 */
+/* 55 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */

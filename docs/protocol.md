@@ -250,75 +250,7 @@
 }
 ```
 
----bittorrent protocol--------------------------------
 
-### GET /announce (向tracker注册并请求peers)
-#### 参数
-```javastript
-{  
-    info_hash: string             //频道标识，目前是url的sha1值
-    browser:   string             //浏览器名
-    device: string                //mobile 或 PC
-    os: string                    //操作系统                      
-}
-```
-#### 返回
-```javastript
-{
-    peer_id: string                //节点的唯一ID   
-    report_interval: number        //上报统计信息的时间间隔 
-    peers: [
-        {id: string}                         
-    ]
-}
-```
-
-### GET /get_peers (向tracker请求peers)
-#### 参数
-```javastript
-{  
-    info_hash: string              //频道标识，目前是url的sha1值
-    peer_id: string                //节点的唯一ID   
-}
-```
-#### 返回
-```javastript
-{
-    peers: [
-        {id: string}                         
-    ]
-}
-```
-
-### POST /stats (向tracker请求peers)
-#### 参数
-```javastript
-{  
-    info_hash: string             //频道标识，目前是url的sha1值
-    peer_id: string
-    source: number
-    p2p: number
-}
-```
-#### 返回
-```javastript
-{
-                         
-}
-```
-### GET /heartbeat 
-#### 参数
-```javastript
-{  
-    info_hash: string             //频道标识，目前是url的sha1值
-    peer_id: string
-}
-```
-#### 返回
-```javastript
-{
-                     
-}
 
 ## fastmesh拓扑结构可视化协议
 
