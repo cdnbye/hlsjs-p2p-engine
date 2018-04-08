@@ -6566,9 +6566,9 @@ var _btTracker = __webpack_require__(46);
 
 var _btTracker2 = _interopRequireDefault(_btTracker);
 
-var _fragLoader = __webpack_require__(50);
+var _btLoader = __webpack_require__(50);
 
-var _fragLoader2 = _interopRequireDefault(_fragLoader);
+var _btLoader2 = _interopRequireDefault(_btLoader);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -6584,7 +6584,7 @@ var config = {
 };
 
 exports.Tracker = _btTracker2.default;
-exports.FragLoader = _fragLoader2.default;
+exports.FragLoader = _btLoader2.default;
 exports.config = config;
 
 /***/ }),
@@ -6716,12 +6716,18 @@ var HlsPeerify = function (_EventEmitter) {
 
         hlsjs.config.currLoaded = hlsjs.config.currPlay = 0;
 
-        hlsjs.on(hlsjs.constructor.Events.MANIFEST_PARSED, function (event, data) {
+        var onLevelLoaded = function onLevelLoaded(event, data) {
 
-            // this.bitrate = data.levels[0].bitrate;                                                //获取固定码率，用于子流
+            var isLive = data.details.live;
+            console.warn('live ' + isLive);
+            _this.config.live = isLive;
             var channel = hlsjs.url.split('?')[0];
             _this._init(channel);
-        });
+
+            hlsjs.off(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
+        };
+
+        hlsjs.on(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
 
         //streaming rate
         // this.streamingRate = 0;                        //单位bps
@@ -6746,8 +6752,8 @@ var HlsPeerify = function (_EventEmitter) {
             this.bufMgr = new _bufferManager2.default(this.config);
             this.hlsjs.config.bufMgr = this.bufMgr;
 
-            if (this.config.mode === 'live') {
-                //直播模式，采用fastmesh算法
+            if (this.config.engine === 'fastmesh') {
+                //采用fastmesh算法
                 //实例化RP服务器
                 this.signaler = new _fastmesh.RPClient(channel, this.config, browserInfo);
 
@@ -6759,8 +6765,9 @@ var HlsPeerify = function (_EventEmitter) {
 
                 //替换fLoader
                 this.hlsjs.config.fLoader = _fastmesh.HybridLoader;
-            } else if (this.config.mode === 'vod') {
-                //点播模式。采用BT算法
+            } else if (this.config.engine === 'bt') {
+                //采用BT算法
+
                 //实例化Fetcher
                 var fetcher = new _pear.Fetcher(this.config.key, _simpleSha2.default.sync(channel), this.config.announce);
                 //实例化tracker服务器
@@ -6768,6 +6775,8 @@ var HlsPeerify = function (_EventEmitter) {
                 this.signaler.scheduler.bufMgr = this.bufMgr;
                 //替换fLoader
                 this.hlsjs.config.fLoader = _bittorrent.FragLoader;
+                //向loader导入scheduler
+                this.hlsjs.config.scheduler = this.signaler.scheduler;
                 //在fLoader中使用fetcher
                 this.hlsjs.config.fetcher = fetcher;
             }
@@ -6810,7 +6819,6 @@ var HlsPeerify = function (_EventEmitter) {
             //     log('LEVEL_LOADED totalduration: '+JSON.stringify(data.details.totalduration, null, 2));
             //     log('LEVEL_LOADED live: '+JSON.stringify(data.details.live, null, 2));
             // });
-
 
             this.hlsjs.on(this.hlsjs.constructor.Events.DESTROYING, function () {
                 // log('DESTROYING: '+JSON.stringify(frag));
@@ -6877,7 +6885,7 @@ var _bittorrent = __webpack_require__(23);
  */
 var defaultP2PConfig = {
     key: 'free', //连接RP服务器的API key
-    mode: 'vod', //播放的流媒体类别，分为‘live‘和‘vod’两种，默认vod
+    engine: 'bt', //采用的算法，分为“bt”和“fastmesh”，默认“bt”
 
     wsSignalerAddr: 'ws://120.78.168.126:8081/ws', //信令服务器地址
     wsMaxRetries: 3, //发送数据重试次数
@@ -6890,10 +6898,10 @@ var defaultP2PConfig = {
     dcRequestTimeout: 3, //datachannel接收二进制数据的超时时间
     dcUploadTimeout: 3, //datachannel上传二进制数据的超时时间
     dcPingPackets: 10, //datachannel发送ping数据包的数量
-    dcTolerance: 2, //请求超时或错误多少次淘汰该peer
+    dcTolerance: 4, //请求超时或错误多少次淘汰该peer
 
     packetSize: 16 * 1024, //每次通过datachannel发送的包的大小
-    maxBufSize: 1024 * 1024 * 50, //p2p缓存的最大数据量
+    maxBufSize: 1024 * 1024 * 10, //p2p缓存的最大数据量
     loadTimeout: 5, //p2p下载的超时时间
     reportInterval: 60 //统计信息上报的时间间隔(废弃)
 
@@ -10393,6 +10401,7 @@ var BTScheduler = function (_EventEmitter) {
     }, {
         key: 'updatePlaySN',
         value: function updatePlaySN(sn) {
+            if (this.config.live) return; //rearest first只用于vod
             if (!this.hasPeers) return;
             var requested = [];
             for (var idx = sn + 1; idx <= sn + this.config.urgentOffset + 1; idx++) {
@@ -10429,9 +10438,10 @@ var BTScheduler = function (_EventEmitter) {
                     }
                 }
             }
+
             //检查是否有空闲的节点，有的话采用rearest first策略下载
             var idlePeers = this._getIdlePeer();
-            if (idlePeers.length === 0 || this.bitCounts.size === 0) return;
+            if (idlePeers.length === 0 || this.bitCounts.size === 0 || this.bufMgr.overflowed) return; //缓存溢出则停止rearest first
             var sortedArr = [].concat(_toConsumableArray(this.bitCounts.entries())).sort(function (item1, item2) {
                 return item1[1] < item2[1];
             });
@@ -10496,6 +10506,49 @@ var BTScheduler = function (_EventEmitter) {
             });
         }
     }, {
+        key: 'peersHasSN',
+        value: function peersHasSN(sn) {
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
+
+            try {
+                for (var _iterator3 = this.peerMap.values()[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var peer = _step3.value;
+
+                    if (peer.bitset.has(sn)) {
+                        return peer;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
+                    }
+                } finally {
+                    if (_didIteratorError3) {
+                        throw _iteratorError3;
+                    }
+                }
+            }
+
+            return null;
+        }
+    }, {
+        key: 'load',
+        value: function load(peer, context, config, callbacks) {
+            this.context = context;
+            var frag = context.frag;
+            this.callbacks = callbacks;
+            this.stats = { trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0 };
+            this.criticalSeg = { sn: frag.sn, relurl: frag.relurl };
+            peer.requestDataBySN(frag.sn, true);
+            this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout * 1000);
+        }
+    }, {
         key: '_setupDC',
         value: function _setupDC(dc) {
             var _this3 = this;
@@ -10518,11 +10571,26 @@ var BTScheduler = function (_EventEmitter) {
                     //防止重复下载
                     _this3._increBitCounts(sn);
                 }
-            }).on(_pear.Events.DC_PIECE, function () {//接收到piece事件，即二进制包头
-
+            }).on(_pear.Events.DC_PIECE, function (msg) {
+                //接收到piece事件，即二进制包头
+                if (_this3.criticalSeg && _this3.criticalSeg.sn === msg.sn) {
+                    //接收到critical的响应
+                    _this3.stats.tfirst = Math.max(performance.now(), _this3.stats.trequest);
+                }
             }).on(_pear.Events.DC_RESPONSE, function (response) {
                 //接收到完整二进制数据
-                _this3.bufMgr.addBuffer(response.sn, response.url, response.data);
+                if (_this3.criticalSeg && _this3.criticalSeg.sn === response.sn && _this3.criticaltimeouter) {
+                    console.warn('DC_RESPONSE onSuccess');
+                    window.clearTimeout(_this3.criticaltimeouter); //清除定时器
+                    _this3.criticaltimeouter = null;
+                    var stats = _this3.stats;
+                    stats.tload = Math.max(stats.tfirst, performance.now());
+                    stats.loaded = stats.total = response.data.byteLength;
+                    _this3.criticalSeg = null;
+                    _this3.callbacks.onSuccess(response, _this3.stats, _this3.context);
+                } else {
+                    _this3.bufMgr.addBuffer(response.sn, response.url, response.data);
+                }
                 _this3.updateLoadedSN(response.sn);
             }).on(_pear.Events.DC_REQUEST, function (msg) {
                 var url = _this3.bufMgr.getURLbySN(msg.sn);
@@ -10537,27 +10605,27 @@ var BTScheduler = function (_EventEmitter) {
     }, {
         key: '_broadcastToPeers',
         value: function _broadcastToPeers(msg) {
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
 
             try {
-                for (var _iterator3 = this.peerMap.values()[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var peer = _step3.value;
+                for (var _iterator4 = this.peerMap.values()[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    var peer = _step4.value;
 
                     peer.sendJson(msg);
                 }
             } catch (err) {
-                _didIteratorError3 = true;
-                _iteratorError3 = err;
+                _didIteratorError4 = true;
+                _iteratorError4 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                        _iterator3.return();
+                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                        _iterator4.return();
                     }
                 } finally {
-                    if (_didIteratorError3) {
-                        throw _iteratorError3;
+                    if (_didIteratorError4) {
+                        throw _iteratorError4;
                     }
                 }
             }
@@ -10606,6 +10674,14 @@ var BTScheduler = function (_EventEmitter) {
                 var last = this.bitCounts.get(index);
                 this.bitCounts.set(index, last + 1);
             }
+        }
+    }, {
+        key: '_criticaltimeout',
+        value: function _criticaltimeout() {
+            console.warn('_criticaltimeout');
+            this.criticalSeg = null;
+            this.callbacks.onTimeout(this.stats, this.context, null);
+            this.criticaltimeouter = null;
         }
     }, {
         key: 'hasPeers',
@@ -10676,7 +10752,7 @@ var DataChannel = function (_EventEmitter) {
         _this.miss = 0; //超时或者错误的次数
 
         //下载控制
-        _this.rcvdReqQueue = []; //接收到的请求的队列    队列末尾优先级最高
+        _this.rcvdReqQueue = []; //接收到的请求的队列    队列末尾优先级最高 sn
         _this.downloading = false;
         _this.uploading = false;
 
@@ -10742,6 +10818,8 @@ var DataChannel = function (_EventEmitter) {
                             break;
                         case _events4.default.DC_PIECE:
                             _this2._prepareForBinary(msg.attachments, msg.url, msg.sn, msg.size);
+                            _this2.emit(msg.event, msg);
+                            break;
                         case _events4.default.DC_REQUEST:
                             _this2._handleRequestMsg(msg);
                             break;
@@ -11236,7 +11314,7 @@ var FragLoader = function (_EventEmitter) {
         _this.bufMgr = config.bufMgr;
         _this.xhrLoader = new _xhrLoader2.default(config);
         _this.p2pEnabled = config.p2pEnabled;
-
+        _this.scheduler = config.scheduler;
         _this.fetcher = config.fetcher;
         return _this;
     }
@@ -11283,19 +11361,32 @@ var FragLoader = function (_EventEmitter) {
                     callbacks.onSuccess(response, stats, context);
                 }, 50);
             } else {
-                //否则用http下载
-                log('xhrLoader load ' + frag.relurl + ' at ' + frag.sn);
-                this.loader = this.xhrLoader;
-                context.frag.loadByXhr = true;
+                var peer = this.scheduler.peersHasSN(frag.sn);
+                if (peer) {
+                    //如果在peers的bitmap中找到
+                    console.warn('found sn ' + frag.sn + ' from peers');
+                    this.scheduler.load(peer, context, config, callbacks);
+                    callbacks.onTimeout = function (stats, context) {
+                        //如果P2P下载超时则立即切换到xhr下载
+                        log('xhrLoader load ' + frag.relurl + ' at ' + frag.sn);
+                        context.frag.loadByXhr = true;
+                        _this2.xhrLoader.load(context, config, callbacks);
+                    };
+                } else {
+                    //否则用http下载
+                    log('xhrLoader load ' + frag.relurl + ' at ' + frag.sn);
+                    context.frag.loadByXhr = true;
+                    this.xhrLoader.load(context, config, callbacks);
+                }
                 var onSuccess = callbacks.onSuccess;
                 callbacks.onSuccess = function (response, stats, context) {
+                    //在onsucess回调中复制并缓存二进制数据
                     if (!_this2.bufMgr.hasSegOfURL(frag.relurl)) {
                         _this2.bufMgr.copyAndAddBuffer(response.data, frag.relurl, frag.sn);
                     }
                     _this2.fetcher.reportFlow(stats, false);
                     onSuccess(response, stats, context);
                 };
-                this.xhrLoader.load(context, config, callbacks);
             }
         }
     }]);
@@ -11357,6 +11448,7 @@ var BufferManager = function (_EventEmitter) {
         _this._segPool = new Map(); //存放seg的Map            relurl -> segment
         _this._currBufSize = 0; //目前的buffer总大小
         _this.sn2Url = new Map(); //以sn查找relurl      sn -> relurl
+        _this.overflowed = false; //缓存是否溢出
         return _this;
     }
 
@@ -11414,6 +11506,7 @@ var BufferManager = function (_EventEmitter) {
                 this._segPool.delete(lastSeg.relurl);
                 this.sn2Url.delete(lastSeg.sn);
                 this._currBufSize -= parseInt(lastSeg.size);
+                this.overflowed = true;
             }
         }
     }, {

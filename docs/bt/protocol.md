@@ -81,7 +81,7 @@
 ## datachannel交互协议
 
 
-### 请求数据 
+### 通过SN请求数据 
 ```javastript       
 {
     event: 'REQUEST'   
@@ -89,6 +89,7 @@
     urgent: boolean         //是否紧急
 }
 ```
+
 
 ### 返回二进制数据头
 ```javastript       
