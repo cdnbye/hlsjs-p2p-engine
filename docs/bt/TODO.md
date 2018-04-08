@@ -1,5 +1,4 @@
 ## web端
-- burMgr满了之后不再请求数据
 - 兼容Sarari
 
 ## tracker
