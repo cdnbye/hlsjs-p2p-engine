@@ -61,6 +61,20 @@
 }
 ```
 
+### 发送ping数据包(用于计时)
+```javastript       
+{
+    event: 'PING'  
+}
+```
+
+### 发送响应ping数据包(用于计时)
+```javastript       
+{
+    event: 'PONG'  
+}
+```
+
 ---fastmesh protocol--------------------------------
 
 ### 通知对方成为子节点         

@@ -6580,6 +6580,7 @@ var config = {
     announce: "http://127.0.0.1:8080", //tracker服务器地址
     neighbours: 4, //连接的节点数量
     urgentOffset: 3 //播放点的后多少个buffer为urgent
+
 };
 
 exports.Tracker = _btTracker2.default;
@@ -6602,6 +6603,8 @@ Object.defineProperty(exports, "__esModule", {
 
 exports.default = {
     //data-channel
+    DC_PING: 'PING',
+    DC_PONG: 'PONG',
     DC_SIGNAL: 'SIGNAL',
     DC_OPEN: 'OPEN',
     DC_REQUEST: 'REQUEST',
@@ -6886,11 +6889,13 @@ var defaultP2PConfig = {
     dcKeepAliveAckTimeout: 2, //datachannel接收keep-alive-ack信息的超时时间，超时则认为连接失败并主动关闭
     dcRequestTimeout: 3, //datachannel接收二进制数据的超时时间
     dcUploadTimeout: 3, //datachannel上传二进制数据的超时时间
+    dcPingPackets: 10, //datachannel发送ping数据包的数量
+    dcTolerance: 2, //请求超时或错误多少次淘汰该peer
 
     packetSize: 16 * 1024, //每次通过datachannel发送的包的大小
     maxBufSize: 1024 * 1024 * 50, //p2p缓存的最大数据量
     loadTimeout: 5, //p2p下载的超时时间
-    reportInterval: 60 //统计信息上报的时间间隔
+    reportInterval: 60 //统计信息上报的时间间隔(废弃)
 
 };
 
@@ -10063,7 +10068,7 @@ var BTTracker = function (_EventEmitter) {
         _this.connected = false;
         _this.scheduler = new _btScheduler2.default(config);
         _this.DCMap = new Map(); //{key: remotePeerId, value: DataChannnel} 目前已经建立连接或正在建立连接的dc
-        _this.failedDCMap = new Map(); //{key: remotePeerId, value: boolean} 建立连接失败的dc
+        _this.failedDCSet = new Set(); //{remotePeerId} 建立连接失败的dc
         _this.signalerWs = null; //信令服务器ws
         _this.heartbeatInterval = 30;
         //tracker request API
@@ -10136,7 +10141,7 @@ var BTTracker = function (_EventEmitter) {
             }
 
             this.peers = this.peers.filter(function (node) {
-                var _arr = [].concat(_toConsumableArray(_this3.DCMap.keys()), _toConsumableArray(_this3.failedDCMap.keys()));
+                var _arr = [].concat(_toConsumableArray(_this3.DCMap.keys()), _toConsumableArray(_this3.failedDCSet.keys()));
 
                 for (var _i = 0; _i < _arr.length; _i++) {
                     var peerId = _arr[_i];
@@ -10168,7 +10173,7 @@ var BTTracker = function (_EventEmitter) {
                 if (!_this4.signalTimer) {
                     _this4.signalTimer = window.setTimeout(function () {
                         _this4.DCMap.delete(datachannel.remotePeerId);
-                        _this4.failedDCMap.set(datachannel.remotePeerId, true); //记录失败的连接
+                        _this4.failedDCSet.add(datachannel.remotePeerId); //记录失败的连接
                         console.warn(datachannel.remotePeerId + ' signaling timeout');
                         _this4.signalTimer = null;
                         _this4._tryConnectToPeer();
@@ -10178,7 +10183,7 @@ var BTTracker = function (_EventEmitter) {
                 console.log('datachannel error ' + datachannel.channelId);
                 _this4.scheduler.deletePeer(datachannel);
                 _this4.DCMap.delete(datachannel.remotePeerId);
-                _this4.failedDCMap.set(datachannel.remotePeerId, true); //记录失败的连接
+                _this4.failedDCSet.add(datachannel.remotePeerId); //记录失败的连接
                 _this4._tryConnectToPeer();
                 datachannel.destroy();
 
@@ -10261,6 +10266,7 @@ var BTTracker = function (_EventEmitter) {
             if (!datachannel) {
                 //收到子节点连接请求
                 console.log('receive child node connection request');
+                if (this.failedDCSet.has(remotePeerId)) return;
                 datachannel = new _pear.DataChannel(this.peerId, remotePeerId, false, this.config);
                 this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
                 this._setupDC(datachannel);
@@ -10295,17 +10301,17 @@ var BTTracker = function (_EventEmitter) {
     }, {
         key: 'currentPlaySN',
         set: function set(sn) {
-            this.scheduler.addPlaySN(sn);
+            this.scheduler.updatePlaySN(sn);
         }
     }, {
         key: 'currentLoadingSN',
         set: function set(sn) {
-            this.scheduler.addLoadingSN(sn);
+            this.scheduler.updateLoadingSN(sn);
         }
     }, {
         key: 'currentLoadedSN',
         set: function set(sn) {
-            this.scheduler.addLoadedSN(sn); //更新bitmap
+            this.scheduler.updateLoadedSN(sn); //更新bitmap
         }
     }]);
 
@@ -10364,8 +10370,8 @@ var BTScheduler = function (_EventEmitter) {
     }
 
     _createClass(BTScheduler, [{
-        key: 'addLoadedSN',
-        value: function addLoadedSN(sn) {
+        key: 'updateLoadedSN',
+        value: function updateLoadedSN(sn) {
             this.bitset.add(sn); //在bitset中记录
             if (this.bitCounts.has(sn)) {
                 this.bitCounts.delete(sn); //在bitCounts清除，防止重复下载
@@ -10379,14 +10385,14 @@ var BTScheduler = function (_EventEmitter) {
             }
         }
     }, {
-        key: 'addLoadingSN',
-        value: function addLoadingSN(sn) {
+        key: 'updateLoadingSN',
+        value: function updateLoadingSN(sn) {
             //防止下载hls.js正在下载的sn
             this.loadingSN = sn;
         }
     }, {
-        key: 'addPlaySN',
-        value: function addPlaySN(sn) {
+        key: 'updatePlaySN',
+        value: function updatePlaySN(sn) {
             if (!this.hasPeers) return;
             var requested = [];
             for (var idx = sn + 1; idx <= sn + this.config.urgentOffset + 1; idx++) {
@@ -10517,7 +10523,7 @@ var BTScheduler = function (_EventEmitter) {
             }).on(_pear.Events.DC_RESPONSE, function (response) {
                 //接收到完整二进制数据
                 _this3.bufMgr.addBuffer(response.sn, response.url, response.data);
-                _this3.addLoadedSN(response.sn);
+                _this3.updateLoadedSN(response.sn);
             }).on(_pear.Events.DC_REQUEST, function (msg) {
                 var url = _this3.bufMgr.getURLbySN(msg.sn);
                 if (url && _this3.bufMgr.hasSegOfURL(url)) {
@@ -10667,17 +10673,20 @@ var DataChannel = function (_EventEmitter) {
         // console.warn(`this.channelId ${this.channelId}`);
         _this.connected = false;
         _this.msgQueue = [];
+        _this.miss = 0; //超时或者错误的次数
 
         //下载控制
         _this.rcvdReqQueue = []; //接收到的请求的队列    队列末尾优先级最高
         _this.downloading = false;
         _this.uploading = false;
 
+        //延迟计算
+        _this.delays = [];
+
         _this._datachannel = new _simplePeer2.default({ initiator: isInitiator, objectMode: true });
         _this.isReceiver = isInitiator; //主动发起连接的为数据接受者，用于标识本节点的类型
         _this._init(_this._datachannel);
 
-        //fastmesh
         _this.streamingRate = 0; //单位bit/s
         //记录发送的数据量，用于计算streaming rate
         _this.recordSended = _this._adjustStreamingRate(10);
@@ -10702,6 +10711,8 @@ var DataChannel = function (_EventEmitter) {
             datachannel.once('connect', function () {
                 log('datachannel CONNECTED to ' + _this2.remotePeerId);
                 _this2.emit(_events4.default.DC_OPEN);
+                //测试延迟
+                _this2._sendPing();
                 //发送消息队列中的消息
                 while (_this2.msgQueue.length > 0) {
                     var msg = _this2.msgQueue.shift();
@@ -10721,48 +10732,28 @@ var DataChannel = function (_EventEmitter) {
                     }
                     var event = msg.event;
                     switch (event) {
-                        // case 'KEEPALIVE':
-                        //     this._handleKeepAlive(msg);
-                        //     break;
-                        // case 'KEEPALIVE-ACK':
-                        //     this._handleKeepAliveAck(msg);
-                        //     break;
-                        case _events4.default.DC_PIECE:
-                            _this2.emit(_events4.default.DC_PIECE);
-                            _this2._prepareForBinary(msg.attachments, msg.url, msg.sn, msg.size);
+                        case _events4.default.DC_PONG:
+                            _this2._handlePongMsg();
                             break;
+                        case _events4.default.DC_PING:
+                            _this2.sendJson({
+                                event: _events4.default.DC_PONG
+                            });
+                            break;
+                        case _events4.default.DC_PIECE:
+                            _this2._prepareForBinary(msg.attachments, msg.url, msg.sn, msg.size);
                         case _events4.default.DC_REQUEST:
                             _this2._handleRequestMsg(msg);
-                            break;
-                        case _events4.default.DC_LACK:
-                            _this2.downloading = false;
-                            _this2.emit(_events4.default.DC_REQUESTFAIL, msg);
-                            break;
-                        case _events4.default.DC_DISPLACE:
-                            //通知对方成为子节点
-                            _this2.emit(_events4.default.DISPLACE, msg);
-                            break;
-                        case _events4.default.DC_CLOSE:
-                            _this2.emit(_events4.default.DC_CLOSE);
-                            break;
-                        case _events4.default.DC_TRANSITION:
-                            //子节点的跃迁请求
-                            _this2.emit(_events4.default.DC_TRANSITION, msg);
                             break;
                         case _events4.default.DC_GRANT:
                             //收到GRANT信息后首先判断是否发给自己的，否则如果TTL>0则继续向子节点广播
                             _this2._handleGrant(msg);
                             break;
-                        case _events4.default.DC_BITFIELD:
-                            _this2.emit(_events4.default.DC_BITFIELD, msg);
-                            break;
-                        case _events4.default.DC_HAVE:
-                            _this2.emit(_events4.default.DC_HAVE, msg);
-                            break;
                         case _events4.default.DC_PIECE_ACK:
                             _this2._handlePieceAck();
                             break;
                         default:
+                            _this2.emit(msg.event, msg);
 
                     }
                 } else if (data instanceof Buffer) {
@@ -10870,7 +10861,6 @@ var DataChannel = function (_EventEmitter) {
     }, {
         key: 'receiveSignal',
         value: function receiveSignal(data) {
-            log('datachannel receive siganl ' + JSON.stringify(data));
             this._datachannel.signal(data);
         }
     }, {
@@ -10881,6 +10871,7 @@ var DataChannel = function (_EventEmitter) {
             // window.clearTimeout(this.keepAliveAckTimeout);
             // this.keepAliveAckTimeout = null;
             window.clearInterval(this.adjustSRInterval);
+            window.clearInterval(this.pinger);
             this._datachannel.removeAllListeners();
             this.removeAllListeners();
             this._datachannel.destroy();
@@ -10964,6 +10955,14 @@ var DataChannel = function (_EventEmitter) {
             this.emit(_events4.default.DC_TIMEOUT);
             this.requestTimeout = null;
             this.downloading = false;
+            this.miss++;
+            if (this.miss >= this.config.dcTolerance) {
+                var msg = {
+                    event: _events4.default.DC_CLOSE
+                };
+                this.sendJson(msg);
+                this.emit(_events4.default.DC_ERROR);
+            }
         }
     }, {
         key: '_uploadtimeout',
@@ -10975,6 +10974,56 @@ var DataChannel = function (_EventEmitter) {
                 var sn = this.rcvdReqQueue.pop();
                 this.emit(_events4.default.DC_REQUEST, { sn: sn });
             }
+        }
+    }, {
+        key: '_sendPing',
+        value: function _sendPing() {
+            var _this4 = this;
+
+            this.ping = performance.now();
+            for (var i = 0; i < this.config.dcPingPackets; i++) {
+                this.sendJson({
+                    event: _events4.default.DC_PING
+                });
+            }
+            window.setTimeout(function () {
+                if (_this4.delays.length > 0) {
+                    var sum = 0;
+                    var _iteratorNormalCompletion = true;
+                    var _didIteratorError = false;
+                    var _iteratorError = undefined;
+
+                    try {
+                        for (var _iterator = _this4.delays[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                            var delay = _step.value;
+
+                            sum += delay;
+                        }
+                    } catch (err) {
+                        _didIteratorError = true;
+                        _iteratorError = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion && _iterator.return) {
+                                _iterator.return();
+                            }
+                        } finally {
+                            if (_didIteratorError) {
+                                throw _iteratorError;
+                            }
+                        }
+                    }
+
+                    _this4.delay = sum / _this4.delays.length;
+                    _this4.delays = [];
+                }
+            }, 100);
+        }
+    }, {
+        key: '_handlePongMsg',
+        value: function _handlePongMsg() {
+            var delay = performance.now() - this.ping;
+            this.delays.push(delay);
         }
     }]);
 
@@ -11119,13 +11168,13 @@ var Fetcher = function () {
             } else {
                 this.cdnDownloaded += stats.total;
             }
-            log('cdnDownloaded ' + this.cdnDownloaded + ' p2pDownloaded ' + this.p2pDownloaded);
+            // log(`cdnDownloaded ${this.cdnDownloaded} p2pDownloaded ${this.p2pDownloaded}`)
         }
     }, {
         key: 'destroy',
         value: function destroy() {
             window.clearInterval(this.statser);
-            this.statser = null;
+            window.clearInterval(this.heartbeater);
         }
     }]);
 
