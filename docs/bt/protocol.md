@@ -140,3 +140,11 @@
     sn: number               //ts数据的播放序号
 }
 ```
+
+### lost一个ts后立即广播给所有peers
+```javastript       
+{
+    event: 'LOST'  
+    sn: number               //ts数据的播放序号
+}
+```
