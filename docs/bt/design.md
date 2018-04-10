@@ -21,13 +21,13 @@
 
 ## 算法流程
 1. 替换hls.js的fLoader(使用http请求ts文件的模块)为定制的frag-loader，并初始化bt-tracker，以ts文件为单位建立bitmap;
-2. 当hls.js请求数据时，frag-loader先在buffer-manager中查找，如果找到则返回缓存的ts文件，否则用http请求；
-3. bt-tracker通过tracker服务器获取节点，并与节点建立p2p连接；
-4. p2p连接建立成功后向peer发送bitmap，并在下载成功某个ts文件文件后将序号及时广播给其它peer；
-5. 通过监听hls.js事件来实时获取目前的播放进度，将当前播放点的后几个待下载数据定义为urgent，其余则为prefetch；
-5. 在获取peer传递过来的bitmap后首先查看peer是否有自己待下载的urgent数据，如果有则优先下载这些数据，否则采用BT的
-最少优先策略，优先下载周围节点最少的数据
-6. 每隔一段时间上次统计信息
+2. bt-tracker通过tracker服务器获取节点，并与节点建立p2p连接；
+2. p2p连接建立成功后向peer发送bitmap，并在下载成功某个ts文件文件后将序号及时广播给其它peer；
+3. 当hls.js请求数据时，先在buffer-manager中查找，如果找到则返回缓存的ts文件，否则进入下一步；
+4. 查看peers的bitmap，如果找到则向相应pear请求，否则用http请求
+5. 通过监听hls.js事件来实时获取目前的播放进度，将当前播放点的后几个待下载数据定义为urgent，其余则为非urgent；
+6. 在获取peer传递过来的bitmap后首先查看peer是否有自己待下载的urgent数据，如果有则优先下载这些数据；
+7. 每隔一段时间采用BT的最少优先策略，查看所有peers的bitmap，优先下载周围节点最少的ts文件
 
 ## 代码结构
 - ./index.hls-peerify.js
@@ -46,18 +46,18 @@
     - 默认配置文件
 - ./buffer-manager
     - 对缓存数据进行管理
-- ./vod/frag-loader
+- ./bt/bt-loader
     - 用于替换hls.js的fLoader
     - 接收到数据请求时，先在buffer-manager中查找，如果找到则返回缓存的ts文件，否则用xhr-loader请求
-- ./vod/bt-tracker
+- ./bt/bt-tracker
     - 负责通过tracker服务器获取节点
     - 初始化bt-scheduler
-- ./vod/bt-scheduler
+- ./bt/bt-scheduler
     - 负责管理所有data channel
     - 实现仿BT算法
-- ./vod/bittorrent
+- ./bt/bittorrent
     - ./vod的入口文件
     - 保存vod模块的默认配置
-- ./utils/xhr-loader
-    - hls.js的http请求模块
+- ./utils/ua-parser
+    - 获取用户端设备信息
     
