@@ -1,5 +1,4 @@
 ## web端
-- 兼容Sarari
 - lost
 
 ## tracker
