@@ -6755,7 +6755,7 @@ var DataChannel = function (_EventEmitter) {
         _this.delays = [];
 
         _this._datachannel = new _simplePeer2.default({ initiator: isInitiator, objectMode: true });
-        _this.isReceiver = isInitiator; //主动发起连接的为数据接受者，用于标识本节点的类型
+        _this.isInitiator = isInitiator; //是否主动发起连接的
         _this._init(_this._datachannel);
 
         _this.streamingRate = 0; //单位bit/s
@@ -8536,7 +8536,9 @@ var Fetcher = function () {
         this.getPeersURL = baseUrl + '/get_peers/' + queryStr;
         this.statsURL = baseUrl + '/stats/' + queryStr;
 
-        this.conns = 0; //连接的peer数量
+        //连接情况上报
+        this.conns = 0; //连接的peer的增量
+        this.failConns = 0; //连接失败的peer的增量
 
         //流量上报
         this.cdnDownloaded = 0;
@@ -8565,7 +8567,9 @@ var Fetcher = function () {
             var _this2 = this;
 
             this.heartbeater = window.setInterval(function () {
-                fetch(_this2.heartbeatURL + ('&peer_id=' + _this2.peerId)).then(function (response) {}).catch(function (err) {});
+                fetch(_this2.heartbeatURL + ('&peer_id=' + _this2.peerId)).then(function (response) {}).catch(function (err) {
+                    window.clearInterval(_this2.heartbeater);
+                });
             }, interval * 1000);
         }
     }, {
@@ -8584,9 +8588,20 @@ var Fetcher = function () {
             });
         }
     }, {
-        key: 'btUpdateConns',
-        value: function btUpdateConns(n) {
-            this.conns = n;
+        key: 'increConns',
+        value: function increConns() {
+            //主动连接的负责报告(增量)
+            this.conns++;
+        }
+    }, {
+        key: 'decreConns',
+        value: function decreConns() {
+            this.conns--;
+        }
+    }, {
+        key: 'increFailConns',
+        value: function increFailConns() {
+            this.failConns++;
         }
     }, {
         key: 'btStatsStart',
@@ -8594,18 +8609,28 @@ var Fetcher = function () {
             var _this4 = this;
 
             this.statser = window.setInterval(function () {
+                var body = {
+                    source: Math.round(_this4.cdnDownloaded / 1024),
+                    p2p: Math.round(_this4.p2pDownloaded / 1024)
+                };
+                if (_this4.conns !== 0) {
+                    body.conns = _this4.conns;
+                }
+                if (_this4.failConns > 0) {
+                    body.failConns = _this4.failConns;
+                }
                 fetch(_this4.statsURL + ('&peer_id=' + _this4.peerId), {
                     method: 'POST', // 指定是POST请求
-                    body: JSON.stringify({
-                        source: Math.round(_this4.cdnDownloaded / 1024),
-                        p2p: Math.round(_this4.p2pDownloaded / 1024),
-                        conns: _this4.conns
-                    })
+                    body: JSON.stringify(body)
                 }).then(function (response) {
                     if (response.ok) {
                         _this4.cdnDownloaded = 0;
                         _this4.p2pDownloaded = 0;
+                        _this4.conns = 0;
+                        _this4.failConns = 0;
                     }
+                }).catch(function (err) {
+                    window.clearInterval(_this4.statser);
                 });
             }, interval * 1000);
         }
@@ -10211,9 +10236,6 @@ var BTTracker = function (_EventEmitter) {
     }
 
     _createClass(BTTracker, [{
-        key: 'send',
-        value: function send(msg) {}
-    }, {
         key: 'resumeP2P',
         value: function resumeP2P() {
             var _this2 = this;
@@ -10221,9 +10243,7 @@ var BTTracker = function (_EventEmitter) {
             this.fetcher.btAnnounce().then(function (json) {
                 console.warn('announceURL response ' + JSON.stringify(json));
                 _this2.peerId = json.peer_id;
-                // this.heartbeatInterval = json.heartbeat_interval;
                 _this2.fetcher.btHeartbeat(json.heartbeat_interval);
-                // this.reportInterval = json.report_interval;
                 _this2.fetcher.btStatsStart(json.report_interval);
                 _this2.signalerWs = _this2._initSignalerWs(); //连上tracker后开始连接信令服务器
                 _this2._handlePeers(json.peers);
@@ -10318,7 +10338,15 @@ var BTTracker = function (_EventEmitter) {
                 _this4._requestMorePeers();
 
                 //更新conns
-                _this4.fetcher.btUpdateConns(_this4.scheduler.peerMap.size);
+                if (datachannel.isInitiator) {
+                    if (datachannel.connected) {
+                        //连接断开
+                        _this4.fetcher.decreConns();
+                    } else {
+                        //连接失败
+                        _this4.fetcher.increFailConns();
+                    }
+                }
             }).once(_pear.Events.DC_CLOSE, function () {
 
                 console.warn('datachannel closed ' + datachannel.channelId + ' ');
@@ -10332,7 +10360,7 @@ var BTTracker = function (_EventEmitter) {
                 _this4._requestMorePeers();
 
                 //更新conns
-                _this4.fetcher.btUpdateConns(_this4.scheduler.peerMap.size);
+                _this4.fetcher.decreConns();
             }).once(_pear.Events.DC_OPEN, function () {
 
                 _this4.scheduler.handshakePeer(datachannel);
@@ -10343,7 +10371,7 @@ var BTTracker = function (_EventEmitter) {
                 }
 
                 //更新conns
-                _this4.fetcher.btUpdateConns(_this4.scheduler.peerMap.size);
+                _this4.fetcher.increConns();
             });
         }
     }, {
@@ -10956,7 +10984,7 @@ var FragLoader = function (_EventEmitter) {
                     if (!_this2.bufMgr.hasSegOfURL(frag.relurl)) {
                         _this2.bufMgr.copyAndAddBuffer(response.data, frag.relurl, frag.sn);
                     }
-                    _this2.fetcher.reportFlow(stats, context.frag.loadByXhr ? false : true);
+                    _this2.fetcher.reportFlow(stats, true);
                     onSuccess(response, stats, context);
                 };
             } else {
@@ -10969,7 +10997,7 @@ var FragLoader = function (_EventEmitter) {
                     if (!_this2.bufMgr.hasSegOfURL(frag.relurl)) {
                         _this2.bufMgr.copyAndAddBuffer(response.data, frag.relurl, frag.sn);
                     }
-                    _this2.fetcher.reportFlow(stats, context.frag.loadByXhr ? false : true);
+                    _this2.fetcher.reportFlow(stats, false);
                     _onSuccess(response, stats, context);
                 };
             }

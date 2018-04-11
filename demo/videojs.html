@@ -30,10 +30,10 @@
     <video id="player" class="video-js vjs-default-skin" height="360" width="640" controls preload="none">
         <!--<source src="http://wowza.peer5.com/live/smil:bbb_abr.smil/chunklist_w794046364_b2204000.m3u8"-->
                 <!--type="application/x-mpegURL"/>-->
-        <source src="http://112.90.52.139/hls/pear.m3u8"
-                type="application/x-mpegURL"/>
-        <!--<source src="https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8"-->
+        <!--<source src="http://112.90.52.139/hls/pear.m3u8"-->
                 <!--type="application/x-mpegURL"/>-->
+        <source src="https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8"
+                type="application/x-mpegURL"/>
     </video>
     <table class="table table-hover" style="border: 0; margin: 0">
         <thead>
@@ -77,9 +77,9 @@
         autoplay: true,
         html5: {
             hlsjsConfig: {
-//                maxBufferSize: 0,
+                maxBufferSize: 0,
 //                maxBufferLength: 30,
-//                liveSyncDurationCount: 10,
+                liveSyncDurationCount: 10,
 //                liveSyncDurationCount: 5,
                 fragLoadingTimeOut: 4000,              // used by fragment-loader
             }

@@ -55,6 +55,7 @@
     source: number
     p2p: number
     conns: number                 //连接的peer数量
+    failConns: number
 }
 ```
 #### 返回
