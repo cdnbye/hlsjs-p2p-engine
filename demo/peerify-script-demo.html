@@ -72,6 +72,12 @@
 //          break;
 //      }
         });
+
+        hls.on(Hls.Events.FRAG_LOADED, function (e, data) {
+            var frag = data.frag;
+
+//            console.warn(`frag ${JSON.stringify(frag)}`);
+        });
     }
 </script>
 </body>

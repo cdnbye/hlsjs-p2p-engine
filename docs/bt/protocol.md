@@ -55,7 +55,7 @@
     source: number
     p2p: number
     conns: number                 //连接的peer数量
-    failConns: number
+    failConns: number             //连接失败的数量
 }
 ```
 #### 返回
@@ -87,6 +87,7 @@
 {
     event: 'REQUEST'   
     sn: number              //ts数据的播放序号
+    url: string             //如果是请求url的信息则加上这个字段
     urgent: boolean         //是否紧急
 }
 ```
@@ -100,6 +101,15 @@
     url: string              //ts文件的url（相对url）
     sn: number               //ts数据的播放序号
     size: number             //二进制数据的总大小，可用于校验
+}
+```
+
+### 返回找不到对应url数据的信息
+```javastript       
+{
+    event: 'PIECE_NOT_FOUND'   
+    url: string              //ts文件的url（相对url）
+    sn: number               //ts数据的播放序号
 }
 ```
 

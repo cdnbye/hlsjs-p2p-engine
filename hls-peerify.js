@@ -6006,7 +6006,7 @@ exports.default = {
     DC_SIGNAL: 'SIGNAL',
     DC_OPEN: 'OPEN',
     DC_REQUEST: 'REQUEST',
-    DC_REQUESTFAIL: 'REQUEST_FAIL', //当请求的数据找不到时触发
+    DC_PIECE_NOT_FOUND: 'PIECE_NOT_FOUND', //当请求的数据找不到时触发
     DC_CLOSE: 'CLOSE',
     DC_RESPONSE: 'RESPONSE',
     DC_ERROR: 'ERROR',
@@ -6819,6 +6819,11 @@ var DataChannel = function (_EventEmitter) {
                             _this2._prepareForBinary(msg.attachments, msg.url, msg.sn, msg.size);
                             _this2.emit(msg.event, msg);
                             break;
+                        case _events4.default.DC_PIECE_NOT_FOUND:
+                            window.clearTimeout(_this2.requestTimeout); //清除定时器
+                            _this2.requestTimeout = null;
+                            _this2.emit(msg.event, msg);
+                            break;
                         case _events4.default.DC_REQUEST:
                             _this2._handleRequestMsg(msg);
                             break;
@@ -6913,10 +6918,12 @@ var DataChannel = function (_EventEmitter) {
     }, {
         key: 'requestDataByURL',
         value: function requestDataByURL(relurl) {
+            var urgent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
             //由于需要阻塞下载数据，因此request请求用新的API
             var msg = {
                 event: _events4.default.DC_REQUEST,
-                url: relurl
+                url: relurl,
+                urgent: urgent
             };
             this.downloading = true;
             this.sendJson(msg);
@@ -10697,7 +10704,9 @@ var BTScheduler = function (_EventEmitter) {
             }
 
             if (target) {
-                target.requestDataBySN(frag.sn, true);
+                // target.requestDataBySN(frag.sn, true);
+                target.requestDataByURL(frag.relurl, true); //critical的根据url请求
+                console.warn('request criticalSeg url ' + frag.relurl + ' at ' + frag.sn);
             }
             this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout * 1000);
         }
@@ -10732,29 +10741,50 @@ var BTScheduler = function (_EventEmitter) {
                 _this3._decreBitCounts(sn);
             }).on(_pear.Events.DC_PIECE, function (msg) {
                 //接收到piece事件，即二进制包头
-                if (_this3.criticalSeg && _this3.criticalSeg.sn === msg.sn) {
+                if (_this3.criticalSeg && _this3.criticalSeg.relurl === msg.url) {
                     //接收到critical的响应
                     _this3.stats.tfirst = Math.max(performance.now(), _this3.stats.trequest);
                 }
+            }).on(_pear.Events.DC_PIECE_NOT_FOUND, function (msg) {
+                if (_this3.criticalSeg && _this3.criticalSeg.relurl === msg.url) {
+                    //接收到critical未找到的响应
+                    window.clearTimeout(_this3.criticaltimeouter); //清除定时器
+                    _this3.criticaltimeouter = null;
+                    _this3._criticaltimeout(); //触发超时，由xhr下载
+                }
             }).on(_pear.Events.DC_RESPONSE, function (response) {
                 //接收到完整二进制数据
-                if (_this3.criticalSeg && _this3.criticalSeg.sn === response.sn && _this3.criticaltimeouter) {
+                if (_this3.criticalSeg && _this3.criticalSeg.relurl === response.url && _this3.criticaltimeouter) {
+                    console.warn('receive criticalSeg url ' + response.url);
                     window.clearTimeout(_this3.criticaltimeouter); //清除定时器
                     _this3.criticaltimeouter = null;
                     var stats = _this3.stats;
                     stats.tload = Math.max(stats.tfirst, performance.now());
                     stats.loaded = stats.total = response.data.byteLength;
                     _this3.criticalSeg = null;
-                    _this3.callbacks.onSuccess(response, _this3.stats, _this3.context);
+                    _this3.callbacks.onSuccess(response, stats, _this3.context);
                 } else {
                     _this3.bufMgr.addBuffer(response.sn, response.url, response.data);
                 }
                 _this3.updateLoadedSN(response.sn);
             }).on(_pear.Events.DC_REQUEST, function (msg) {
-                var url = _this3.bufMgr.getURLbySN(msg.sn);
+                var url = '';
+                if (!msg.url) {
+                    //请求sn的request
+                    url = _this3.bufMgr.getURLbySN(msg.sn);
+                } else {
+                    //请求url的request
+                    url = msg.url;
+                }
                 if (url && _this3.bufMgr.hasSegOfURL(url)) {
                     var seg = _this3.bufMgr.getSegByURL(url);
                     dc.sendBuffer(msg.sn, seg.relurl, seg.data);
+                } else {
+                    dc.sendJson({
+                        event: _pear.Events.DC_PIECE_NOT_FOUND,
+                        url: url,
+                        sn: msg.sn
+                    });
                 }
             }).on(_pear.Events.DC_TIMEOUT, function () {
                 console.warn('DC_TIMEOUT');
@@ -10960,7 +10990,7 @@ var FragLoader = function (_EventEmitter) {
                     total = void 0;
                 trequest = performance.now();
                 tfirst = tload = trequest + 50;
-                loaded = total = seg.size;
+                loaded = total = frag.loaded = seg.size;
                 var stats = { trequest: trequest, tfirst: tfirst, tload: tload, loaded: loaded, total: total, retry: 0 };
                 // console.warn(`bufMgr onSuccess ${JSON.stringify(this.bufMgr.tmp.data.byteLength, null, 1)}  ${JSON.stringify(stats, null, 1)} ${JSON.stringify(context, null, 1)}`)
                 window.setTimeout(function () {
@@ -10985,6 +11015,7 @@ var FragLoader = function (_EventEmitter) {
                         _this2.bufMgr.copyAndAddBuffer(response.data, frag.relurl, frag.sn);
                     }
                     _this2.fetcher.reportFlow(stats, true);
+                    frag.loaded = stats.loaded;
                     onSuccess(response, stats, context);
                 };
             } else {
