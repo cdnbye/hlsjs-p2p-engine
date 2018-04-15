@@ -1,5 +1,7 @@
 ## web端
-- lost
+- ua-parser
+- arraybuffer代替buffer
+- 分散peer请求
 
 ## tracker
 - connects

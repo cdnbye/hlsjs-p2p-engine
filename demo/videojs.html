@@ -22,9 +22,9 @@
 <link href="http://vjs.zencdn.net/5.19.2/video-js.css" rel="stylesheet">
 <script src="http://vjs.zencdn.net/5.19.2/video.js"></script>
 <script src="../dist/videojs-contrib-hlsjs.min.js"></script>
-<script src="../dist/hls-peerify.min.js"></script>
+<!--<script src="../dist/hls-peerify.min.js"></script>-->
 <!--<script src="../dist/hls-peerify.js"></script>-->
-<!--<script src="../hls-peerify.js"></script>-->
+<script src="../hls-peerify.js"></script>
 <body>
 <div id="main">
     <video id="player" class="video-js vjs-default-skin" height="360" width="640" controls preload="none">
@@ -88,17 +88,8 @@
 
     var p2pConfig = {
         key: 'free',
-//        wsSchedulerAddr: `ws://211.159.220.166:8080/ws`,
-        wsSchedulerAddr: `ws://127.0.0.1:8080/ws`,
-        wsSignalerAddr: 'ws://120.78.168.126:8081/ws',
-        reportInterval: 30,
-//            defaultUploadBW: 2561241,
-//            defaultUploadBW: 2561241 + 100,
-//            defaultUploadBW: 853290*3+1000,
-        defaultUploadBW: 798032/3*5,
-//            transitionEnabled: true,
-        transitionEnabled: false,
-        transitionCheckInterval: 90
+//        announce: "http://120.78.168.126:8088",
+
     };
     new HlsPeerify(player.tech_.sourceHandler_.hls, p2pConfig);
 
@@ -110,7 +101,7 @@
     player.tech_.on(Hls.Events.FRAG_LOADED, function (e, data) {
         var frag = data.frag;
 //            console.warn(`sn ${frag.sn} relurl ${frag.relurl} level ${frag.level} downloaded ${frag.loaded} source ${frag.loadByXhr?'CDN':'P2P'}`);
-        var source = frag.loadByXhr === true ?'CDN':'P2P';
+        var source = frag.loadByP2P === true ?'P2P':'CDN';
         addToTable(frag.sn, frag.relurl, frag.level, frag.loaded, source);
     });
 

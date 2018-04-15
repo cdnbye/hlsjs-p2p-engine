@@ -77,11 +77,11 @@ function getAliasesForLightDist(target = 'vod') {
 
     if (target === 'vod') {
         aliases = Object.assign({}, aliases, {
-            './live/fastmesh': './empty.js'
+            './fastmesh': './empty.js'
         });
     } else if (target === 'live') {
         aliases = Object.assign({}, aliases, {
-            './vod/bittorrent': './empty.js'
+            './bittorrent': './empty.js'
         });
     }
 

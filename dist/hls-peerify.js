@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 18);
+/******/ 	return __webpack_require__(__webpack_require__.s = 23);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -410,6 +410,48 @@ module.exports = g;
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.getBrowserRTC = exports.Buffer = exports.Fetcher = exports.Events = exports.DataChannel = undefined;
+
+var _datachannel = __webpack_require__(24);
+
+var _datachannel2 = _interopRequireDefault(_datachannel);
+
+var _events = __webpack_require__(18);
+
+var _events2 = _interopRequireDefault(_events);
+
+var _fetcher = __webpack_require__(40);
+
+var _fetcher2 = _interopRequireDefault(_fetcher);
+
+var _getBrowserRtc = __webpack_require__(11);
+
+var _getBrowserRtc2 = _interopRequireDefault(_getBrowserRtc);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Created by xieting on 2018/4/3.
+ */
+
+var Buffer = __webpack_require__(6).Buffer;
+
+exports.DataChannel = _datachannel2.default;
+exports.Events = _events2.default;
+exports.Fetcher = _fetcher2.default;
+exports.Buffer = Buffer;
+exports.getBrowserRTC = _getBrowserRtc2.default;
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -599,7 +641,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -628,7 +670,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -662,7 +704,7 @@ if (typeof Object.create === 'function') {
 
 /*<replacement>*/
 
-var processNextTick = __webpack_require__(9);
+var pna = __webpack_require__(9);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -678,7 +720,7 @@ module.exports = Duplex;
 
 /*<replacement>*/
 var util = __webpack_require__(8);
-util.inherits = __webpack_require__(3);
+util.inherits = __webpack_require__(4);
 /*</replacement>*/
 
 var Readable = __webpack_require__(12);
@@ -686,10 +728,13 @@ var Writable = __webpack_require__(15);
 
 util.inherits(Duplex, Readable);
 
-var keys = objectKeys(Writable.prototype);
-for (var v = 0; v < keys.length; v++) {
-  var method = keys[v];
-  if (!Duplex.prototype[method]) Duplex.prototype[method] = Writable.prototype[method];
+{
+  // avoid scope creep, the keys array can then be collected
+  var keys = objectKeys(Writable.prototype);
+  for (var v = 0; v < keys.length; v++) {
+    var method = keys[v];
+    if (!Duplex.prototype[method]) Duplex.prototype[method] = Writable.prototype[method];
+  }
 }
 
 function Duplex(options) {
@@ -708,6 +753,16 @@ function Duplex(options) {
   this.once('end', onend);
 }
 
+Object.defineProperty(Duplex.prototype, 'writableHighWaterMark', {
+  // making it explicit this property is not enumerable
+  // because otherwise some prototype manipulation in
+  // userland will fail
+  enumerable: false,
+  get: function () {
+    return this._writableState.highWaterMark;
+  }
+});
+
 // the no-half-open enforcer
 function onend() {
   // if we allow half-open state, or if the writable side ended,
@@ -716,7 +771,7 @@ function onend() {
 
   // no more data can be written.
   // But allow more writes to happen in this tick.
-  processNextTick(onEndNT, this);
+  pna.nextTick(onEndNT, this);
 }
 
 function onEndNT(self) {
@@ -748,53 +803,8 @@ Duplex.prototype._destroy = function (err, cb) {
   this.push(null);
   this.end();
 
-  processNextTick(cb, err);
+  pna.nextTick(cb, err);
 };
-
-function forEach(xs, f) {
-  for (var i = 0, l = xs.length; i < l; i++) {
-    f(xs[i], i);
-  }
-}
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-/**
- * Created by xieting on 2018/1/9.
- */
-
-exports.default = {
-
-    //data-channel
-    DC_SIGNAL: 'signal',
-    DC_OPEN: 'open',
-    DC_REQUEST: 'request',
-    DC_REQUESTFAIL: 'request_fail', //当请求的数据找不到时触发
-    DC_CLOSE: 'close',
-    DC_RESPONSE: 'response',
-    DC_ERROR: 'error',
-    DC_BINARY: 'binary',
-    DC_TRANSITION: 'transition',
-    DC_GRANT: 'grant',
-    //buffer-manager
-
-
-    //loader-scheduler
-    SEGMENT: 'segment',
-    TRANSITION: "transition", //跃迁事件
-    DISPLACE: 'displace',
-    CONNECT: 'connect', //建立data channel
-    ADOPT: 'adopt'
-};
-module.exports = exports['default'];
 
 /***/ }),
 /* 6 */
@@ -811,9 +821,9 @@ module.exports = exports['default'];
 
 
 
-var base64 = __webpack_require__(20)
-var ieee754 = __webpack_require__(21)
-var isArray = __webpack_require__(11)
+var base64 = __webpack_require__(26)
+var ieee754 = __webpack_require__(27)
+var isArray = __webpack_require__(10)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -2785,9 +2795,9 @@ function objectToString(o) {
 if (!process.version ||
     process.version.indexOf('v0.') === 0 ||
     process.version.indexOf('v1.') === 0 && process.version.indexOf('v1.8.') !== 0) {
-  module.exports = nextTick;
+  module.exports = { nextTick: nextTick };
 } else {
-  module.exports = process.nextTick;
+  module.exports = process
 }
 
 function nextTick(fn, arg1, arg2, arg3) {
@@ -2824,837 +2834,11 @@ function nextTick(fn, arg1, arg2, arg3) {
   }
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
 /* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(Buffer) {module.exports = Peer
-
-var debug = __webpack_require__(22)('simple-peer')
-var getBrowserRTC = __webpack_require__(25)
-var inherits = __webpack_require__(3)
-var randombytes = __webpack_require__(26)
-var stream = __webpack_require__(27)
-
-var MAX_BUFFERED_AMOUNT = 64 * 1024
-
-inherits(Peer, stream.Duplex)
-
-/**
- * WebRTC peer connection. Same API as node core `net.Socket`, plus a few extra methods.
- * Duplex stream.
- * @param {Object} opts
- */
-function Peer (opts) {
-  var self = this
-  if (!(self instanceof Peer)) return new Peer(opts)
-
-  self._id = randombytes(4).toString('hex').slice(0, 7)
-  self._debug('new peer %o', opts)
-
-  opts = Object.assign({
-    allowHalfOpen: false
-  }, opts)
-
-  stream.Duplex.call(self, opts)
-
-  self.channelName = opts.initiator
-    ? opts.channelName || randombytes(20).toString('hex')
-    : null
-
-  // Needed by _transformConstraints, so set this early
-  self._isChromium = typeof window !== 'undefined' && !!window.webkitRTCPeerConnection
-
-  self.initiator = opts.initiator || false
-  self.channelConfig = opts.channelConfig || Peer.channelConfig
-  self.config = opts.config || Peer.config
-  self.constraints = self._transformConstraints(opts.constraints || Peer.constraints)
-  self.offerConstraints = self._transformConstraints(opts.offerConstraints || {})
-  self.answerConstraints = self._transformConstraints(opts.answerConstraints || {})
-  self.reconnectTimer = opts.reconnectTimer || false
-  self.sdpTransform = opts.sdpTransform || function (sdp) { return sdp }
-  self.stream = opts.stream || false
-  self.trickle = opts.trickle !== undefined ? opts.trickle : true
-  self._earlyMessage = null
-
-  self.destroyed = false
-  self.connected = false
-
-  self.remoteAddress = undefined
-  self.remoteFamily = undefined
-  self.remotePort = undefined
-  self.localAddress = undefined
-  self.localPort = undefined
-
-  self._wrtc = (opts.wrtc && typeof opts.wrtc === 'object')
-    ? opts.wrtc
-    : getBrowserRTC()
-
-  if (!self._wrtc) {
-    if (typeof window === 'undefined') {
-      throw new Error('No WebRTC support: Specify `opts.wrtc` option in this environment')
-    } else {
-      throw new Error('No WebRTC support: Not a supported browser')
-    }
-  }
-
-  self._pcReady = false
-  self._channelReady = false
-  self._iceComplete = false // ice candidate trickle done (got null candidate)
-  self._channel = null
-  self._pendingCandidates = []
-  self._previousStreams = []
-
-  self._chunk = null
-  self._cb = null
-  self._interval = null
-  self._reconnectTimeout = null
-
-  self._pc = new (self._wrtc.RTCPeerConnection)(self.config, self.constraints)
-
-  // We prefer feature detection whenever possible, but sometimes that's not
-  // possible for certain implementations.
-  self._isWrtc = Array.isArray(self._pc.RTCIceConnectionStates)
-  self._isReactNativeWebrtc = typeof self._pc._peerConnectionId === 'number'
-
-  self._pc.oniceconnectionstatechange = function () {
-    self._onIceStateChange()
-  }
-  self._pc.onicegatheringstatechange = function () {
-    self._onIceStateChange()
-  }
-  self._pc.onsignalingstatechange = function () {
-    self._onSignalingStateChange()
-  }
-  self._pc.onicecandidate = function (event) {
-    self._onIceCandidate(event)
-  }
-
-  // Other spec events, unused by this implementation:
-  // - onconnectionstatechange
-  // - onicecandidateerror
-  // - onfingerprintfailure
-
-  if (self.initiator) {
-    var createdOffer = false
-    self._pc.onnegotiationneeded = function () {
-      if (!createdOffer) self._createOffer()
-      createdOffer = true
-    }
-
-    self._setupData({
-      channel: self._pc.createDataChannel(self.channelName, self.channelConfig)
-    })
-  } else {
-    self._pc.ondatachannel = function (event) {
-      self._setupData(event)
-    }
-  }
-
-  if ('addTrack' in self._pc) {
-    // WebRTC Spec, Firefox
-    if (self.stream) {
-      self.stream.getTracks().forEach(function (track) {
-        self._pc.addTrack(track, self.stream)
-      })
-    }
-    self._pc.ontrack = function (event) {
-      self._onTrack(event)
-    }
-  } else {
-    // Chrome, etc. This can be removed once all browsers support `ontrack`
-    if (self.stream) self._pc.addStream(self.stream)
-    self._pc.onaddstream = function (event) {
-      self._onAddStream(event)
-    }
-  }
-
-  // HACK: wrtc doesn't fire the 'negotionneeded' event
-  if (self.initiator && self._isWrtc) {
-    self._pc.onnegotiationneeded()
-  }
-
-  self._onFinishBound = function () {
-    self._onFinish()
-  }
-  self.once('finish', self._onFinishBound)
-}
-
-Peer.WEBRTC_SUPPORT = !!getBrowserRTC()
-
-/**
- * Expose config, constraints, and data channel config for overriding all Peer
- * instances. Otherwise, just set opts.config, opts.constraints, or opts.channelConfig
- * when constructing a Peer.
- */
-Peer.config = {
-  iceServers: [
-    {
-      urls: 'stun:stun.l.google.com:19302'
-    },
-    {
-      urls: 'stun:global.stun.twilio.com:3478?transport=udp'
-    }
-  ]
-}
-Peer.constraints = {}
-Peer.channelConfig = {}
-
-Object.defineProperty(Peer.prototype, 'bufferSize', {
-  get: function () {
-    var self = this
-    return (self._channel && self._channel.bufferedAmount) || 0
-  }
-})
-
-Peer.prototype.address = function () {
-  var self = this
-  return { port: self.localPort, family: 'IPv4', address: self.localAddress }
-}
-
-Peer.prototype.signal = function (data) {
-  var self = this
-  if (self.destroyed) throw new Error('cannot signal after peer is destroyed')
-  if (typeof data === 'string') {
-    try {
-      data = JSON.parse(data)
-    } catch (err) {
-      data = {}
-    }
-  }
-  self._debug('signal()')
-
-  if (data.candidate) {
-    if (self._pc.remoteDescription) self._addIceCandidate(data.candidate)
-    else self._pendingCandidates.push(data.candidate)
-  }
-  if (data.sdp) {
-    self._pc.setRemoteDescription(new (self._wrtc.RTCSessionDescription)(data), function () {
-      if (self.destroyed) return
-
-      self._pendingCandidates.forEach(function (candidate) {
-        self._addIceCandidate(candidate)
-      })
-      self._pendingCandidates = []
-
-      if (self._pc.remoteDescription.type === 'offer') self._createAnswer()
-    }, function (err) { self._destroy(err) })
-  }
-  if (!data.sdp && !data.candidate) {
-    self._destroy(new Error('signal() called with invalid signal data'))
-  }
-}
-
-Peer.prototype._addIceCandidate = function (candidate) {
-  var self = this
-  try {
-    self._pc.addIceCandidate(
-      new self._wrtc.RTCIceCandidate(candidate),
-      noop,
-      function (err) { self._destroy(err) }
-    )
-  } catch (err) {
-    self._destroy(new Error('error adding candidate: ' + err.message))
-  }
-}
-
-/**
- * Send text/binary data to the remote peer.
- * @param {TypedArrayView|ArrayBuffer|Buffer|string|Blob|Object} chunk
- */
-Peer.prototype.send = function (chunk) {
-  var self = this
-
-  // HACK: `wrtc` module crashes on Node.js Buffer, so convert to Uint8Array
-  // See: https://github.com/feross/simple-peer/issues/60
-  if (self._isWrtc && Buffer.isBuffer(chunk)) {
-    chunk = new Uint8Array(chunk)
-  }
-
-  self._channel.send(chunk)
-}
-
-Peer.prototype.destroy = function (onclose) {
-  var self = this
-  self._destroy(null, onclose)
-}
-
-Peer.prototype._destroy = function (err, onclose) {
-  var self = this
-  if (self.destroyed) return
-  if (onclose) self.once('close', onclose)
-
-  self._debug('destroy (error: %s)', err && (err.message || err))
-
-  self.readable = self.writable = false
-
-  if (!self._readableState.ended) self.push(null)
-  if (!self._writableState.finished) self.end()
-
-  self.destroyed = true
-  self.connected = false
-  self._pcReady = false
-  self._channelReady = false
-  self._previousStreams = null
-  self._earlyMessage = null
-
-  clearInterval(self._interval)
-  clearTimeout(self._reconnectTimeout)
-  self._interval = null
-  self._reconnectTimeout = null
-  self._chunk = null
-  self._cb = null
-
-  if (self._onFinishBound) self.removeListener('finish', self._onFinishBound)
-  self._onFinishBound = null
-
-  if (self._pc) {
-    try {
-      self._pc.close()
-    } catch (err) {}
-
-    self._pc.oniceconnectionstatechange = null
-    self._pc.onicegatheringstatechange = null
-    self._pc.onsignalingstatechange = null
-    self._pc.onicecandidate = null
-    if ('addTrack' in self._pc) {
-      self._pc.ontrack = null
-    } else {
-      self._pc.onaddstream = null
-    }
-    self._pc.onnegotiationneeded = null
-    self._pc.ondatachannel = null
-  }
-
-  if (self._channel) {
-    try {
-      self._channel.close()
-    } catch (err) {}
-
-    self._channel.onmessage = null
-    self._channel.onopen = null
-    self._channel.onclose = null
-    self._channel.onerror = null
-  }
-  self._pc = null
-  self._channel = null
-
-  if (err) self.emit('error', err)
-  self.emit('close')
-}
-
-Peer.prototype._setupData = function (event) {
-  var self = this
-  if (!event.channel) {
-    // In some situations `pc.createDataChannel()` returns `undefined` (in wrtc),
-    // which is invalid behavior. Handle it gracefully.
-    // See: https://github.com/feross/simple-peer/issues/163
-    return self._destroy(new Error('Data channel event is missing `channel` property'))
-  }
-
-  self._channel = event.channel
-  self._channel.binaryType = 'arraybuffer'
-
-  if (typeof self._channel.bufferedAmountLowThreshold === 'number') {
-    self._channel.bufferedAmountLowThreshold = MAX_BUFFERED_AMOUNT
-  }
-
-  self.channelName = self._channel.label
-
-  self._channel.onmessage = function (event) {
-    if (!self._channelReady) { // HACK: Workaround for Chrome not firing "open" between tabs
-      self._earlyMessage = event
-      self._onChannelOpen()
-    } else {
-      self._onChannelMessage(event)
-    }
-  }
-  self._channel.onbufferedamountlow = function () {
-    self._onChannelBufferedAmountLow()
-  }
-  self._channel.onopen = function () {
-    if (!self._channelReady) self._onChannelOpen()
-  }
-  self._channel.onclose = function () {
-    self._onChannelClose()
-  }
-  self._channel.onerror = function (err) {
-    self._destroy(err)
-  }
-}
-
-Peer.prototype._read = function () {}
-
-Peer.prototype._write = function (chunk, encoding, cb) {
-  var self = this
-  if (self.destroyed) return cb(new Error('cannot write after peer is destroyed'))
-
-  if (self.connected) {
-    try {
-      self.send(chunk)
-    } catch (err) {
-      return self._destroy(err)
-    }
-    if (self._channel.bufferedAmount > MAX_BUFFERED_AMOUNT) {
-      self._debug('start backpressure: bufferedAmount %d', self._channel.bufferedAmount)
-      self._cb = cb
-    } else {
-      cb(null)
-    }
-  } else {
-    self._debug('write before connect')
-    self._chunk = chunk
-    self._cb = cb
-  }
-}
-
-// When stream finishes writing, close socket. Half open connections are not
-// supported.
-Peer.prototype._onFinish = function () {
-  var self = this
-  if (self.destroyed) return
-
-  if (self.connected) {
-    destroySoon()
-  } else {
-    self.once('connect', destroySoon)
-  }
-
-  // Wait a bit before destroying so the socket flushes.
-  // TODO: is there a more reliable way to accomplish this?
-  function destroySoon () {
-    setTimeout(function () {
-      self._destroy()
-    }, 1000)
-  }
-}
-
-Peer.prototype._createOffer = function () {
-  var self = this
-  if (self.destroyed) return
-
-  self._pc.createOffer(function (offer) {
-    if (self.destroyed) return
-    offer.sdp = self.sdpTransform(offer.sdp)
-    self._pc.setLocalDescription(offer, onSuccess, onError)
-
-    function onSuccess () {
-      if (self.destroyed) return
-      if (self.trickle || self._iceComplete) sendOffer()
-      else self.once('_iceComplete', sendOffer) // wait for candidates
-    }
-
-    function onError (err) {
-      self._destroy(err)
-    }
-
-    function sendOffer () {
-      var signal = self._pc.localDescription || offer
-      self._debug('signal')
-      self.emit('signal', {
-        type: signal.type,
-        sdp: signal.sdp
-      })
-    }
-  }, function (err) { self._destroy(err) }, self.offerConstraints)
-}
-
-Peer.prototype._createAnswer = function () {
-  var self = this
-  if (self.destroyed) return
-
-  self._pc.createAnswer(function (answer) {
-    if (self.destroyed) return
-    answer.sdp = self.sdpTransform(answer.sdp)
-    self._pc.setLocalDescription(answer, onSuccess, onError)
-
-    function onSuccess () {
-      if (self.destroyed) return
-      if (self.trickle || self._iceComplete) sendAnswer()
-      else self.once('_iceComplete', sendAnswer)
-    }
-
-    function onError (err) {
-      self._destroy(err)
-    }
-
-    function sendAnswer () {
-      var signal = self._pc.localDescription || answer
-      self._debug('signal')
-      self.emit('signal', {
-        type: signal.type,
-        sdp: signal.sdp
-      })
-    }
-  }, function (err) { self._destroy(err) }, self.answerConstraints)
-}
-
-Peer.prototype._onIceStateChange = function () {
-  var self = this
-  if (self.destroyed) return
-  var iceConnectionState = self._pc.iceConnectionState
-  var iceGatheringState = self._pc.iceGatheringState
-
-  self._debug(
-    'iceStateChange (connection: %s) (gathering: %s)',
-    iceConnectionState,
-    iceGatheringState
-  )
-  self.emit('iceStateChange', iceConnectionState, iceGatheringState)
-
-  if (iceConnectionState === 'connected' || iceConnectionState === 'completed') {
-    clearTimeout(self._reconnectTimeout)
-    self._pcReady = true
-    self._maybeReady()
-  }
-  if (iceConnectionState === 'disconnected') {
-    if (self.reconnectTimer) {
-      // If user has set `opt.reconnectTimer`, allow time for ICE to attempt a reconnect
-      clearTimeout(self._reconnectTimeout)
-      self._reconnectTimeout = setTimeout(function () {
-        self._destroy()
-      }, self.reconnectTimer)
-    } else {
-      self._destroy()
-    }
-  }
-  if (iceConnectionState === 'failed') {
-    self._destroy(new Error('Ice connection failed.'))
-  }
-  if (iceConnectionState === 'closed') {
-    self._destroy()
-  }
-}
-
-Peer.prototype.getStats = function (cb) {
-  var self = this
-
-  // Promise-based getStats() (standard)
-  if (self._pc.getStats.length === 0) {
-    self._pc.getStats().then(function (res) {
-      var reports = []
-      res.forEach(function (report) {
-        reports.push(report)
-      })
-      cb(null, reports)
-    }, function (err) { cb(err) })
-
-  // Two-parameter callback-based getStats() (deprecated, former standard)
-  } else if (self._isReactNativeWebrtc) {
-    self._pc.getStats(null, function (res) {
-      var reports = []
-      res.forEach(function (report) {
-        reports.push(report)
-      })
-      cb(null, reports)
-    }, function (err) { cb(err) })
-
-  // Single-parameter callback-based getStats() (non-standard)
-  } else if (self._pc.getStats.length > 0) {
-    self._pc.getStats(function (res) {
-      // If we destroy connection in `connect` callback this code might happen to run when actual connection is already closed
-      if (self.destroyed) return
-
-      var reports = []
-      res.result().forEach(function (result) {
-        var report = {}
-        result.names().forEach(function (name) {
-          report[name] = result.stat(name)
-        })
-        report.id = result.id
-        report.type = result.type
-        report.timestamp = result.timestamp
-        reports.push(report)
-      })
-      cb(null, reports)
-    }, function (err) { cb(err) })
-
-  // Unknown browser, skip getStats() since it's anyone's guess which style of
-  // getStats() they implement.
-  } else {
-    cb(null, [])
-  }
-}
-
-Peer.prototype._maybeReady = function () {
-  var self = this
-  self._debug('maybeReady pc %s channel %s', self._pcReady, self._channelReady)
-  if (self.connected || self._connecting || !self._pcReady || !self._channelReady) return
-
-  self._connecting = true
-
-  // HACK: We can't rely on order here, for details see https://github.com/js-platform/node-webrtc/issues/339
-  function findCandidatePair () {
-    if (self.destroyed) return
-
-    self.getStats(function (err, items) {
-      if (self.destroyed) return
-
-      // Treat getStats error as non-fatal. It's not essential.
-      if (err) items = []
-
-      var remoteCandidates = {}
-      var localCandidates = {}
-      var candidatePairs = {}
-      var foundSelectedCandidatePair = false
-
-      items.forEach(function (item) {
-        // TODO: Once all browsers support the hyphenated stats report types, remove
-        // the non-hypenated ones
-        if (item.type === 'remotecandidate' || item.type === 'remote-candidate') {
-          remoteCandidates[item.id] = item
-        }
-        if (item.type === 'localcandidate' || item.type === 'local-candidate') {
-          localCandidates[item.id] = item
-        }
-        if (item.type === 'candidatepair' || item.type === 'candidate-pair') {
-          candidatePairs[item.id] = item
-        }
-      })
-
-      items.forEach(function (item) {
-        // Spec-compliant
-        if (item.type === 'transport') {
-          setSelectedCandidatePair(candidatePairs[item.selectedCandidatePairId])
-        }
-
-        // Old implementations
-        if (
-          (item.type === 'googCandidatePair' && item.googActiveConnection === 'true') ||
-          ((item.type === 'candidatepair' || item.type === 'candidate-pair') && item.selected)
-        ) {
-          setSelectedCandidatePair(item)
-        }
-      })
-
-      function setSelectedCandidatePair (selectedCandidatePair) {
-        foundSelectedCandidatePair = true
-
-        var local = localCandidates[selectedCandidatePair.localCandidateId]
-
-        if (local && local.ip) {
-          // Spec
-          self.localAddress = local.ip
-          self.localPort = Number(local.port)
-        } else if (local && local.ipAddress) {
-          // Firefox
-          self.localAddress = local.ipAddress
-          self.localPort = Number(local.portNumber)
-        } else if (typeof selectedCandidatePair.googLocalAddress === 'string') {
-          // TODO: remove this once Chrome 58 is released
-          local = selectedCandidatePair.googLocalAddress.split(':')
-          self.localAddress = local[0]
-          self.localPort = Number(local[1])
-        }
-
-        var remote = remoteCandidates[selectedCandidatePair.remoteCandidateId]
-
-        if (remote && remote.ip) {
-          // Spec
-          self.remoteAddress = remote.ip
-          self.remotePort = Number(remote.port)
-        } else if (remote && remote.ipAddress) {
-          // Firefox
-          self.remoteAddress = remote.ipAddress
-          self.remotePort = Number(remote.portNumber)
-        } else if (typeof selectedCandidatePair.googRemoteAddress === 'string') {
-          // TODO: remove this once Chrome 58 is released
-          remote = selectedCandidatePair.googRemoteAddress.split(':')
-          self.remoteAddress = remote[0]
-          self.remotePort = Number(remote[1])
-        }
-        self.remoteFamily = 'IPv4'
-
-        self._debug(
-          'connect local: %s:%s remote: %s:%s',
-          self.localAddress, self.localPort, self.remoteAddress, self.remotePort
-        )
-      }
-
-      if (!foundSelectedCandidatePair && items.length) {
-        setTimeout(findCandidatePair, 100)
-        return
-      } else {
-        self._connecting = false
-        self.connected = true
-      }
-
-      if (self._chunk) {
-        try {
-          self.send(self._chunk)
-        } catch (err) {
-          return self._destroy(err)
-        }
-        self._chunk = null
-        self._debug('sent chunk from "write before connect"')
-
-        var cb = self._cb
-        self._cb = null
-        cb(null)
-      }
-
-      // If `bufferedAmountLowThreshold` and 'onbufferedamountlow' are unsupported,
-      // fallback to using setInterval to implement backpressure.
-      if (typeof self._channel.bufferedAmountLowThreshold !== 'number') {
-        self._interval = setInterval(function () { self._onInterval() }, 150)
-        if (self._interval.unref) self._interval.unref()
-      }
-
-      self._debug('connect')
-      self.emit('connect')
-      if (self._earlyMessage) { // HACK: Workaround for Chrome not firing "open" between tabs
-        self._onChannelMessage(self._earlyMessage)
-        self._earlyMessage = null
-      }
-    })
-  }
-  findCandidatePair()
-}
-
-Peer.prototype._onInterval = function () {
-  if (!this._cb || !this._channel || this._channel.bufferedAmount > MAX_BUFFERED_AMOUNT) {
-    return
-  }
-  this._onChannelBufferedAmountLow()
-}
-
-Peer.prototype._onSignalingStateChange = function () {
-  var self = this
-  if (self.destroyed) return
-  self._debug('signalingStateChange %s', self._pc.signalingState)
-  self.emit('signalingStateChange', self._pc.signalingState)
-}
-
-Peer.prototype._onIceCandidate = function (event) {
-  var self = this
-  if (self.destroyed) return
-  if (event.candidate && self.trickle) {
-    self.emit('signal', {
-      candidate: {
-        candidate: event.candidate.candidate,
-        sdpMLineIndex: event.candidate.sdpMLineIndex,
-        sdpMid: event.candidate.sdpMid
-      }
-    })
-  } else if (!event.candidate) {
-    self._iceComplete = true
-    self.emit('_iceComplete')
-  }
-}
-
-Peer.prototype._onChannelMessage = function (event) {
-  var self = this
-  if (self.destroyed) return
-  var data = event.data
-  if (data instanceof ArrayBuffer) data = Buffer.from(data)
-  self.push(data)
-}
-
-Peer.prototype._onChannelBufferedAmountLow = function () {
-  var self = this
-  if (self.destroyed || !self._cb) return
-  self._debug('ending backpressure: bufferedAmount %d', self._channel.bufferedAmount)
-  var cb = self._cb
-  self._cb = null
-  cb(null)
-}
-
-Peer.prototype._onChannelOpen = function () {
-  var self = this
-  if (self.connected || self.destroyed) return
-  self._debug('on channel open')
-  self._channelReady = true
-  self._maybeReady()
-}
-
-Peer.prototype._onChannelClose = function () {
-  var self = this
-  if (self.destroyed) return
-  self._debug('on channel close')
-  self._destroy()
-}
-
-Peer.prototype._onAddStream = function (event) {
-  var self = this
-  if (self.destroyed) return
-  self._debug('on add stream')
-  self.emit('stream', event.stream)
-}
-
-Peer.prototype._onTrack = function (event) {
-  var self = this
-  if (self.destroyed) return
-  self._debug('on track')
-  var id = event.streams[0].id
-  if (self._previousStreams.indexOf(id) !== -1) return // Only fire one 'stream' event, even though there may be multiple tracks per stream
-  self._previousStreams.push(id)
-  self.emit('stream', event.streams[0])
-}
-
-Peer.prototype._debug = function () {
-  var self = this
-  var args = [].slice.call(arguments)
-  args[0] = '[' + self._id + '] ' + args[0]
-  debug.apply(null, args)
-}
-
-// Transform constraints objects into the new format (unless Chromium)
-// TODO: This can be removed when Chromium supports the new format
-Peer.prototype._transformConstraints = function (constraints) {
-  var self = this
-
-  if (Object.keys(constraints).length === 0) {
-    return constraints
-  }
-
-  if ((constraints.mandatory || constraints.optional) && !self._isChromium) {
-    // convert to new format
-
-    // Merge mandatory and optional objects, prioritizing mandatory
-    var newConstraints = Object.assign({}, constraints.optional, constraints.mandatory)
-
-    // fix casing
-    if (newConstraints.OfferToReceiveVideo !== undefined) {
-      newConstraints.offerToReceiveVideo = newConstraints.OfferToReceiveVideo
-      delete newConstraints['OfferToReceiveVideo']
-    }
-
-    if (newConstraints.OfferToReceiveAudio !== undefined) {
-      newConstraints.offerToReceiveAudio = newConstraints.OfferToReceiveAudio
-      delete newConstraints['OfferToReceiveAudio']
-    }
-
-    return newConstraints
-  } else if (!constraints.mandatory && !constraints.optional && self._isChromium) {
-    // convert to old format
-
-    // fix casing
-    if (constraints.offerToReceiveVideo !== undefined) {
-      constraints.OfferToReceiveVideo = constraints.offerToReceiveVideo
-      delete constraints['offerToReceiveVideo']
-    }
-
-    if (constraints.offerToReceiveAudio !== undefined) {
-      constraints.OfferToReceiveAudio = constraints.offerToReceiveAudio
-      delete constraints['offerToReceiveAudio']
-    }
-
-    return {
-      mandatory: constraints // NOTE: All constraints are upgraded to mandatory
-    }
-  }
-
-  return constraints
-}
-
-function noop () {}
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6).Buffer))
-
-/***/ }),
-/* 11 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -3662,6 +2846,27 @@ var toString = {}.toString;
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+// originally pulled out of simple-peer
+
+module.exports = function getBrowserRTC () {
+  if (typeof window === 'undefined') return null
+  var wrtc = {
+    RTCPeerConnection: window.RTCPeerConnection || window.mozRTCPeerConnection ||
+      window.webkitRTCPeerConnection,
+    RTCSessionDescription: window.RTCSessionDescription ||
+      window.mozRTCSessionDescription || window.webkitRTCSessionDescription,
+    RTCIceCandidate: window.RTCIceCandidate || window.mozRTCIceCandidate ||
+      window.webkitRTCIceCandidate
+  }
+  if (!wrtc.RTCPeerConnection) return null
+  return wrtc
+}
 
 
 /***/ }),
@@ -3694,13 +2899,13 @@ module.exports = Array.isArray || function (arr) {
 
 /*<replacement>*/
 
-var processNextTick = __webpack_require__(9);
+var pna = __webpack_require__(9);
 /*</replacement>*/
 
 module.exports = Readable;
 
 /*<replacement>*/
-var isArray = __webpack_require__(11);
+var isArray = __webpack_require__(10);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -3721,9 +2926,8 @@ var EElistenerCount = function (emitter, type) {
 var Stream = __webpack_require__(13);
 /*</replacement>*/
 
-// TODO(bmeurer): Change this back to const once hole checks are
-// properly optimized away early in Ignition+TurboFan.
 /*<replacement>*/
+
 var Buffer = __webpack_require__(7).Buffer;
 var OurUint8Array = global.Uint8Array || function () {};
 function _uint8ArrayToBuffer(chunk) {
@@ -3732,15 +2936,16 @@ function _uint8ArrayToBuffer(chunk) {
 function _isUint8Array(obj) {
   return Buffer.isBuffer(obj) || obj instanceof OurUint8Array;
 }
+
 /*</replacement>*/
 
 /*<replacement>*/
 var util = __webpack_require__(8);
-util.inherits = __webpack_require__(3);
+util.inherits = __webpack_require__(4);
 /*</replacement>*/
 
 /*<replacement>*/
-var debugUtil = __webpack_require__(28);
+var debugUtil = __webpack_require__(33);
 var debug = void 0;
 if (debugUtil && debugUtil.debuglog) {
   debug = debugUtil.debuglog('stream');
@@ -3749,7 +2954,7 @@ if (debugUtil && debugUtil.debuglog) {
 }
 /*</replacement>*/
 
-var BufferList = __webpack_require__(29);
+var BufferList = __webpack_require__(34);
 var destroyImpl = __webpack_require__(14);
 var StringDecoder;
 
@@ -3760,33 +2965,40 @@ var kProxyEvents = ['error', 'close', 'destroy', 'pause', 'resume'];
 function prependListener(emitter, event, fn) {
   // Sadly this is not cacheable as some libraries bundle their own
   // event emitter implementation with them.
-  if (typeof emitter.prependListener === 'function') {
-    return emitter.prependListener(event, fn);
-  } else {
-    // This is a hack to make sure that our error handler is attached before any
-    // userland ones.  NEVER DO THIS. This is here only because this code needs
-    // to continue to work with older versions of Node.js that do not include
-    // the prependListener() method. The goal is to eventually remove this hack.
-    if (!emitter._events || !emitter._events[event]) emitter.on(event, fn);else if (isArray(emitter._events[event])) emitter._events[event].unshift(fn);else emitter._events[event] = [fn, emitter._events[event]];
-  }
+  if (typeof emitter.prependListener === 'function') return emitter.prependListener(event, fn);
+
+  // This is a hack to make sure that our error handler is attached before any
+  // userland ones.  NEVER DO THIS. This is here only because this code needs
+  // to continue to work with older versions of Node.js that do not include
+  // the prependListener() method. The goal is to eventually remove this hack.
+  if (!emitter._events || !emitter._events[event]) emitter.on(event, fn);else if (isArray(emitter._events[event])) emitter._events[event].unshift(fn);else emitter._events[event] = [fn, emitter._events[event]];
 }
 
 function ReadableState(options, stream) {
-  Duplex = Duplex || __webpack_require__(4);
+  Duplex = Duplex || __webpack_require__(5);
 
   options = options || {};
+
+  // Duplex streams are both readable and writable, but share
+  // the same options object.
+  // However, some cases require setting options to different
+  // values for the readable and the writable sides of the duplex stream.
+  // These options can be provided separately as readableXXX and writableXXX.
+  var isDuplex = stream instanceof Duplex;
 
   // object stream flag. Used to make read(n) ignore n and to
   // make all the buffer merging and length checks go away
   this.objectMode = !!options.objectMode;
 
-  if (stream instanceof Duplex) this.objectMode = this.objectMode || !!options.readableObjectMode;
+  if (isDuplex) this.objectMode = this.objectMode || !!options.readableObjectMode;
 
   // the point at which it stops calling _read() to fill the buffer
   // Note: 0 is a valid value, means "don't call _read preemptively ever"
   var hwm = options.highWaterMark;
+  var readableHwm = options.readableHighWaterMark;
   var defaultHwm = this.objectMode ? 16 : 16 * 1024;
-  this.highWaterMark = hwm || hwm === 0 ? hwm : defaultHwm;
+
+  if (hwm || hwm === 0) this.highWaterMark = hwm;else if (isDuplex && (readableHwm || readableHwm === 0)) this.highWaterMark = readableHwm;else this.highWaterMark = defaultHwm;
 
   // cast to ints.
   this.highWaterMark = Math.floor(this.highWaterMark);
@@ -3840,7 +3052,7 @@ function ReadableState(options, stream) {
 }
 
 function Readable(options) {
-  Duplex = Duplex || __webpack_require__(4);
+  Duplex = Duplex || __webpack_require__(5);
 
   if (!(this instanceof Readable)) return new Readable(options);
 
@@ -4159,7 +3371,7 @@ function emitReadable(stream) {
   if (!state.emittedReadable) {
     debug('emitReadable', state.flowing);
     state.emittedReadable = true;
-    if (state.sync) processNextTick(emitReadable_, stream);else emitReadable_(stream);
+    if (state.sync) pna.nextTick(emitReadable_, stream);else emitReadable_(stream);
   }
 }
 
@@ -4178,7 +3390,7 @@ function emitReadable_(stream) {
 function maybeReadMore(stream, state) {
   if (!state.readingMore) {
     state.readingMore = true;
-    processNextTick(maybeReadMore_, stream, state);
+    pna.nextTick(maybeReadMore_, stream, state);
   }
 }
 
@@ -4223,7 +3435,7 @@ Readable.prototype.pipe = function (dest, pipeOpts) {
   var doEnd = (!pipeOpts || pipeOpts.end !== false) && dest !== process.stdout && dest !== process.stderr;
 
   var endFn = doEnd ? onend : unpipe;
-  if (state.endEmitted) processNextTick(endFn);else src.once('end', endFn);
+  if (state.endEmitted) pna.nextTick(endFn);else src.once('end', endFn);
 
   dest.on('unpipe', onunpipe);
   function onunpipe(readable, unpipeInfo) {
@@ -4413,7 +3625,7 @@ Readable.prototype.on = function (ev, fn) {
       state.readableListening = state.needReadable = true;
       state.emittedReadable = false;
       if (!state.reading) {
-        processNextTick(nReadingNextTick, this);
+        pna.nextTick(nReadingNextTick, this);
       } else if (state.length) {
         emitReadable(this);
       }
@@ -4444,7 +3656,7 @@ Readable.prototype.resume = function () {
 function resume(stream, state) {
   if (!state.resumeScheduled) {
     state.resumeScheduled = true;
-    processNextTick(resume_, stream, state);
+    pna.nextTick(resume_, stream, state);
   }
 }
 
@@ -4481,18 +3693,19 @@ function flow(stream) {
 // This is *not* part of the readable stream interface.
 // It is an ugly unfortunate mess of history.
 Readable.prototype.wrap = function (stream) {
+  var _this = this;
+
   var state = this._readableState;
   var paused = false;
 
-  var self = this;
   stream.on('end', function () {
     debug('wrapped end');
     if (state.decoder && !state.ended) {
       var chunk = state.decoder.end();
-      if (chunk && chunk.length) self.push(chunk);
+      if (chunk && chunk.length) _this.push(chunk);
     }
 
-    self.push(null);
+    _this.push(null);
   });
 
   stream.on('data', function (chunk) {
@@ -4502,7 +3715,7 @@ Readable.prototype.wrap = function (stream) {
     // don't skip over falsy values in objectMode
     if (state.objectMode && (chunk === null || chunk === undefined)) return;else if (!state.objectMode && (!chunk || !chunk.length)) return;
 
-    var ret = self.push(chunk);
+    var ret = _this.push(chunk);
     if (!ret) {
       paused = true;
       stream.pause();
@@ -4523,12 +3736,12 @@ Readable.prototype.wrap = function (stream) {
 
   // proxy certain important events.
   for (var n = 0; n < kProxyEvents.length; n++) {
-    stream.on(kProxyEvents[n], self.emit.bind(self, kProxyEvents[n]));
+    stream.on(kProxyEvents[n], this.emit.bind(this, kProxyEvents[n]));
   }
 
   // when we try to consume some more bytes, simply unpause the
   // underlying stream.
-  self._read = function (n) {
+  this._read = function (n) {
     debug('wrapped _read', n);
     if (paused) {
       paused = false;
@@ -4536,8 +3749,18 @@ Readable.prototype.wrap = function (stream) {
     }
   };
 
-  return self;
+  return this;
 };
+
+Object.defineProperty(Readable.prototype, 'readableHighWaterMark', {
+  // making it explicit this property is not enumerable
+  // because otherwise some prototype manipulation in
+  // userland will fail
+  enumerable: false,
+  get: function () {
+    return this._readableState.highWaterMark;
+  }
+});
 
 // exposed for testing purposes only.
 Readable._fromList = fromList;
@@ -4651,7 +3874,7 @@ function endReadable(stream) {
 
   if (!state.endEmitted) {
     state.ended = true;
-    processNextTick(endReadableNT, state, stream);
+    pna.nextTick(endReadableNT, state, stream);
   }
 }
 
@@ -4664,19 +3887,13 @@ function endReadableNT(state, stream) {
   }
 }
 
-function forEach(xs, f) {
-  for (var i = 0, l = xs.length; i < l; i++) {
-    f(xs[i], i);
-  }
-}
-
 function indexOf(xs, x) {
   for (var i = 0, l = xs.length; i < l; i++) {
     if (xs[i] === x) return i;
   }
   return -1;
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3)))
 
 /***/ }),
 /* 13 */
@@ -4694,7 +3911,7 @@ module.exports = __webpack_require__(0).EventEmitter;
 
 /*<replacement>*/
 
-var processNextTick = __webpack_require__(9);
+var pna = __webpack_require__(9);
 /*</replacement>*/
 
 // undocumented cb() API, needed for core, not for public API
@@ -4708,9 +3925,9 @@ function destroy(err, cb) {
     if (cb) {
       cb(err);
     } else if (err && (!this._writableState || !this._writableState.errorEmitted)) {
-      processNextTick(emitErrorNT, this, err);
+      pna.nextTick(emitErrorNT, this, err);
     }
-    return;
+    return this;
   }
 
   // we set destroyed to true before firing error callbacks in order
@@ -4727,7 +3944,7 @@ function destroy(err, cb) {
 
   this._destroy(err || null, function (err) {
     if (!cb && err) {
-      processNextTick(emitErrorNT, _this, err);
+      pna.nextTick(emitErrorNT, _this, err);
       if (_this._writableState) {
         _this._writableState.errorEmitted = true;
       }
@@ -4735,6 +3952,8 @@ function destroy(err, cb) {
       cb(err);
     }
   });
+
+  return this;
 }
 
 function undestroy() {
@@ -4797,7 +4016,7 @@ module.exports = {
 
 /*<replacement>*/
 
-var processNextTick = __webpack_require__(9);
+var pna = __webpack_require__(9);
 /*</replacement>*/
 
 module.exports = Writable;
@@ -4824,7 +4043,7 @@ function CorkedRequest(state) {
 /* </replacement> */
 
 /*<replacement>*/
-var asyncWrite = !process.browser && ['v0.10', 'v0.9.'].indexOf(process.version.slice(0, 5)) > -1 ? setImmediate : processNextTick;
+var asyncWrite = !process.browser && ['v0.10', 'v0.9.'].indexOf(process.version.slice(0, 5)) > -1 ? setImmediate : pna.nextTick;
 /*</replacement>*/
 
 /*<replacement>*/
@@ -4835,12 +4054,12 @@ Writable.WritableState = WritableState;
 
 /*<replacement>*/
 var util = __webpack_require__(8);
-util.inherits = __webpack_require__(3);
+util.inherits = __webpack_require__(4);
 /*</replacement>*/
 
 /*<replacement>*/
 var internalUtil = {
-  deprecate: __webpack_require__(32)
+  deprecate: __webpack_require__(38)
 };
 /*</replacement>*/
 
@@ -4849,6 +4068,7 @@ var Stream = __webpack_require__(13);
 /*</replacement>*/
 
 /*<replacement>*/
+
 var Buffer = __webpack_require__(7).Buffer;
 var OurUint8Array = global.Uint8Array || function () {};
 function _uint8ArrayToBuffer(chunk) {
@@ -4857,6 +4077,7 @@ function _uint8ArrayToBuffer(chunk) {
 function _isUint8Array(obj) {
   return Buffer.isBuffer(obj) || obj instanceof OurUint8Array;
 }
+
 /*</replacement>*/
 
 var destroyImpl = __webpack_require__(14);
@@ -4866,22 +4087,31 @@ util.inherits(Writable, Stream);
 function nop() {}
 
 function WritableState(options, stream) {
-  Duplex = Duplex || __webpack_require__(4);
+  Duplex = Duplex || __webpack_require__(5);
 
   options = options || {};
+
+  // Duplex streams are both readable and writable, but share
+  // the same options object.
+  // However, some cases require setting options to different
+  // values for the readable and the writable sides of the duplex stream.
+  // These options can be provided separately as readableXXX and writableXXX.
+  var isDuplex = stream instanceof Duplex;
 
   // object stream flag to indicate whether or not this stream
   // contains buffers or objects.
   this.objectMode = !!options.objectMode;
 
-  if (stream instanceof Duplex) this.objectMode = this.objectMode || !!options.writableObjectMode;
+  if (isDuplex) this.objectMode = this.objectMode || !!options.writableObjectMode;
 
   // the point at which write() starts returning false
   // Note: 0 is a valid value, means that we always return false if
   // the entire buffer is not flushed immediately on write()
   var hwm = options.highWaterMark;
+  var writableHwm = options.writableHighWaterMark;
   var defaultHwm = this.objectMode ? 16 : 16 * 1024;
-  this.highWaterMark = hwm || hwm === 0 ? hwm : defaultHwm;
+
+  if (hwm || hwm === 0) this.highWaterMark = hwm;else if (isDuplex && (writableHwm || writableHwm === 0)) this.highWaterMark = writableHwm;else this.highWaterMark = defaultHwm;
 
   // cast to ints.
   this.highWaterMark = Math.floor(this.highWaterMark);
@@ -4995,6 +4225,7 @@ if (typeof Symbol === 'function' && Symbol.hasInstance && typeof Function.protot
   Object.defineProperty(Writable, Symbol.hasInstance, {
     value: function (object) {
       if (realHasInstance.call(this, object)) return true;
+      if (this !== Writable) return false;
 
       return object && object._writableState instanceof WritableState;
     }
@@ -5006,7 +4237,7 @@ if (typeof Symbol === 'function' && Symbol.hasInstance && typeof Function.protot
 }
 
 function Writable(options) {
-  Duplex = Duplex || __webpack_require__(4);
+  Duplex = Duplex || __webpack_require__(5);
 
   // Writable ctor is applied to Duplexes, too.
   // `realHasInstance` is necessary because using plain `instanceof`
@@ -5046,7 +4277,7 @@ function writeAfterEnd(stream, cb) {
   var er = new Error('write after end');
   // TODO: defer error events consistently everywhere, not just the cb
   stream.emit('error', er);
-  processNextTick(cb, er);
+  pna.nextTick(cb, er);
 }
 
 // Checks that a user-supplied chunk is valid, especially for the particular
@@ -5063,7 +4294,7 @@ function validChunk(stream, state, chunk, cb) {
   }
   if (er) {
     stream.emit('error', er);
-    processNextTick(cb, er);
+    pna.nextTick(cb, er);
     valid = false;
   }
   return valid;
@@ -5072,7 +4303,7 @@ function validChunk(stream, state, chunk, cb) {
 Writable.prototype.write = function (chunk, encoding, cb) {
   var state = this._writableState;
   var ret = false;
-  var isBuf = _isUint8Array(chunk) && !state.objectMode;
+  var isBuf = !state.objectMode && _isUint8Array(chunk);
 
   if (isBuf && !Buffer.isBuffer(chunk)) {
     chunk = _uint8ArrayToBuffer(chunk);
@@ -5125,6 +4356,16 @@ function decodeChunk(state, chunk, encoding) {
   }
   return chunk;
 }
+
+Object.defineProperty(Writable.prototype, 'writableHighWaterMark', {
+  // making it explicit this property is not enumerable
+  // because otherwise some prototype manipulation in
+  // userland will fail
+  enumerable: false,
+  get: function () {
+    return this._writableState.highWaterMark;
+  }
+});
 
 // if we're already writing something, then just put this
 // in the queue, and wait our turn.  Otherwise, call _write
@@ -5183,10 +4424,10 @@ function onwriteError(stream, state, sync, er, cb) {
   if (sync) {
     // defer the callback if we are being called synchronously
     // to avoid piling up things on the stack
-    processNextTick(cb, er);
+    pna.nextTick(cb, er);
     // this can emit finish, and it will always happen
     // after error
-    processNextTick(finishMaybe, stream, state);
+    pna.nextTick(finishMaybe, stream, state);
     stream._writableState.errorEmitted = true;
     stream.emit('error', er);
   } else {
@@ -5284,6 +4525,7 @@ function clearBuffer(stream, state) {
     } else {
       state.corkedRequestsFree = new CorkedRequest(state);
     }
+    state.bufferedRequestCount = 0;
   } else {
     // Slow case, write chunks one-by-one
     while (entry) {
@@ -5294,6 +4536,7 @@ function clearBuffer(stream, state) {
 
       doWrite(stream, state, false, len, chunk, encoding, cb);
       entry = entry.next;
+      state.bufferedRequestCount--;
       // if we didn't call the onwrite immediately, then
       // it means that we need to wait until it does.
       // also, that means that the chunk and cb are currently
@@ -5306,7 +4549,6 @@ function clearBuffer(stream, state) {
     if (entry === null) state.lastBufferedRequest = null;
   }
 
-  state.bufferedRequestCount = 0;
   state.bufferedRequest = entry;
   state.bufferProcessing = false;
 }
@@ -5360,7 +4602,7 @@ function prefinish(stream, state) {
     if (typeof stream._final === 'function') {
       state.pendingcb++;
       state.finalCalled = true;
-      processNextTick(callFinal, stream, state);
+      pna.nextTick(callFinal, stream, state);
     } else {
       state.prefinished = true;
       stream.emit('prefinish');
@@ -5384,7 +4626,7 @@ function endWritable(stream, state, cb) {
   state.ending = true;
   finishMaybe(stream, state);
   if (cb) {
-    if (state.finished) processNextTick(cb);else stream.once('finish', cb);
+    if (state.finished) pna.nextTick(cb);else stream.once('finish', cb);
   }
   state.ended = true;
   stream.writable = false;
@@ -5432,16 +4674,40 @@ Writable.prototype._destroy = function (err, cb) {
   this.end();
   cb(err);
 };
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(30).setImmediate, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(36).setImmediate, __webpack_require__(1)))
 
 /***/ }),
 /* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
+
+/*<replacement>*/
 
 var Buffer = __webpack_require__(7).Buffer;
+/*</replacement>*/
 
 var isEncoding = Buffer.isEncoding || function (encoding) {
   encoding = '' + encoding;
@@ -5553,10 +4819,10 @@ StringDecoder.prototype.fillLast = function (buf) {
 };
 
 // Checks the type of a UTF-8 byte, whether it's ASCII, a leading byte, or a
-// continuation byte.
+// continuation byte. If an invalid byte is detected, -2 is returned.
 function utf8CheckByte(byte) {
   if (byte <= 0x7F) return 0;else if (byte >> 5 === 0x06) return 2;else if (byte >> 4 === 0x0E) return 3;else if (byte >> 3 === 0x1E) return 4;
-  return -1;
+  return byte >> 6 === 0x02 ? -1 : -2;
 }
 
 // Checks at most 3 bytes at the end of a Buffer in order to detect an
@@ -5570,13 +4836,13 @@ function utf8CheckIncomplete(self, buf, i) {
     if (nb > 0) self.lastNeed = nb - 1;
     return nb;
   }
-  if (--j < i) return 0;
+  if (--j < i || nb === -2) return 0;
   nb = utf8CheckByte(buf[j]);
   if (nb >= 0) {
     if (nb > 0) self.lastNeed = nb - 2;
     return nb;
   }
-  if (--j < i) return 0;
+  if (--j < i || nb === -2) return 0;
   nb = utf8CheckByte(buf[j]);
   if (nb >= 0) {
     if (nb > 0) {
@@ -5590,7 +4856,7 @@ function utf8CheckIncomplete(self, buf, i) {
 // Validates as many continuation bytes for a multi-byte UTF-8 character as
 // needed or are available. If we see a non-continuation byte where we expect
 // one, we "replace" the validated continuation bytes we've seen so far with
-// UTF-8 replacement characters ('\ufffd'), to match v8's UTF-8 decoding
+// a single UTF-8 replacement character ('\ufffd'), to match v8's UTF-8 decoding
 // behavior. The continuation byte check is included three times in the case
 // where all of the continuation bytes for a character exist in the same buffer.
 // It is also done this way as a slight performance increase instead of using a
@@ -5598,17 +4864,17 @@ function utf8CheckIncomplete(self, buf, i) {
 function utf8CheckExtraBytes(self, buf, p) {
   if ((buf[0] & 0xC0) !== 0x80) {
     self.lastNeed = 0;
-    return '\ufffd'.repeat(p);
+    return '\ufffd';
   }
   if (self.lastNeed > 1 && buf.length > 1) {
     if ((buf[1] & 0xC0) !== 0x80) {
       self.lastNeed = 1;
-      return '\ufffd'.repeat(p + 1);
+      return '\ufffd';
     }
     if (self.lastNeed > 2 && buf.length > 2) {
       if ((buf[2] & 0xC0) !== 0x80) {
         self.lastNeed = 2;
-        return '\ufffd'.repeat(p + 2);
+        return '\ufffd';
       }
     }
   }
@@ -5639,11 +4905,11 @@ function utf8Text(buf, i) {
   return buf.toString('utf8', i, end);
 }
 
-// For UTF-8, a replacement character for each buffered byte of a (partial)
-// character needs to be added to the output.
+// For UTF-8, a replacement character is added when ending on a partial
+// character.
 function utf8End(buf) {
   var r = buf && buf.length ? this.write(buf) : '';
-  if (this.lastNeed) return r + '\ufffd'.repeat(this.lastTotal - this.lastNeed);
+  if (this.lastNeed) return r + '\ufffd';
   return r;
 }
 
@@ -5784,48 +5050,37 @@ function simpleEnd(buf) {
 
 module.exports = Transform;
 
-var Duplex = __webpack_require__(4);
+var Duplex = __webpack_require__(5);
 
 /*<replacement>*/
 var util = __webpack_require__(8);
-util.inherits = __webpack_require__(3);
+util.inherits = __webpack_require__(4);
 /*</replacement>*/
 
 util.inherits(Transform, Duplex);
 
-function TransformState(stream) {
-  this.afterTransform = function (er, data) {
-    return afterTransform(stream, er, data);
-  };
-
-  this.needTransform = false;
-  this.transforming = false;
-  this.writecb = null;
-  this.writechunk = null;
-  this.writeencoding = null;
-}
-
-function afterTransform(stream, er, data) {
-  var ts = stream._transformState;
+function afterTransform(er, data) {
+  var ts = this._transformState;
   ts.transforming = false;
 
   var cb = ts.writecb;
 
   if (!cb) {
-    return stream.emit('error', new Error('write callback called multiple times'));
+    return this.emit('error', new Error('write callback called multiple times'));
   }
 
   ts.writechunk = null;
   ts.writecb = null;
 
-  if (data !== null && data !== undefined) stream.push(data);
+  if (data != null) // single equals check for both `null` and `undefined`
+    this.push(data);
 
   cb(er);
 
-  var rs = stream._readableState;
+  var rs = this._readableState;
   rs.reading = false;
   if (rs.needReadable || rs.length < rs.highWaterMark) {
-    stream._read(rs.highWaterMark);
+    this._read(rs.highWaterMark);
   }
 }
 
@@ -5834,9 +5089,14 @@ function Transform(options) {
 
   Duplex.call(this, options);
 
-  this._transformState = new TransformState(this);
-
-  var stream = this;
+  this._transformState = {
+    afterTransform: afterTransform.bind(this),
+    needTransform: false,
+    transforming: false,
+    writecb: null,
+    writechunk: null,
+    writeencoding: null
+  };
 
   // start out asking for a readable event once data is transformed.
   this._readableState.needReadable = true;
@@ -5853,11 +5113,19 @@ function Transform(options) {
   }
 
   // When the writable side finishes, then flush out anything remaining.
-  this.once('prefinish', function () {
-    if (typeof this._flush === 'function') this._flush(function (er, data) {
-      done(stream, er, data);
-    });else done(stream);
-  });
+  this.on('prefinish', prefinish);
+}
+
+function prefinish() {
+  var _this = this;
+
+  if (typeof this._flush === 'function') {
+    this._flush(function (er, data) {
+      done(_this, er, data);
+    });
+  } else {
+    done(this, null, null);
+  }
 }
 
 Transform.prototype.push = function (chunk, encoding) {
@@ -5907,27 +5175,25 @@ Transform.prototype._read = function (n) {
 };
 
 Transform.prototype._destroy = function (err, cb) {
-  var _this = this;
+  var _this2 = this;
 
   Duplex.prototype._destroy.call(this, err, function (err2) {
     cb(err2);
-    _this.emit('close');
+    _this2.emit('close');
   });
 };
 
 function done(stream, er, data) {
   if (er) return stream.emit('error', er);
 
-  if (data !== null && data !== undefined) stream.push(data);
+  if (data != null) // single equals check for both `null` and `undefined`
+    stream.push(data);
 
   // if there's nothing in the write buffer, then that means
   // that nothing more will ever be provided
-  var ws = stream._writableState;
-  var ts = stream._transformState;
+  if (stream._writableState.length) throw new Error('Calling transform done when ws.length != 0');
 
-  if (ws.length) throw new Error('Calling transform done when ws.length != 0');
-
-  if (ts.transforming) throw new Error('Calling transform done when still transforming');
+  if (stream._transformState.transforming) throw new Error('Calling transform done when still transforming');
 
   return stream.push(null);
 }
@@ -5942,38 +5208,510 @@ function done(stream, er, data) {
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+/**
+ * Created by xieting on 2018/4/3.
+ */
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+exports.default = {
+    //data-channel
+    DC_PING: 'PING',
+    DC_PONG: 'PONG',
+    DC_SIGNAL: 'SIGNAL',
+    DC_OPEN: 'OPEN',
+    DC_REQUEST: 'REQUEST',
+    DC_PIECE_NOT_FOUND: 'PIECE_NOT_FOUND', //当请求的数据找不到时触发
+    DC_CLOSE: 'CLOSE',
+    DC_RESPONSE: 'RESPONSE',
+    DC_ERROR: 'ERROR',
+    DC_PIECE: "PIECE",
+    DC_TIMEOUT: "TIMEOUT",
+    DC_PIECE_ACK: "PIECE_ACK",
+    //---------------------------live---------------------------------------------------------
+    DC_TRANSITION: 'TRANSITION',
+    DC_GRANT: 'GRANT',
+    DC_LACK: "LACK",
+    DC_DISPLACE: "DISPLACE",
+    //---------------------------vod---------------------------------------------------------
+    DC_BITFIELD: "BITFIELD",
+    DC_CHOKE: "CHOKE",
+    DC_UNCHOKE: "UNCHOKE",
+    DC_INTERESTED: "INTERESTED",
+    DC_NOTINTERESTED: "NOT_INTERESTED",
+    DC_HAVE: "HAVE",
+    DC_LOST: "LOST",
 
-var _events = __webpack_require__(5);
+    //buffer-manager
+    BM_LOST: 'lost',
 
-var _events2 = _interopRequireDefault(_events);
+    //loader-scheduler
+    SEGMENT: 'segment',
+    TRANSITION: "transition", //跃迁事件
+    DISPLACE: 'displace',
+    CONNECT: 'connect', //建立data channel
+    ADOPT: 'adopt'
+};
+module.exports = exports['default'];
 
-var _events3 = __webpack_require__(0);
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
 
-var _events4 = _interopRequireDefault(_events3);
+"use strict";
 
-var _config = __webpack_require__(19);
 
-var _simplePeer = __webpack_require__(10);
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.config = exports.HybridLoader = exports.RPClient = undefined;
 
-var _simplePeer2 = _interopRequireDefault(_simplePeer);
+var _rpClient = __webpack_require__(42);
 
-var _p2pSignaler = __webpack_require__(34);
+var _rpClient2 = _interopRequireDefault(_rpClient);
 
-var _p2pSignaler2 = _interopRequireDefault(_p2pSignaler);
-
-var _hybridLoader = __webpack_require__(39);
+var _hybridLoader = __webpack_require__(45);
 
 var _hybridLoader2 = _interopRequireDefault(_hybridLoader);
 
-var _bufferManager = __webpack_require__(41);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Created by xieting on 2018/3/26.
+ */
+
+var config = {
+    wsSchedulerAddr: 'ws://120.78.168.126:3389', //调度服务器地址
+    transitionEnabled: true, //是否允许节点自动跃迁
+    transitionCheckInterval: 30, //跃迁检查时间间隔
+    transitionTTL: 2, //跃迁的最大跳数
+    transitionWaitTime: 5, //跃迁等待Grant响应的时间
+
+    defaultUploadBW: 1024 * 1024 * 4 / 8, //总上行带宽默认4Mbps
+    maxTransitionTries: 1, //最大跃迁次数（跃迁失败也算一次）
+    maxGetParentsTries: 3, //获取父节点的最大尝试次数(不包含ws连上后的请求)
+
+    defaultSubstreams: 3 //默认子流数量
+};
+
+exports.RPClient = _rpClient2.default;
+exports.HybridLoader = _hybridLoader2.default;
+exports.config = config;
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+;
+;
+;
+var isWebSocket = function (constructor) {
+    return constructor && constructor.CLOSING === 2;
+};
+var isGlobalWebSocket = function () {
+    return typeof WebSocket !== 'undefined' && isWebSocket(WebSocket);
+};
+var getDefaultOptions = function () { return ({
+    constructor: isGlobalWebSocket() ? WebSocket : null,
+    maxReconnectionDelay: 10000,
+    minReconnectionDelay: 1500,
+    reconnectionDelayGrowFactor: 1.3,
+    connectionTimeout: 4000,
+    maxRetries: Infinity,
+    debug: false,
+}); };
+var bypassProperty = function (src, dst, name) {
+    Object.defineProperty(dst, name, {
+        get: function () { return src[name]; },
+        set: function (value) { src[name] = value; },
+        enumerable: true,
+        configurable: true,
+    });
+};
+var initReconnectionDelay = function (config) {
+    return (config.minReconnectionDelay + Math.random() * config.minReconnectionDelay);
+};
+var updateReconnectionDelay = function (config, previousDelay) {
+    var newDelay = previousDelay * config.reconnectionDelayGrowFactor;
+    return (newDelay > config.maxReconnectionDelay)
+        ? config.maxReconnectionDelay
+        : newDelay;
+};
+var LEVEL_0_EVENTS = ['onopen', 'onclose', 'onmessage', 'onerror'];
+var reassignEventListeners = function (ws, oldWs, listeners) {
+    Object.keys(listeners).forEach(function (type) {
+        listeners[type].forEach(function (_a) {
+            var listener = _a[0], options = _a[1];
+            ws.addEventListener(type, listener, options);
+        });
+    });
+    if (oldWs) {
+        LEVEL_0_EVENTS.forEach(function (name) {
+            ws[name] = oldWs[name];
+        });
+    }
+};
+var ReconnectingWebsocket = function (url, protocols, options) {
+    var _this = this;
+    if (options === void 0) { options = {}; }
+    var ws;
+    var connectingTimeout;
+    var reconnectDelay = 0;
+    var retriesCount = 0;
+    var shouldRetry = true;
+    var savedOnClose = null;
+    var listeners = {};
+    // require new to construct
+    if (!(this instanceof ReconnectingWebsocket)) {
+        throw new TypeError("Failed to construct 'ReconnectingWebSocket': Please use the 'new' operator");
+    }
+    // Set config. Not using `Object.assign` because of IE11
+    var config = getDefaultOptions();
+    Object.keys(config)
+        .filter(function (key) { return options.hasOwnProperty(key); })
+        .forEach(function (key) { return config[key] = options[key]; });
+    if (!isWebSocket(config.constructor)) {
+        throw new TypeError('Invalid WebSocket constructor. Set `options.constructor`');
+    }
+    var log = config.debug ? function () {
+        var params = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            params[_i] = arguments[_i];
+        }
+        return console.log.apply(console, ['RWS:'].concat(params));
+    } : function () { };
+    /**
+     * Not using dispatchEvent, otherwise we must use a DOM Event object
+     * Deferred because we want to handle the close event before this
+     */
+    var emitError = function (code, msg) { return setTimeout(function () {
+        var err = new Error(msg);
+        err.code = code;
+        if (Array.isArray(listeners.error)) {
+            listeners.error.forEach(function (_a) {
+                var fn = _a[0];
+                return fn(err);
+            });
+        }
+        if (ws.onerror) {
+            ws.onerror(err);
+        }
+    }, 0); };
+    var handleClose = function () {
+        log('handleClose', { shouldRetry: shouldRetry });
+        retriesCount++;
+        log('retries count:', retriesCount);
+        if (retriesCount > config.maxRetries) {
+            emitError('EHOSTDOWN', 'Too many failed connection attempts');
+            return;
+        }
+        if (!reconnectDelay) {
+            reconnectDelay = initReconnectionDelay(config);
+        }
+        else {
+            reconnectDelay = updateReconnectionDelay(config, reconnectDelay);
+        }
+        log('handleClose - reconnectDelay:', reconnectDelay);
+        if (shouldRetry) {
+            setTimeout(connect, reconnectDelay);
+        }
+    };
+    var connect = function () {
+        if (!shouldRetry) {
+            return;
+        }
+        log('connect');
+        var oldWs = ws;
+        var wsUrl = (typeof url === 'function') ? url() : url;
+        ws = new config.constructor(wsUrl, protocols);
+        connectingTimeout = setTimeout(function () {
+            log('timeout');
+            ws.close();
+            emitError('ETIMEDOUT', 'Connection timeout');
+        }, config.connectionTimeout);
+        log('bypass properties');
+        for (var key in ws) {
+            // @todo move to constant
+            if (['addEventListener', 'removeEventListener', 'close', 'send'].indexOf(key) < 0) {
+                bypassProperty(ws, _this, key);
+            }
+        }
+        ws.addEventListener('open', function () {
+            clearTimeout(connectingTimeout);
+            log('open');
+            reconnectDelay = initReconnectionDelay(config);
+            log('reconnectDelay:', reconnectDelay);
+            retriesCount = 0;
+        });
+        ws.addEventListener('close', handleClose);
+        reassignEventListeners(ws, oldWs, listeners);
+        // because when closing with fastClose=true, it is saved and set to null to avoid double calls
+        ws.onclose = ws.onclose || savedOnClose;
+        savedOnClose = null;
+    };
+    log('init');
+    connect();
+    this.close = function (code, reason, _a) {
+        if (code === void 0) { code = 1000; }
+        if (reason === void 0) { reason = ''; }
+        var _b = _a === void 0 ? {} : _a, _c = _b.keepClosed, keepClosed = _c === void 0 ? false : _c, _d = _b.fastClose, fastClose = _d === void 0 ? true : _d, _e = _b.delay, delay = _e === void 0 ? 0 : _e;
+        log('close - params:', { reason: reason, keepClosed: keepClosed, fastClose: fastClose, delay: delay, retriesCount: retriesCount, maxRetries: config.maxRetries });
+        shouldRetry = !keepClosed && retriesCount <= config.maxRetries;
+        if (delay) {
+            reconnectDelay = delay;
+        }
+        ws.close(code, reason);
+        if (fastClose) {
+            var fakeCloseEvent_1 = {
+                code: code,
+                reason: reason,
+                wasClean: true,
+            };
+            // execute close listeners soon with a fake closeEvent
+            // and remove them from the WS instance so they
+            // don't get fired on the real close.
+            handleClose();
+            ws.removeEventListener('close', handleClose);
+            // run and remove level2
+            if (Array.isArray(listeners.close)) {
+                listeners.close.forEach(function (_a) {
+                    var listener = _a[0], options = _a[1];
+                    listener(fakeCloseEvent_1);
+                    ws.removeEventListener('close', listener, options);
+                });
+            }
+            // run and remove level0
+            if (ws.onclose) {
+                savedOnClose = ws.onclose;
+                ws.onclose(fakeCloseEvent_1);
+                ws.onclose = null;
+            }
+        }
+    };
+    this.send = function (data) {
+        ws.send(data);
+    };
+    this.addEventListener = function (type, listener, options) {
+        if (Array.isArray(listeners[type])) {
+            if (!listeners[type].some(function (_a) {
+                var l = _a[0];
+                return l === listener;
+            })) {
+                listeners[type].push([listener, options]);
+            }
+        }
+        else {
+            listeners[type] = [[listener, options]];
+        }
+        ws.addEventListener(type, listener, options);
+    };
+    this.removeEventListener = function (type, listener, options) {
+        if (Array.isArray(listeners[type])) {
+            listeners[type] = listeners[type].filter(function (_a) {
+                var l = _a[0];
+                return l !== listener;
+            });
+        }
+        ws.removeEventListener(type, listener, options);
+    };
+};
+module.exports = ReconnectingWebsocket;
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _events = __webpack_require__(0);
+
+var _events2 = _interopRequireDefault(_events);
+
+var _reconnectingWebsocket = __webpack_require__(20);
+
+var _reconnectingWebsocket2 = _interopRequireDefault(_reconnectingWebsocket);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Created by xieting on 2018/3/23.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+var SignalClient = function (_EventEmitter) {
+    _inherits(SignalClient, _EventEmitter);
+
+    function SignalClient(peerId, config) {
+        _classCallCheck(this, SignalClient);
+
+        var _this = _possibleConstructorReturn(this, (SignalClient.__proto__ || Object.getPrototypeOf(SignalClient)).call(this));
+
+        _this.peerId = peerId;
+        _this.config = config;
+        _this.connected = false;
+        _this._ws = _this._init(peerId);
+        return _this;
+    }
+
+    _createClass(SignalClient, [{
+        key: '_init',
+        value: function _init(id) {
+            var _this2 = this;
+
+            var wsOptions = {
+                maxRetries: this.config.wsMaxRetries,
+                minReconnectionDelay: this.config.wsReconnectInterval * 1000
+            };
+            var queryStr = '?id=' + id;
+            var websocket = new _reconnectingWebsocket2.default(this.config.wsSignalerAddr + queryStr, undefined, wsOptions);
+            websocket.onopen = function () {
+                console.log('Signaler websocket connection opened');
+
+                _this2.connected = true;
+                if (_this2.onopen) _this2.onopen();
+            };
+
+            websocket.push = websocket.send;
+            websocket.send = function (msg) {
+                var msgStr = JSON.stringify(Object.assign({ peer_id: id }, msg));
+                if (websocket.readyState !== 1) {
+                    console.warn('websocket connection is not opened yet.');
+                    return setTimeout(function () {
+                        websocket.send(msg);
+                    }, 1000);
+                }
+                websocket.push(msgStr);
+            };
+            websocket.onmessage = function (e) {
+
+                if (_this2.onmessage) _this2.onmessage(e);
+            };
+            websocket.onclose = function () {
+                //websocket断开时清除datachannel
+                console.warn('Signaler websocket closed');
+                if (_this2.onclose) _this2.onclose();
+                _this2.connected = false;
+            };
+            return websocket;
+        }
+    }, {
+        key: 'sendSignal',
+        value: function sendSignal(remotePeerId, data) {
+            var msg = {
+                action: 'signal',
+                peer_id: this.peerId,
+                to_peer_id: remotePeerId,
+                data: data
+            };
+            this.send(msg);
+        }
+    }, {
+        key: 'send',
+        value: function send(msg) {
+            this._ws.send(msg);
+        }
+    }, {
+        key: 'close',
+        value: function close() {
+            this._ws.close();
+            this._ws = null;
+        }
+    }]);
+
+    return SignalClient;
+}(_events2.default);
+
+exports.default = SignalClient;
+module.exports = exports['default'];
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.config = exports.FragLoader = exports.Tracker = undefined;
+
+var _btTracker = __webpack_require__(46);
+
+var _btTracker2 = _interopRequireDefault(_btTracker);
+
+var _btLoader = __webpack_require__(48);
+
+var _btLoader2 = _interopRequireDefault(_btLoader);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Created by xieting on 2018/3/26.
+ */
+
+var config = {
+    announce: "http://127.0.0.1:8088", //tracker服务器地址
+    neighbours: 4, //连接的节点数量
+    urgentOffset: 3 //播放点的后多少个buffer为urgent
+
+};
+
+exports.Tracker = _btTracker2.default;
+exports.FragLoader = _btLoader2.default;
+exports.config = config;
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _pear = __webpack_require__(2);
+
+var _pear2 = _interopRequireDefault(_pear);
+
+var _events = __webpack_require__(0);
+
+var _events2 = _interopRequireDefault(_events);
+
+var _config = __webpack_require__(41);
+
+var _config2 = _interopRequireDefault(_config);
+
+var _fastmesh = __webpack_require__(19);
+
+var _bittorrent = __webpack_require__(22);
+
+var _bufferManager = __webpack_require__(49);
 
 var _bufferManager2 = _interopRequireDefault(_bufferManager);
 
-var _uaParserJs = __webpack_require__(42);
+var _uaParserJs = __webpack_require__(50);
 
 var _uaParserJs2 = _interopRequireDefault(_uaParserJs);
+
+var _simpleSha = __webpack_require__(52);
+
+var _simpleSha2 = _interopRequireDefault(_simpleSha);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5994,7 +5732,7 @@ var HlsPeerify = function (_EventEmitter) {
     _createClass(HlsPeerify, null, [{
         key: 'Events',
         get: function get() {
-            return _events2.default;
+            return _pear2.default;
         }
     }, {
         key: 'uaParserResult',
@@ -6008,31 +5746,24 @@ var HlsPeerify = function (_EventEmitter) {
 
         var _this = _possibleConstructorReturn(this, (HlsPeerify.__proto__ || Object.getPrototypeOf(HlsPeerify)).call(this));
 
-        _this.config = Object.assign({}, _config.defaultP2PConfig, p2pConfig);
-
+        _this.config = Object.assign({}, _config2.default, p2pConfig);
         _this.hlsjs = hlsjs;
         _this.p2pEnabled = _this.config.disableP2P === false ? false : true; //默认开启P2P
 
         hlsjs.config.currLoaded = hlsjs.config.currPlay = 0;
 
-        if (hlsjs.url) {
+        var onLevelLoaded = function onLevelLoaded(event, data) {
+
+            var isLive = data.details.live;
+            console.warn('live ' + isLive);
+            _this.config.live = isLive;
             var channel = hlsjs.url.split('?')[0];
             _this._init(channel);
-        } else {
-            hlsjs.on(hlsjs.constructor.Events.MANIFEST_PARSED, function (event, data) {
 
-                // this.bitrate = data.levels[0].bitrate;                                                //获取固定码率，用于子流
-                var channel = hlsjs.url.split('?')[0];
-                _this._init(channel);
-            });
-        }
+            hlsjs.off(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
+        };
 
-        //level上报
-        _this.levelCounter = 0;
-        _this.averageLevel = 0;
-        //流量上报
-        _this.cdnDownloaded = 0;
-        _this.p2pDownloaded = 0;
+        hlsjs.on(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
 
         //streaming rate
         // this.streamingRate = 0;                        //单位bps
@@ -6045,8 +5776,6 @@ var HlsPeerify = function (_EventEmitter) {
         value: function _init(channel) {
             var _this2 = this;
 
-            this.reportIntervalId = window.setInterval(this._statisticsReport.bind(this), this.config.reportInterval * 1000);
-
             //上传浏览器信息
             var browserInfo = {
                 browser: uaParserResult.browser.name,
@@ -6054,51 +5783,61 @@ var HlsPeerify = function (_EventEmitter) {
                 os: uaParserResult.os.name
             };
 
-            //实例化信令
-            this.signaler = new _p2pSignaler2.default(channel, this.config, browserInfo);
-
+            this.hlsjs.config.p2pEnabled = this.p2pEnabled;
             //实例化BufferManager
             this.bufMgr = new _bufferManager2.default(this.config);
             this.hlsjs.config.bufMgr = this.bufMgr;
 
-            //通过config向hybrid-loader导入p2p-scheduler
-            this.hlsjs.config.p2pLoader = this.signaler.scheduler;
+            if (this.config.engine === 'fastmesh') {
+                //采用fastmesh算法
+                //实例化RP服务器
+                this.signaler = new _fastmesh.RPClient(channel, this.config, browserInfo);
 
-            //向hybrid-loader导入buffer-manager
-            this.hlsjs.config.p2pLoader.bufMgr = this.bufMgr;
+                //通过config向hybrid-loader导入p2p-scheduler
+                this.hlsjs.config.p2pLoader = this.signaler.scheduler;
 
-            //替换fLoader
-            this.hlsjs.config.fLoader = _hybridLoader2.default;
+                //向hybrid-loader导入buffer-manager
+                this.hlsjs.config.p2pLoader.bufMgr = this.bufMgr;
 
-            this.hlsjs.config.p2pEnabled = this.p2pEnabled;
+                //替换fLoader
+                this.hlsjs.config.fLoader = _fastmesh.HybridLoader;
+            } else if (this.config.engine === 'bt') {
+                //采用BT算法
+
+                //实例化Fetcher
+                var fetcher = new _pear.Fetcher(this.config.key, _simpleSha2.default.sync(channel), this.config.announce);
+                //实例化tracker服务器
+                this.signaler = new _bittorrent.Tracker(fetcher, this.config, browserInfo);
+                this.signaler.scheduler.bufferManager = this.bufMgr;
+                //替换fLoader
+                this.hlsjs.config.fLoader = _bittorrent.FragLoader;
+                //向loader导入scheduler
+                this.hlsjs.config.scheduler = this.signaler.scheduler;
+                //在fLoader中使用fetcher
+                this.hlsjs.config.fetcher = fetcher;
+            }
 
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADING, function (id, data) {
                 // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
                 log('FRAG_LOADING: ' + data.frag.sn);
-
-                //level统计
-                _this2.averageLevel = (_this2.averageLevel * _this2.levelCounter + data.frag.level) / ++_this2.levelCounter;
+                _this2.signaler.currentLoadingSN = data.frag.sn;
             });
 
+            this.signalTried = false; //防止重复连接ws
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADED, function (id, data) {
-                _this2.hlsjs.config.currLoaded = data.frag.sn;
+                var sn = data.frag.sn;
+                _this2.hlsjs.config.currLoaded = sn;
+                _this2.signaler.currentLoadedSN = sn; //用于BT算法
                 _this2.hlsjs.config.currLoadedDuration = data.frag.duration;
-                if (data.frag.loadByXhr) {
-                    log('FRAG_LOADED ' + data.frag.sn + ' loadByXhr');
-                    _this2.cdnDownloaded += data.frag.loaded;
-                } else {
-                    log('FRAG_LOADED ' + data.frag.sn + ' loadByP2P');
-                    _this2.p2pDownloaded += data.frag.loaded;
-                }
-                if (!_this2.signaler.connected && _this2.config.p2pEnabled) {
-
-                    //计算平均streaming rate
+                if (!_this2.signalTried && !_this2.signaler.connected && _this2.config.p2pEnabled) {
+                    //用一个ts的大小和时长来代表平均streaming rate
                     var bitrate = data.frag.loaded * 8 / data.frag.duration;
                     //计算子流码率
-                    _this2.signaler.scheduler.substreams.bitrate = Math.round(bitrate);
+                    _this2.signaler.scheduler.bitrate = Math.round(bitrate);
                     console.warn('FRAG_LOADED bitrate ' + bitrate);
 
                     _this2.signaler.resumeP2P();
+                    _this2.signalTried = true;
                 }
                 // this.streamingRate = (this.streamingRate*this.fragLoadedCounter + bitrate)/(++this.fragLoadedCounter);
                 // this.signaler.scheduler.streamingRate = Math.floor(this.streamingRate);
@@ -6117,13 +5856,10 @@ var HlsPeerify = function (_EventEmitter) {
             //     log('LEVEL_LOADED live: '+JSON.stringify(data.details.live, null, 2));
             // });
 
-
             this.hlsjs.on(this.hlsjs.constructor.Events.DESTROYING, function () {
                 // log('DESTROYING: '+JSON.stringify(frag));
                 _this2.signaler.destroy();
                 _this2.signaler = null;
-
-                window.clearInterval(_this2.reportIntervalId);
             });
         }
     }, {
@@ -6152,38 +5888,12 @@ var HlsPeerify = function (_EventEmitter) {
                 }
             }
         }
-    }, {
-        key: '_statisticsReport',
-        value: function _statisticsReport() {
-            // let ul_srs = {};
-            // let substreams = this.signaler.scheduler.substreams;
-            // let substreamRate = Math.round(substreams.bitrate/substreams.total);
-            // for (let stream of substreams) {
-            //     // ul_srs[channel.remotePeerId] = channel.streamingRate;                 //用固定子流码率代替动态
-            //     if (ul_srs[stream.remotePeerId]) {
-            //
-            //     }
-            // }
-
-            if (this.signaler) {
-                var msg = {
-                    action: 'statistics',
-                    level: Number(this.averageLevel.toFixed(2)),
-                    source: Math.round(this.cdnDownloaded / 1024), //单位KB
-                    p2p: Math.round(this.p2pDownloaded / 1024),
-                    // ul_srs: ul_srs,
-                    plr: 0 //todo
-                };
-                this.signaler.send(msg);
-                this.cdnDownloaded = this.p2pDownloaded = 0; //上报的是增量部分
-            }
-        }
     }]);
 
     return HlsPeerify;
-}(_events4.default);
+}(_events2.default);
 
-HlsPeerify.WEBRTC_SUPPORT = _simplePeer2.default.WEBRTC_SUPPORT;
+HlsPeerify.WEBRTC_SUPPORT = !!(0, _pear.getBrowserRTC)();
 
 HlsPeerify.version = "0.0.1";
 
@@ -6191,7 +5901,7 @@ exports.default = HlsPeerify;
 module.exports = exports['default'];
 
 /***/ }),
-/* 19 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6200,47 +5910,1259 @@ module.exports = exports['default'];
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-/**
- * Created by xieting on 2018/1/3.
- */
 
-//时间单位统一为秒
-var defaultP2PConfig = {
-    key: 'free', //连接RP服务器的API key
-    mode: 'live', //播放的流媒体类别，分为‘live‘和‘vod’两种，默认live
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-    wsSchedulerAddr: 'ws://120.78.168.126:3389', //调度服务器地址
-    wsSignalerAddr: 'ws://120.78.168.126:8081/ws', //信令服务器地址
-    wsMaxRetries: 10, //发送数据重试时间间隔
-    wsReconnectInterval: 5, //websocket重连时间间隔
+var _simpleChannel = __webpack_require__(25);
 
-    p2pEnabled: true, //是否开启P2P，默认true
+var _simpleChannel2 = _interopRequireDefault(_simpleChannel);
 
-    dcKeepAliveInterval: 10, //datachannel多少秒发送一次keep-alive信息
-    dcKeepAliveAckTimeout: 2, //datachannel接收keep-alive-ack信息的超时时间，超时则认为连接失败并主动关闭
-    dcRequestTimeout: 2, //datachannel接收二进制数据的超时时间
+var _events = __webpack_require__(0);
 
-    packetSize: 16 * 1024, //每次通过datachannel发送的包的大小
-    maxBufSize: 1024 * 1024 * 50, //p2p缓存的最大数据量
-    loadTimeout: 5, //p2p下载的超时时间
-    reportInterval: 60, //统计信息上报的时间间隔
+var _events2 = _interopRequireDefault(_events);
 
-    transitionEnabled: true, //是否允许节点自动跃迁
-    transitionCheckInterval: 30, //跃迁检查时间间隔
-    transitionTTL: 2, //跃迁的最大跳数
-    transitionWaitTime: 5, //跃迁等待Grant响应的时间
+var _events3 = __webpack_require__(18);
 
-    defaultUploadBW: 1024 * 1024 * 4 / 8, //总上行带宽默认4Mbps
-    maxTransitionTries: 1, //最大跃迁次数（跃迁失败也算一次）
-    maxGetParentsTries: 3, //获取父节点的最大尝试次数(不包含ws连上后的请求)
+var _events4 = _interopRequireDefault(_events3);
 
-    defaultSubstreams: 2 //默认子流数量
-};
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.defaultP2PConfig = defaultP2PConfig;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Created by xieting on 2018/4/2.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+var Buffer = __webpack_require__(6).Buffer;
+
+var log = console.log;
+
+var DataChannel = function (_EventEmitter) {
+    _inherits(DataChannel, _EventEmitter);
+
+    function DataChannel(peerId, remotePeerId, isInitiator, config) {
+        _classCallCheck(this, DataChannel);
+
+        var _this = _possibleConstructorReturn(this, (DataChannel.__proto__ || Object.getPrototypeOf(DataChannel)).call(this));
+
+        _this.config = config;
+        _this.remotePeerId = remotePeerId;
+        _this.channelId = isInitiator ? peerId + '-' + remotePeerId : remotePeerId + '-' + peerId; //标识该channel
+        // console.warn(`this.channelId ${this.channelId}`);
+        _this.connected = false;
+        _this.msgQueue = [];
+        _this.miss = 0; //超时或者错误的次数
+
+        //下载控制
+        _this.rcvdReqQueue = []; //接收到的请求的队列    队列末尾优先级最高 sn
+        _this.downloading = false;
+        _this.uploading = false;
+
+        //延迟计算
+        _this.delays = [];
+
+        _this._datachannel = new _simpleChannel2.default({ initiator: isInitiator, objectMode: true });
+        _this.isInitiator = isInitiator; //是否主动发起连接的
+        _this._init(_this._datachannel);
+
+        _this.streamingRate = 0; //单位bit/s
+        //记录发送的数据量，用于计算streaming rate
+        _this.recordSended = _this._adjustStreamingRate(10);
+        return _this;
+    }
+
+    _createClass(DataChannel, [{
+        key: '_init',
+        value: function _init(datachannel) {
+            var _this2 = this;
+
+            datachannel.on('error', function (err) {
+                log('datachannel error', err);
+                _this2.emit(_events4.default.DC_ERROR);
+            });
+
+            datachannel.on('signal', function (data) {
+                // log('SIGNAL', JSON.stringify(data));
+                _this2.emit(_events4.default.DC_SIGNAL, data);
+            });
+
+            var _onConnect = function _onConnect() {
+                log('datachannel CONNECTED to ' + _this2.remotePeerId);
+                _this2.connected = true;
+                _this2.emit(_events4.default.DC_OPEN);
+                //测试延迟
+                _this2._sendPing();
+                //发送消息队列中的消息
+                while (_this2.msgQueue.length > 0) {
+                    var msg = _this2.msgQueue.shift();
+                    _this2.emit(msg.event, msg);
+                }
+            };
+
+            datachannel.once('connect', _onConnect);
+
+            datachannel.on('data', function (data) {
+                if (typeof data === 'string') {
+                    log('datachannel receive string: ' + data + 'from ' + _this2.remotePeerId);
+
+                    var msg = JSON.parse(data);
+                    //如果还没连接，则先保存在消息队列中
+                    if (!_this2.connected) {
+                        _this2.msgQueue.push(msg);
+                        // _onConnect();
+                        return;
+                    }
+                    var event = msg.event;
+                    switch (event) {
+                        case _events4.default.DC_PONG:
+                            _this2._handlePongMsg();
+                            break;
+                        case _events4.default.DC_PING:
+                            _this2.sendJson({
+                                event: _events4.default.DC_PONG
+                            });
+                            break;
+                        case _events4.default.DC_PIECE:
+                            _this2._prepareForBinary(msg.attachments, msg.url, msg.sn, msg.size);
+                            _this2.emit(msg.event, msg);
+                            break;
+                        case _events4.default.DC_PIECE_NOT_FOUND:
+                            window.clearTimeout(_this2.requestTimeout); //清除定时器
+                            _this2.requestTimeout = null;
+                            _this2.emit(msg.event, msg);
+                            break;
+                        case _events4.default.DC_REQUEST:
+                            _this2._handleRequestMsg(msg);
+                            break;
+                        case _events4.default.DC_GRANT:
+                            //收到GRANT信息后首先判断是否发给自己的，否则如果TTL>0则继续向子节点广播
+                            _this2._handleGrant(msg);
+                            break;
+                        case _events4.default.DC_PIECE_ACK:
+                            _this2._handlePieceAck();
+                            break;
+                        default:
+                            _this2.emit(msg.event, msg);
+
+                    }
+                } else {
+                    //binary data
+                    // console.warn(`datachannel receive binary data size ${data.byteLength}`);
+                    _this2.bufArr.push(data);
+                    _this2.remainAttachments--;
+                    if (_this2.remainAttachments === 0) {
+                        window.clearTimeout(_this2.requestTimeout); //清除定时器
+                        _this2.requestTimeout = null;
+                        _this2.sendJson({ //发送给peer确认信息
+                            event: _events4.default.DC_PIECE_ACK,
+                            sn: _this2.bufSN,
+                            url: _this2.bufUrl
+                        });
+                        _this2._handleBinaryData();
+                    }
+                }
+            });
+
+            datachannel.once('close', function () {
+                _this2.emit(_events4.default.DC_CLOSE);
+            });
+        }
+    }, {
+        key: 'sendJson',
+        value: function sendJson(json) {
+            this.send(JSON.stringify(json));
+        }
+    }, {
+        key: 'send',
+        value: function send(data) {
+            if (this._datachannel && this._datachannel.connected) {
+                this._datachannel.send(data);
+            }
+        }
+    }, {
+        key: 'sendBitField',
+        value: function sendBitField(field) {
+            this.sendJson({ //向peer发送bitfield
+                event: _events4.default.DC_BITFIELD,
+                field: field
+            });
+        }
+    }, {
+        key: 'sendBuffer',
+        value: function sendBuffer(sn, url, payload) {
+            this.uploading = true;
+            //开始计时
+            this.uploadTimeout = window.setTimeout(this._uploadtimeout.bind(this), this.config.dcUploadTimeout * 1000);
+
+            var dataSize = payload.byteLength,
+                //二进制数据大小
+            packetSize = this.config.packetSize,
+                //每个数据包的大小
+            remainder = 0,
+                //最后一个包的大小
+            attachments = 0; //分多少个包发
+            if (dataSize % packetSize === 0) {
+                attachments = dataSize / packetSize;
+            } else {
+                attachments = Math.floor(dataSize / packetSize) + 1;
+                remainder = dataSize % packetSize;
+            }
+            var response = {
+                event: _events4.default.DC_PIECE,
+                attachments: attachments,
+                url: url,
+                sn: sn,
+                size: dataSize
+            };
+            this.sendJson(response);
+            var bufArr = dividePayload(payload, packetSize, attachments, remainder);
+            for (var j = 0; j < bufArr.length; j++) {
+                this.send(bufArr[j]);
+            }
+            //记录streaming rate
+            this.recordSended(dataSize);
+        }
+    }, {
+        key: 'requestDataByURL',
+        value: function requestDataByURL(relurl) {
+            var urgent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+            //由于需要阻塞下载数据，因此request请求用新的API
+            var msg = {
+                event: _events4.default.DC_REQUEST,
+                url: relurl,
+                urgent: urgent
+            };
+            this.downloading = true;
+            this.sendJson(msg);
+            //开始计时
+            this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), this.config.dcRequestTimeout * 1000);
+        }
+    }, {
+        key: 'requestDataBySN',
+        value: function requestDataBySN(sn) {
+            var urgent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+            //用于BT算法
+            var msg = {
+                event: _events4.default.DC_REQUEST,
+                sn: sn, //ts数据的播放序号
+                urgent: urgent //是否紧急
+            };
+            this.downloading = true;
+            this.sendJson(msg);
+            //开始计时
+            this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), this.config.dcRequestTimeout * 1000);
+        }
+    }, {
+        key: 'close',
+        value: function close() {
+            this.destroy();
+        }
+    }, {
+        key: 'receiveSignal',
+        value: function receiveSignal(data) {
+            this._datachannel.signal(data);
+        }
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            // window.clearInterval(this.keepAliveInterval);
+            // this.keepAliveInterval = null;
+            // window.clearTimeout(this.keepAliveAckTimeout);
+            // this.keepAliveAckTimeout = null;
+            window.clearInterval(this.adjustSRInterval);
+            window.clearInterval(this.pinger);
+            this._datachannel.removeAllListeners();
+            this.removeAllListeners();
+            this._datachannel.destroy();
+        }
+    }, {
+        key: '_handleRequestMsg',
+        value: function _handleRequestMsg(msg) {
+            if (this.rcvdReqQueue.length > 0) {
+                if (msg.urgent) {
+                    this.rcvdReqQueue.push(msg.sn); //urgent的放在队列末尾
+                } else {
+                    this.rcvdReqQueue.unshift(msg.sn);
+                }
+            } else {
+                this.emit(_events4.default.DC_REQUEST, msg);
+            }
+        }
+    }, {
+        key: '_handlePieceAck',
+        value: function _handlePieceAck() {
+            this.uploading = false;
+            window.clearTimeout(this.uploadTimeout);
+            this.uploadTimeout = null;
+            if (this.rcvdReqQueue.length > 0) {
+                var sn = this.rcvdReqQueue.pop();
+                this.emit(_events4.default.DC_REQUEST, { sn: sn });
+            }
+        }
+    }, {
+        key: '_prepareForBinary',
+        value: function _prepareForBinary(attachments, url, sn, expectedSize) {
+            this.bufArr = [];
+            this.remainAttachments = attachments;
+            this.bufUrl = url;
+            this.bufSN = sn;
+            this.expectedSize = expectedSize;
+        }
+    }, {
+        key: '_handleBinaryData',
+        value: function _handleBinaryData() {
+            var payload = Buffer.concat(this.bufArr);
+            if (payload.byteLength == this.expectedSize) {
+                //校验数据
+                this.emit(_events4.default.DC_RESPONSE, { url: this.bufUrl, sn: this.bufSN, data: payload });
+            }
+            this.bufUrl = '';
+            this.bufArr = [];
+            this.expectedSize = -1;
+
+            this.downloading = false;
+        }
+    }, {
+        key: '_handleGrant',
+        value: function _handleGrant(msg) {
+            if (msg.TTL > 0) {
+                this.emit(_events4.default.DC_GRANT, msg);
+            }
+        }
+    }, {
+        key: '_adjustStreamingRate',
+        value: function _adjustStreamingRate(interval) {
+            var _this3 = this;
+
+            //每隔一段时间计算streaming rate，单位bit/s
+            var sended = 0;
+            this.adjustSRInterval = window.setInterval(function () {
+                _this3.streamingRate = Math.round(sended * 8 / interval);
+                sended = 0;
+                // console.warn(`streamingRate ${this.streamingRate/8/1024}KB/s`);
+            }, interval * 1000);
+            return function (increment) {
+                sended += increment;
+            };
+        }
+    }, {
+        key: '_loadtimeout',
+        value: function _loadtimeout() {
+            //下载超时
+            log('datachannel timeout while downloading');
+            this.emit(_events4.default.DC_TIMEOUT);
+            this.requestTimeout = null;
+            this.downloading = false;
+            this.miss++;
+            if (this.miss >= this.config.dcTolerance) {
+                var msg = {
+                    event: _events4.default.DC_CLOSE
+                };
+                this.sendJson(msg);
+                this.emit(_events4.default.DC_ERROR);
+            }
+        }
+    }, {
+        key: '_uploadtimeout',
+        value: function _uploadtimeout() {
+            //上传超时
+            log('datachannel timeout while uploading');
+            this.uploading = false;
+            if (this.rcvdReqQueue.length > 0) {
+                var sn = this.rcvdReqQueue.pop();
+                this.emit(_events4.default.DC_REQUEST, { sn: sn });
+            }
+        }
+    }, {
+        key: '_sendPing',
+        value: function _sendPing() {
+            var _this4 = this;
+
+            this.ping = performance.now();
+            for (var i = 0; i < this.config.dcPingPackets; i++) {
+                this.sendJson({
+                    event: _events4.default.DC_PING
+                });
+            }
+            window.setTimeout(function () {
+                if (_this4.delays.length > 0) {
+                    var sum = 0;
+                    var _iteratorNormalCompletion = true;
+                    var _didIteratorError = false;
+                    var _iteratorError = undefined;
+
+                    try {
+                        for (var _iterator = _this4.delays[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                            var delay = _step.value;
+
+                            sum += delay;
+                        }
+                    } catch (err) {
+                        _didIteratorError = true;
+                        _iteratorError = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion && _iterator.return) {
+                                _iterator.return();
+                            }
+                        } finally {
+                            if (_didIteratorError) {
+                                throw _iteratorError;
+                            }
+                        }
+                    }
+
+                    _this4.delay = sum / _this4.delays.length;
+                    _this4.delays = [];
+                }
+            }, 100);
+        }
+    }, {
+        key: '_handlePongMsg',
+        value: function _handlePongMsg() {
+            var delay = performance.now() - this.ping;
+            this.delays.push(delay);
+        }
+    }]);
+
+    return DataChannel;
+}(_events2.default);
+
+function dividePayload(payload, packetSize, attachments, remainder) {
+    var bufArr = [];
+    if (remainder) {
+        var packet = void 0;
+        for (var i = 0; i < attachments - 1; i++) {
+            packet = payload.slice(i * packetSize, (i + 1) * packetSize);
+            bufArr.push(packet);
+        }
+        packet = payload.slice(payload.byteLength - remainder, payload.byteLength);
+        bufArr.push(packet);
+    } else {
+        var _packet = void 0;
+        for (var _i = 0; _i < attachments; _i++) {
+            _packet = payload.slice(_i * packetSize, (_i + 1) * packetSize);
+            bufArr.push(_packet);
+        }
+    }
+    return bufArr;
+}
+
+exports.default = DataChannel;
+module.exports = exports['default'];
 
 /***/ }),
-/* 20 */
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+module.exports = Peer;
+
+var debug = __webpack_require__(28)('simple-channel');
+var getBrowserRTC = __webpack_require__(11);
+var inherits = __webpack_require__(4);
+var randombytes = __webpack_require__(31);
+var stream = __webpack_require__(32);
+
+var MAX_BUFFERED_AMOUNT = 64 * 1024;
+
+inherits(Peer, stream.Duplex);
+
+function Peer(opts) {
+    var self = this;
+    if (!(self instanceof Peer)) return new Peer(opts);
+
+    self._id = randombytes(4).toString('hex').slice(0, 7);
+    self._debug('new peer %o', opts);
+
+    opts = Object.assign({
+        allowHalfOpen: false
+    }, opts);
+
+    stream.Duplex.call(self, opts);
+
+    self.channelName = opts.initiator ? opts.channelName || randombytes(20).toString('hex') : null;
+
+    // Needed by _transformConstraints, so set this early
+    self._isChromium = typeof window !== 'undefined' && !!window.webkitRTCPeerConnection;
+
+    self.initiator = opts.initiator || false;
+    self.channelConfig = opts.channelConfig || Peer.channelConfig;
+    self.config = opts.config || Peer.config;
+    self.constraints = self._transformConstraints(opts.constraints || Peer.constraints);
+    self.offerConstraints = self._transformConstraints(opts.offerConstraints || {});
+    self.answerConstraints = self._transformConstraints(opts.answerConstraints || {});
+    self.reconnectTimer = opts.reconnectTimer || false;
+    self.sdpTransform = opts.sdpTransform || function (sdp) {
+        return sdp;
+    };
+    self.stream = opts.stream || false;
+    self.trickle = opts.trickle !== undefined ? opts.trickle : true;
+
+    self.destroyed = false;
+    self.connected = false;
+
+    self.remoteAddress = undefined;
+    self.remoteFamily = undefined;
+    self.remotePort = undefined;
+    self.localAddress = undefined;
+    self.localPort = undefined;
+
+    self._wrtc = opts.wrtc && _typeof(opts.wrtc) === 'object' ? opts.wrtc : getBrowserRTC();
+
+    if (!self._wrtc) {
+        if (typeof window === 'undefined') {
+            throw new Error('No WebRTC support: Specify `opts.wrtc` option in this environment');
+        } else {
+            throw new Error('No WebRTC support: Not a supported browser');
+        }
+    }
+
+    self._pcReady = false;
+    self._channelReady = false;
+    self._iceComplete = false; // ice candidate trickle done (got null candidate)
+    self._channel = null;
+    self._pendingCandidates = [];
+    self._previousStreams = [];
+
+    self._chunk = null;
+    self._cb = null;
+    self._interval = null;
+    self._reconnectTimeout = null;
+
+    self._pc = new self._wrtc.RTCPeerConnection(self.config, self.constraints);
+
+    // We prefer feature detection whenever possible, but sometimes that's not
+    // possible for certain implementations.
+    self._isWrtc = Array.isArray(self._pc.RTCIceConnectionStates);
+    self._isReactNativeWebrtc = typeof self._pc._peerConnectionId === 'number';
+
+    self._pc.oniceconnectionstatechange = function () {
+        self._onIceStateChange();
+    };
+    self._pc.onicegatheringstatechange = function () {
+        self._onIceStateChange();
+    };
+    self._pc.onsignalingstatechange = function () {
+        self._onSignalingStateChange();
+    };
+    self._pc.onicecandidate = function (event) {
+        self._onIceCandidate(event);
+    };
+
+    // Other spec events, unused by this implementation:
+    // - onconnectionstatechange
+    // - onicecandidateerror
+    // - onfingerprintfailure
+
+    if (self.initiator) {
+        var createdOffer = false;
+        self._pc.onnegotiationneeded = function () {
+            if (!createdOffer) self._createOffer();
+            createdOffer = true;
+        };
+
+        self._setupData({
+            channel: self._pc.createDataChannel(self.channelName, self.channelConfig)
+        });
+    } else {
+        self._pc.ondatachannel = function (event) {
+            self._setupData(event);
+        };
+    }
+
+    if ('addTrack' in self._pc) {
+        // WebRTC Spec, Firefox
+        if (self.stream) {
+            self.stream.getTracks().forEach(function (track) {
+                self._pc.addTrack(track, self.stream);
+            });
+        }
+        self._pc.ontrack = function (event) {
+            self._onTrack(event);
+        };
+    } else {
+        // Chrome, etc. This can be removed once all browsers support `ontrack`
+        if (self.stream) self._pc.addStream(self.stream);
+        self._pc.onaddstream = function (event) {
+            self._onAddStream(event);
+        };
+    }
+
+    // HACK: wrtc doesn't fire the 'negotionneeded' event
+    if (self.initiator && self._isWrtc) {
+        self._pc.onnegotiationneeded();
+    }
+
+    self._onFinishBound = function () {
+        self._onFinish();
+    };
+    self.once('finish', self._onFinishBound);
+}
+
+Peer.WEBRTC_SUPPORT = !!getBrowserRTC();
+
+/**
+ * Expose config, constraints, and data channel config for overriding all Peer
+ * instances. Otherwise, just set opts.config, opts.constraints, or opts.channelConfig
+ * when constructing a Peer.
+ */
+Peer.config = {
+    iceServers: [{
+        urls: 'stun:stun.l.google.com:19302'
+    }, {
+        urls: 'stun:global.stun.twilio.com:3478?transport=udp'
+    }]
+};
+Peer.constraints = {};
+Peer.channelConfig = {};
+
+Object.defineProperty(Peer.prototype, 'bufferSize', {
+    get: function get() {
+        var self = this;
+        return self._channel && self._channel.bufferedAmount || 0;
+    }
+});
+
+Peer.prototype.address = function () {
+    var self = this;
+    return { port: self.localPort, family: 'IPv4', address: self.localAddress };
+};
+
+Peer.prototype.signal = function (data) {
+    var self = this;
+    if (self.destroyed) throw new Error('cannot signal after peer is destroyed');
+    if (typeof data === 'string') {
+        try {
+            data = JSON.parse(data);
+        } catch (err) {
+            data = {};
+        }
+    }
+    self._debug('signal()');
+
+    if (data.candidate) {
+        if (self._pc.remoteDescription && self._pc.remoteDescription.type) self._addIceCandidate(data.candidate);else self._pendingCandidates.push(data.candidate);
+    }
+    if (data.sdp) {
+        self._pc.setRemoteDescription(new self._wrtc.RTCSessionDescription(data), function () {
+            if (self.destroyed) return;
+
+            self._pendingCandidates.forEach(function (candidate) {
+                self._addIceCandidate(candidate);
+            });
+            self._pendingCandidates = [];
+
+            if (self._pc.remoteDescription.type === 'offer') self._createAnswer();
+        }, function (err) {
+            self.destroy(err);
+        });
+    }
+    if (!data.sdp && !data.candidate) {
+        self.destroy(new Error('signal() called with invalid signal data'));
+    }
+};
+
+Peer.prototype._addIceCandidate = function (candidate) {
+    var self = this;
+    try {
+        self._pc.addIceCandidate(new self._wrtc.RTCIceCandidate(candidate), noop, function (err) {
+            self.destroy(err);
+        });
+    } catch (err) {
+        self.destroy(new Error('error adding candidate: ' + err.message));
+    }
+};
+
+/**
+ * Send text/binary data to the remote peer.
+ * @param {TypedArrayView|ArrayBuffer|Buffer|string|Blob|Object} chunk
+ */
+Peer.prototype.send = function (chunk) {
+    var self = this;
+    self._channel.send(chunk);
+};
+
+// TODO: Delete this method once readable-stream is updated to contain a default
+// implementation of destroy() that automatically calls _destroy()
+// See: https://github.com/nodejs/readable-stream/issues/283
+Peer.prototype.destroy = function (err) {
+    var self = this;
+    self._destroy(err, function () {});
+};
+
+Peer.prototype._destroy = function (err, cb) {
+    var self = this;
+    if (self.destroyed) return;
+
+    self._debug('destroy (error: %s)', err && (err.message || err));
+
+    self.readable = self.writable = false;
+
+    if (!self._readableState.ended) self.push(null);
+    if (!self._writableState.finished) self.end();
+
+    self.destroyed = true;
+    self.connected = false;
+    self._pcReady = false;
+    self._channelReady = false;
+    self._previousStreams = null;
+
+    clearInterval(self._interval);
+    clearTimeout(self._reconnectTimeout);
+    self._interval = null;
+    self._reconnectTimeout = null;
+    self._chunk = null;
+    self._cb = null;
+
+    if (self._onFinishBound) self.removeListener('finish', self._onFinishBound);
+    self._onFinishBound = null;
+
+    if (self._pc) {
+        try {
+            self._pc.close();
+        } catch (err) {}
+
+        self._pc.oniceconnectionstatechange = null;
+        self._pc.onicegatheringstatechange = null;
+        self._pc.onsignalingstatechange = null;
+        self._pc.onicecandidate = null;
+        if ('addTrack' in self._pc) {
+            self._pc.ontrack = null;
+        } else {
+            self._pc.onaddstream = null;
+        }
+        self._pc.onnegotiationneeded = null;
+        self._pc.ondatachannel = null;
+    }
+
+    if (self._channel) {
+        try {
+            self._channel.close();
+        } catch (err) {}
+
+        self._channel.onmessage = null;
+        self._channel.onopen = null;
+        self._channel.onclose = null;
+        self._channel.onerror = null;
+    }
+    self._pc = null;
+    self._channel = null;
+
+    if (err) self.emit('error', err);
+    self.emit('close');
+    cb();
+};
+
+Peer.prototype._setupData = function (event) {
+    var self = this;
+    if (!event.channel) {
+        // In some situations `pc.createDataChannel()` returns `undefined` (in wrtc),
+        // which is invalid behavior. Handle it gracefully.
+        // See: https://github.com/feross/simple-peer/issues/163
+        return self.destroy(new Error('Data channel event is missing `channel` property'));
+    }
+
+    self._channel = event.channel;
+    self._channel.binaryType = 'arraybuffer';
+
+    if (typeof self._channel.bufferedAmountLowThreshold === 'number') {
+        self._channel.bufferedAmountLowThreshold = MAX_BUFFERED_AMOUNT;
+    }
+
+    self.channelName = self._channel.label;
+
+    self._channel.onmessage = function (event) {
+        self._onChannelMessage(event);
+    };
+    self._channel.onbufferedamountlow = function () {
+        self._onChannelBufferedAmountLow();
+    };
+    self._channel.onopen = function () {
+        self._onChannelOpen();
+    };
+    self._channel.onclose = function () {
+        self._onChannelClose();
+    };
+    self._channel.onerror = function (err) {
+        self.destroy(err);
+    };
+};
+
+Peer.prototype._read = function () {};
+
+Peer.prototype._write = function (chunk, encoding, cb) {
+    var self = this;
+    if (self.destroyed) return cb(new Error('cannot write after peer is destroyed'));
+
+    if (self.connected) {
+        try {
+            self.send(chunk);
+        } catch (err) {
+            return self.destroy(err);
+        }
+        if (self._channel.bufferedAmount > MAX_BUFFERED_AMOUNT) {
+            self._debug('start backpressure: bufferedAmount %d', self._channel.bufferedAmount);
+            self._cb = cb;
+        } else {
+            cb(null);
+        }
+    } else {
+        self._debug('write before connect');
+        self._chunk = chunk;
+        self._cb = cb;
+    }
+};
+
+// When stream finishes writing, close socket. Half open connections are not
+// supported.
+Peer.prototype._onFinish = function () {
+    var self = this;
+    if (self.destroyed) return;
+
+    if (self.connected) {
+        destroySoon();
+    } else {
+        self.once('connect', destroySoon);
+    }
+
+    // Wait a bit before destroying so the socket flushes.
+    // TODO: is there a more reliable way to accomplish this?
+    function destroySoon() {
+        setTimeout(function () {
+            self.destroy();
+        }, 1000);
+    }
+};
+
+Peer.prototype._createOffer = function () {
+    var self = this;
+    if (self.destroyed) return;
+
+    self._pc.createOffer(function (offer) {
+        if (self.destroyed) return;
+        offer.sdp = self.sdpTransform(offer.sdp);
+        self._pc.setLocalDescription(offer, onSuccess, onError);
+
+        function onSuccess() {
+            if (self.destroyed) return;
+            if (self.trickle || self._iceComplete) sendOffer();else self.once('_iceComplete', sendOffer); // wait for candidates
+        }
+
+        function onError(err) {
+            self.destroy(err);
+        }
+
+        function sendOffer() {
+            var signal = self._pc.localDescription || offer;
+            self._debug('signal');
+            self.emit('signal', {
+                type: signal.type,
+                sdp: signal.sdp
+            });
+        }
+    }, function (err) {
+        self.destroy(err);
+    }, self.offerConstraints);
+};
+
+Peer.prototype._createAnswer = function () {
+    var self = this;
+    if (self.destroyed) return;
+
+    self._pc.createAnswer(function (answer) {
+        if (self.destroyed) return;
+        answer.sdp = self.sdpTransform(answer.sdp);
+        self._pc.setLocalDescription(answer, onSuccess, onError);
+
+        function onSuccess() {
+            if (self.destroyed) return;
+            if (self.trickle || self._iceComplete) sendAnswer();else self.once('_iceComplete', sendAnswer);
+        }
+
+        function onError(err) {
+            self.destroy(err);
+        }
+
+        function sendAnswer() {
+            var signal = self._pc.localDescription || answer;
+            self._debug('signal');
+            self.emit('signal', {
+                type: signal.type,
+                sdp: signal.sdp
+            });
+        }
+    }, function (err) {
+        self.destroy(err);
+    }, self.answerConstraints);
+};
+
+Peer.prototype._onIceStateChange = function () {
+    var self = this;
+    if (self.destroyed) return;
+    var iceConnectionState = self._pc.iceConnectionState;
+    var iceGatheringState = self._pc.iceGatheringState;
+
+    self._debug('iceStateChange (connection: %s) (gathering: %s)', iceConnectionState, iceGatheringState);
+    self.emit('iceStateChange', iceConnectionState, iceGatheringState);
+
+    if (iceConnectionState === 'connected' || iceConnectionState === 'completed') {
+        clearTimeout(self._reconnectTimeout);
+        self._pcReady = true;
+        self._maybeReady();
+    }
+    if (iceConnectionState === 'disconnected') {
+        if (self.reconnectTimer) {
+            // If user has set `opt.reconnectTimer`, allow time for ICE to attempt a reconnect
+            clearTimeout(self._reconnectTimeout);
+            self._reconnectTimeout = setTimeout(function () {
+                self.destroy();
+            }, self.reconnectTimer);
+        } else {
+            self.destroy();
+        }
+    }
+    if (iceConnectionState === 'failed') {
+        self.destroy(new Error('Ice connection failed.'));
+    }
+    if (iceConnectionState === 'closed') {
+        self.destroy();
+    }
+};
+
+Peer.prototype.getStats = function (cb) {
+    var self = this;
+
+    // Promise-based getStats() (standard)
+    if (self._pc.getStats.length === 0) {
+        self._pc.getStats().then(function (res) {
+            var reports = [];
+            res.forEach(function (report) {
+                reports.push(report);
+            });
+            cb(null, reports);
+        }, function (err) {
+            cb(err);
+        });
+
+        // Two-parameter callback-based getStats() (deprecated, former standard)
+    } else if (self._isReactNativeWebrtc) {
+        self._pc.getStats(null, function (res) {
+            var reports = [];
+            res.forEach(function (report) {
+                reports.push(report);
+            });
+            cb(null, reports);
+        }, function (err) {
+            cb(err);
+        });
+
+        // Single-parameter callback-based getStats() (non-standard)
+    } else if (self._pc.getStats.length > 0) {
+        self._pc.getStats(function (res) {
+            // If we destroy connection in `connect` callback this code might happen to run when actual connection is already closed
+            if (self.destroyed) return;
+
+            var reports = [];
+            res.result().forEach(function (result) {
+                var report = {};
+                result.names().forEach(function (name) {
+                    report[name] = result.stat(name);
+                });
+                report.id = result.id;
+                report.type = result.type;
+                report.timestamp = result.timestamp;
+                reports.push(report);
+            });
+            cb(null, reports);
+        }, function (err) {
+            cb(err);
+        });
+
+        // Unknown browser, skip getStats() since it's anyone's guess which style of
+        // getStats() they implement.
+    } else {
+        cb(null, []);
+    }
+};
+
+Peer.prototype._maybeReady = function () {
+    var self = this;
+    self._debug('maybeReady pc %s channel %s', self._pcReady, self._channelReady);
+    if (self.connected || self._connecting || !self._pcReady || !self._channelReady) return;
+
+    self._connecting = true;
+
+    // HACK: We can't rely on order here, for details see https://github.com/js-platform/node-webrtc/issues/339
+    function findCandidatePair() {
+        if (self.destroyed) return;
+
+        self.getStats(function (err, items) {
+            if (self.destroyed) return;
+
+            // Treat getStats error as non-fatal. It's not essential.
+            if (err) items = [];
+
+            var remoteCandidates = {};
+            var localCandidates = {};
+            var candidatePairs = {};
+            var foundSelectedCandidatePair = false;
+
+            items.forEach(function (item) {
+                // TODO: Once all browsers support the hyphenated stats report types, remove
+                // the non-hypenated ones
+                if (item.type === 'remotecandidate' || item.type === 'remote-candidate') {
+                    remoteCandidates[item.id] = item;
+                }
+                if (item.type === 'localcandidate' || item.type === 'local-candidate') {
+                    localCandidates[item.id] = item;
+                }
+                if (item.type === 'candidatepair' || item.type === 'candidate-pair') {
+                    candidatePairs[item.id] = item;
+                }
+            });
+
+            items.forEach(function (item) {
+                // Spec-compliant
+                if (item.type === 'transport') {
+                    setSelectedCandidatePair(candidatePairs[item.selectedCandidatePairId]);
+                }
+
+                // Old implementations
+                if (item.type === 'googCandidatePair' && item.googActiveConnection === 'true' || (item.type === 'candidatepair' || item.type === 'candidate-pair') && item.selected) {
+                    setSelectedCandidatePair(item);
+                }
+            });
+
+            function setSelectedCandidatePair(selectedCandidatePair) {
+                foundSelectedCandidatePair = true;
+
+                var local = localCandidates[selectedCandidatePair.localCandidateId];
+
+                if (local && local.ip) {
+                    // Spec
+                    self.localAddress = local.ip;
+                    self.localPort = Number(local.port);
+                } else if (local && local.ipAddress) {
+                    // Firefox
+                    self.localAddress = local.ipAddress;
+                    self.localPort = Number(local.portNumber);
+                } else if (typeof selectedCandidatePair.googLocalAddress === 'string') {
+                    // TODO: remove this once Chrome 58 is released
+                    local = selectedCandidatePair.googLocalAddress.split(':');
+                    self.localAddress = local[0];
+                    self.localPort = Number(local[1]);
+                }
+
+                var remote = remoteCandidates[selectedCandidatePair.remoteCandidateId];
+
+                if (remote && remote.ip) {
+                    // Spec
+                    self.remoteAddress = remote.ip;
+                    self.remotePort = Number(remote.port);
+                } else if (remote && remote.ipAddress) {
+                    // Firefox
+                    self.remoteAddress = remote.ipAddress;
+                    self.remotePort = Number(remote.portNumber);
+                } else if (typeof selectedCandidatePair.googRemoteAddress === 'string') {
+                    // TODO: remove this once Chrome 58 is released
+                    remote = selectedCandidatePair.googRemoteAddress.split(':');
+                    self.remoteAddress = remote[0];
+                    self.remotePort = Number(remote[1]);
+                }
+                self.remoteFamily = 'IPv4';
+
+                self._debug('connect local: %s:%s remote: %s:%s', self.localAddress, self.localPort, self.remoteAddress, self.remotePort);
+            }
+
+            // Ignore candidate pair selection in browsers like Safari 11 that do not have any local or remote candidates
+            // But wait until at least 1 candidate pair is available
+            if (!foundSelectedCandidatePair && (!Object.keys(candidatePairs).length || Object.keys(localCandidates).length)) {
+                setTimeout(findCandidatePair, 100);
+                return;
+            } else {
+                self._connecting = false;
+                self.connected = true;
+            }
+
+            if (self._chunk) {
+                try {
+                    self.send(self._chunk);
+                } catch (err) {
+                    return self.destroy(err);
+                }
+                self._chunk = null;
+                self._debug('sent chunk from "write before connect"');
+
+                var cb = self._cb;
+                self._cb = null;
+                cb(null);
+            }
+
+            // If `bufferedAmountLowThreshold` and 'onbufferedamountlow' are unsupported,
+            // fallback to using setInterval to implement backpressure.
+            if (typeof self._channel.bufferedAmountLowThreshold !== 'number') {
+                self._interval = setInterval(function () {
+                    self._onInterval();
+                }, 150);
+                if (self._interval.unref) self._interval.unref();
+            }
+
+            self._debug('connect');
+            self.emit('connect');
+        });
+    }
+    findCandidatePair();
+};
+
+Peer.prototype._onInterval = function () {
+    var self = this;
+    if (!self._cb || !self._channel || self._channel.bufferedAmount > MAX_BUFFERED_AMOUNT) {
+        return;
+    }
+    self._onChannelBufferedAmountLow();
+};
+
+Peer.prototype._onSignalingStateChange = function () {
+    var self = this;
+    if (self.destroyed) return;
+    self._debug('signalingStateChange %s', self._pc.signalingState);
+    self.emit('signalingStateChange', self._pc.signalingState);
+};
+
+Peer.prototype._onIceCandidate = function (event) {
+    var self = this;
+    if (self.destroyed) return;
+    if (event.candidate && self.trickle) {
+        self.emit('signal', {
+            candidate: {
+                candidate: event.candidate.candidate,
+                sdpMLineIndex: event.candidate.sdpMLineIndex,
+                sdpMid: event.candidate.sdpMid
+            }
+        });
+    } else if (!event.candidate) {
+        self._iceComplete = true;
+        self.emit('_iceComplete');
+    }
+};
+
+Peer.prototype._onChannelMessage = function (event) {
+    var self = this;
+    if (self.destroyed) return;
+    var data = event.data;
+    if (data instanceof ArrayBuffer) data = Buffer.from(data);
+    self.push(data);
+};
+
+Peer.prototype._onChannelBufferedAmountLow = function () {
+    var self = this;
+    if (self.destroyed || !self._cb) return;
+    self._debug('ending backpressure: bufferedAmount %d', self._channel.bufferedAmount);
+    var cb = self._cb;
+    self._cb = null;
+    cb(null);
+};
+
+Peer.prototype._onChannelOpen = function () {
+    var self = this;
+    if (self.connected || self.destroyed) return;
+    self._debug('on channel open');
+    self._channelReady = true;
+    self._maybeReady();
+};
+
+Peer.prototype._onChannelClose = function () {
+    var self = this;
+    if (self.destroyed) return;
+    self._debug('on channel close');
+    self.destroy();
+};
+
+Peer.prototype._onAddStream = function (event) {
+    var self = this;
+    if (self.destroyed) return;
+    self._debug('on add stream');
+    self.emit('stream', event.stream);
+};
+
+Peer.prototype._onTrack = function (event) {
+    var self = this;
+    if (self.destroyed) return;
+    self._debug('on track');
+    var id = event.streams[0].id;
+    if (self._previousStreams.indexOf(id) !== -1) return; // Only fire one 'stream' event, even though there may be multiple tracks per stream
+    self._previousStreams.push(id);
+    self.emit('stream', event.streams[0]);
+};
+
+Peer.prototype._debug = function () {
+    var self = this;
+    var args = [].slice.call(arguments);
+    args[0] = '[' + self._id + '] ' + args[0];
+    debug.apply(null, args);
+};
+
+// Transform constraints objects into the new format (unless Chromium)
+// TODO: This can be removed when Chromium supports the new format
+Peer.prototype._transformConstraints = function (constraints) {
+    var self = this;
+
+    if (Object.keys(constraints).length === 0) {
+        return constraints;
+    }
+
+    if ((constraints.mandatory || constraints.optional) && !self._isChromium) {
+        // convert to new format
+
+        // Merge mandatory and optional objects, prioritizing mandatory
+        var newConstraints = Object.assign({}, constraints.optional, constraints.mandatory);
+
+        // fix casing
+        if (newConstraints.OfferToReceiveVideo !== undefined) {
+            newConstraints.offerToReceiveVideo = newConstraints.OfferToReceiveVideo;
+            delete newConstraints['OfferToReceiveVideo'];
+        }
+
+        if (newConstraints.OfferToReceiveAudio !== undefined) {
+            newConstraints.offerToReceiveAudio = newConstraints.OfferToReceiveAudio;
+            delete newConstraints['OfferToReceiveAudio'];
+        }
+
+        return newConstraints;
+    } else if (!constraints.mandatory && !constraints.optional && self._isChromium) {
+        // convert to old format
+
+        // fix casing
+        if (constraints.offerToReceiveVideo !== undefined) {
+            constraints.OfferToReceiveVideo = constraints.offerToReceiveVideo;
+            delete constraints['offerToReceiveVideo'];
+        }
+
+        if (constraints.offerToReceiveAudio !== undefined) {
+            constraints.OfferToReceiveAudio = constraints.offerToReceiveAudio;
+            delete constraints['offerToReceiveAudio'];
+        }
+
+        return {
+            mandatory: constraints // NOTE: All constraints are upgraded to mandatory
+        };
+    }
+
+    return constraints;
+};
+
+function noop() {}
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6).Buffer))
+
+/***/ }),
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6260,6 +7182,8 @@ for (var i = 0, len = code.length; i < len; ++i) {
   revLookup[code.charCodeAt(i)] = i
 }
 
+// Support decoding URL-safe base64 strings, as Node.js does.
+// See: https://en.wikipedia.org/wiki/Base64#URL_applications
 revLookup['-'.charCodeAt(0)] = 62
 revLookup['_'.charCodeAt(0)] = 63
 
@@ -6321,7 +7245,7 @@ function encodeChunk (uint8, start, end) {
   var tmp
   var output = []
   for (var i = start; i < end; i += 3) {
-    tmp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
+    tmp = ((uint8[i] << 16) & 0xFF0000) + ((uint8[i + 1] << 8) & 0xFF00) + (uint8[i + 2] & 0xFF)
     output.push(tripletToBase64(tmp))
   }
   return output.join('')
@@ -6361,12 +7285,12 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 21 */
+/* 27 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
-  var eLen = nBytes * 8 - mLen - 1
+  var eLen = (nBytes * 8) - mLen - 1
   var eMax = (1 << eLen) - 1
   var eBias = eMax >> 1
   var nBits = -7
@@ -6379,12 +7303,12 @@ exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   e = s & ((1 << (-nBits)) - 1)
   s >>= (-nBits)
   nBits += eLen
-  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+  for (; nBits > 0; e = (e * 256) + buffer[offset + i], i += d, nBits -= 8) {}
 
   m = e & ((1 << (-nBits)) - 1)
   e >>= (-nBits)
   nBits += mLen
-  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+  for (; nBits > 0; m = (m * 256) + buffer[offset + i], i += d, nBits -= 8) {}
 
   if (e === 0) {
     e = 1 - eBias
@@ -6399,7 +7323,7 @@ exports.read = function (buffer, offset, isLE, mLen, nBytes) {
 
 exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   var e, m, c
-  var eLen = nBytes * 8 - mLen - 1
+  var eLen = (nBytes * 8) - mLen - 1
   var eMax = (1 << eLen) - 1
   var eBias = eMax >> 1
   var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
@@ -6432,7 +7356,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
       m = 0
       e = eMax
     } else if (e + eBias >= 1) {
-      m = (value * c - 1) * Math.pow(2, mLen)
+      m = ((value * c) - 1) * Math.pow(2, mLen)
       e = e + eBias
     } else {
       m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
@@ -6451,7 +7375,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 22 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {/**
@@ -6460,7 +7384,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
  * Expose `debug()` as the module.
  */
 
-exports = module.exports = __webpack_require__(23);
+exports = module.exports = __webpack_require__(29);
 exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
@@ -6476,12 +7400,17 @@ exports.storage = 'undefined' != typeof chrome
  */
 
 exports.colors = [
-  'lightseagreen',
-  'forestgreen',
-  'goldenrod',
-  'dodgerblue',
-  'darkorchid',
-  'crimson'
+  '#0000CC', '#0000FF', '#0033CC', '#0033FF', '#0066CC', '#0066FF', '#0099CC',
+  '#0099FF', '#00CC00', '#00CC33', '#00CC66', '#00CC99', '#00CCCC', '#00CCFF',
+  '#3300CC', '#3300FF', '#3333CC', '#3333FF', '#3366CC', '#3366FF', '#3399CC',
+  '#3399FF', '#33CC00', '#33CC33', '#33CC66', '#33CC99', '#33CCCC', '#33CCFF',
+  '#6600CC', '#6600FF', '#6633CC', '#6633FF', '#66CC00', '#66CC33', '#9900CC',
+  '#9900FF', '#9933CC', '#9933FF', '#99CC00', '#99CC33', '#CC0000', '#CC0033',
+  '#CC0066', '#CC0099', '#CC00CC', '#CC00FF', '#CC3300', '#CC3333', '#CC3366',
+  '#CC3399', '#CC33CC', '#CC33FF', '#CC6600', '#CC6633', '#CC9900', '#CC9933',
+  '#CCCC00', '#CCCC33', '#FF0000', '#FF0033', '#FF0066', '#FF0099', '#FF00CC',
+  '#FF00FF', '#FF3300', '#FF3333', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF',
+  '#FF6600', '#FF6633', '#FF9900', '#FF9933', '#FFCC00', '#FFCC33'
 ];
 
 /**
@@ -6498,6 +7427,11 @@ function useColors() {
   // explicitly
   if (typeof window !== 'undefined' && window.process && window.process.type === 'renderer') {
     return true;
+  }
+
+  // Internet Explorer and Edge do not support colors.
+  if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
+    return false;
   }
 
   // is webkit? http://stackoverflow.com/a/16459606/376773
@@ -6640,10 +7574,10 @@ function localstorage() {
   } catch (e) {}
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
-/* 23 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -6659,7 +7593,12 @@ exports.coerce = coerce;
 exports.disable = disable;
 exports.enable = enable;
 exports.enabled = enabled;
-exports.humanize = __webpack_require__(24);
+exports.humanize = __webpack_require__(30);
+
+/**
+ * Active `debug` instances.
+ */
+exports.instances = [];
 
 /**
  * The currently active debug mode names, and names to skip.
@@ -6675,12 +7614,6 @@ exports.skips = [];
  */
 
 exports.formatters = {};
-
-/**
- * Previous log timestamp.
- */
-
-var prevTime;
 
 /**
  * Select a color.
@@ -6709,6 +7642,8 @@ function selectColor(namespace) {
  */
 
 function createDebug(namespace) {
+
+  var prevTime;
 
   function debug() {
     // disabled?
@@ -6766,13 +7701,26 @@ function createDebug(namespace) {
   debug.enabled = exports.enabled(namespace);
   debug.useColors = exports.useColors();
   debug.color = selectColor(namespace);
+  debug.destroy = destroy;
 
   // env-specific initialization logic for debug instances
   if ('function' === typeof exports.init) {
     exports.init(debug);
   }
 
+  exports.instances.push(debug);
+
   return debug;
+}
+
+function destroy () {
+  var index = exports.instances.indexOf(this);
+  if (index !== -1) {
+    exports.instances.splice(index, 1);
+    return true;
+  } else {
+    return false;
+  }
 }
 
 /**
@@ -6789,10 +7737,11 @@ function enable(namespaces) {
   exports.names = [];
   exports.skips = [];
 
+  var i;
   var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
   var len = split.length;
 
-  for (var i = 0; i < len; i++) {
+  for (i = 0; i < len; i++) {
     if (!split[i]) continue; // ignore empty strings
     namespaces = split[i].replace(/\*/g, '.*?');
     if (namespaces[0] === '-') {
@@ -6800,6 +7749,11 @@ function enable(namespaces) {
     } else {
       exports.names.push(new RegExp('^' + namespaces + '$'));
     }
+  }
+
+  for (i = 0; i < exports.instances.length; i++) {
+    var instance = exports.instances[i];
+    instance.enabled = exports.enabled(instance.namespace);
   }
 }
 
@@ -6822,6 +7776,9 @@ function disable() {
  */
 
 function enabled(name) {
+  if (name[name.length - 1] === '*') {
+    return true;
+  }
   var i, len;
   for (i = 0, len = exports.skips.length; i < len; i++) {
     if (exports.skips[i].test(name)) {
@@ -6851,7 +7808,7 @@ function coerce(val) {
 
 
 /***/ }),
-/* 24 */
+/* 30 */
 /***/ (function(module, exports) {
 
 /**
@@ -7009,35 +7966,14 @@ function plural(ms, n, name) {
 
 
 /***/ }),
-/* 25 */
-/***/ (function(module, exports) {
-
-// originally pulled out of simple-peer
-
-module.exports = function getBrowserRTC () {
-  if (typeof window === 'undefined') return null
-  var wrtc = {
-    RTCPeerConnection: window.RTCPeerConnection || window.mozRTCPeerConnection ||
-      window.webkitRTCPeerConnection,
-    RTCSessionDescription: window.RTCSessionDescription ||
-      window.mozRTCSessionDescription || window.webkitRTCSessionDescription,
-    RTCIceCandidate: window.RTCIceCandidate || window.mozRTCIceCandidate ||
-      window.webkitRTCIceCandidate
-  }
-  if (!wrtc.RTCPeerConnection) return null
-  return wrtc
-}
-
-
-/***/ }),
-/* 26 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(global, process) {
 
 function oldBrowser () {
-  throw new Error('secure random number generation not supported by this browser\nuse chrome, FireFox or Internet Explorer 11')
+  throw new Error('Secure random number generation is not supported by this browser.\nUse Chrome, Firefox or Internet Explorer 11')
 }
 
 var Buffer = __webpack_require__(7).Buffer
@@ -7073,40 +8009,38 @@ function randomBytes (size, cb) {
   return bytes
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3)))
 
 /***/ }),
-/* 27 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(12);
 exports.Stream = exports;
 exports.Readable = exports;
 exports.Writable = __webpack_require__(15);
-exports.Duplex = __webpack_require__(4);
+exports.Duplex = __webpack_require__(5);
 exports.Transform = __webpack_require__(17);
-exports.PassThrough = __webpack_require__(33);
+exports.PassThrough = __webpack_require__(39);
 
 
 /***/ }),
-/* 28 */
+/* 33 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 29 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-/*<replacement>*/
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Buffer = __webpack_require__(7).Buffer;
-/*</replacement>*/
+var util = __webpack_require__(35);
 
 function copyBuffer(src, target, offset) {
   src.copy(target, offset);
@@ -7174,11 +8108,24 @@ module.exports = function () {
   return BufferList;
 }();
 
+if (util && util.inspect && util.inspect.custom) {
+  module.exports.prototype[util.inspect.custom] = function () {
+    var obj = util.inspect({ length: this.length });
+    return this.constructor.name + ' ' + obj;
+  };
+}
+
 /***/ }),
-/* 30 */
+/* 35 */
+/***/ (function(module, exports) {
+
+/* (ignored) */
+
+/***/ }),
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var apply = Function.prototype.apply;
+/* WEBPACK VAR INJECTION */(function(global) {var apply = Function.prototype.apply;
 
 // DOM APIs, for completeness
 
@@ -7228,13 +8175,21 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(31);
-exports.setImmediate = setImmediate;
-exports.clearImmediate = clearImmediate;
+__webpack_require__(37);
+// On some exotic environments, it's not clear which object `setimmeidate` was
+// able to install onto.  Search each possibility in the same order as the
+// `setimmediate` library.
+exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
+                       (typeof global !== "undefined" && global.setImmediate) ||
+                       (this && this.setImmediate);
+exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
+                         (typeof global !== "undefined" && global.clearImmediate) ||
+                         (this && this.clearImmediate);
 
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 31 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -7424,10 +8379,10 @@ exports.clearImmediate = clearImmediate;
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3)))
 
 /***/ }),
-/* 32 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {
@@ -7501,7 +8456,7 @@ function config (name) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 33 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7538,7 +8493,7 @@ var Transform = __webpack_require__(17);
 
 /*<replacement>*/
 var util = __webpack_require__(8);
-util.inherits = __webpack_require__(3);
+util.inherits = __webpack_require__(4);
 /*</replacement>*/
 
 util.inherits(PassThrough, Transform);
@@ -7554,7 +8509,219 @@ PassThrough.prototype._transform = function (chunk, encoding, cb) {
 };
 
 /***/ }),
-/* 34 */
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/**
+ * Created by xieting on 2018/4/3.
+ */
+var log = console.warn;
+
+var Fetcher = function () {
+    function Fetcher(key, room, baseUrl) {
+        _classCallCheck(this, Fetcher);
+
+        //-----------bt---------------------
+        var queryStr = '?key=' + window.encodeURIComponent(key) + '&info_hash=' + room;
+        this.announceURL = baseUrl + '/announce/' + queryStr;
+        this.heartbeatURL = baseUrl + '/heartbeat/' + queryStr;
+        this.getPeersURL = baseUrl + '/get_peers/' + queryStr;
+        this.statsURL = baseUrl + '/stats/' + queryStr;
+
+        //连接情况上报
+        this.conns = 0; //连接的peer的增量
+        this.failConns = 0; //连接失败的peer的增量
+
+        //流量上报
+        this.cdnDownloaded = 0;
+        this.p2pDownloaded = 0;
+    }
+
+    _createClass(Fetcher, [{
+        key: 'btAnnounce',
+        value: function btAnnounce() {
+            var _this = this;
+
+            return new Promise(function (resolve, reject) {
+                fetch(_this.announceURL).then(function (response) {
+                    return response.json();
+                }).then(function (json) {
+                    _this.peerId = json.peer_id; //保存peerId
+                    resolve(json);
+                }).catch(function (err) {
+                    reject(err);
+                });
+            });
+        }
+    }, {
+        key: 'btHeartbeat',
+        value: function btHeartbeat(interval) {
+            var _this2 = this;
+
+            this.heartbeater = window.setInterval(function () {
+                fetch(_this2.heartbeatURL + ('&peer_id=' + _this2.peerId)).then(function (response) {}).catch(function (err) {
+                    window.clearInterval(_this2.heartbeater);
+                });
+            }, interval * 1000);
+        }
+    }, {
+        key: 'btGetPeers',
+        value: function btGetPeers() {
+            var _this3 = this;
+
+            return new Promise(function (resolve, reject) {
+                fetch(_this3.getPeersURL + ('&peer_id=' + _this3.peerId)).then(function (response) {
+                    return response.json();
+                }).then(function (json) {
+                    resolve(json);
+                }).catch(function (err) {
+                    reject(err);
+                });
+            });
+        }
+    }, {
+        key: 'increConns',
+        value: function increConns() {
+            //主动连接的负责报告(增量)
+            this.conns++;
+        }
+    }, {
+        key: 'decreConns',
+        value: function decreConns() {
+            this.conns--;
+        }
+    }, {
+        key: 'increFailConns',
+        value: function increFailConns() {
+            this.failConns++;
+        }
+    }, {
+        key: 'btStatsStart',
+        value: function btStatsStart(interval) {
+            var _this4 = this;
+
+            this.statser = window.setInterval(function () {
+                var body = {
+                    source: Math.round(_this4.cdnDownloaded / 1024),
+                    p2p: Math.round(_this4.p2pDownloaded / 1024)
+                };
+                if (_this4.conns !== 0) {
+                    body.conns = _this4.conns;
+                }
+                if (_this4.failConns > 0) {
+                    body.failConns = _this4.failConns;
+                }
+                fetch(_this4.statsURL + ('&peer_id=' + _this4.peerId), {
+                    method: 'POST', // 指定是POST请求
+                    body: JSON.stringify(body)
+                }).then(function (response) {
+                    if (response.ok) {
+                        _this4.cdnDownloaded = 0;
+                        _this4.p2pDownloaded = 0;
+                        _this4.conns = 0;
+                        _this4.failConns = 0;
+                    }
+                }).catch(function (err) {
+                    window.clearInterval(_this4.statser);
+                });
+            }, interval * 1000);
+        }
+    }, {
+        key: 'reportFlow',
+        value: function reportFlow(stats) {
+            var p2p = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+
+            if (p2p) {
+                this.p2pDownloaded += stats.total;
+            } else {
+                this.cdnDownloaded += stats.total;
+            }
+            // log(`cdnDownloaded ${this.cdnDownloaded} p2pDownloaded ${this.p2pDownloaded}`)
+        }
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            window.clearInterval(this.statser);
+            window.clearInterval(this.heartbeater);
+        }
+    }]);
+
+    return Fetcher;
+}();
+
+exports.default = Fetcher;
+module.exports = exports['default'];
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _fastmesh = __webpack_require__(19);
+
+var _bittorrent = __webpack_require__(22);
+
+//时间单位统一为秒
+/**
+ * Created by xieting on 2018/1/3.
+ */
+var defaultP2PConfig = {
+    key: 'free', //连接RP服务器的API key
+    engine: 'bt', //采用的算法，分为“bt”和“fastmesh”，默认“bt”
+
+    wsSignalerAddr: 'ws://120.78.168.126:8081/ws', //信令服务器地址
+    wsMaxRetries: 3, //发送数据重试次数
+    wsReconnectInterval: 5, //websocket重连时间间隔
+
+    p2pEnabled: true, //是否开启P2P，默认true
+
+    dcKeepAliveInterval: 10, //datachannel多少秒发送一次keep-alive信息
+    dcKeepAliveAckTimeout: 2, //datachannel接收keep-alive-ack信息的超时时间，超时则认为连接失败并主动关闭
+    dcRequestTimeout: 3, //datachannel接收二进制数据的超时时间
+    dcUploadTimeout: 3, //datachannel上传二进制数据的超时时间
+    dcPingPackets: 10, //datachannel发送ping数据包的数量
+    dcTolerance: 4, //请求超时或错误多少次淘汰该peer
+
+    packetSize: 16 * 1024, //每次通过datachannel发送的包的大小
+    maxBufSize: 1024 * 1024 * 50, //p2p缓存的最大数据量
+    loadTimeout: 5, //p2p下载的超时时间
+    reportInterval: 20 //统计信息上报的时间间隔(废弃)
+
+};
+
+var p2pConfig = void 0;
+
+if (false) {
+    p2pConfig = Object.assign(defaultP2PConfig, _bittorrent.config);
+} else if (false) {
+    p2pConfig = Object.assign(defaultP2PConfig, _fastmesh.config);
+} else {
+    p2pConfig = Object.assign(defaultP2PConfig, _fastmesh.config, _bittorrent.config);
+}
+
+exports.default = p2pConfig;
+module.exports = exports['default'];
+
+/***/ }),
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7570,21 +8737,21 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _events3 = __webpack_require__(5);
+var _pear = __webpack_require__(2);
 
-var _events4 = _interopRequireDefault(_events3);
+var _pear2 = _interopRequireDefault(_pear);
 
-var _dataChannel = __webpack_require__(35);
-
-var _dataChannel2 = _interopRequireDefault(_dataChannel);
-
-var _p2pScheduler = __webpack_require__(36);
+var _p2pScheduler = __webpack_require__(43);
 
 var _p2pScheduler2 = _interopRequireDefault(_p2pScheduler);
 
-var _reconnectingWebsocket = __webpack_require__(38);
+var _reconnectingWebsocket = __webpack_require__(20);
 
 var _reconnectingWebsocket2 = _interopRequireDefault(_reconnectingWebsocket);
+
+var _signalClient = __webpack_require__(21);
+
+var _signalClient2 = _interopRequireDefault(_signalClient);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7667,7 +8834,7 @@ var P2PSignaler = function (_EventEmitter) {
 
             this.tranPending = false;
 
-            scheduler.on(_events4.default.TRANSITION, function () {
+            scheduler.on(_pear.Events.TRANSITION, function () {
                 //监听跃迁请求
 
                 if (!_this2.tranPending) {
@@ -7680,12 +8847,12 @@ var P2PSignaler = function (_EventEmitter) {
                 }
             })
             //parents: {peer_id, substreams}
-            .on(_events4.default.CONNECT, function (parents) {
+            .on(_pear.Events.CONNECT, function (parents) {
                 //爬树中尝试与所有peer建立data channel
                 parents.forEach(function (parent) {
                     _this2._createDatachannel(parent.peer_id, true, parent.substreams);
                 });
-            }).on(_events4.default.ADOPT, function (peerId) {
+            }).on(_pear.Events.ADOPT, function (peerId) {
                 // let adoptMsg = {
                 //     action: 'adopt',
                 //     to_peer_id: peerId
@@ -7699,23 +8866,9 @@ var P2PSignaler = function (_EventEmitter) {
         value: function _initSignalerWs() {
             var _this3 = this;
 
-            var wsOptions = {
-                maxRetries: this.config.wsMaxRetries,
-                minReconnectionDelay: this.config.wsReconnectInterval * 1000
-            };
-            var queryStr = '?id=' + this.peerId;
-            var websocket = new _reconnectingWebsocket2.default(this.config.wsSignalerAddr + queryStr, undefined, wsOptions);
+            var websocket = new _signalClient2.default(this.peerId, this.config);
             websocket.onopen = function () {
-                console.log('Signaler websocket connection opened');
-
-                //发送进入频道请求
-                // let req = {
-                //     action: 'register'
-                // };
-                //
-                // websocket.push(JSON.stringify(req));
                 _this3.connected = true;
-
                 //向scheduler websocket发送获取父节点信息
                 var msg = {
                     action: 'get_parents'
@@ -7725,20 +8878,7 @@ var P2PSignaler = function (_EventEmitter) {
                 }
             };
 
-            websocket.push = websocket.send;
-            websocket.send = function (msg) {
-                var msgStr = JSON.stringify(Object.assign({ peer_id: _this3.peerId }, msg));
-                console.log("send to websocket Signaler is " + msgStr);
-                if (websocket.readyState !== 1) {
-                    console.warn('websocket connection is not opened yet.');
-                    return setTimeout(function () {
-                        websocket.send(data);
-                    }, 1000);
-                }
-                websocket.push(msgStr);
-            };
             websocket.onmessage = function (e) {
-                console.log('Signaler websocket on msg: ' + e.data);
                 var msg = JSON.parse(e.data);
                 var action = msg.action;
                 switch (action) {
@@ -7756,7 +8896,6 @@ var P2PSignaler = function (_EventEmitter) {
             };
             websocket.onclose = function () {
                 //websocket断开时清除datachannel
-                console.warn('Signaler websocket closed');
                 _this3.connected = false;
             };
             return websocket;
@@ -7984,7 +9123,7 @@ var P2PSignaler = function (_EventEmitter) {
         value: function _createDatachannel(remotePeerId, isInitiator, copys) {
             //copys:占据多少条子流，默认1
             if (!copys) copys = 1;
-            var datachannel = new _dataChannel2.default(this.peerId, remotePeerId, isInitiator, this.config);
+            var datachannel = new _pear2.default(this.peerId, remotePeerId, isInitiator, this.config);
             this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
             datachannel.copys = copys;
             this._setupDC(datachannel);
@@ -7995,15 +9134,9 @@ var P2PSignaler = function (_EventEmitter) {
         value: function _setupDC(datachannel) {
             var _this6 = this;
 
-            datachannel.on('signal', function (data) {
-                var msg = {
-                    action: 'signal',
-                    peer_id: _this6.peerId,
-                    to_peer_id: datachannel.remotePeerId,
-                    data: data
-                };
-                _this6.signalerWs.send(msg);
-            }).once('error', function () {
+            datachannel.on(_pear.Events.DC_SIGNAL, function (data) {
+                _this6.signalerWs.sendSignal(datachannel.remotePeerId, data);
+            }).once(_pear.Events.DC_ERROR, function () {
                 var msg = {
                     action: 'dc_failed',
                     dc_id: datachannel.channelId
@@ -8031,7 +9164,7 @@ var P2PSignaler = function (_EventEmitter) {
                 }
 
                 datachannel.destroy();
-            }).once(_events4.default.DC_CLOSE, function () {
+            }).once(_pear.Events.DC_CLOSE, function () {
 
                 console.warn('datachannel closed ' + datachannel.channelId + ' ');
                 var msg = {
@@ -8055,7 +9188,7 @@ var P2PSignaler = function (_EventEmitter) {
                 }
 
                 datachannel.destroy();
-            }).once(_events4.default.DC_OPEN, function () {
+            }).once(_pear.Events.DC_OPEN, function () {
 
                 _this6.scheduler.addDataChannel(datachannel);
                 datachannel.connected = true;
@@ -8108,6 +9241,9 @@ var P2PSignaler = function (_EventEmitter) {
         set: function set(sn) {
             this.scheduler.currentPlaySN = sn;
         }
+    }, {
+        key: 'currentLoadedSN',
+        set: function set(sn) {}
     }]);
 
     return P2PSignaler;
@@ -8117,294 +9253,7 @@ exports.default = P2PSignaler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 35 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _simplePeer = __webpack_require__(10);
-
-var _simplePeer2 = _interopRequireDefault(_simplePeer);
-
-var _events = __webpack_require__(0);
-
-var _events2 = _interopRequireDefault(_events);
-
-var _events3 = __webpack_require__(5);
-
-var _events4 = _interopRequireDefault(_events3);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Created by xieting on 2018/1/4.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-var Buffer = __webpack_require__(6).Buffer;
-
-var log = console.log;
-
-var DataChannel = function (_EventEmitter) {
-    _inherits(DataChannel, _EventEmitter);
-
-    function DataChannel(peerId, remotePeerId, isInitiator, config) {
-        _classCallCheck(this, DataChannel);
-
-        var _this = _possibleConstructorReturn(this, (DataChannel.__proto__ || Object.getPrototypeOf(DataChannel)).call(this));
-
-        _this.config = config;
-        _this.remotePeerId = remotePeerId;
-        _this.channelId = isInitiator ? peerId + '-' + remotePeerId : remotePeerId + '-' + peerId; //标识该channel
-        // console.warn(`this.channelId ${this.channelId}`);
-        _this.connected = false;
-
-        //下载控制
-        _this.queue = []; //下载队列
-        _this.loading = false;
-
-        _this._datachannel = new _simplePeer2.default({ initiator: isInitiator, objectMode: true });
-        _this.isReceiver = isInitiator; //主动发起连接的为数据接受者，用于标识本节点的类型
-        _this._init(_this._datachannel);
-
-        //fastmesh
-        _this.streamingRate = 0; //单位bit/s
-        //记录发送的数据量，用于计算streaming rate
-        _this.recordSended = _this._adjustStreamingRate(10);
-        return _this;
-    }
-
-    _createClass(DataChannel, [{
-        key: '_init',
-        value: function _init(datachannel) {
-            var _this2 = this;
-
-            datachannel.on('error', function (err) {
-                log('datachannel error', err);
-                _this2.emit(_events4.default.DC_ERROR);
-            });
-
-            datachannel.on('signal', function (data) {
-                // log('SIGNAL', JSON.stringify(data));
-                _this2.emit(_events4.default.DC_SIGNAL, data);
-            });
-
-            datachannel.once('connect', function () {
-                log('datachannel CONNECTED to ' + _this2.remotePeerId);
-                _this2.emit(_events4.default.DC_OPEN);
-                // if (this.isReceiver) {
-                //     this.keepAliveInterval = window.setInterval(() => {                      //数据接收者每隔一段时间发送keep-alive信息
-                //         let msg = {
-                //             event: 'KEEPALIVE'
-                //         };
-                //         datachannel.send(JSON.stringify(msg));
-                //         // this.keepAliveAckTimeout = window.setTimeout(this._handleKeepAliveAckTimeout.bind(this),
-                //         //     config.dcKeepAliveAckTimeout*1000);
-                //     }, config.dcKeepAliveInterval*1000);
-                // }
-            });
-
-            datachannel.on('data', function (data) {
-                if (typeof data === 'string') {
-                    log('datachannel receive string: ' + data + 'from ' + _this2.remotePeerId);
-
-                    var msg = JSON.parse(data);
-                    var event = msg.event;
-                    switch (event) {
-                        // case 'KEEPALIVE':
-                        //     this._handleKeepAlive(msg);
-                        //     break;
-                        // case 'KEEPALIVE-ACK':
-                        //     this._handleKeepAliveAck(msg);
-                        //     break;
-                        case 'BINARY':
-                            _this2.emit(_events4.default.DC_BINARY);
-                            _this2._prepareForBinary(msg.attachments, msg.url, msg.sn, msg.size);
-                            break;
-                        case 'REQUEST':
-                            // if (msg.br) this.streamingRate = msg.br;                       //记录该datachannel的码率(改成实时调整)
-                            _this2.emit(_events4.default.DC_REQUEST, msg);
-                            break;
-                        case 'LACK':
-                            _this2.loading = false;
-                            _this2.emit(_events4.default.DC_REQUESTFAIL, msg);
-                            break;
-                        case 'DISPLACE':
-                            //通知对方成为子节点
-                            _this2.emit(_events4.default.DISPLACE, msg);
-                            break;
-                        case 'CLOSE':
-                            _this2.emit(_events4.default.DC_CLOSE);
-                            break;
-                        case 'TRANSITION':
-                            //子节点的跃迁请求
-                            _this2.emit(_events4.default.DC_TRANSITION, msg);
-                            break;
-                        case 'GRANT':
-                            //收到GRANT信息后首先判断是否发给自己的，否则如果TTL>0则继续向子节点广播
-                            _this2._handleGrant(msg);
-                            break;
-                        default:
-
-                    }
-                } else if (data instanceof Buffer) {
-                    //binary data
-                    // log(`datachannel receive binary data size ${data.byteLength}`);
-                    _this2.bufArr.push(data);
-                    _this2.remainAttachments--;
-                    if (_this2.remainAttachments === 0) {
-                        _this2._handleBanaryData();
-                    }
-                }
-            });
-
-            datachannel.once('close', function () {
-                _this2.emit(_events4.default.DC_CLOSE);
-            });
-        }
-    }, {
-        key: 'send',
-        value: function send(data) {
-            if (this._datachannel && this._datachannel.connected) {
-                this._datachannel.send(data);
-            }
-        }
-    }, {
-        key: 'requestData',
-        value: function requestData(relurl) {
-            //由于需要阻塞下载数据，因此request请求用新的API
-            var msg = {
-                event: 'REQUEST',
-                url: relurl
-            };
-            if (this._datachannel && this._datachannel.connected) {
-                if (this.loading) {
-                    this.queue.push(JSON.stringify(msg));
-                } else {
-                    this._datachannel.send(JSON.stringify(msg));
-                    this.loading = true;
-                }
-            }
-        }
-    }, {
-        key: 'close',
-        value: function close() {
-            this.destroy();
-        }
-    }, {
-        key: 'receiveSignal',
-        value: function receiveSignal(data) {
-            log('datachannel receive siganl ' + JSON.stringify(data));
-            this._datachannel.signal(data);
-        }
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            // window.clearInterval(this.keepAliveInterval);
-            // this.keepAliveInterval = null;
-            // window.clearTimeout(this.keepAliveAckTimeout);
-            // this.keepAliveAckTimeout = null;
-            window.clearInterval(this.adjustSRInterval);
-            this._datachannel.removeAllListeners();
-            this.removeAllListeners();
-            this._datachannel.destroy();
-        }
-    }, {
-        key: 'clearQueue',
-        value: function clearQueue() {
-            if (this.queue.length > 0) {
-                this.queue = [];
-            }
-        }
-    }, {
-        key: '_prepareForBinary',
-        value: function _prepareForBinary(attachments, url, sn, expectedSize) {
-            this.bufArr = [];
-            this.remainAttachments = attachments;
-            this.bufUrl = url;
-            this.bufSN = sn;
-            this.expectedSize = expectedSize;
-        }
-    }, {
-        key: '_handleBanaryData',
-        value: function _handleBanaryData() {
-            log('datachannel _handleBanaryData');
-            var payload = Buffer.concat(this.bufArr);
-            if (payload.byteLength == this.expectedSize) {
-                //校验数据
-                this.emit(_events4.default.DC_RESPONSE, { url: this.bufUrl, sn: this.bufSN, data: payload });
-            }
-            this.bufUrl = '';
-            this.bufArr = [];
-            this.expectedSize = -1;
-
-            this.loading = false;
-            if (this.queue.length > 0) {
-                //如果下载队列不为空
-                var data = this.queue.shift();
-                this.request(data);
-            }
-        }
-    }, {
-        key: '_handleGrant',
-        value: function _handleGrant(msg) {
-            if (msg.TTL > 0) {
-                this.emit(_events4.default.DC_GRANT, msg);
-            }
-        }
-
-        // _handleKeepAlive() {
-        //     let msg = {
-        //         event: 'KEEPALIVE-ACK'
-        //     };
-        //     this._datachannel.send(JSON.stringify(msg));
-        // }
-
-        // _handleKeepAliveAck() {
-        //     window.clearTimeout(this.keepAliveAckTimeout);
-        // }
-
-        // _handleKeepAliveAckTimeout() {
-        //     log('KeepAliveAckTimeout');
-        //     this.emit(Events.DC_ERROR);
-        // }
-
-    }, {
-        key: '_adjustStreamingRate',
-        value: function _adjustStreamingRate(interval) {
-            var _this3 = this;
-
-            //每隔一段时间计算streaming rate，单位bit/s
-            var sended = 0;
-            this.adjustSRInterval = window.setInterval(function () {
-                _this3.streamingRate = Math.round(sended * 8 / interval);
-                sended = 0;
-                // console.warn(`streamingRate ${this.streamingRate/8/1024}KB/s`);
-            }, interval * 1000);
-            return function (increment) {
-                sended += increment;
-            };
-        }
-    }]);
-
-    return DataChannel;
-}(_events2.default);
-
-exports.default = DataChannel;
-module.exports = exports['default'];
-
-/***/ }),
-/* 36 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8420,11 +9269,9 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _events3 = __webpack_require__(5);
+var _pear = __webpack_require__(2);
 
-var _events4 = _interopRequireDefault(_events3);
-
-var _substreams = __webpack_require__(37);
+var _substreams = __webpack_require__(44);
 
 var _substreams2 = _interopRequireDefault(_substreams);
 
@@ -8570,25 +9417,32 @@ var P2PScheduler = function (_EventEmitter) {
             log('delete datachannel ' + channel.channelId);
             if (channel.isReceiver) {
                 this.substreams.deleteSubstream(channel.remotePeerId);
+                this.upstreamers = this.upstreamers.filter(function (c) {
+                    return c !== channel;
+                });
+            } else {
+                this.downstreamers = this.downstreamers.filter(function (c) {
+                    return c !== channel;
+                });
             }
-            for (var i = 0; i < this.downstreamers.length; ++i) {
-                if (this.downstreamers[i] === channel) {
-                    this.downstreamers.splice(i, 1);
-                    return;
-                }
-            }
-            for (var _i = 0; _i < this.upstreamers.length; ++_i) {
-                if (this.upstreamers[_i] === channel) {
-                    this.upstreamers.splice(_i, 1);
-                    return;
-                }
-            }
+            // for (let i=0;i<this.downstreamers.length;++i){
+            //     if (this.downstreamers[i] === channel) {
+            //         this.downstreamers.splice(i, 1);
+            //         return;
+            //     }
+            // }
+            // for (let i=0;i<this.upstreamers.length;++i){
+            //     if (this.upstreamers[i] === channel) {
+            //         this.upstreamers.splice(i, 1);
+            //         return;
+            //     }
+            // }
         }
     }, {
         key: 'moveUpstreamsersToDown',
         value: function moveUpstreamsersToDown() {
             var msg = {
-                event: 'DISPLACE'
+                event: _pear.Events.DC_DISPLACE
             };
             while (this.upstreamers.length > 0) {
                 var streamer = this.upstreamers.pop();
@@ -8610,7 +9464,7 @@ var P2PScheduler = function (_EventEmitter) {
                     var streamer = _step.value;
 
                     var msg = {
-                        event: 'CLOSE'
+                        event: _pear.Events.DC_CLOSE
                     };
                     streamer.send(JSON.stringify(msg));
                     streamer.destroy();
@@ -8639,7 +9493,7 @@ var P2PScheduler = function (_EventEmitter) {
             for (var i = 0; i < this.downstreamers.length; ++i) {
                 var streamer = this.downstreamers.pop();
                 var msg = {
-                    event: 'CLOSE'
+                    event: _pear.Events.DC_CLOSE
                 };
                 streamer.send(JSON.stringify(msg));
                 streamer.destroy();
@@ -8650,20 +9504,22 @@ var P2PScheduler = function (_EventEmitter) {
         value: function exchangeWithStreamser(streamer) {
             //与streamer交换位置
             var msg = {
-                event: 'DISPLACE'
+                event: _pear.Events.DC_DISPLACE
             };
             if (streamer.isReceiver) {
                 //交换的对象是父节点
-                this.upstreamers.splice(this.upstreamers.findIndex(function (item) {
-                    return item.remotePeerId === streamer.remotePeerId;
-                }), 1);
+                // this.upstreamers.splice(this.upstreamers.findIndex(item => item.remotePeerId === streamer.remotePeerId), 1);
+                this.upstreamers = this.upstreamers.filter(function (item) {
+                    return item.remotePeerId !== streamer.remotePeerId;
+                });
                 this.downstreamers.push(streamer);
                 this.substreams.deleteSubstream(streamer.remotePeerId);
                 msg.substreams = streamer.copys; //先前有多少子流，交换后保持一致
             } else {
-                this.downstreamers.splice(this.downstreamers.findIndex(function (item) {
-                    return item.remotePeerId === streamer.remotePeerId;
-                }), 1);
+                // this.downstreamers.splice(this.downstreamers.findIndex(item => item.remotePeerId === streamer.remotePeerId), 1);
+                this.downstreamers = this.downstreamers.filter(function (item) {
+                    return item.remotePeerId !== streamer.remotePeerId;
+                });
                 this.upstreamers.unshift(streamer); //放在最优先位置
                 this.substreams.addSubstreams(streamer, 1);
             }
@@ -8748,7 +9604,7 @@ var P2PScheduler = function (_EventEmitter) {
             // })
 
             //upstreamer
-            channel.on(_events4.default.DC_REQUEST, function (msg) {
+            channel.on(_pear.Events.DC_REQUEST, function (msg) {
                 var sn = msg.sn,
                     url = msg.url;
 
@@ -8777,7 +9633,7 @@ var P2PScheduler = function (_EventEmitter) {
                             remainder = dataSize % packetSize;
                         }
                         var response = {
-                            event: 'BINARY',
+                            event: _pear.Events.DC_PIECE,
                             attachments: attachments,
                             url: seg.relurl,
                             sn: seg.sn,
@@ -8795,24 +9651,25 @@ var P2PScheduler = function (_EventEmitter) {
                     } else {
                         //缓存找不到请求的数据
                         var _response = {
-                            event: 'LACK',
+                            event: _pear.Events.DC_LACK,
                             url: url,
                             current: _this2._currPlaySN
                         };
                         channel.send(JSON.stringify(_response));
                     }
                 }
-            }).on(_events4.default.DISPLACE, function (msg) {
+            }).on(_pear.Events.DISPLACE, function (msg) {
                 //收到子节点要跃迁的事件
                 var channelId = channel.channelId;
                 channel.isReceiver = !channel.isReceiver;
-                _this2.downstreamers.splice(_this2.downstreamers.findIndex(function (item) {
-                    return item.channelId === channelId;
-                }), 1);
+                // this.downstreamers.splice(this.downstreamers.findIndex(item => item.channelId === channelId), 1);
+                _this2.downstreamers = _this2.downstreamers.filter(function (item) {
+                    return item.channelId !== channelId;
+                });
                 _this2.upstreamers.unshift(channel);
                 _this2.substreams.addSubstreams(channel, msg.substreams);
                 console.log('datachannel ' + channelId + ' displaced');
-            }).on(_events4.default.DC_GRANT, function (msg) {
+            }).on(_pear.Events.DC_GRANT, function (msg) {
                 if (msg.to_peer_id === _this2.peerId) {
 
                     _this2.grantAncestors.push(msg);
@@ -8824,7 +9681,7 @@ var P2PScheduler = function (_EventEmitter) {
             });
 
             //dowmstreamer
-            channel.on(_events4.default.DC_RESPONSE, function (response) {
+            channel.on(_pear.Events.DC_RESPONSE, function (response) {
                 //response: {url: string, sn: number, payload: Buffer}
                 log('receive response sn ' + response.sn + ' url ' + response.url + ' size ' + response.data.byteLength + ' from ' + channel.remotePeerId);
                 if (_this2.expectedSeg && response.url === _this2.expectedSeg.relurl && _this2.requestTimeout) {
@@ -8844,12 +9701,12 @@ var P2PScheduler = function (_EventEmitter) {
                 } else {
                     //不是目前request的则保存到buffer-manager
                     if (_this2.bufMgr && !_this2.bufMgr.hasSegOfURL(response.url)) {
-                        _this2._addSegToBuf(response);
+                        _this2.bufMgr.addBuffer(response.sn, response.url, response.data);
                     }
                 }
                 // this.leadingCounter = 0;
                 // log(`this.upstreamers.length ${this.upstreamers.length}`);
-            }).on(_events4.default.DC_REQUESTFAIL, function (msg) {//当请求的数据找不到时触发
+            }).on(_pear.Events.DC_REQUESTFAIL, function (msg) {//当请求的数据找不到时触发
                 // if (this.requestTimeout && this.upstreamers.length >= 2) {                                         //如果还没有超时
                 //     this.target = (this.target === this.upstreamers.total -1 ? 0 : this.target  + 1);
                 //     log(`load one more time from ${this.upstreamers[this.target].remotePeerId}`);
@@ -8871,12 +9728,12 @@ var P2PScheduler = function (_EventEmitter) {
                 //     this.leadingCounter = 0;
                 // }
 
-            }).on(_events4.default.DC_BINARY, function () {
-                //接收到binary事件，用于tfirst
+            }).on(_pear.Events.DC_PIECE, function () {
+                //接收到piece事件，用于tfirst
                 if (!_this2.stats.tfirst) {
                     _this2.stats.tfirst = Math.max(performance.now(), _this2.stats.trequest);
                 }
-            }).on(_events4.default.DC_TRANSITION, function (msg) {
+            }).on(_pear.Events.DC_TRANSITION, function (msg) {
                 if (msg.TTL > 0) {
                     //如果TTL大于0，则继续广播给父节点
                     msg.TTL--;
@@ -8913,7 +9770,7 @@ var P2PScheduler = function (_EventEmitter) {
                         }
 
                         var resp = {
-                            event: 'GRANT',
+                            event: _pear.Events.DC_GRANT,
                             delay: 0, //待修改
                             TTL: msg.source_TTL - msg.TTL,
                             parents: parents,
@@ -8926,18 +9783,6 @@ var P2PScheduler = function (_EventEmitter) {
             });
         }
     }, {
-        key: '_addSegToBuf',
-        value: function _addSegToBuf(response) {
-            log('_addSegToBuf sn ' + response.sn + ' relurl ' + response.relurl);
-            var segment = {
-                sn: response.sn,
-                relurl: response.relurl,
-                data: response.data,
-                size: response.data.byteLength
-            };
-            this.bufMgr.addSeg(segment);
-        }
-    }, {
         key: '_setupTransInspector',
         value: function _setupTransInspector() {
             var _this3 = this;
@@ -8947,7 +9792,7 @@ var P2PScheduler = function (_EventEmitter) {
                 if (_this3.residualBW > _this3.totalUploadBW / 2 && _this3.upstreamers.length) {
                     //如果剩余带宽大于streaming rate并且有父节点  TODO
                     var msg = {
-                        event: 'TRANSITION',
+                        event: _pear.Events.DC_TRANSITION,
                         ul_bw: _this3.totalUploadBW, //总上行带宽（单位bps）
                         TTL: _this3.p2pConfig.transitionTTL,
                         source_TTL: _this3.p2pConfig.transitionTTL,
@@ -8978,10 +9823,10 @@ var P2PScheduler = function (_EventEmitter) {
                         console.warn('targetAncestorId: ' + _this3.targetAncestorId);
                         if (ancestor.parents.length > 0) {
                             //如果ancestor有父节点则连接其父节点
-                            _this3.emit(_events4.default.CONNECT, ancestor.parents);
+                            _this3.emit(_pear.Events.CONNECT, ancestor.parents);
                         } else {
                             //否则直接通知ancestor成为子节点
-                            _this3.emit(_events4.default.ADOPT, ancestor.from_peer_id);
+                            _this3.emit(_pear.Events.ADOPT, ancestor.from_peer_id);
                         }
                         _this3.grantAncestors = []; //清空，为下次准备
                     }, _this3.p2pConfig.transitionWaitTime * 1000);
@@ -9046,6 +9891,11 @@ var P2PScheduler = function (_EventEmitter) {
         set: function set(sn) {
             this._currPlaySN = sn;
         }
+    }, {
+        key: 'bitrate',
+        set: function set(br) {
+            this.substreams.bitrate = br;
+        }
     }]);
 
     return P2PScheduler;
@@ -9063,8 +9913,8 @@ function dividePayload(payload, packetSize, attachments, remainder) {
         bufArr.push(packet);
     } else {
         var _packet = void 0;
-        for (var _i2 = 0; _i2 < attachments; _i2++) {
-            _packet = payload.slice(_i2 * packetSize, (_i2 + 1) * packetSize);
+        for (var _i = 0; _i < attachments; _i++) {
+            _packet = payload.slice(_i * packetSize, (_i + 1) * packetSize);
             bufArr.push(_packet);
         }
     }
@@ -9075,7 +9925,7 @@ exports.default = P2PScheduler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 37 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9091,10 +9941,6 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _events3 = __webpack_require__(5);
-
-var _events4 = _interopRequireDefault(_events3);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -9105,6 +9951,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * Created by xieting on 2018/3/9.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 
+
+// import {Events} from '../pear';
 
 var Substreams = function (_EventEmitter) {
     _inherits(Substreams, _EventEmitter);
@@ -9149,42 +9997,22 @@ var Substreams = function (_EventEmitter) {
         value: function addSubstreams(stream, copys) {
             for (var i = 0; i < copys; ++i) {
                 if (this.streams.length >= this.totalStreams) break;
-                console.warn('this.streams.push ' + stream.remotePeerId);
                 this.streams.push(stream);
             }
         }
     }, {
         key: 'deleteSubstream',
         value: function deleteSubstream(id) {
-            var newStreams = [];
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-                for (var _iterator = this.streams[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var stream = _step.value;
-
-                    if (stream.remotePeerId !== id) {
-                        newStreams.push(stream);
-                    }
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
-                    }
-                } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
-            }
-
-            this.streams = newStreams;
+            // let newStreams = [];
+            // for (let stream of this.streams) {
+            //     if (stream.remotePeerId !== id) {
+            //         newStreams.push(stream);
+            //     }
+            // }
+            // this.streams = newStreams;
+            this.streams = this.streams.filter(function (stream) {
+                return stream.remotePeerId !== id;
+            });
         }
     }, {
         key: 'needMoreStreams',
@@ -9227,229 +10055,7 @@ exports.default = Substreams;
 module.exports = exports['default'];
 
 /***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-;
-;
-;
-var isWebSocket = function (constructor) {
-    return constructor && constructor.CLOSING === 2;
-};
-var isGlobalWebSocket = function () {
-    return typeof WebSocket !== 'undefined' && isWebSocket(WebSocket);
-};
-var getDefaultOptions = function () { return ({
-    constructor: isGlobalWebSocket() ? WebSocket : null,
-    maxReconnectionDelay: 10000,
-    minReconnectionDelay: 1500,
-    reconnectionDelayGrowFactor: 1.3,
-    connectionTimeout: 4000,
-    maxRetries: Infinity,
-    debug: false,
-}); };
-var bypassProperty = function (src, dst, name) {
-    Object.defineProperty(dst, name, {
-        get: function () { return src[name]; },
-        set: function (value) { src[name] = value; },
-        enumerable: true,
-        configurable: true,
-    });
-};
-var initReconnectionDelay = function (config) {
-    return (config.minReconnectionDelay + Math.random() * config.minReconnectionDelay);
-};
-var updateReconnectionDelay = function (config, previousDelay) {
-    var newDelay = previousDelay * config.reconnectionDelayGrowFactor;
-    return (newDelay > config.maxReconnectionDelay)
-        ? config.maxReconnectionDelay
-        : newDelay;
-};
-var LEVEL_0_EVENTS = ['onopen', 'onclose', 'onmessage', 'onerror'];
-var reassignEventListeners = function (ws, oldWs, listeners) {
-    Object.keys(listeners).forEach(function (type) {
-        listeners[type].forEach(function (_a) {
-            var listener = _a[0], options = _a[1];
-            ws.addEventListener(type, listener, options);
-        });
-    });
-    if (oldWs) {
-        LEVEL_0_EVENTS.forEach(function (name) {
-            ws[name] = oldWs[name];
-        });
-    }
-};
-var ReconnectingWebsocket = function (url, protocols, options) {
-    var _this = this;
-    if (options === void 0) { options = {}; }
-    var ws;
-    var connectingTimeout;
-    var reconnectDelay = 0;
-    var retriesCount = 0;
-    var shouldRetry = true;
-    var savedOnClose = null;
-    var listeners = {};
-    // require new to construct
-    if (!(this instanceof ReconnectingWebsocket)) {
-        throw new TypeError("Failed to construct 'ReconnectingWebSocket': Please use the 'new' operator");
-    }
-    // Set config. Not using `Object.assign` because of IE11
-    var config = getDefaultOptions();
-    Object.keys(config)
-        .filter(function (key) { return options.hasOwnProperty(key); })
-        .forEach(function (key) { return config[key] = options[key]; });
-    if (!isWebSocket(config.constructor)) {
-        throw new TypeError('Invalid WebSocket constructor. Set `options.constructor`');
-    }
-    var log = config.debug ? function () {
-        var params = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            params[_i] = arguments[_i];
-        }
-        return console.log.apply(console, ['RWS:'].concat(params));
-    } : function () { };
-    /**
-     * Not using dispatchEvent, otherwise we must use a DOM Event object
-     * Deferred because we want to handle the close event before this
-     */
-    var emitError = function (code, msg) { return setTimeout(function () {
-        var err = new Error(msg);
-        err.code = code;
-        if (Array.isArray(listeners.error)) {
-            listeners.error.forEach(function (_a) {
-                var fn = _a[0];
-                return fn(err);
-            });
-        }
-        if (ws.onerror) {
-            ws.onerror(err);
-        }
-    }, 0); };
-    var handleClose = function () {
-        log('handleClose', { shouldRetry: shouldRetry });
-        retriesCount++;
-        log('retries count:', retriesCount);
-        if (retriesCount > config.maxRetries) {
-            emitError('EHOSTDOWN', 'Too many failed connection attempts');
-            return;
-        }
-        if (!reconnectDelay) {
-            reconnectDelay = initReconnectionDelay(config);
-        }
-        else {
-            reconnectDelay = updateReconnectionDelay(config, reconnectDelay);
-        }
-        log('handleClose - reconnectDelay:', reconnectDelay);
-        if (shouldRetry) {
-            setTimeout(connect, reconnectDelay);
-        }
-    };
-    var connect = function () {
-        if (!shouldRetry) {
-            return;
-        }
-        log('connect');
-        var oldWs = ws;
-        var wsUrl = (typeof url === 'function') ? url() : url;
-        ws = new config.constructor(wsUrl, protocols);
-        connectingTimeout = setTimeout(function () {
-            log('timeout');
-            ws.close();
-            emitError('ETIMEDOUT', 'Connection timeout');
-        }, config.connectionTimeout);
-        log('bypass properties');
-        for (var key in ws) {
-            // @todo move to constant
-            if (['addEventListener', 'removeEventListener', 'close', 'send'].indexOf(key) < 0) {
-                bypassProperty(ws, _this, key);
-            }
-        }
-        ws.addEventListener('open', function () {
-            clearTimeout(connectingTimeout);
-            log('open');
-            reconnectDelay = initReconnectionDelay(config);
-            log('reconnectDelay:', reconnectDelay);
-            retriesCount = 0;
-        });
-        ws.addEventListener('close', handleClose);
-        reassignEventListeners(ws, oldWs, listeners);
-        // because when closing with fastClose=true, it is saved and set to null to avoid double calls
-        ws.onclose = ws.onclose || savedOnClose;
-        savedOnClose = null;
-    };
-    log('init');
-    connect();
-    this.close = function (code, reason, _a) {
-        if (code === void 0) { code = 1000; }
-        if (reason === void 0) { reason = ''; }
-        var _b = _a === void 0 ? {} : _a, _c = _b.keepClosed, keepClosed = _c === void 0 ? false : _c, _d = _b.fastClose, fastClose = _d === void 0 ? true : _d, _e = _b.delay, delay = _e === void 0 ? 0 : _e;
-        log('close - params:', { reason: reason, keepClosed: keepClosed, fastClose: fastClose, delay: delay, retriesCount: retriesCount, maxRetries: config.maxRetries });
-        shouldRetry = !keepClosed && retriesCount <= config.maxRetries;
-        if (delay) {
-            reconnectDelay = delay;
-        }
-        ws.close(code, reason);
-        if (fastClose) {
-            var fakeCloseEvent_1 = {
-                code: code,
-                reason: reason,
-                wasClean: true,
-            };
-            // execute close listeners soon with a fake closeEvent
-            // and remove them from the WS instance so they
-            // don't get fired on the real close.
-            handleClose();
-            ws.removeEventListener('close', handleClose);
-            // run and remove level2
-            if (Array.isArray(listeners.close)) {
-                listeners.close.forEach(function (_a) {
-                    var listener = _a[0], options = _a[1];
-                    listener(fakeCloseEvent_1);
-                    ws.removeEventListener('close', listener, options);
-                });
-            }
-            // run and remove level0
-            if (ws.onclose) {
-                savedOnClose = ws.onclose;
-                ws.onclose(fakeCloseEvent_1);
-                ws.onclose = null;
-            }
-        }
-    };
-    this.send = function (data) {
-        ws.send(data);
-    };
-    this.addEventListener = function (type, listener, options) {
-        if (Array.isArray(listeners[type])) {
-            if (!listeners[type].some(function (_a) {
-                var l = _a[0];
-                return l === listener;
-            })) {
-                listeners[type].push([listener, options]);
-            }
-        }
-        else {
-            listeners[type] = [[listener, options]];
-        }
-        ws.addEventListener(type, listener, options);
-    };
-    this.removeEventListener = function (type, listener, options) {
-        if (Array.isArray(listeners[type])) {
-            listeners[type] = listeners[type].filter(function (_a) {
-                var l = _a[0];
-                return l !== listener;
-            });
-        }
-        ws.removeEventListener(type, listener, options);
-    };
-};
-module.exports = ReconnectingWebsocket;
-
-
-/***/ }),
-/* 39 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9465,10 +10071,6 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _xhrLoader = __webpack_require__(40);
-
-var _xhrLoader2 = _interopRequireDefault(_xhrLoader);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -9480,10 +10082,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 
 // import Events from './events';
-
-
-// import Buffer from 'buffer';
-var Buffer = __webpack_require__(6).Buffer;
 
 var log = console.log;
 
@@ -9501,7 +10099,7 @@ var LoaderScheduler = function (_EventEmitter) {
         _this.currPlay = config.currPlay;
 
         _this.bufMgr = config.bufMgr;
-        _this.xhrLoader = new _xhrLoader2.default(config);
+        _this.xhrLoader = new config.loader(config);
         _this.p2pLoader = config.p2pLoader;
         _this.p2pLoader.sourceStreamer = _this.xhrLoader; //向p2pLoader注入源
         _this.p2pEnabled = config.p2pEnabled;
@@ -9523,7 +10121,7 @@ var LoaderScheduler = function (_EventEmitter) {
         }
 
         /*
-          首先从缓存中寻找请求的seg，如果缓存中找不到则在urgent情况下用http请求，非urgent情况下用p2p请求。
+          在urgent情况下用http请求，非urgent情况下用p2p请求。
          */
 
     }, {
@@ -9532,6 +10130,7 @@ var LoaderScheduler = function (_EventEmitter) {
             var _this2 = this;
 
             var frag = context.frag;
+            // console.warn(`${JSON.stringify(frag)}`)
             this.loadByP2P = frag.sn - this.currPlay > 1 && frag.sn - this.currLoaded == 1 && this.currLoaded - this.currPlay >= 1 && this.p2pLoader.hasUpstreamer;
             log('loading ' + frag.sn + ' loaded ' + this.currLoaded + ' play ' + this.currPlay + ' loaded by ' + (this.loadByP2P ? 'P2P' : 'HTTP'));
 
@@ -9548,7 +10147,7 @@ var LoaderScheduler = function (_EventEmitter) {
             var onSuccess = callbacks.onSuccess;
             callbacks.onSuccess = function (response, stats, context) {
                 if (_this2.bufMgr && !_this2.bufMgr.hasSegOfURL(frag.relurl)) {
-                    _this2._copyFrag(response.data, frag.relurl, frag.sn);
+                    _this2.bufMgr.copyAndAddBuffer(response.data, frag.relurl, frag.sn);
                 }
                 onSuccess(response, stats, context);
             };
@@ -9565,24 +10164,6 @@ var LoaderScheduler = function (_EventEmitter) {
             };
             this.loader.load(context, config, callbacks);
         }
-    }, {
-        key: '_copyFrag',
-        value: function _copyFrag(data, url, sn) {
-            var payloadBuf = Buffer.from(data);
-            var byteLength = payloadBuf.byteLength;
-            var targetBuffer = new Buffer(byteLength);
-            payloadBuf.copy(targetBuffer);
-
-            var segment = {
-                sn: sn,
-                relurl: url,
-                data: targetBuffer,
-                size: byteLength
-            };
-
-            this.bufMgr.addSeg(segment);
-            // this.emit(Events.SEGMENT, segment);
-        }
     }]);
 
     return LoaderScheduler;
@@ -9592,7 +10173,7 @@ exports.default = LoaderScheduler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 40 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9604,187 +10185,724 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _events = __webpack_require__(0);
+
+var _events2 = _interopRequireDefault(_events);
+
+var _btScheduler = __webpack_require__(47);
+
+var _btScheduler2 = _interopRequireDefault(_btScheduler);
+
+var _signalClient = __webpack_require__(21);
+
+var _signalClient2 = _interopRequireDefault(_signalClient);
+
+var _pear = __webpack_require__(2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/**
- * XHR based logger
- */
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-var XhrLoader = function () {
-    function XhrLoader(config) {
-        _classCallCheck(this, XhrLoader);
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Created by xieting on 2018/3/23.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 
-        if (config && config.xhrSetup) {
-            this.xhrSetup = config.xhrSetup;
-        }
+var BTTracker = function (_EventEmitter) {
+    _inherits(BTTracker, _EventEmitter);
+
+    function BTTracker(fetcher, config, info) {
+        _classCallCheck(this, BTTracker);
+
+        var _this = _possibleConstructorReturn(this, (BTTracker.__proto__ || Object.getPrototypeOf(BTTracker)).call(this));
+
+        _this.config = config;
+        _this.browserInfo = info;
+        _this.connected = false;
+        _this.scheduler = new _btScheduler2.default(config);
+        _this.DCMap = new Map(); //{key: remotePeerId, value: DataChannnel} 目前已经建立连接或正在建立连接的dc
+        _this.failedDCSet = new Set(); //{remotePeerId} 建立连接失败的dc
+        _this.signalerWs = null; //信令服务器ws
+        _this.heartbeatInterval = 30;
+        //tracker request API
+        _this.fetcher = fetcher;
+        /*
+        peers: Array<Object{id:string}>
+         */
+        _this.peers = [];
+
+        _this._setupScheduler(_this.scheduler);
+        return _this;
     }
 
-    _createClass(XhrLoader, [{
-        key: 'destroy',
-        value: function destroy() {
-            this.abort();
-            this.loader = null;
+    _createClass(BTTracker, [{
+        key: 'resumeP2P',
+        value: function resumeP2P() {
+            var _this2 = this;
+
+            this.fetcher.btAnnounce().then(function (json) {
+                console.warn('announceURL response ' + JSON.stringify(json));
+                _this2.peerId = json.peer_id;
+                _this2.fetcher.btHeartbeat(json.heartbeat_interval);
+                _this2.fetcher.btStatsStart(json.report_interval);
+                _this2.signalerWs = _this2._initSignalerWs(); //连上tracker后开始连接信令服务器
+                _this2._handlePeers(json.peers);
+            }).catch(function (err) {});
         }
     }, {
-        key: 'abort',
-        value: function abort() {
-            var loader = this.loader;
-            if (loader && loader.readyState !== 4) {
-                this.stats.aborted = true;
-                loader.abort();
+        key: 'destroy',
+        value: function destroy() {
+            window.clearInterval(this.heartbeater);
+            this.heartbeater = null;
+        }
+    }, {
+        key: '_handlePeers',
+        value: function _handlePeers(peers) {
+            var _this3 = this;
+
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = peers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var peer = _step.value;
+
+                    this.peers.push({
+                        id: peer.id
+                    });
+                }
+                //过滤掉已经连接的节点和连接失败的节点
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
             }
 
-            window.clearTimeout(this.requestTimeout);
-            this.requestTimeout = null;
-            window.clearTimeout(this.retryTimeout);
-            this.retryTimeout = null;
+            this.peers = this.peers.filter(function (node) {
+                var _arr = [].concat(_toConsumableArray(_this3.DCMap.keys()), _toConsumableArray(_this3.failedDCSet.keys()));
+
+                for (var _i = 0; _i < _arr.length; _i++) {
+                    var peerId = _arr[_i];
+                    if (node.id === peerId) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+    }, {
+        key: '_tryConnectToPeer',
+        value: function _tryConnectToPeer() {
+            if (this.peers.length === 0) return;
+            var remotePeerId = this.peers.pop().id;
+            console.warn('_tryConnectToPeer ' + remotePeerId);
+            var datachannel = new _pear.DataChannel(this.peerId, remotePeerId, true, this.config);
+            this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
+            this._setupDC(datachannel);
+        }
+    }, {
+        key: '_setupDC',
+        value: function _setupDC(datachannel) {
+            var _this4 = this;
+
+            datachannel.on(_pear.Events.DC_SIGNAL, function (data) {
+                _this4.signalerWs.sendSignal(datachannel.remotePeerId, data);
+                //启动定时器，如果指定时间对方没有响应则连接下一个
+                if (!_this4.signalTimer) {
+                    _this4.signalTimer = window.setTimeout(function () {
+                        _this4.DCMap.delete(datachannel.remotePeerId);
+                        _this4.failedDCSet.add(datachannel.remotePeerId); //记录失败的连接
+                        console.warn(datachannel.remotePeerId + ' signaling timeout');
+                        _this4.signalTimer = null;
+                        _this4._tryConnectToPeer();
+                    }, 2000);
+                }
+            }).once(_pear.Events.DC_ERROR, function () {
+                console.log('datachannel error ' + datachannel.channelId);
+                _this4.scheduler.deletePeer(datachannel);
+                _this4.DCMap.delete(datachannel.remotePeerId);
+                _this4.failedDCSet.add(datachannel.remotePeerId); //记录失败的连接
+                _this4._tryConnectToPeer();
+                datachannel.destroy();
+
+                _this4._requestMorePeers();
+
+                //更新conns
+                if (datachannel.isInitiator) {
+                    if (datachannel.connected) {
+                        //连接断开
+                        _this4.fetcher.decreConns();
+                    } else {
+                        //连接失败
+                        _this4.fetcher.increFailConns();
+                    }
+                }
+            }).once(_pear.Events.DC_CLOSE, function () {
+
+                console.warn('datachannel closed ' + datachannel.channelId + ' ');
+                _this4.scheduler.deletePeer(datachannel);
+                _this4.DCMap.delete(datachannel.remotePeerId);
+                _this4.failedDCSet.add(datachannel.remotePeerId); //记录断开的连接
+                _this4._tryConnectToPeer();
+
+                datachannel.destroy();
+
+                _this4._requestMorePeers();
+
+                //更新conns
+                _this4.fetcher.decreConns();
+            }).once(_pear.Events.DC_OPEN, function () {
+
+                _this4.scheduler.handshakePeer(datachannel);
+
+                //如果dc数量不够则继续尝试连接
+                if (_this4.DCMap.size < _this4.config.neighbours) {
+                    _this4._tryConnectToPeer();
+                }
+
+                //更新conns
+                _this4.fetcher.increConns();
+            });
+        }
+    }, {
+        key: '_initSignalerWs',
+        value: function _initSignalerWs() {
+            var _this5 = this;
+
+            var websocket = new _signalClient2.default(this.peerId, this.config);
+            websocket.onopen = function () {
+                _this5.connected = true;
+                _this5._tryConnectToPeer();
+            };
+
+            websocket.onmessage = function (e) {
+                var msg = JSON.parse(e.data);
+                var action = msg.action;
+                switch (action) {
+                    case 'signal':
+                        console.log('start _handleSignal');
+                        window.clearTimeout(_this5.signalTimer); //接收到信令后清除定时器
+                        _this5.signalTimer = null;
+                        _this5._handleSignal(msg.from_peer_id, msg.data);
+                        break;
+                    case 'reject':
+                        _this5.stopP2P();
+                        break;
+                    default:
+                        console.log('Signaler websocket unknown action ' + action);
+
+                }
+            };
+            websocket.onclose = function () {
+                //websocket断开时清除datachannel
+                _this5.connected = false;
+                _this5.destroy();
+            };
+            return websocket;
+        }
+    }, {
+        key: '_handleSignal',
+        value: function _handleSignal(remotePeerId, data) {
+            var datachannel = this.DCMap.get(remotePeerId);
+            if (datachannel && datachannel.connected) {
+                console.warn('datachannel had connected, signal ignored');
+                return;
+            }
+            if (!datachannel) {
+                //收到子节点连接请求
+                console.log('receive child node connection request');
+                if (this.failedDCSet.has(remotePeerId)) return;
+                datachannel = new _pear.DataChannel(this.peerId, remotePeerId, false, this.config);
+                this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
+                this._setupDC(datachannel);
+            }
+            datachannel.receiveSignal(data);
+        }
+    }, {
+        key: '_setupScheduler',
+        value: function _setupScheduler(s) {}
+    }, {
+        key: '_heartbeat',
+        value: function _heartbeat() {
+            var _this6 = this;
+
+            this.heartbeater = window.setInterval(function () {
+                _this6.fetcher.btHeartbeat();
+            }, this.heartbeatInterval * 1000);
+        }
+    }, {
+        key: '_requestMorePeers',
+        value: function _requestMorePeers() {
+            var _this7 = this;
+
+            if (this.scheduler.peerMap.size <= Math.floor(this.config.neighbours / 2)) {
+                this.fetcher.btGetPeers().then(function (json) {
+                    console.warn('_requestMorePeers ' + JSON.stringify(json));
+                    _this7._handlePeers(json.peers);
+                    _this7._tryConnectToPeer();
+                });
+            }
+        }
+    }, {
+        key: 'currentPlaySN',
+        set: function set(sn) {
+            this.scheduler.updatePlaySN(sn);
+        }
+    }, {
+        key: 'currentLoadingSN',
+        set: function set(sn) {
+            this.scheduler.updateLoadingSN(sn);
+        }
+    }, {
+        key: 'currentLoadedSN',
+        set: function set(sn) {
+            this.scheduler.updateLoadedSN(sn); //更新bitmap
+        }
+    }]);
+
+    return BTTracker;
+}(_events2.default);
+
+exports.default = BTTracker;
+module.exports = exports['default'];
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _events = __webpack_require__(0);
+
+var _events2 = _interopRequireDefault(_events);
+
+var _pear = __webpack_require__(2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Created by xieting on 2018/3/23.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+var BTScheduler = function (_EventEmitter) {
+    _inherits(BTScheduler, _EventEmitter);
+
+    function BTScheduler(config) {
+        _classCallCheck(this, BTScheduler);
+
+        var _this = _possibleConstructorReturn(this, (BTScheduler.__proto__ || Object.getPrototypeOf(BTScheduler)).call(this));
+
+        _this.config = config;
+        _this.bufMgr = null;
+        _this.peerMap = new Map(); // remotePeerId -> dc
+        _this.bitset = new Set(); //本节点的bitfield
+        _this.bitCounts = new Map(); //记录peers的每个buffer的总和，用于BT的rearest first策略  index -> count
+
+        return _this;
+    }
+
+    _createClass(BTScheduler, [{
+        key: 'updateLoadedSN',
+        value: function updateLoadedSN(sn) {
+            this.bitset.add(sn); //在bitset中记录
+            if (this.bitCounts.has(sn)) {
+                this.bitCounts.delete(sn); //在bitCounts清除，防止重复下载
+            }
+            if (this.peerMap.size > 0) {
+                var msg = {
+                    event: _pear.Events.DC_HAVE,
+                    sn: sn
+                };
+                this._broadcastToPeers(msg);
+            }
+        }
+    }, {
+        key: 'updateLoadingSN',
+        value: function updateLoadingSN(sn) {
+            //防止下载hls.js正在下载的sn
+            this.loadingSN = sn;
+        }
+    }, {
+        key: 'updatePlaySN',
+        value: function updatePlaySN(sn) {
+            if (this.config.live) return; //rearest first只用于vod
+            if (!this.hasPeers) return;
+            var requested = [];
+            for (var idx = sn + 1; idx <= sn + this.config.urgentOffset + 1; idx++) {
+                if (!this.bitset.has(idx) && idx !== this.loadingSN && this.bitCounts.has(idx)) {
+                    //如果这个块没有缓存并且peers有
+                    var _iteratorNormalCompletion = true;
+                    var _didIteratorError = false;
+                    var _iteratorError = undefined;
+
+                    try {
+                        for (var _iterator = this.peerMap.values()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                            var peer = _step.value;
+                            //找到拥有这个块并且空闲的peer
+                            if (peer.downloading === false && peer.bitset.has(idx)) {
+                                peer.requestDataBySN(idx, true);
+                                console.warn('request urgent ' + idx + ' from peer ' + peer.remotePeerId);
+                                requested.push(idx);
+                                break;
+                            }
+                        }
+                    } catch (err) {
+                        _didIteratorError = true;
+                        _iteratorError = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion && _iterator.return) {
+                                _iterator.return();
+                            }
+                        } finally {
+                            if (_didIteratorError) {
+                                throw _iteratorError;
+                            }
+                        }
+                    }
+                }
+            }
+
+            //检查是否有空闲的节点，有的话采用rearest first策略下载
+            var idlePeers = this._getIdlePeer();
+            if (idlePeers.length === 0 || this.bitCounts.size === 0 || this.bufMgr.overflowed) return; //缓存溢出则停止rearest first
+            var sortedArr = [].concat(_toConsumableArray(this.bitCounts.entries())).sort(function (item1, item2) {
+                return item1[1] < item2[1];
+            });
+            if (sortedArr.length === 0) return;
+            //每次只下载一个rearest块
+            var rearest = sortedArr.pop()[0];
+            while (rearest === this.loadingSN || requested.includes(rearest)) {
+                //排除掉loading的和requested的
+                if (sortedArr.length === 0) return;
+                rearest = sortedArr.pop()[0];
+            }
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+                for (var _iterator2 = idlePeers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var _peer = _step2.value;
+
+                    if (_peer.bitset.has(rearest)) {
+                        _peer.requestDataBySN(rearest, false);
+                        console.warn('request rearest ' + rearest + ' from peer ' + _peer.remotePeerId);
+                        break;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
+                }
+            }
+        }
+    }, {
+        key: 'deletePeer',
+        value: function deletePeer(dc) {
+            var _this2 = this;
+
+            if (this.peerMap.has(dc.remotePeerId)) {
+                dc.bitset.forEach(function (value) {
+                    _this2._decreBitCounts(value);
+                });
+                this.peerMap.delete(dc.remotePeerId);
+            }
+        }
+    }, {
+        key: 'handshakePeer',
+        value: function handshakePeer(dc) {
+            console.warn('handshake peer ' + dc.remotePeerId);
+            this._setupDC(dc);
+            dc.sendBitField(Array.from(this.bitset)); //向peer发送bitfield
+        }
+    }, {
+        key: 'addPeer',
+        value: function addPeer(peer) {
+            console.warn('add peer ' + peer.remotePeerId);
+            this.peerMap.set(peer.remotePeerId, peer);
+        }
+    }, {
+        key: 'peersHasSN',
+        value: function peersHasSN(sn) {
+            return this.bitCounts.has(sn);
         }
     }, {
         key: 'load',
         value: function load(context, config, callbacks) {
             this.context = context;
-            this.config = config;
+            var frag = context.frag;
             this.callbacks = callbacks;
-            this.stats = { trequest: performance.now(), retry: 0 };
-            this.retryDelay = config.retryDelay;
-            this.loadInternal();
-        }
-    }, {
-        key: 'loadInternal',
-        value: function loadInternal() {
-            var xhr,
-                context = this.context;
-            xhr = this.loader = new XMLHttpRequest();
+            this.stats = { trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0 };
+            this.criticalSeg = { sn: frag.sn, relurl: frag.relurl };
 
-            var stats = this.stats;
-            stats.tfirst = 0;
-            stats.loaded = 0;
-            var xhrSetup = this.xhrSetup;
+            var target = void 0;
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
 
             try {
-                if (xhrSetup) {
-                    try {
-                        xhrSetup(xhr, context.url);
-                    } catch (e) {
-                        // fix xhrSetup: (xhr, url) => {xhr.setRequestHeader("Content-Language", "test");}
-                        // not working, as xhr.setRequestHeader expects xhr.readyState === OPEN
-                        xhr.open('GET', context.url, true);
-                        xhrSetup(xhr, context.url);
+                for (var _iterator3 = this.peerMap.values()[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var peer = _step3.value;
+
+                    if (peer.bitset.has(frag.sn)) {
+                        target = peer;
                     }
                 }
-                if (!xhr.readyState) {
-                    xhr.open('GET', context.url, true);
+            } catch (err) {
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
+                    }
+                } finally {
+                    if (_didIteratorError3) {
+                        throw _iteratorError3;
+                    }
                 }
-            } catch (e) {
-                // IE11 throws an exception on xhr.open if attempting to access an HTTP resource over HTTPS
-                this.callbacks.onError({ code: xhr.status, text: e.message }, context, xhr);
-                return;
             }
 
-            if (context.rangeEnd) {
-                xhr.setRequestHeader('Range', 'bytes=' + context.rangeStart + '-' + (context.rangeEnd - 1));
+            if (target) {
+                // target.requestDataBySN(frag.sn, true);
+                target.requestDataByURL(frag.relurl, true); //critical的根据url请求
+                console.warn('request criticalSeg url ' + frag.relurl + ' at ' + frag.sn);
             }
-            xhr.onreadystatechange = this.readystatechange.bind(this);
-            xhr.onprogress = this.loadprogress.bind(this);
-            xhr.responseType = context.responseType;
-
-            // setup timeout before we perform request
-            this.requestTimeout = window.setTimeout(this.loadtimeout.bind(this), this.config.timeout);
-            xhr.send();
+            this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout * 1000);
         }
     }, {
-        key: 'readystatechange',
-        value: function readystatechange(event) {
-            var xhr = event.currentTarget,
-                readyState = xhr.readyState,
-                stats = this.stats,
-                context = this.context,
-                config = this.config;
+        key: '_setupDC',
+        value: function _setupDC(dc) {
+            var _this3 = this;
 
-            // don't proceed if xhr has been aborted
-            if (stats.aborted) {
-                return;
-            }
-
-            // >= HEADERS_RECEIVED
-            if (readyState >= 2) {
-                // clear xhr timeout and rearm it if readyState less than 4
-                window.clearTimeout(this.requestTimeout);
-                if (stats.tfirst === 0) {
-                    stats.tfirst = Math.max(performance.now(), stats.trequest);
-                }
-                if (readyState === 4) {
-                    var status = xhr.status;
-                    // http status between 200 to 299 are all successful
-                    if (status >= 200 && status < 300) {
-                        stats.tload = Math.max(stats.tfirst, performance.now());
-                        var data = void 0,
-                            len = void 0;
-                        if (context.responseType === 'arraybuffer') {
-                            data = xhr.response;
-                            len = data.byteLength;
-                        } else {
-                            data = xhr.responseText;
-                            len = data.length;
-                        }
-                        stats.loaded = stats.total = len;
-                        var response = { url: xhr.responseURL, data: data };
-                        this.callbacks.onSuccess(response, stats, context, xhr);
-                    } else {
-                        // if max nb of retries reached or if http status between 400 and 499 (such error cannot be recovered, retrying is useless), return error
-                        if (stats.retry >= config.maxRetry || status >= 400 && status < 499) {
-                            // logger.error(`${status} while loading ${context.url}` );
-                            this.callbacks.onError({ code: status, text: xhr.statusText }, context, xhr);
-                        } else {
-                            // retry
-                            // logger.warn(`${status} while loading ${context.url}, retrying in ${this.retryDelay}...`);
-                            // aborts and resets internal state
-                            this.destroy();
-                            // schedule retry
-                            this.retryTimeout = window.setTimeout(this.loadInternal.bind(this), this.retryDelay);
-                            // set exponential backoff
-                            this.retryDelay = Math.min(2 * this.retryDelay, config.maxRetryDelay);
-                            stats.retry++;
-                        }
+            dc.on(_pear.Events.DC_BITFIELD, function (msg) {
+                if (!msg.field) return;
+                var bitset = new Set(msg.field);
+                dc.bitset = bitset;
+                msg.field.forEach(function (value) {
+                    if (!_this3.bitset.has(value)) {
+                        //防止重复下载
+                        _this3._increBitCounts(value);
                     }
+                });
+                _this3.addPeer(dc); //只有获取bitfield之后才加入peerMap
+            }).on(_pear.Events.DC_HAVE, function (msg) {
+                if (!msg.sn || !dc.bitset) return;
+                var sn = msg.sn;
+                dc.bitset.add(sn);
+                if (!_this3.bitset.has(sn)) {
+                    //防止重复下载
+                    _this3._increBitCounts(sn);
+                }
+            }).on(_pear.Events.DC_LOST, function (msg) {
+                if (!msg.sn || !dc.bitset) return;
+                var sn = msg.sn;
+                dc.bitset.delete(sn);
+                _this3._decreBitCounts(sn);
+            }).on(_pear.Events.DC_PIECE, function (msg) {
+                //接收到piece事件，即二进制包头
+                if (_this3.criticalSeg && _this3.criticalSeg.relurl === msg.url) {
+                    //接收到critical的响应
+                    _this3.stats.tfirst = Math.max(performance.now(), _this3.stats.trequest);
+                }
+            }).on(_pear.Events.DC_PIECE_NOT_FOUND, function (msg) {
+                if (_this3.criticalSeg && _this3.criticalSeg.relurl === msg.url) {
+                    //接收到critical未找到的响应
+                    window.clearTimeout(_this3.criticaltimeouter); //清除定时器
+                    _this3.criticaltimeouter = null;
+                    _this3._criticaltimeout(); //触发超时，由xhr下载
+                }
+            }).on(_pear.Events.DC_RESPONSE, function (response) {
+                //接收到完整二进制数据
+                if (_this3.criticalSeg && _this3.criticalSeg.relurl === response.url && _this3.criticaltimeouter) {
+                    console.warn('receive criticalSeg url ' + response.url);
+                    window.clearTimeout(_this3.criticaltimeouter); //清除定时器
+                    _this3.criticaltimeouter = null;
+                    var stats = _this3.stats;
+                    stats.tload = Math.max(stats.tfirst, performance.now());
+                    stats.loaded = stats.total = response.data.byteLength;
+                    _this3.criticalSeg = null;
+                    _this3.callbacks.onSuccess(response, stats, _this3.context);
                 } else {
-                    // readyState >= 2 AND readyState !==4 (readyState = HEADERS_RECEIVED || LOADING) rearm timeout as xhr not finished yet
-                    this.requestTimeout = window.setTimeout(this.loadtimeout.bind(this), config.timeout);
+                    _this3.bufMgr.addBuffer(response.sn, response.url, response.data);
+                }
+                _this3.updateLoadedSN(response.sn);
+            }).on(_pear.Events.DC_REQUEST, function (msg) {
+                var url = '';
+                if (!msg.url) {
+                    //请求sn的request
+                    url = _this3.bufMgr.getURLbySN(msg.sn);
+                } else {
+                    //请求url的request
+                    url = msg.url;
+                }
+                if (url && _this3.bufMgr.hasSegOfURL(url)) {
+                    var seg = _this3.bufMgr.getSegByURL(url);
+                    dc.sendBuffer(msg.sn, seg.relurl, seg.data);
+                } else {
+                    dc.sendJson({
+                        event: _pear.Events.DC_PIECE_NOT_FOUND,
+                        url: url,
+                        sn: msg.sn
+                    });
+                }
+            }).on(_pear.Events.DC_TIMEOUT, function () {
+                console.warn('DC_TIMEOUT');
+            });
+        }
+    }, {
+        key: '_broadcastToPeers',
+        value: function _broadcastToPeers(msg) {
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
+
+            try {
+                for (var _iterator4 = this.peerMap.values()[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    var peer = _step4.value;
+
+                    peer.sendJson(msg);
+                }
+            } catch (err) {
+                _didIteratorError4 = true;
+                _iteratorError4 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                        _iterator4.return();
+                    }
+                } finally {
+                    if (_didIteratorError4) {
+                        throw _iteratorError4;
+                    }
                 }
             }
         }
     }, {
-        key: 'loadtimeout',
-        value: function loadtimeout() {
-            // logger.warn(`timeout while loading ${this.context.url}` );
-            this.callbacks.onTimeout(this.stats, this.context, null);
+        key: '_getIdlePeer',
+        value: function _getIdlePeer() {
+            return [].concat(_toConsumableArray(this.peerMap.values())).filter(function (peer) {
+                return peer.downloading === false;
+            });
+        }
+
+        /*
+         _sendNextReq() {                                                 //每个周期向所有peers发送sendReqQueue的下一个req
+         if (this.peerMap.size === 0) return;
+         for (let peer of this.peerMap.values()) {
+         if (this.sendReqQueue.length === 0) return;
+         if (peer.loading === true) continue;
+         let req = this.sendReqQueue.pop();
+         while (this.bitmap.has(req.sn) ) {
+         if (this.sendReqQueue.length === 0) return;
+         req = this.sendReqQueue.pop();
+         }
+         peer.requestDataBySN(req.sn, req.urgent);
+         }
+         }
+         */
+
+    }, {
+        key: '_decreBitCounts',
+        value: function _decreBitCounts(index) {
+            if (this.bitCounts.has(index)) {
+                var last = this.bitCounts.get(index);
+                // this.bitCounts.set(index, last-1);
+                // if (this.bitCounts.get(index) === 0) {
+                //     this.bitCounts.delete(index);
+                // }
+                if (last === 1) {
+                    this.bitCounts.delete(index);
+                } else {
+                    this.bitCounts.set(index, last - 1);
+                }
+            }
         }
     }, {
-        key: 'loadprogress',
-        value: function loadprogress(event) {
-            var xhr = event.currentTarget,
-                stats = this.stats;
+        key: '_increBitCounts',
+        value: function _increBitCounts(index) {
+            if (!this.bitCounts.has(index)) {
+                this.bitCounts.set(index, 1);
+            } else {
+                var last = this.bitCounts.get(index);
+                this.bitCounts.set(index, last + 1);
+            }
+        }
+    }, {
+        key: '_criticaltimeout',
+        value: function _criticaltimeout() {
+            console.warn('_criticaltimeout');
+            this.criticalSeg = null;
+            this.callbacks.onTimeout(this.stats, this.context, null);
+            this.criticaltimeouter = null;
+        }
+    }, {
+        key: 'hasPeers',
+        get: function get() {
+            return this.peerMap.size > 0;
+        }
+    }, {
+        key: 'bufferManager',
+        set: function set(bm) {
+            var _this4 = this;
 
-            stats.loaded = event.loaded;
-            if (event.lengthComputable) {
-                stats.total = event.total;
-            }
-            var onProgress = this.callbacks.onProgress;
-            if (onProgress) {
-                // third arg is to provide on progress data
-                onProgress(stats, this.context, null, xhr);
-            }
+            this.bufMgr = bm;
+
+            bm.on(_pear.Events.BM_LOST, function (sn) {
+                console.warn('bufMgr lost ' + sn);
+                _this4._broadcastToPeers({ //向peers广播已经不缓存的sn
+                    event: _pear.Events.DC_LOST,
+                    sn: sn
+                });
+                _this4.bitset.delete(sn);
+            });
         }
     }]);
 
-    return XhrLoader;
-}();
+    return BTScheduler;
+}(_events2.default);
 
-exports.default = XhrLoader;
+exports.default = BTScheduler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 41 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9802,6 +10920,169 @@ var _events2 = _interopRequireDefault(_events);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Created by xieting on 2018/3/23.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+// import Events from './events';
+
+var log = console.log;
+
+var FragLoader = function (_EventEmitter) {
+    _inherits(FragLoader, _EventEmitter);
+
+    function FragLoader(config) {
+        _classCallCheck(this, FragLoader);
+
+        //denoted by sn
+        var _this = _possibleConstructorReturn(this, (FragLoader.__proto__ || Object.getPrototypeOf(FragLoader)).call(this));
+
+        _this.currLoaded = config.currLoaded;
+        _this.currLoadedDuration = config.currLoadedDuration; //最新下载的块的时长
+        _this.currPlay = config.currPlay;
+
+        _this.bufMgr = config.bufMgr;
+        _this.xhrLoader = new config.loader(config);
+        _this.p2pEnabled = config.p2pEnabled;
+        _this.scheduler = config.scheduler;
+        _this.fetcher = config.fetcher;
+        return _this;
+    }
+
+    _createClass(FragLoader, [{
+        key: 'destroy',
+        value: function destroy() {
+            this.abort();
+        }
+    }, {
+        key: 'abort',
+        value: function abort() {
+            this.xhrLoader.abort();
+        }
+
+        /*
+         首先从缓存中寻找请求的seg，如果缓存中找不到则用http请求。
+         */
+
+    }, {
+        key: 'load',
+        value: function load(context, config, callbacks) {
+            var _this2 = this;
+
+            var frag = context.frag;
+            if (this.bufMgr.hasSegOfURL(frag.relurl)) {
+                //如果命中缓存
+                console.warn('bufMgr found seg sn ' + frag.sn + ' url ' + frag.relurl);
+                var seg = this.bufMgr.getSegByURL(frag.relurl);
+                var response = { url: context.url, data: seg.data },
+                    trequest = void 0,
+                    tfirst = void 0,
+                    tload = void 0,
+                    loaded = void 0,
+                    total = void 0;
+                trequest = performance.now();
+                tfirst = tload = trequest + 50;
+                loaded = total = frag.loaded = seg.size;
+                var stats = { trequest: trequest, tfirst: tfirst, tload: tload, loaded: loaded, total: total, retry: 0 };
+                // console.warn(`bufMgr onSuccess ${JSON.stringify(this.bufMgr.tmp.data.byteLength, null, 1)}  ${JSON.stringify(stats, null, 1)} ${JSON.stringify(context, null, 1)}`)
+                window.setTimeout(function () {
+                    //必须是异步回调
+                    _this2.fetcher.reportFlow(stats, true);
+                    callbacks.onSuccess(response, stats, context);
+                }, 50);
+            } else if (this.scheduler.peersHasSN(frag.sn)) {
+                //如果在peers的bitmap中找到
+                console.warn('found sn ' + frag.sn + ' from peers');
+                this.scheduler.load(context, config, callbacks);
+                callbacks.onTimeout = function (stats, context) {
+                    //如果P2P下载超时则立即切换到xhr下载
+                    log('xhrLoader load ' + frag.relurl + ' at ' + frag.sn);
+                    context.frag.loadByXhr = true;
+                    _this2.xhrLoader.load(context, config, callbacks);
+                };
+                var onSuccess = callbacks.onSuccess;
+                callbacks.onSuccess = function (response, stats, context) {
+                    //在onsucess回调中复制并缓存二进制数据
+                    if (!_this2.bufMgr.hasSegOfURL(frag.relurl)) {
+                        _this2.bufMgr.copyAndAddBuffer(response.data, frag.relurl, frag.sn);
+                    }
+                    _this2.fetcher.reportFlow(stats, true);
+                    frag.loaded = stats.loaded;
+                    onSuccess(response, stats, context);
+                };
+            } else {
+                log('xhrLoader load ' + frag.relurl + ' at ' + frag.sn);
+                context.frag.loadByXhr = true;
+                this.xhrLoader.load(context, config, callbacks);
+                var _onSuccess = callbacks.onSuccess;
+                callbacks.onSuccess = function (response, stats, context) {
+                    //在onsucess回调中复制并缓存二进制数据
+                    if (!_this2.bufMgr.hasSegOfURL(frag.relurl)) {
+                        _this2.bufMgr.copyAndAddBuffer(response.data, frag.relurl, frag.sn);
+                    }
+                    _this2.fetcher.reportFlow(stats, false);
+                    _onSuccess(response, stats, context);
+                };
+            }
+
+            // else {
+            //     const peer = this.scheduler.peersHasSN(frag.sn);
+            //     if (peer) {                                                                 //如果在peers的bitmap中找到
+            //         console.warn(`found sn ${frag.sn} from peers`);
+            //         this.scheduler.load(peer, context, config, callbacks);
+            //         callbacks.onTimeout = (stats, context) => {                             //如果P2P下载超时则立即切换到xhr下载
+            //             log(`xhrLoader load ${frag.relurl} at ${frag.sn}`);
+            //             context.frag.loadByXhr = true;
+            //             this.xhrLoader.load(context, config, callbacks);
+            //         };
+            //     } else {                                                                    //否则用http下载
+            //         log(`xhrLoader load ${frag.relurl} at ${frag.sn}`);
+            //         context.frag.loadByXhr = true;
+            //         this.xhrLoader.load(context, config, callbacks);
+            //     }
+            //     const onSuccess = callbacks.onSuccess;
+            //     callbacks.onSuccess = (response, stats, context) => {                       //在onsucess回调中复制并缓存二进制数据
+            //         if (!this.bufMgr.hasSegOfURL(frag.relurl)) {
+            //             this.bufMgr.copyAndAddBuffer(response.data, frag.relurl, frag.sn);
+            //         }
+            //         this.fetcher.reportFlow(stats, context.frag.loadByXhr ? false : true);
+            //         onSuccess(response,stats,context);
+            //     };
+            // }
+        }
+    }]);
+
+    return FragLoader;
+}(_events2.default);
+
+exports.default = FragLoader;
+module.exports = exports['default'];
+
+/***/ }),
+/* 49 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _events = __webpack_require__(0);
+
+var _events2 = _interopRequireDefault(_events);
+
+var _pear = __webpack_require__(2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -9811,6 +11092,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * Created by xieting on 2018/1/9.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
+
+// var Buffer = require('buffer/').Buffer;
+
 
 var log = console.log;
 
@@ -9829,8 +11113,10 @@ var BufferManager = function (_EventEmitter) {
         data: Buffer
         size: string
          */
-        _this._segPool = new Map(); //存放seg的Map
+        _this._segPool = new Map(); //存放seg的Map            relurl -> segment
         _this._currBufSize = 0; //目前的buffer总大小
+        _this.sn2Url = new Map(); //以sn查找relurl      sn -> relurl
+        _this.overflowed = false; //缓存是否溢出
         return _this;
     }
 
@@ -9839,6 +11125,39 @@ var BufferManager = function (_EventEmitter) {
         value: function hasSegOfURL(url) {
             //防止重复加入seg
             return this._segPool.has(url);
+        }
+    }, {
+        key: 'copyAndAddBuffer',
+        value: function copyAndAddBuffer(data, url, sn) {
+            //先复制再缓存
+            var payloadBuf = _pear.Buffer.from(data);
+            var byteLength = payloadBuf.byteLength;
+            var targetBuffer = new _pear.Buffer(byteLength);
+            payloadBuf.copy(targetBuffer);
+
+            var segment = {
+                sn: sn,
+                relurl: url,
+                data: targetBuffer,
+                size: byteLength
+            };
+
+            this.addSeg(segment);
+            this.sn2Url.set(sn, url);
+        }
+    }, {
+        key: 'addBuffer',
+        value: function addBuffer(sn, url, buf) {
+            //直接缓存
+            log('addBuffer sn ' + sn + ' relurl ' + url);
+            var segment = {
+                sn: sn,
+                relurl: url,
+                data: buf,
+                size: buf.byteLength
+            };
+            this.addSeg(segment);
+            this.sn2Url.set(sn, url);
         }
     }, {
         key: 'addSeg',
@@ -9851,9 +11170,12 @@ var BufferManager = function (_EventEmitter) {
             while (this._currBufSize > this.config.maxBufSize) {
                 //去掉多余的数据
                 var lastSeg = [].concat(_toConsumableArray(this._segPool.values())).shift();
-                console.warn('pop seg ' + lastSeg.relurl);
+                console.warn('pop seg ' + lastSeg.relurl + ' at ' + lastSeg.sn);
                 this._segPool.delete(lastSeg.relurl);
+                this.sn2Url.delete(lastSeg.sn);
                 this._currBufSize -= parseInt(lastSeg.size);
+                if (!this.overflowed) this.overflowed = true;
+                this.emit(_pear.Events.BM_LOST, lastSeg.sn);
             }
         }
     }, {
@@ -9862,9 +11184,15 @@ var BufferManager = function (_EventEmitter) {
             return this._segPool.get(relurl);
         }
     }, {
+        key: 'getURLbySN',
+        value: function getURLbySN(sn) {
+            return this.sn2Url.get(sn);
+        }
+    }, {
         key: 'clear',
         value: function clear() {
             this._segPool.clear();
+            this.sn2Url.clear();
             this._currBufSize = 0;
         }
     }, {
@@ -9881,7 +11209,7 @@ exports.default = BufferManager;
 module.exports = exports['default'];
 
 /***/ }),
-/* 42 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -10924,7 +12252,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
         exports.UAParser = UAParser;
     } else {
         // requirejs env (optional)
-        if ("function" === FUNC_TYPE && __webpack_require__(43)) {
+        if ("function" === FUNC_TYPE && __webpack_require__(51)) {
             !(__WEBPACK_AMD_DEFINE_RESULT__ = (function () {
                 return UAParser;
             }).call(exports, __webpack_require__, exports, module),
@@ -10960,13 +12288,1013 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 
 /***/ }),
-/* 43 */
+/* 51 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
 module.exports = __webpack_amd_options__;
 
 /* WEBPACK VAR INJECTION */}.call(exports, {}))
+
+/***/ }),
+/* 52 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Rusha = __webpack_require__(53)
+
+var rusha = new Rusha
+var scope = typeof window !== 'undefined' ? window : self
+var crypto = scope.crypto || scope.msCrypto || {}
+var subtle = crypto.subtle || crypto.webkitSubtle
+
+function sha1sync (buf) {
+  return rusha.digest(buf)
+}
+
+// Browsers throw if they lack support for an algorithm.
+// Promise will be rejected on non-secure origins. (http://goo.gl/lq4gCo)
+try {
+  subtle.digest({ name: 'sha-1' }, new Uint8Array).catch(function () {
+    subtle = false
+  })
+} catch (err) { subtle = false }
+
+function sha1 (buf, cb) {
+  if (!subtle) {
+    // Use Rusha
+    setTimeout(cb, 0, sha1sync(buf))
+    return
+  }
+
+  if (typeof buf === 'string') {
+    buf = uint8array(buf)
+  }
+
+  subtle.digest({ name: 'sha-1' }, buf)
+    .then(function succeed (result) {
+      cb(hex(new Uint8Array(result)))
+    },
+    function fail (error) {
+      cb(sha1sync(buf))
+    })
+}
+
+function uint8array (s) {
+  var l = s.length
+  var array = new Uint8Array(l)
+  for (var i = 0; i < l; i++) {
+    array[i] = s.charCodeAt(i)
+  }
+  return array
+}
+
+function hex (buf) {
+  var l = buf.length
+  var chars = []
+  for (var i = 0; i < l; i++) {
+    var bite = buf[i]
+    chars.push((bite >>> 4).toString(16))
+    chars.push((bite & 0x0f).toString(16))
+  }
+  return chars.join('')
+}
+
+module.exports = sha1
+module.exports.sync = sha1sync
+
+
+/***/ }),
+/* 53 */
+/***/ (function(module, exports, __webpack_require__) {
+
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(true)
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["Rusha"] = factory();
+	else
+		root["Rusha"] = factory();
+})(typeof self !== 'undefined' ? self : this, function() {
+return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/* eslint-env commonjs, browser */
+
+var RushaCore = __webpack_require__(5);
+
+var _require = __webpack_require__(1),
+    toHex = _require.toHex,
+    ceilHeapSize = _require.ceilHeapSize;
+
+var conv = __webpack_require__(6);
+
+// Calculate the length of buffer that the sha1 routine uses
+// including the padding.
+var padlen = function (len) {
+  for (len += 9; len % 64 > 0; len += 1) {}
+  return len;
+};
+
+var padZeroes = function (bin, len) {
+  var h8 = new Uint8Array(bin.buffer);
+  var om = len % 4,
+      align = len - om;
+  switch (om) {
+    case 0:
+      h8[align + 3] = 0;
+    case 1:
+      h8[align + 2] = 0;
+    case 2:
+      h8[align + 1] = 0;
+    case 3:
+      h8[align + 0] = 0;
+  }
+  for (var i = (len >> 2) + 1; i < bin.length; i++) {
+    bin[i] = 0;
+  }
+};
+
+var padData = function (bin, chunkLen, msgLen) {
+  bin[chunkLen >> 2] |= 0x80 << 24 - (chunkLen % 4 << 3);
+  // To support msgLen >= 2 GiB, use a float division when computing the
+  // high 32-bits of the big-endian message length in bits.
+  bin[((chunkLen >> 2) + 2 & ~0x0f) + 14] = msgLen / (1 << 29) | 0;
+  bin[((chunkLen >> 2) + 2 & ~0x0f) + 15] = msgLen << 3;
+};
+
+var getRawDigest = function (heap, padMaxChunkLen) {
+  var io = new Int32Array(heap, padMaxChunkLen + 320, 5);
+  var out = new Int32Array(5);
+  var arr = new DataView(out.buffer);
+  arr.setInt32(0, io[0], false);
+  arr.setInt32(4, io[1], false);
+  arr.setInt32(8, io[2], false);
+  arr.setInt32(12, io[3], false);
+  arr.setInt32(16, io[4], false);
+  return out;
+};
+
+var Rusha = function () {
+  function Rusha(chunkSize) {
+    _classCallCheck(this, Rusha);
+
+    chunkSize = chunkSize || 64 * 1024;
+    if (chunkSize % 64 > 0) {
+      throw new Error('Chunk size must be a multiple of 128 bit');
+    }
+    this._offset = 0;
+    this._maxChunkLen = chunkSize;
+    this._padMaxChunkLen = padlen(chunkSize);
+    // The size of the heap is the sum of:
+    // 1. The padded input message size
+    // 2. The extended space the algorithm needs (320 byte)
+    // 3. The 160 bit state the algoritm uses
+    this._heap = new ArrayBuffer(ceilHeapSize(this._padMaxChunkLen + 320 + 20));
+    this._h32 = new Int32Array(this._heap);
+    this._h8 = new Int8Array(this._heap);
+    this._core = new RushaCore({ Int32Array: Int32Array }, {}, this._heap);
+  }
+
+  Rusha.prototype._initState = function _initState(heap, padMsgLen) {
+    this._offset = 0;
+    var io = new Int32Array(heap, padMsgLen + 320, 5);
+    io[0] = 1732584193;
+    io[1] = -271733879;
+    io[2] = -1732584194;
+    io[3] = 271733878;
+    io[4] = -1009589776;
+  };
+
+  Rusha.prototype._padChunk = function _padChunk(chunkLen, msgLen) {
+    var padChunkLen = padlen(chunkLen);
+    var view = new Int32Array(this._heap, 0, padChunkLen >> 2);
+    padZeroes(view, chunkLen);
+    padData(view, chunkLen, msgLen);
+    return padChunkLen;
+  };
+
+  Rusha.prototype._write = function _write(data, chunkOffset, chunkLen, off) {
+    conv(data, this._h8, this._h32, chunkOffset, chunkLen, off || 0);
+  };
+
+  Rusha.prototype._coreCall = function _coreCall(data, chunkOffset, chunkLen, msgLen, finalize) {
+    var padChunkLen = chunkLen;
+    this._write(data, chunkOffset, chunkLen);
+    if (finalize) {
+      padChunkLen = this._padChunk(chunkLen, msgLen);
+    }
+    this._core.hash(padChunkLen, this._padMaxChunkLen);
+  };
+
+  Rusha.prototype.rawDigest = function rawDigest(str) {
+    var msgLen = str.byteLength || str.length || str.size || 0;
+    this._initState(this._heap, this._padMaxChunkLen);
+    var chunkOffset = 0,
+        chunkLen = this._maxChunkLen;
+    for (chunkOffset = 0; msgLen > chunkOffset + chunkLen; chunkOffset += chunkLen) {
+      this._coreCall(str, chunkOffset, chunkLen, msgLen, false);
+    }
+    this._coreCall(str, chunkOffset, msgLen - chunkOffset, msgLen, true);
+    return getRawDigest(this._heap, this._padMaxChunkLen);
+  };
+
+  Rusha.prototype.digest = function digest(str) {
+    return toHex(this.rawDigest(str).buffer);
+  };
+
+  Rusha.prototype.digestFromString = function digestFromString(str) {
+    return this.digest(str);
+  };
+
+  Rusha.prototype.digestFromBuffer = function digestFromBuffer(str) {
+    return this.digest(str);
+  };
+
+  Rusha.prototype.digestFromArrayBuffer = function digestFromArrayBuffer(str) {
+    return this.digest(str);
+  };
+
+  Rusha.prototype.resetState = function resetState() {
+    this._initState(this._heap, this._padMaxChunkLen);
+    return this;
+  };
+
+  Rusha.prototype.append = function append(chunk) {
+    var chunkOffset = 0;
+    var chunkLen = chunk.byteLength || chunk.length || chunk.size || 0;
+    var turnOffset = this._offset % this._maxChunkLen;
+    var inputLen = void 0;
+
+    this._offset += chunkLen;
+    while (chunkOffset < chunkLen) {
+      inputLen = Math.min(chunkLen - chunkOffset, this._maxChunkLen - turnOffset);
+      this._write(chunk, chunkOffset, inputLen, turnOffset);
+      turnOffset += inputLen;
+      chunkOffset += inputLen;
+      if (turnOffset === this._maxChunkLen) {
+        this._core.hash(this._maxChunkLen, this._padMaxChunkLen);
+        turnOffset = 0;
+      }
+    }
+    return this;
+  };
+
+  Rusha.prototype.getState = function getState() {
+    var turnOffset = this._offset % this._maxChunkLen;
+    var heap = void 0;
+    if (!turnOffset) {
+      var io = new Int32Array(this._heap, this._padMaxChunkLen + 320, 5);
+      heap = io.buffer.slice(io.byteOffset, io.byteOffset + io.byteLength);
+    } else {
+      heap = this._heap.slice(0);
+    }
+    return {
+      offset: this._offset,
+      heap: heap
+    };
+  };
+
+  Rusha.prototype.setState = function setState(state) {
+    this._offset = state.offset;
+    if (state.heap.byteLength === 20) {
+      var io = new Int32Array(this._heap, this._padMaxChunkLen + 320, 5);
+      io.set(new Int32Array(state.heap));
+    } else {
+      this._h32.set(new Int32Array(state.heap));
+    }
+    return this;
+  };
+
+  Rusha.prototype.rawEnd = function rawEnd() {
+    var msgLen = this._offset;
+    var chunkLen = msgLen % this._maxChunkLen;
+    var padChunkLen = this._padChunk(chunkLen, msgLen);
+    this._core.hash(padChunkLen, this._padMaxChunkLen);
+    var result = getRawDigest(this._heap, this._padMaxChunkLen);
+    this._initState(this._heap, this._padMaxChunkLen);
+    return result;
+  };
+
+  Rusha.prototype.end = function end() {
+    return toHex(this.rawEnd().buffer);
+  };
+
+  return Rusha;
+}();
+
+module.exports = Rusha;
+module.exports._core = RushaCore;
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+/* eslint-env commonjs, browser */
+
+//
+// toHex
+//
+
+var precomputedHex = new Array(256);
+for (var i = 0; i < 256; i++) {
+  precomputedHex[i] = (i < 0x10 ? '0' : '') + i.toString(16);
+}
+
+module.exports.toHex = function (arrayBuffer) {
+  var binarray = new Uint8Array(arrayBuffer);
+  var res = new Array(arrayBuffer.byteLength);
+  for (var _i = 0; _i < res.length; _i++) {
+    res[_i] = precomputedHex[binarray[_i]];
+  }
+  return res.join('');
+};
+
+//
+// ceilHeapSize
+//
+
+module.exports.ceilHeapSize = function (v) {
+  // The asm.js spec says:
+  // The heap object's byteLength must be either
+  // 2^n for n in [12, 24) or 2^24 * n for n ≥ 1.
+  // Also, byteLengths smaller than 2^16 are deprecated.
+  var p = 0;
+  // If v is smaller than 2^16, the smallest possible solution
+  // is 2^16.
+  if (v <= 65536) return 65536;
+  // If v < 2^24, we round up to 2^n,
+  // otherwise we round up to 2^24 * n.
+  if (v < 16777216) {
+    for (p = 1; p < v; p = p << 1) {}
+  } else {
+    for (p = 16777216; p < v; p += 16777216) {}
+  }
+  return p;
+};
+
+//
+// isDedicatedWorkerScope
+//
+
+module.exports.isDedicatedWorkerScope = function (self) {
+  var isRunningInWorker = 'WorkerGlobalScope' in self && self instanceof self.WorkerGlobalScope;
+  var isRunningInSharedWorker = 'SharedWorkerGlobalScope' in self && self instanceof self.SharedWorkerGlobalScope;
+  var isRunningInServiceWorker = 'ServiceWorkerGlobalScope' in self && self instanceof self.ServiceWorkerGlobalScope;
+
+  // Detects whether we run inside a dedicated worker or not.
+  //
+  // We can't just check for `DedicatedWorkerGlobalScope`, since IE11
+  // has a bug where it only supports `WorkerGlobalScope`.
+  //
+  // Therefore, we consider us as running inside a dedicated worker
+  // when we are running inside a worker, but not in a shared or service worker.
+  //
+  // When new types of workers are introduced, we will need to adjust this code.
+  return isRunningInWorker && !isRunningInSharedWorker && !isRunningInServiceWorker;
+};
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* eslint-env commonjs, worker */
+
+module.exports = function () {
+  var Rusha = __webpack_require__(0);
+
+  var hashData = function (hasher, data, cb) {
+    try {
+      return cb(null, hasher.digest(data));
+    } catch (e) {
+      return cb(e);
+    }
+  };
+
+  var hashFile = function (hasher, readTotal, blockSize, file, cb) {
+    var reader = new self.FileReader();
+    reader.onloadend = function onloadend() {
+      if (reader.error) {
+        return cb(reader.error);
+      }
+      var buffer = reader.result;
+      readTotal += reader.result.byteLength;
+      try {
+        hasher.append(buffer);
+      } catch (e) {
+        cb(e);
+        return;
+      }
+      if (readTotal < file.size) {
+        hashFile(hasher, readTotal, blockSize, file, cb);
+      } else {
+        cb(null, hasher.end());
+      }
+    };
+    reader.readAsArrayBuffer(file.slice(readTotal, readTotal + blockSize));
+  };
+
+  var workerBehaviourEnabled = true;
+
+  self.onmessage = function (event) {
+    if (!workerBehaviourEnabled) {
+      return;
+    }
+
+    var data = event.data.data,
+        file = event.data.file,
+        id = event.data.id;
+    if (typeof id === 'undefined') return;
+    if (!file && !data) return;
+    var blockSize = event.data.blockSize || 4 * 1024 * 1024;
+    var hasher = new Rusha(blockSize);
+    hasher.resetState();
+    var done = function (err, hash) {
+      if (!err) {
+        self.postMessage({ id: id, hash: hash });
+      } else {
+        self.postMessage({ id: id, error: err.name });
+      }
+    };
+    if (data) hashData(hasher, data, done);
+    if (file) hashFile(hasher, 0, blockSize, file, done);
+  };
+
+  return function () {
+    workerBehaviourEnabled = false;
+  };
+};
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* eslint-env commonjs, browser */
+
+var work = __webpack_require__(4);
+var Rusha = __webpack_require__(0);
+var createHash = __webpack_require__(7);
+var runWorker = __webpack_require__(2);
+
+var _require = __webpack_require__(1),
+    isDedicatedWorkerScope = _require.isDedicatedWorkerScope;
+
+var isRunningInDedicatedWorker = typeof self !== 'undefined' && isDedicatedWorkerScope(self);
+
+Rusha.disableWorkerBehaviour = isRunningInDedicatedWorker ? runWorker() : function () {};
+
+Rusha.createWorker = function () {
+  var worker = work(/*require.resolve*/(2));
+  var terminate = worker.terminate;
+  worker.terminate = function () {
+    URL.revokeObjectURL(worker.objectURL);
+    terminate.call(worker);
+  };
+  return worker;
+};
+
+Rusha.createHash = createHash;
+
+module.exports = Rusha;
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+function webpackBootstrapFunc (modules) {
+/******/  // The module cache
+/******/  var installedModules = {};
+
+/******/  // The require function
+/******/  function __webpack_require__(moduleId) {
+
+/******/    // Check if module is in cache
+/******/    if(installedModules[moduleId])
+/******/      return installedModules[moduleId].exports;
+
+/******/    // Create a new module (and put it into the cache)
+/******/    var module = installedModules[moduleId] = {
+/******/      i: moduleId,
+/******/      l: false,
+/******/      exports: {}
+/******/    };
+
+/******/    // Execute the module function
+/******/    modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/    // Flag the module as loaded
+/******/    module.l = true;
+
+/******/    // Return the exports of the module
+/******/    return module.exports;
+/******/  }
+
+/******/  // expose the modules object (__webpack_modules__)
+/******/  __webpack_require__.m = modules;
+
+/******/  // expose the module cache
+/******/  __webpack_require__.c = installedModules;
+
+/******/  // identity function for calling harmony imports with the correct context
+/******/  __webpack_require__.i = function(value) { return value; };
+
+/******/  // define getter function for harmony exports
+/******/  __webpack_require__.d = function(exports, name, getter) {
+/******/    if(!__webpack_require__.o(exports, name)) {
+/******/      Object.defineProperty(exports, name, {
+/******/        configurable: false,
+/******/        enumerable: true,
+/******/        get: getter
+/******/      });
+/******/    }
+/******/  };
+
+/******/  // define __esModule on exports
+/******/  __webpack_require__.r = function(exports) {
+/******/    Object.defineProperty(exports, '__esModule', { value: true });
+/******/  };
+
+/******/  // getDefaultExport function for compatibility with non-harmony modules
+/******/  __webpack_require__.n = function(module) {
+/******/    var getter = module && module.__esModule ?
+/******/      function getDefault() { return module['default']; } :
+/******/      function getModuleExports() { return module; };
+/******/    __webpack_require__.d(getter, 'a', getter);
+/******/    return getter;
+/******/  };
+
+/******/  // Object.prototype.hasOwnProperty.call
+/******/  __webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+
+/******/  // __webpack_public_path__
+/******/  __webpack_require__.p = "/";
+
+/******/  // on error function for async loading
+/******/  __webpack_require__.oe = function(err) { console.error(err); throw err; };
+
+  var f = __webpack_require__(__webpack_require__.s = ENTRY_MODULE)
+  return f.default || f // try to call default if defined to also support babel esmodule exports
+}
+
+var moduleNameReqExp = '[\\.|\\-|\\+|\\w|\/|@]+'
+var dependencyRegExp = '\\((\/\\*.*?\\*\/)?\s?.*?(' + moduleNameReqExp + ').*?\\)' // additional chars when output.pathinfo is true
+
+// http://stackoverflow.com/a/2593661/130442
+function quoteRegExp (str) {
+  return (str + '').replace(/[.?*+^$[\]\\(){}|-]/g, '\\$&')
+}
+
+function getModuleDependencies (sources, module, queueName) {
+  var retval = {}
+  retval[queueName] = []
+
+  var fnString = module.toString()
+  var wrapperSignature = fnString.match(/^function\s?\(\w+,\s*\w+,\s*(\w+)\)/)
+  if (!wrapperSignature) return retval
+  var webpackRequireName = wrapperSignature[1]
+
+  // main bundle deps
+  var re = new RegExp('(\\\\n|\\W)' + quoteRegExp(webpackRequireName) + dependencyRegExp, 'g')
+  var match
+  while ((match = re.exec(fnString))) {
+    if (match[3] === 'dll-reference') continue
+    retval[queueName].push(match[3])
+  }
+
+  // dll deps
+  re = new RegExp('\\(' + quoteRegExp(webpackRequireName) + '\\("(dll-reference\\s(' + moduleNameReqExp + '))"\\)\\)' + dependencyRegExp, 'g')
+  while ((match = re.exec(fnString))) {
+    if (!sources[match[2]]) {
+      retval[queueName].push(match[1])
+      sources[match[2]] = __webpack_require__(match[1]).m
+    }
+    retval[match[2]] = retval[match[2]] || []
+    retval[match[2]].push(match[4])
+  }
+
+  return retval
+}
+
+function hasValuesInQueues (queues) {
+  var keys = Object.keys(queues)
+  return keys.reduce(function (hasValues, key) {
+    return hasValues || queues[key].length > 0
+  }, false)
+}
+
+function getRequiredModules (sources, moduleId) {
+  var modulesQueue = {
+    main: [moduleId]
+  }
+  var requiredModules = {
+    main: []
+  }
+  var seenModules = {
+    main: {}
+  }
+
+  while (hasValuesInQueues(modulesQueue)) {
+    var queues = Object.keys(modulesQueue)
+    for (var i = 0; i < queues.length; i++) {
+      var queueName = queues[i]
+      var queue = modulesQueue[queueName]
+      var moduleToCheck = queue.pop()
+      seenModules[queueName] = seenModules[queueName] || {}
+      if (seenModules[queueName][moduleToCheck] || !sources[queueName][moduleToCheck]) continue
+      seenModules[queueName][moduleToCheck] = true
+      requiredModules[queueName] = requiredModules[queueName] || []
+      requiredModules[queueName].push(moduleToCheck)
+      var newModules = getModuleDependencies(sources, sources[queueName][moduleToCheck], queueName)
+      var newModulesKeys = Object.keys(newModules)
+      for (var j = 0; j < newModulesKeys.length; j++) {
+        modulesQueue[newModulesKeys[j]] = modulesQueue[newModulesKeys[j]] || []
+        modulesQueue[newModulesKeys[j]] = modulesQueue[newModulesKeys[j]].concat(newModules[newModulesKeys[j]])
+      }
+    }
+  }
+
+  return requiredModules
+}
+
+module.exports = function (moduleId, options) {
+  options = options || {}
+  var sources = {
+    main: __webpack_require__.m
+  }
+
+  var requiredModules = options.all ? { main: Object.keys(sources) } : getRequiredModules(sources, moduleId)
+
+  var src = ''
+
+  Object.keys(requiredModules).filter(function (m) { return m !== 'main' }).forEach(function (module) {
+    var entryModule = 0
+    while (requiredModules[module][entryModule]) {
+      entryModule++
+    }
+    requiredModules[module].push(entryModule)
+    sources[module][entryModule] = '(function(module, exports, __webpack_require__) { module.exports = __webpack_require__; })'
+    src = src + 'var ' + module + ' = (' + webpackBootstrapFunc.toString().replace('ENTRY_MODULE', JSON.stringify(entryModule)) + ')({' + requiredModules[module].map(function (id) { return '' + JSON.stringify(id) + ': ' + sources[module][id].toString() }).join(',') + '});\n'
+  })
+
+  src = src + '(' + webpackBootstrapFunc.toString().replace('ENTRY_MODULE', JSON.stringify(moduleId)) + ')({' + requiredModules.main.map(function (id) { return '' + JSON.stringify(id) + ': ' + sources.main[id].toString() }).join(',') + '})(self);'
+
+  var blob = new window.Blob([src], { type: 'text/javascript' })
+  if (options.bare) { return blob }
+
+  var URL = window.URL || window.webkitURL || window.mozURL || window.msURL
+
+  var workerUrl = URL.createObjectURL(blob)
+  var worker = new window.Worker(workerUrl)
+  worker.objectURL = workerUrl
+
+  return worker
+}
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+// The low-level RushCore module provides the heart of Rusha,
+// a high-speed sha1 implementation working on an Int32Array heap.
+// At first glance, the implementation seems complicated, however
+// with the SHA1 spec at hand, it is obvious this almost a textbook
+// implementation that has a few functions hand-inlined and a few loops
+// hand-unrolled.
+module.exports = function RushaCore(stdlib$846, foreign$847, heap$848) {
+    'use asm';
+    var H$849 = new stdlib$846.Int32Array(heap$848);
+    function hash$850(k$851, x$852) {
+        // k in bytes
+        k$851 = k$851 | 0;
+        x$852 = x$852 | 0;
+        var i$853 = 0, j$854 = 0, y0$855 = 0, z0$856 = 0, y1$857 = 0, z1$858 = 0, y2$859 = 0, z2$860 = 0, y3$861 = 0, z3$862 = 0, y4$863 = 0, z4$864 = 0, t0$865 = 0, t1$866 = 0;
+        y0$855 = H$849[x$852 + 320 >> 2] | 0;
+        y1$857 = H$849[x$852 + 324 >> 2] | 0;
+        y2$859 = H$849[x$852 + 328 >> 2] | 0;
+        y3$861 = H$849[x$852 + 332 >> 2] | 0;
+        y4$863 = H$849[x$852 + 336 >> 2] | 0;
+        for (i$853 = 0; (i$853 | 0) < (k$851 | 0); i$853 = i$853 + 64 | 0) {
+            z0$856 = y0$855;
+            z1$858 = y1$857;
+            z2$860 = y2$859;
+            z3$862 = y3$861;
+            z4$864 = y4$863;
+            for (j$854 = 0; (j$854 | 0) < 64; j$854 = j$854 + 4 | 0) {
+                t1$866 = H$849[i$853 + j$854 >> 2] | 0;
+                t0$865 = ((y0$855 << 5 | y0$855 >>> 27) + (y1$857 & y2$859 | ~y1$857 & y3$861) | 0) + ((t1$866 + y4$863 | 0) + 1518500249 | 0) | 0;
+                y4$863 = y3$861;
+                y3$861 = y2$859;
+                y2$859 = y1$857 << 30 | y1$857 >>> 2;
+                y1$857 = y0$855;
+                y0$855 = t0$865;
+                H$849[k$851 + j$854 >> 2] = t1$866;
+            }
+            for (j$854 = k$851 + 64 | 0; (j$854 | 0) < (k$851 + 80 | 0); j$854 = j$854 + 4 | 0) {
+                t1$866 = (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) << 1 | (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) >>> 31;
+                t0$865 = ((y0$855 << 5 | y0$855 >>> 27) + (y1$857 & y2$859 | ~y1$857 & y3$861) | 0) + ((t1$866 + y4$863 | 0) + 1518500249 | 0) | 0;
+                y4$863 = y3$861;
+                y3$861 = y2$859;
+                y2$859 = y1$857 << 30 | y1$857 >>> 2;
+                y1$857 = y0$855;
+                y0$855 = t0$865;
+                H$849[j$854 >> 2] = t1$866;
+            }
+            for (j$854 = k$851 + 80 | 0; (j$854 | 0) < (k$851 + 160 | 0); j$854 = j$854 + 4 | 0) {
+                t1$866 = (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) << 1 | (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) >>> 31;
+                t0$865 = ((y0$855 << 5 | y0$855 >>> 27) + (y1$857 ^ y2$859 ^ y3$861) | 0) + ((t1$866 + y4$863 | 0) + 1859775393 | 0) | 0;
+                y4$863 = y3$861;
+                y3$861 = y2$859;
+                y2$859 = y1$857 << 30 | y1$857 >>> 2;
+                y1$857 = y0$855;
+                y0$855 = t0$865;
+                H$849[j$854 >> 2] = t1$866;
+            }
+            for (j$854 = k$851 + 160 | 0; (j$854 | 0) < (k$851 + 240 | 0); j$854 = j$854 + 4 | 0) {
+                t1$866 = (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) << 1 | (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) >>> 31;
+                t0$865 = ((y0$855 << 5 | y0$855 >>> 27) + (y1$857 & y2$859 | y1$857 & y3$861 | y2$859 & y3$861) | 0) + ((t1$866 + y4$863 | 0) - 1894007588 | 0) | 0;
+                y4$863 = y3$861;
+                y3$861 = y2$859;
+                y2$859 = y1$857 << 30 | y1$857 >>> 2;
+                y1$857 = y0$855;
+                y0$855 = t0$865;
+                H$849[j$854 >> 2] = t1$866;
+            }
+            for (j$854 = k$851 + 240 | 0; (j$854 | 0) < (k$851 + 320 | 0); j$854 = j$854 + 4 | 0) {
+                t1$866 = (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) << 1 | (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) >>> 31;
+                t0$865 = ((y0$855 << 5 | y0$855 >>> 27) + (y1$857 ^ y2$859 ^ y3$861) | 0) + ((t1$866 + y4$863 | 0) - 899497514 | 0) | 0;
+                y4$863 = y3$861;
+                y3$861 = y2$859;
+                y2$859 = y1$857 << 30 | y1$857 >>> 2;
+                y1$857 = y0$855;
+                y0$855 = t0$865;
+                H$849[j$854 >> 2] = t1$866;
+            }
+            y0$855 = y0$855 + z0$856 | 0;
+            y1$857 = y1$857 + z1$858 | 0;
+            y2$859 = y2$859 + z2$860 | 0;
+            y3$861 = y3$861 + z3$862 | 0;
+            y4$863 = y4$863 + z4$864 | 0;
+        }
+        H$849[x$852 + 320 >> 2] = y0$855;
+        H$849[x$852 + 324 >> 2] = y1$857;
+        H$849[x$852 + 328 >> 2] = y2$859;
+        H$849[x$852 + 332 >> 2] = y3$861;
+        H$849[x$852 + 336 >> 2] = y4$863;
+    }
+    return { hash: hash$850 };
+};
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+var _this = this;
+
+/* eslint-env commonjs, browser */
+
+var reader = void 0;
+if (typeof self !== 'undefined' && typeof self.FileReaderSync !== 'undefined') {
+  reader = new self.FileReaderSync();
+}
+
+// Convert a binary string and write it to the heap.
+// A binary string is expected to only contain char codes < 256.
+var convStr = function (str, H8, H32, start, len, off) {
+  var i = void 0,
+      om = off % 4,
+      lm = (len + om) % 4,
+      j = len - lm;
+  switch (om) {
+    case 0:
+      H8[off] = str.charCodeAt(start + 3);
+    case 1:
+      H8[off + 1 - (om << 1) | 0] = str.charCodeAt(start + 2);
+    case 2:
+      H8[off + 2 - (om << 1) | 0] = str.charCodeAt(start + 1);
+    case 3:
+      H8[off + 3 - (om << 1) | 0] = str.charCodeAt(start);
+  }
+  if (len < lm + (4 - om)) {
+    return;
+  }
+  for (i = 4 - om; i < j; i = i + 4 | 0) {
+    H32[off + i >> 2] = str.charCodeAt(start + i) << 24 | str.charCodeAt(start + i + 1) << 16 | str.charCodeAt(start + i + 2) << 8 | str.charCodeAt(start + i + 3);
+  }
+  switch (lm) {
+    case 3:
+      H8[off + j + 1 | 0] = str.charCodeAt(start + j + 2);
+    case 2:
+      H8[off + j + 2 | 0] = str.charCodeAt(start + j + 1);
+    case 1:
+      H8[off + j + 3 | 0] = str.charCodeAt(start + j);
+  }
+};
+
+// Convert a buffer or array and write it to the heap.
+// The buffer or array is expected to only contain elements < 256.
+var convBuf = function (buf, H8, H32, start, len, off) {
+  var i = void 0,
+      om = off % 4,
+      lm = (len + om) % 4,
+      j = len - lm;
+  switch (om) {
+    case 0:
+      H8[off] = buf[start + 3];
+    case 1:
+      H8[off + 1 - (om << 1) | 0] = buf[start + 2];
+    case 2:
+      H8[off + 2 - (om << 1) | 0] = buf[start + 1];
+    case 3:
+      H8[off + 3 - (om << 1) | 0] = buf[start];
+  }
+  if (len < lm + (4 - om)) {
+    return;
+  }
+  for (i = 4 - om; i < j; i = i + 4 | 0) {
+    H32[off + i >> 2 | 0] = buf[start + i] << 24 | buf[start + i + 1] << 16 | buf[start + i + 2] << 8 | buf[start + i + 3];
+  }
+  switch (lm) {
+    case 3:
+      H8[off + j + 1 | 0] = buf[start + j + 2];
+    case 2:
+      H8[off + j + 2 | 0] = buf[start + j + 1];
+    case 1:
+      H8[off + j + 3 | 0] = buf[start + j];
+  }
+};
+
+var convBlob = function (blob, H8, H32, start, len, off) {
+  var i = void 0,
+      om = off % 4,
+      lm = (len + om) % 4,
+      j = len - lm;
+  var buf = new Uint8Array(reader.readAsArrayBuffer(blob.slice(start, start + len)));
+  switch (om) {
+    case 0:
+      H8[off] = buf[3];
+    case 1:
+      H8[off + 1 - (om << 1) | 0] = buf[2];
+    case 2:
+      H8[off + 2 - (om << 1) | 0] = buf[1];
+    case 3:
+      H8[off + 3 - (om << 1) | 0] = buf[0];
+  }
+  if (len < lm + (4 - om)) {
+    return;
+  }
+  for (i = 4 - om; i < j; i = i + 4 | 0) {
+    H32[off + i >> 2 | 0] = buf[i] << 24 | buf[i + 1] << 16 | buf[i + 2] << 8 | buf[i + 3];
+  }
+  switch (lm) {
+    case 3:
+      H8[off + j + 1 | 0] = buf[j + 2];
+    case 2:
+      H8[off + j + 2 | 0] = buf[j + 1];
+    case 1:
+      H8[off + j + 3 | 0] = buf[j];
+  }
+};
+
+module.exports = function (data, H8, H32, start, len, off) {
+  if (typeof data === 'string') {
+    return convStr(data, H8, H32, start, len, off);
+  }
+  if (data instanceof Array) {
+    return convBuf(data, H8, H32, start, len, off);
+  }
+  // Safely doing a Buffer check using "this" to avoid Buffer polyfill to be included in the dist
+  if (_this && _this.Buffer && _this.Buffer.isBuffer(data)) {
+    return convBuf(data, H8, H32, start, len, off);
+  }
+  if (data instanceof ArrayBuffer) {
+    return convBuf(new Uint8Array(data), H8, H32, start, len, off);
+  }
+  if (data.buffer instanceof ArrayBuffer) {
+    return convBuf(new Uint8Array(data.buffer, data.byteOffset, data.byteLength), H8, H32, start, len, off);
+  }
+  if (data instanceof Blob) {
+    return convBlob(data, H8, H32, start, len, off);
+  }
+  throw new Error('Unsupported data type.');
+};
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/* eslint-env commonjs, browser */
+
+var Rusha = __webpack_require__(0);
+
+var _require = __webpack_require__(1),
+    toHex = _require.toHex;
+
+var Hash = function () {
+  function Hash() {
+    _classCallCheck(this, Hash);
+
+    this._rusha = new Rusha();
+    this._rusha.resetState();
+  }
+
+  Hash.prototype.update = function update(data) {
+    this._rusha.append(data);
+    return this;
+  };
+
+  Hash.prototype.digest = function digest(encoding) {
+    var digest = this._rusha.rawEnd().buffer;
+    if (!encoding) {
+      return digest;
+    }
+    if (encoding === 'hex') {
+      return toHex(digest);
+    }
+    throw new Error('unsupported digest encoding');
+  };
+
+  return Hash;
+}();
+
+module.exports = function () {
+  return new Hash();
+};
+
+/***/ })
+/******/ ]);
+});
 
 /***/ })
 /******/ ]);
