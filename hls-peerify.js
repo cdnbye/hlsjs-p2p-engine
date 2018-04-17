@@ -424,7 +424,7 @@ var _datachannel = __webpack_require__(24);
 
 var _datachannel2 = _interopRequireDefault(_datachannel);
 
-var _events = __webpack_require__(18);
+var _events = __webpack_require__(19);
 
 var _events2 = _interopRequireDefault(_events);
 
@@ -432,7 +432,7 @@ var _fetcher = __webpack_require__(40);
 
 var _fetcher2 = _interopRequireDefault(_fetcher);
 
-var _getBrowserRtc = __webpack_require__(11);
+var _getBrowserRtc = __webpack_require__(12);
 
 var _getBrowserRtc2 = _interopRequireDefault(_getBrowserRtc);
 
@@ -723,8 +723,8 @@ var util = __webpack_require__(8);
 util.inherits = __webpack_require__(4);
 /*</replacement>*/
 
-var Readable = __webpack_require__(12);
-var Writable = __webpack_require__(15);
+var Readable = __webpack_require__(13);
+var Writable = __webpack_require__(16);
 
 util.inherits(Duplex, Readable);
 
@@ -823,7 +823,7 @@ Duplex.prototype._destroy = function (err, cb) {
 
 var base64 = __webpack_require__(26)
 var ieee754 = __webpack_require__(27)
-var isArray = __webpack_require__(10)
+var isArray = __webpack_require__(11)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -2839,6 +2839,228 @@ function nextTick(fn, arg1, arg2, arg3) {
 
 /***/ }),
 /* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+;
+;
+;
+var isWebSocket = function (constructor) {
+    return constructor && constructor.CLOSING === 2;
+};
+var isGlobalWebSocket = function () {
+    return typeof WebSocket !== 'undefined' && isWebSocket(WebSocket);
+};
+var getDefaultOptions = function () { return ({
+    constructor: isGlobalWebSocket() ? WebSocket : null,
+    maxReconnectionDelay: 10000,
+    minReconnectionDelay: 1500,
+    reconnectionDelayGrowFactor: 1.3,
+    connectionTimeout: 4000,
+    maxRetries: Infinity,
+    debug: false,
+}); };
+var bypassProperty = function (src, dst, name) {
+    Object.defineProperty(dst, name, {
+        get: function () { return src[name]; },
+        set: function (value) { src[name] = value; },
+        enumerable: true,
+        configurable: true,
+    });
+};
+var initReconnectionDelay = function (config) {
+    return (config.minReconnectionDelay + Math.random() * config.minReconnectionDelay);
+};
+var updateReconnectionDelay = function (config, previousDelay) {
+    var newDelay = previousDelay * config.reconnectionDelayGrowFactor;
+    return (newDelay > config.maxReconnectionDelay)
+        ? config.maxReconnectionDelay
+        : newDelay;
+};
+var LEVEL_0_EVENTS = ['onopen', 'onclose', 'onmessage', 'onerror'];
+var reassignEventListeners = function (ws, oldWs, listeners) {
+    Object.keys(listeners).forEach(function (type) {
+        listeners[type].forEach(function (_a) {
+            var listener = _a[0], options = _a[1];
+            ws.addEventListener(type, listener, options);
+        });
+    });
+    if (oldWs) {
+        LEVEL_0_EVENTS.forEach(function (name) {
+            ws[name] = oldWs[name];
+        });
+    }
+};
+var ReconnectingWebsocket = function (url, protocols, options) {
+    var _this = this;
+    if (options === void 0) { options = {}; }
+    var ws;
+    var connectingTimeout;
+    var reconnectDelay = 0;
+    var retriesCount = 0;
+    var shouldRetry = true;
+    var savedOnClose = null;
+    var listeners = {};
+    // require new to construct
+    if (!(this instanceof ReconnectingWebsocket)) {
+        throw new TypeError("Failed to construct 'ReconnectingWebSocket': Please use the 'new' operator");
+    }
+    // Set config. Not using `Object.assign` because of IE11
+    var config = getDefaultOptions();
+    Object.keys(config)
+        .filter(function (key) { return options.hasOwnProperty(key); })
+        .forEach(function (key) { return config[key] = options[key]; });
+    if (!isWebSocket(config.constructor)) {
+        throw new TypeError('Invalid WebSocket constructor. Set `options.constructor`');
+    }
+    var log = config.debug ? function () {
+        var params = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            params[_i] = arguments[_i];
+        }
+        return console.log.apply(console, ['RWS:'].concat(params));
+    } : function () { };
+    /**
+     * Not using dispatchEvent, otherwise we must use a DOM Event object
+     * Deferred because we want to handle the close event before this
+     */
+    var emitError = function (code, msg) { return setTimeout(function () {
+        var err = new Error(msg);
+        err.code = code;
+        if (Array.isArray(listeners.error)) {
+            listeners.error.forEach(function (_a) {
+                var fn = _a[0];
+                return fn(err);
+            });
+        }
+        if (ws.onerror) {
+            ws.onerror(err);
+        }
+    }, 0); };
+    var handleClose = function () {
+        log('handleClose', { shouldRetry: shouldRetry });
+        retriesCount++;
+        log('retries count:', retriesCount);
+        if (retriesCount > config.maxRetries) {
+            emitError('EHOSTDOWN', 'Too many failed connection attempts');
+            return;
+        }
+        if (!reconnectDelay) {
+            reconnectDelay = initReconnectionDelay(config);
+        }
+        else {
+            reconnectDelay = updateReconnectionDelay(config, reconnectDelay);
+        }
+        log('handleClose - reconnectDelay:', reconnectDelay);
+        if (shouldRetry) {
+            setTimeout(connect, reconnectDelay);
+        }
+    };
+    var connect = function () {
+        if (!shouldRetry) {
+            return;
+        }
+        log('connect');
+        var oldWs = ws;
+        var wsUrl = (typeof url === 'function') ? url() : url;
+        ws = new config.constructor(wsUrl, protocols);
+        connectingTimeout = setTimeout(function () {
+            log('timeout');
+            ws.close();
+            emitError('ETIMEDOUT', 'Connection timeout');
+        }, config.connectionTimeout);
+        log('bypass properties');
+        for (var key in ws) {
+            // @todo move to constant
+            if (['addEventListener', 'removeEventListener', 'close', 'send'].indexOf(key) < 0) {
+                bypassProperty(ws, _this, key);
+            }
+        }
+        ws.addEventListener('open', function () {
+            clearTimeout(connectingTimeout);
+            log('open');
+            reconnectDelay = initReconnectionDelay(config);
+            log('reconnectDelay:', reconnectDelay);
+            retriesCount = 0;
+        });
+        ws.addEventListener('close', handleClose);
+        reassignEventListeners(ws, oldWs, listeners);
+        // because when closing with fastClose=true, it is saved and set to null to avoid double calls
+        ws.onclose = ws.onclose || savedOnClose;
+        savedOnClose = null;
+    };
+    log('init');
+    connect();
+    this.close = function (code, reason, _a) {
+        if (code === void 0) { code = 1000; }
+        if (reason === void 0) { reason = ''; }
+        var _b = _a === void 0 ? {} : _a, _c = _b.keepClosed, keepClosed = _c === void 0 ? false : _c, _d = _b.fastClose, fastClose = _d === void 0 ? true : _d, _e = _b.delay, delay = _e === void 0 ? 0 : _e;
+        log('close - params:', { reason: reason, keepClosed: keepClosed, fastClose: fastClose, delay: delay, retriesCount: retriesCount, maxRetries: config.maxRetries });
+        shouldRetry = !keepClosed && retriesCount <= config.maxRetries;
+        if (delay) {
+            reconnectDelay = delay;
+        }
+        ws.close(code, reason);
+        if (fastClose) {
+            var fakeCloseEvent_1 = {
+                code: code,
+                reason: reason,
+                wasClean: true,
+            };
+            // execute close listeners soon with a fake closeEvent
+            // and remove them from the WS instance so they
+            // don't get fired on the real close.
+            handleClose();
+            ws.removeEventListener('close', handleClose);
+            // run and remove level2
+            if (Array.isArray(listeners.close)) {
+                listeners.close.forEach(function (_a) {
+                    var listener = _a[0], options = _a[1];
+                    listener(fakeCloseEvent_1);
+                    ws.removeEventListener('close', listener, options);
+                });
+            }
+            // run and remove level0
+            if (ws.onclose) {
+                savedOnClose = ws.onclose;
+                ws.onclose(fakeCloseEvent_1);
+                ws.onclose = null;
+            }
+        }
+    };
+    this.send = function (data) {
+        ws.send(data);
+    };
+    this.addEventListener = function (type, listener, options) {
+        if (Array.isArray(listeners[type])) {
+            if (!listeners[type].some(function (_a) {
+                var l = _a[0];
+                return l === listener;
+            })) {
+                listeners[type].push([listener, options]);
+            }
+        }
+        else {
+            listeners[type] = [[listener, options]];
+        }
+        ws.addEventListener(type, listener, options);
+    };
+    this.removeEventListener = function (type, listener, options) {
+        if (Array.isArray(listeners[type])) {
+            listeners[type] = listeners[type].filter(function (_a) {
+                var l = _a[0];
+                return l !== listener;
+            });
+        }
+        ws.removeEventListener(type, listener, options);
+    };
+};
+module.exports = ReconnectingWebsocket;
+
+
+/***/ }),
+/* 11 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -2849,7 +3071,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 // originally pulled out of simple-peer
@@ -2870,7 +3092,7 @@ module.exports = function getBrowserRTC () {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2905,7 +3127,7 @@ var pna = __webpack_require__(9);
 module.exports = Readable;
 
 /*<replacement>*/
-var isArray = __webpack_require__(10);
+var isArray = __webpack_require__(11);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -2923,7 +3145,7 @@ var EElistenerCount = function (emitter, type) {
 /*</replacement>*/
 
 /*<replacement>*/
-var Stream = __webpack_require__(13);
+var Stream = __webpack_require__(14);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -2955,7 +3177,7 @@ if (debugUtil && debugUtil.debuglog) {
 /*</replacement>*/
 
 var BufferList = __webpack_require__(34);
-var destroyImpl = __webpack_require__(14);
+var destroyImpl = __webpack_require__(15);
 var StringDecoder;
 
 util.inherits(Readable, Stream);
@@ -3045,7 +3267,7 @@ function ReadableState(options, stream) {
   this.decoder = null;
   this.encoding = null;
   if (options.encoding) {
-    if (!StringDecoder) StringDecoder = __webpack_require__(16).StringDecoder;
+    if (!StringDecoder) StringDecoder = __webpack_require__(17).StringDecoder;
     this.decoder = new StringDecoder(options.encoding);
     this.encoding = options.encoding;
   }
@@ -3201,7 +3423,7 @@ Readable.prototype.isPaused = function () {
 
 // backwards compatibility.
 Readable.prototype.setEncoding = function (enc) {
-  if (!StringDecoder) StringDecoder = __webpack_require__(16).StringDecoder;
+  if (!StringDecoder) StringDecoder = __webpack_require__(17).StringDecoder;
   this._readableState.decoder = new StringDecoder(enc);
   this._readableState.encoding = enc;
   return this;
@@ -3896,14 +4118,14 @@ function indexOf(xs, x) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3)))
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(0).EventEmitter;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3983,7 +4205,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4064,7 +4286,7 @@ var internalUtil = {
 /*</replacement>*/
 
 /*<replacement>*/
-var Stream = __webpack_require__(13);
+var Stream = __webpack_require__(14);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -4080,7 +4302,7 @@ function _isUint8Array(obj) {
 
 /*</replacement>*/
 
-var destroyImpl = __webpack_require__(14);
+var destroyImpl = __webpack_require__(15);
 
 util.inherits(Writable, Stream);
 
@@ -4677,7 +4899,7 @@ Writable.prototype._destroy = function (err, cb) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(36).setImmediate, __webpack_require__(1)))
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4979,7 +5201,7 @@ function simpleEnd(buf) {
 }
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5199,7 +5421,7 @@ function done(stream, er, data) {
 }
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5253,7 +5475,7 @@ exports.default = {
 module.exports = exports['default'];
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5297,228 +5519,6 @@ exports.HybridLoader = _hybridLoader2.default;
 exports.config = config;
 
 /***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-;
-;
-;
-var isWebSocket = function (constructor) {
-    return constructor && constructor.CLOSING === 2;
-};
-var isGlobalWebSocket = function () {
-    return typeof WebSocket !== 'undefined' && isWebSocket(WebSocket);
-};
-var getDefaultOptions = function () { return ({
-    constructor: isGlobalWebSocket() ? WebSocket : null,
-    maxReconnectionDelay: 10000,
-    minReconnectionDelay: 1500,
-    reconnectionDelayGrowFactor: 1.3,
-    connectionTimeout: 4000,
-    maxRetries: Infinity,
-    debug: false,
-}); };
-var bypassProperty = function (src, dst, name) {
-    Object.defineProperty(dst, name, {
-        get: function () { return src[name]; },
-        set: function (value) { src[name] = value; },
-        enumerable: true,
-        configurable: true,
-    });
-};
-var initReconnectionDelay = function (config) {
-    return (config.minReconnectionDelay + Math.random() * config.minReconnectionDelay);
-};
-var updateReconnectionDelay = function (config, previousDelay) {
-    var newDelay = previousDelay * config.reconnectionDelayGrowFactor;
-    return (newDelay > config.maxReconnectionDelay)
-        ? config.maxReconnectionDelay
-        : newDelay;
-};
-var LEVEL_0_EVENTS = ['onopen', 'onclose', 'onmessage', 'onerror'];
-var reassignEventListeners = function (ws, oldWs, listeners) {
-    Object.keys(listeners).forEach(function (type) {
-        listeners[type].forEach(function (_a) {
-            var listener = _a[0], options = _a[1];
-            ws.addEventListener(type, listener, options);
-        });
-    });
-    if (oldWs) {
-        LEVEL_0_EVENTS.forEach(function (name) {
-            ws[name] = oldWs[name];
-        });
-    }
-};
-var ReconnectingWebsocket = function (url, protocols, options) {
-    var _this = this;
-    if (options === void 0) { options = {}; }
-    var ws;
-    var connectingTimeout;
-    var reconnectDelay = 0;
-    var retriesCount = 0;
-    var shouldRetry = true;
-    var savedOnClose = null;
-    var listeners = {};
-    // require new to construct
-    if (!(this instanceof ReconnectingWebsocket)) {
-        throw new TypeError("Failed to construct 'ReconnectingWebSocket': Please use the 'new' operator");
-    }
-    // Set config. Not using `Object.assign` because of IE11
-    var config = getDefaultOptions();
-    Object.keys(config)
-        .filter(function (key) { return options.hasOwnProperty(key); })
-        .forEach(function (key) { return config[key] = options[key]; });
-    if (!isWebSocket(config.constructor)) {
-        throw new TypeError('Invalid WebSocket constructor. Set `options.constructor`');
-    }
-    var log = config.debug ? function () {
-        var params = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            params[_i] = arguments[_i];
-        }
-        return console.log.apply(console, ['RWS:'].concat(params));
-    } : function () { };
-    /**
-     * Not using dispatchEvent, otherwise we must use a DOM Event object
-     * Deferred because we want to handle the close event before this
-     */
-    var emitError = function (code, msg) { return setTimeout(function () {
-        var err = new Error(msg);
-        err.code = code;
-        if (Array.isArray(listeners.error)) {
-            listeners.error.forEach(function (_a) {
-                var fn = _a[0];
-                return fn(err);
-            });
-        }
-        if (ws.onerror) {
-            ws.onerror(err);
-        }
-    }, 0); };
-    var handleClose = function () {
-        log('handleClose', { shouldRetry: shouldRetry });
-        retriesCount++;
-        log('retries count:', retriesCount);
-        if (retriesCount > config.maxRetries) {
-            emitError('EHOSTDOWN', 'Too many failed connection attempts');
-            return;
-        }
-        if (!reconnectDelay) {
-            reconnectDelay = initReconnectionDelay(config);
-        }
-        else {
-            reconnectDelay = updateReconnectionDelay(config, reconnectDelay);
-        }
-        log('handleClose - reconnectDelay:', reconnectDelay);
-        if (shouldRetry) {
-            setTimeout(connect, reconnectDelay);
-        }
-    };
-    var connect = function () {
-        if (!shouldRetry) {
-            return;
-        }
-        log('connect');
-        var oldWs = ws;
-        var wsUrl = (typeof url === 'function') ? url() : url;
-        ws = new config.constructor(wsUrl, protocols);
-        connectingTimeout = setTimeout(function () {
-            log('timeout');
-            ws.close();
-            emitError('ETIMEDOUT', 'Connection timeout');
-        }, config.connectionTimeout);
-        log('bypass properties');
-        for (var key in ws) {
-            // @todo move to constant
-            if (['addEventListener', 'removeEventListener', 'close', 'send'].indexOf(key) < 0) {
-                bypassProperty(ws, _this, key);
-            }
-        }
-        ws.addEventListener('open', function () {
-            clearTimeout(connectingTimeout);
-            log('open');
-            reconnectDelay = initReconnectionDelay(config);
-            log('reconnectDelay:', reconnectDelay);
-            retriesCount = 0;
-        });
-        ws.addEventListener('close', handleClose);
-        reassignEventListeners(ws, oldWs, listeners);
-        // because when closing with fastClose=true, it is saved and set to null to avoid double calls
-        ws.onclose = ws.onclose || savedOnClose;
-        savedOnClose = null;
-    };
-    log('init');
-    connect();
-    this.close = function (code, reason, _a) {
-        if (code === void 0) { code = 1000; }
-        if (reason === void 0) { reason = ''; }
-        var _b = _a === void 0 ? {} : _a, _c = _b.keepClosed, keepClosed = _c === void 0 ? false : _c, _d = _b.fastClose, fastClose = _d === void 0 ? true : _d, _e = _b.delay, delay = _e === void 0 ? 0 : _e;
-        log('close - params:', { reason: reason, keepClosed: keepClosed, fastClose: fastClose, delay: delay, retriesCount: retriesCount, maxRetries: config.maxRetries });
-        shouldRetry = !keepClosed && retriesCount <= config.maxRetries;
-        if (delay) {
-            reconnectDelay = delay;
-        }
-        ws.close(code, reason);
-        if (fastClose) {
-            var fakeCloseEvent_1 = {
-                code: code,
-                reason: reason,
-                wasClean: true,
-            };
-            // execute close listeners soon with a fake closeEvent
-            // and remove them from the WS instance so they
-            // don't get fired on the real close.
-            handleClose();
-            ws.removeEventListener('close', handleClose);
-            // run and remove level2
-            if (Array.isArray(listeners.close)) {
-                listeners.close.forEach(function (_a) {
-                    var listener = _a[0], options = _a[1];
-                    listener(fakeCloseEvent_1);
-                    ws.removeEventListener('close', listener, options);
-                });
-            }
-            // run and remove level0
-            if (ws.onclose) {
-                savedOnClose = ws.onclose;
-                ws.onclose(fakeCloseEvent_1);
-                ws.onclose = null;
-            }
-        }
-    };
-    this.send = function (data) {
-        ws.send(data);
-    };
-    this.addEventListener = function (type, listener, options) {
-        if (Array.isArray(listeners[type])) {
-            if (!listeners[type].some(function (_a) {
-                var l = _a[0];
-                return l === listener;
-            })) {
-                listeners[type].push([listener, options]);
-            }
-        }
-        else {
-            listeners[type] = [[listener, options]];
-        }
-        ws.addEventListener(type, listener, options);
-    };
-    this.removeEventListener = function (type, listener, options) {
-        if (Array.isArray(listeners[type])) {
-            listeners[type] = listeners[type].filter(function (_a) {
-                var l = _a[0];
-                return l !== listener;
-            });
-        }
-        ws.removeEventListener(type, listener, options);
-    };
-};
-module.exports = ReconnectingWebsocket;
-
-
-/***/ }),
 /* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5535,7 +5535,7 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _reconnectingWebsocket = __webpack_require__(20);
+var _reconnectingWebsocket = __webpack_require__(10);
 
 var _reconnectingWebsocket2 = _interopRequireDefault(_reconnectingWebsocket);
 
@@ -5576,7 +5576,7 @@ var SignalClient = function (_EventEmitter) {
             var queryStr = '?id=' + id;
             var websocket = new _reconnectingWebsocket2.default(this.config.wsSignalerAddr + queryStr, undefined, wsOptions);
             websocket.onopen = function () {
-                console.log('Signaler websocket connection opened');
+                logger.info('Signaler websocket connection opened');
 
                 _this2.connected = true;
                 if (_this2.onopen) _this2.onopen();
@@ -5586,9 +5586,9 @@ var SignalClient = function (_EventEmitter) {
             websocket.send = function (msg) {
                 var msgStr = JSON.stringify(Object.assign({ peer_id: id }, msg));
                 if (websocket.readyState !== 1) {
-                    console.warn('websocket connection is not opened yet.');
+                    logger.warn('websocket connection is not opened yet.');
                     return setTimeout(function () {
-                        websocket.send(msg);
+                        websocket.send(msgStr);
                     }, 1000);
                 }
                 websocket.push(msgStr);
@@ -5599,7 +5599,7 @@ var SignalClient = function (_EventEmitter) {
             };
             websocket.onclose = function () {
                 //websocket断开时清除datachannel
-                console.warn('Signaler websocket closed');
+                logger.warn('Signaler websocket closed');
                 if (_this2.onclose) _this2.onclose();
                 _this2.connected = false;
             };
@@ -5697,7 +5697,7 @@ var _config = __webpack_require__(41);
 
 var _config2 = _interopRequireDefault(_config);
 
-var _fastmesh = __webpack_require__(19);
+var _fastmesh = __webpack_require__(20);
 
 var _bittorrent = __webpack_require__(22);
 
@@ -5709,9 +5709,9 @@ var _uaParserJs = __webpack_require__(50);
 
 var _uaParserJs2 = _interopRequireDefault(_uaParserJs);
 
-var _simpleSha = __webpack_require__(52);
+var _logger = __webpack_require__(52);
 
-var _simpleSha2 = _interopRequireDefault(_simpleSha);
+var _logger2 = _interopRequireDefault(_logger);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5723,7 +5723,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * Created by xieting on 2018/1/2.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 
-var log = console.log;
 var uaParserResult = new _uaParserJs2.default().getResult();
 
 var HlsPeerify = function (_EventEmitter) {
@@ -5750,12 +5749,16 @@ var HlsPeerify = function (_EventEmitter) {
         _this.hlsjs = hlsjs;
         _this.p2pEnabled = _this.config.disableP2P === false ? false : true; //默认开启P2P
 
+        //初始化logger
+        var logger = new _logger2.default(_this.config);
+        window.logger = logger;
+
         hlsjs.config.currLoaded = hlsjs.config.currPlay = 0;
 
         var onLevelLoaded = function onLevelLoaded(event, data) {
 
             var isLive = data.details.live;
-            console.warn('live ' + isLive);
+            logger.info('live ' + isLive);
             _this.config.live = isLive;
             var channel = hlsjs.url.split('?')[0];
             _this._init(channel);
@@ -5805,7 +5808,7 @@ var HlsPeerify = function (_EventEmitter) {
                 //采用BT算法
 
                 //实例化Fetcher
-                var fetcher = new _pear.Fetcher(this.config.key, _simpleSha2.default.sync(channel), this.config.announce, browserInfo);
+                var fetcher = new _pear.Fetcher(this.config.key, window.encodeURIComponent(channel), this.config.announce, browserInfo);
                 //实例化tracker服务器
                 this.signaler = new _bittorrent.Tracker(fetcher, this.config);
                 this.signaler.scheduler.bufferManager = this.bufMgr;
@@ -5819,7 +5822,7 @@ var HlsPeerify = function (_EventEmitter) {
 
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADING, function (id, data) {
                 // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
-                log('FRAG_LOADING: ' + data.frag.sn);
+                logger.debug('FRAG_LOADING: ' + data.frag.sn);
                 _this2.signaler.currentLoadingSN = data.frag.sn;
             });
 
@@ -5834,7 +5837,7 @@ var HlsPeerify = function (_EventEmitter) {
                     var bitrate = data.frag.loaded * 8 / data.frag.duration;
                     //计算子流码率
                     _this2.signaler.scheduler.bitrate = Math.round(bitrate);
-                    console.warn('FRAG_LOADED bitrate ' + bitrate);
+                    logger.warn('FRAG_LOADED bitrate ' + bitrate);
 
                     _this2.signaler.resumeP2P();
                     _this2.signalTried = true;
@@ -5845,16 +5848,15 @@ var HlsPeerify = function (_EventEmitter) {
 
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_CHANGED, function (id, data) {
                 // log('FRAG_CHANGED: '+JSON.stringify(data.frag, null, 2));
-                log('FRAG_CHANGED: ' + data.frag.sn);
+                logger.debug('FRAG_CHANGED: ' + data.frag.sn);
                 var sn = data.frag.sn;
                 _this2.hlsjs.config.currPlay = sn;
                 _this2.signaler.currentPlaySN = sn;
             });
 
-            // this.hlsjs.on(this.hlsjs.constructor.Events.LEVEL_LOADED, (id, data) => {
-            //     log('LEVEL_LOADED totalduration: '+JSON.stringify(data.details.totalduration, null, 2));
-            //     log('LEVEL_LOADED live: '+JSON.stringify(data.details.live, null, 2));
-            // });
+            this.hlsjs.on(this.hlsjs.constructor.Events.ERROR, function (event, data) {
+                logger.error('errorType ' + data.type + ' details ' + data.details + ' errorFatal ' + data.fatal);
+            });
 
             this.hlsjs.on(this.hlsjs.constructor.Events.DESTROYING, function () {
                 // log('DESTROYING: '+JSON.stringify(frag));
@@ -5866,7 +5868,7 @@ var HlsPeerify = function (_EventEmitter) {
         key: 'disableP2P',
         value: function disableP2P() {
             //停止p2p
-            log('disableP2P');
+            logger.debug('disableP2P');
             if (this.p2pEnabled) {
                 this.p2pEnabled = false;
                 this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
@@ -5879,7 +5881,7 @@ var HlsPeerify = function (_EventEmitter) {
         key: 'enableP2P',
         value: function enableP2P() {
             //在停止的情况下重新启动P2P
-            log('enableP2P');
+            logger.debug('enableP2P');
             if (!this.p2pEnabled) {
                 this.p2pEnabled = true;
                 this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
@@ -5921,7 +5923,7 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _events3 = __webpack_require__(18);
+var _events3 = __webpack_require__(19);
 
 var _events4 = _interopRequireDefault(_events3);
 
@@ -6365,7 +6367,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 module.exports = Peer;
 
 var debug = __webpack_require__(28)('simple-channel');
-var getBrowserRTC = __webpack_require__(11);
+var getBrowserRTC = __webpack_require__(12);
 var inherits = __webpack_require__(4);
 var randombytes = __webpack_require__(31);
 var stream = __webpack_require__(32);
@@ -8015,12 +8017,12 @@ function randomBytes (size, cb) {
 /* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(12);
+exports = module.exports = __webpack_require__(13);
 exports.Stream = exports;
 exports.Readable = exports;
-exports.Writable = __webpack_require__(15);
+exports.Writable = __webpack_require__(16);
 exports.Duplex = __webpack_require__(5);
-exports.Transform = __webpack_require__(17);
+exports.Transform = __webpack_require__(18);
 exports.PassThrough = __webpack_require__(39);
 
 
@@ -8489,7 +8491,7 @@ function config (name) {
 
 module.exports = PassThrough;
 
-var Transform = __webpack_require__(17);
+var Transform = __webpack_require__(18);
 
 /*<replacement>*/
 var util = __webpack_require__(8);
@@ -8676,7 +8678,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _fastmesh = __webpack_require__(19);
+var _fastmesh = __webpack_require__(20);
 
 var _bittorrent = __webpack_require__(22);
 
@@ -8704,7 +8706,12 @@ var defaultP2PConfig = {
     packetSize: 16 * 1024, //每次通过datachannel发送的包的大小
     maxBufSize: 1024 * 1024 * 50, //p2p缓存的最大数据量
     loadTimeout: 5, //p2p下载的超时时间
-    reportInterval: 20 //统计信息上报的时间间隔(废弃)
+    reportInterval: 20, //统计信息上报的时间间隔(废弃)
+
+    enableLogUpload: false, //上传log到服务器，默认true
+    logUploadAddr: 'ws://120.78.168.126:8081/ws', //log上传地址
+    logUploadLevel: 'warn', //log上传level，默认warn
+    logLevel: 'warn' //log的level，默认warn
 
 };
 
@@ -8746,7 +8753,7 @@ var _p2pScheduler = __webpack_require__(43);
 
 var _p2pScheduler2 = _interopRequireDefault(_p2pScheduler);
 
-var _reconnectingWebsocket = __webpack_require__(20);
+var _reconnectingWebsocket = __webpack_require__(10);
 
 var _reconnectingWebsocket2 = _interopRequireDefault(_reconnectingWebsocket);
 
@@ -10244,7 +10251,7 @@ var BTTracker = function (_EventEmitter) {
             var _this2 = this;
 
             this.fetcher.btAnnounce().then(function (json) {
-                console.warn('announceURL response ' + JSON.stringify(json));
+                logger.warn('announceURL response ' + JSON.stringify(json));
                 _this2.peerId = json.peer_id;
                 _this2.fetcher.btHeartbeat(json.heartbeat_interval);
                 _this2.fetcher.btStatsStart(json.report_interval);
@@ -10308,7 +10315,7 @@ var BTTracker = function (_EventEmitter) {
         value: function _tryConnectToPeer() {
             if (this.peers.length === 0) return;
             var remotePeerId = this.peers.pop().id;
-            console.warn('_tryConnectToPeer ' + remotePeerId);
+            logger.warn('_tryConnectToPeer ' + remotePeerId);
             var datachannel = new _pear.DataChannel(this.peerId, remotePeerId, true, this.config);
             this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
             this._setupDC(datachannel);
@@ -10325,13 +10332,13 @@ var BTTracker = function (_EventEmitter) {
                     _this4.signalTimer = window.setTimeout(function () {
                         _this4.DCMap.delete(datachannel.remotePeerId);
                         _this4.failedDCSet.add(datachannel.remotePeerId); //记录失败的连接
-                        console.warn(datachannel.remotePeerId + ' signaling timeout');
+                        logger.warn(datachannel.remotePeerId + ' signaling timeout');
                         _this4.signalTimer = null;
                         _this4._tryConnectToPeer();
                     }, 2000);
                 }
             }).once(_pear.Events.DC_ERROR, function () {
-                console.log('datachannel error ' + datachannel.channelId);
+                logger.warn('datachannel error ' + datachannel.channelId);
                 _this4.scheduler.deletePeer(datachannel);
                 _this4.DCMap.delete(datachannel.remotePeerId);
                 _this4.failedDCSet.add(datachannel.remotePeerId); //记录失败的连接
@@ -10352,7 +10359,7 @@ var BTTracker = function (_EventEmitter) {
                 }
             }).once(_pear.Events.DC_CLOSE, function () {
 
-                console.warn('datachannel closed ' + datachannel.channelId + ' ');
+                logger.warn('datachannel closed ' + datachannel.channelId + ' ');
                 _this4.scheduler.deletePeer(datachannel);
                 _this4.DCMap.delete(datachannel.remotePeerId);
                 _this4.failedDCSet.add(datachannel.remotePeerId); //记录断开的连接
@@ -10393,7 +10400,7 @@ var BTTracker = function (_EventEmitter) {
                 var action = msg.action;
                 switch (action) {
                     case 'signal':
-                        console.log('start _handleSignal');
+                        logger.debug('start _handleSignal');
                         window.clearTimeout(_this5.signalTimer); //接收到信令后清除定时器
                         _this5.signalTimer = null;
                         _this5._handleSignal(msg.from_peer_id, msg.data);
@@ -10402,7 +10409,7 @@ var BTTracker = function (_EventEmitter) {
                         _this5.stopP2P();
                         break;
                     default:
-                        console.log('Signaler websocket unknown action ' + action);
+                        logger.warn('Signaler websocket unknown action ' + action);
 
                 }
             };
@@ -10418,12 +10425,12 @@ var BTTracker = function (_EventEmitter) {
         value: function _handleSignal(remotePeerId, data) {
             var datachannel = this.DCMap.get(remotePeerId);
             if (datachannel && datachannel.connected) {
-                console.warn('datachannel had connected, signal ignored');
+                logger.info('datachannel had connected, signal ignored');
                 return;
             }
             if (!datachannel) {
                 //收到子节点连接请求
-                console.log('receive child node connection request');
+                logger.debug('receive child node connection request');
                 if (this.failedDCSet.has(remotePeerId)) return;
                 datachannel = new _pear.DataChannel(this.peerId, remotePeerId, false, this.config);
                 this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
@@ -10450,7 +10457,7 @@ var BTTracker = function (_EventEmitter) {
 
             if (this.scheduler.peerMap.size <= Math.floor(this.config.neighbours / 2)) {
                 this.fetcher.btGetPeers().then(function (json) {
-                    console.warn('_requestMorePeers ' + JSON.stringify(json));
+                    logger.warn('_requestMorePeers ' + JSON.stringify(json));
                     _this7._handlePeers(json.peers);
                     _this7._tryConnectToPeer();
                 });
@@ -10567,7 +10574,7 @@ var BTScheduler = function (_EventEmitter) {
                             //找到拥有这个块并且空闲的peer
                             if (peer.downloading === false && peer.bitset.has(idx)) {
                                 peer.requestDataBySN(idx, true);
-                                console.warn('request urgent ' + idx + ' from peer ' + peer.remotePeerId);
+                                logger.debug('request urgent ' + idx + ' from peer ' + peer.remotePeerId);
                                 requested.push(idx);
                                 break;
                             }
@@ -10613,7 +10620,7 @@ var BTScheduler = function (_EventEmitter) {
 
                     if (_peer.bitset.has(rearest)) {
                         _peer.requestDataBySN(rearest, false);
-                        console.warn('request rearest ' + rearest + ' from peer ' + _peer.remotePeerId);
+                        logger.debug('request rearest ' + rearest + ' from peer ' + _peer.remotePeerId);
                         break;
                     }
                 }
@@ -10647,14 +10654,13 @@ var BTScheduler = function (_EventEmitter) {
     }, {
         key: 'handshakePeer',
         value: function handshakePeer(dc) {
-            console.warn('handshake peer ' + dc.remotePeerId);
             this._setupDC(dc);
             dc.sendBitField(Array.from(this.bitset)); //向peer发送bitfield
         }
     }, {
         key: 'addPeer',
         value: function addPeer(peer) {
-            console.warn('add peer ' + peer.remotePeerId);
+            logger.warn('add peer ' + peer.remotePeerId);
             this.peerMap.set(peer.remotePeerId, peer);
         }
     }, {
@@ -10702,7 +10708,7 @@ var BTScheduler = function (_EventEmitter) {
             if (target) {
                 // target.requestDataBySN(frag.sn, true);
                 target.requestDataByURL(frag.relurl, true); //critical的根据url请求
-                console.warn('request criticalSeg url ' + frag.relurl + ' at ' + frag.sn);
+                logger.warn('request criticalSeg url ' + frag.relurl + ' at ' + frag.sn);
             }
             this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout * 1000);
         }
@@ -10751,7 +10757,7 @@ var BTScheduler = function (_EventEmitter) {
             }).on(_pear.Events.DC_RESPONSE, function (response) {
                 //接收到完整二进制数据
                 if (_this3.criticalSeg && _this3.criticalSeg.relurl === response.url && _this3.criticaltimeouter) {
-                    console.warn('receive criticalSeg url ' + response.url);
+                    logger.warn('receive criticalSeg url ' + response.url);
                     window.clearTimeout(_this3.criticaltimeouter); //清除定时器
                     _this3.criticaltimeouter = null;
                     var stats = _this3.stats;
@@ -10783,7 +10789,7 @@ var BTScheduler = function (_EventEmitter) {
                     });
                 }
             }).on(_pear.Events.DC_TIMEOUT, function () {
-                console.warn('DC_TIMEOUT');
+                logger.warn('DC_TIMEOUT');
             });
         }
     }, {
@@ -10867,7 +10873,7 @@ var BTScheduler = function (_EventEmitter) {
     }, {
         key: '_criticaltimeout',
         value: function _criticaltimeout() {
-            console.warn('_criticaltimeout');
+            logger.warn('_criticaltimeout');
             this.criticalSeg = null;
             this.callbacks.onTimeout(this.stats, this.context, null);
             this.criticaltimeouter = null;
@@ -10885,7 +10891,7 @@ var BTScheduler = function (_EventEmitter) {
             this.bufMgr = bm;
 
             bm.on(_pear.Events.BM_LOST, function (sn) {
-                console.warn('bufMgr lost ' + sn);
+                logger.warn('bufMgr lost ' + sn);
                 _this4._broadcastToPeers({ //向peers广播已经不缓存的sn
                     event: _pear.Events.DC_LOST,
                     sn: sn
@@ -10927,10 +10933,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * Created by xieting on 2018/3/23.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
-
-// import Events from './events';
-
-var log = console.log;
 
 var FragLoader = function (_EventEmitter) {
     _inherits(FragLoader, _EventEmitter);
@@ -10976,7 +10978,7 @@ var FragLoader = function (_EventEmitter) {
             var frag = context.frag;
             if (this.bufMgr.hasSegOfURL(frag.relurl)) {
                 //如果命中缓存
-                console.warn('bufMgr found seg sn ' + frag.sn + ' url ' + frag.relurl);
+                logger.debug('bufMgr found seg sn ' + frag.sn + ' url ' + frag.relurl);
                 var seg = this.bufMgr.getSegByURL(frag.relurl);
                 var response = { url: context.url, data: seg.data },
                     trequest = void 0,
@@ -10989,7 +10991,6 @@ var FragLoader = function (_EventEmitter) {
                 loaded = total = frag.loaded = seg.size;
                 var stats = { trequest: trequest, tfirst: tfirst, tload: tload, loaded: loaded, total: total, retry: 0 };
                 context.frag.loadByP2P = true;
-                // console.warn(`bufMgr onSuccess ${JSON.stringify(this.bufMgr.tmp.data.byteLength, null, 1)}  ${JSON.stringify(stats, null, 1)} ${JSON.stringify(context, null, 1)}`)
                 window.setTimeout(function () {
                     //必须是异步回调
                     _this2.fetcher.reportFlow(stats, true);
@@ -10997,12 +10998,12 @@ var FragLoader = function (_EventEmitter) {
                 }, 50);
             } else if (this.scheduler.peersHasSN(frag.sn)) {
                 //如果在peers的bitmap中找到
-                console.warn('found sn ' + frag.sn + ' from peers');
+                logger.warn('found sn ' + frag.sn + ' from peers');
                 context.frag.loadByP2P = true;
                 this.scheduler.load(context, config, callbacks);
                 callbacks.onTimeout = function (stats, context) {
                     //如果P2P下载超时则立即切换到xhr下载
-                    log('xhrLoader load ' + frag.relurl + ' at ' + frag.sn);
+                    logger.debug('xhrLoader load ' + frag.relurl + ' at ' + frag.sn);
                     context.frag.loadByP2P = false;
                     _this2.xhrLoader.load(context, config, callbacks);
                 };
@@ -11017,7 +11018,7 @@ var FragLoader = function (_EventEmitter) {
                     onSuccess(response, stats, context);
                 };
             } else {
-                log('xhrLoader load ' + frag.relurl + ' at ' + frag.sn);
+                logger.debug('xhrLoader load ' + frag.relurl + ' at ' + frag.sn);
                 context.frag.loadByP2P = false;
                 this.xhrLoader.load(context, config, callbacks);
                 var _onSuccess = callbacks.onSuccess;
@@ -11073,8 +11074,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 // var Buffer = require('buffer/').Buffer;
 
 
-var log = console.log;
-
 var BufferManager = function (_EventEmitter) {
     _inherits(BufferManager, _EventEmitter);
 
@@ -11126,7 +11125,6 @@ var BufferManager = function (_EventEmitter) {
         key: 'addBuffer',
         value: function addBuffer(sn, url, buf) {
             //直接缓存
-            log('addBuffer sn ' + sn + ' relurl ' + url);
             var segment = {
                 sn: sn,
                 relurl: url,
@@ -11139,15 +11137,14 @@ var BufferManager = function (_EventEmitter) {
     }, {
         key: 'addSeg',
         value: function addSeg(seg) {
-            log('add seg ' + seg.sn + ' url ' + seg.relurl + ' size ' + seg.data.byteLength);
             this._segPool.set(seg.relurl, seg);
             // this.urlSet.add(seg.relurl);
             this._currBufSize += parseInt(seg.size);
-            console.log('seg.size ' + seg.size + ' _currBufSize ' + this._currBufSize + ' maxBufSize ' + this.config.maxBufSize);
+            logger.debug('seg.size ' + seg.size + ' _currBufSize ' + this._currBufSize + ' maxBufSize ' + this.config.maxBufSize);
             while (this._currBufSize > this.config.maxBufSize) {
                 //去掉多余的数据
                 var lastSeg = [].concat(_toConsumableArray(this._segPool.values())).shift();
-                console.warn('pop seg ' + lastSeg.relurl + ' at ' + lastSeg.sn);
+                logger.warn('pop seg ' + lastSeg.relurl + ' at ' + lastSeg.sn);
                 this._segPool.delete(lastSeg.relurl);
                 this.sn2Url.delete(lastSeg.sn);
                 this._currBufSize -= parseInt(lastSeg.size);
@@ -12277,1001 +12274,163 @@ module.exports = __webpack_amd_options__;
 /* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Rusha = __webpack_require__(53)
+"use strict";
 
-var rusha = new Rusha
-var scope = typeof window !== 'undefined' ? window : self
-var crypto = scope.crypto || scope.msCrypto || {}
-var subtle = crypto.subtle || crypto.webkitSubtle
 
-function sha1sync (buf) {
-  return rusha.digest(buf)
-}
-
-// Browsers throw if they lack support for an algorithm.
-// Promise will be rejected on non-secure origins. (http://goo.gl/lq4gCo)
-try {
-  subtle.digest({ name: 'sha-1' }, new Uint8Array).catch(function () {
-    subtle = false
-  })
-} catch (err) { subtle = false }
-
-function sha1 (buf, cb) {
-  if (!subtle) {
-    // Use Rusha
-    setTimeout(cb, 0, sha1sync(buf))
-    return
-  }
-
-  if (typeof buf === 'string') {
-    buf = uint8array(buf)
-  }
-
-  subtle.digest({ name: 'sha-1' }, buf)
-    .then(function succeed (result) {
-      cb(hex(new Uint8Array(result)))
-    },
-    function fail (error) {
-      cb(sha1sync(buf))
-    })
-}
-
-function uint8array (s) {
-  var l = s.length
-  var array = new Uint8Array(l)
-  for (var i = 0; i < l; i++) {
-    array[i] = s.charCodeAt(i)
-  }
-  return array
-}
-
-function hex (buf) {
-  var l = buf.length
-  var chars = []
-  for (var i = 0; i < l; i++) {
-    var bite = buf[i]
-    chars.push((bite >>> 4).toString(16))
-    chars.push((bite & 0x0f).toString(16))
-  }
-  return chars.join('')
-}
-
-module.exports = sha1
-module.exports.sync = sha1sync
-
-
-/***/ }),
-/* 53 */
-/***/ (function(module, exports, __webpack_require__) {
-
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(true)
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else if(typeof exports === 'object')
-		exports["Rusha"] = factory();
-	else
-		root["Rusha"] = factory();
-})(typeof self !== 'undefined' ? self : this, function() {
-return /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/* eslint-env commonjs, browser */
-
-var RushaCore = __webpack_require__(5);
-
-var _require = __webpack_require__(1),
-    toHex = _require.toHex,
-    ceilHeapSize = _require.ceilHeapSize;
-
-var conv = __webpack_require__(6);
-
-// Calculate the length of buffer that the sha1 routine uses
-// including the padding.
-var padlen = function (len) {
-  for (len += 9; len % 64 > 0; len += 1) {}
-  return len;
-};
-
-var padZeroes = function (bin, len) {
-  var h8 = new Uint8Array(bin.buffer);
-  var om = len % 4,
-      align = len - om;
-  switch (om) {
-    case 0:
-      h8[align + 3] = 0;
-    case 1:
-      h8[align + 2] = 0;
-    case 2:
-      h8[align + 1] = 0;
-    case 3:
-      h8[align + 0] = 0;
-  }
-  for (var i = (len >> 2) + 1; i < bin.length; i++) {
-    bin[i] = 0;
-  }
-};
-
-var padData = function (bin, chunkLen, msgLen) {
-  bin[chunkLen >> 2] |= 0x80 << 24 - (chunkLen % 4 << 3);
-  // To support msgLen >= 2 GiB, use a float division when computing the
-  // high 32-bits of the big-endian message length in bits.
-  bin[((chunkLen >> 2) + 2 & ~0x0f) + 14] = msgLen / (1 << 29) | 0;
-  bin[((chunkLen >> 2) + 2 & ~0x0f) + 15] = msgLen << 3;
-};
-
-var getRawDigest = function (heap, padMaxChunkLen) {
-  var io = new Int32Array(heap, padMaxChunkLen + 320, 5);
-  var out = new Int32Array(5);
-  var arr = new DataView(out.buffer);
-  arr.setInt32(0, io[0], false);
-  arr.setInt32(4, io[1], false);
-  arr.setInt32(8, io[2], false);
-  arr.setInt32(12, io[3], false);
-  arr.setInt32(16, io[4], false);
-  return out;
-};
-
-var Rusha = function () {
-  function Rusha(chunkSize) {
-    _classCallCheck(this, Rusha);
-
-    chunkSize = chunkSize || 64 * 1024;
-    if (chunkSize % 64 > 0) {
-      throw new Error('Chunk size must be a multiple of 128 bit');
-    }
-    this._offset = 0;
-    this._maxChunkLen = chunkSize;
-    this._padMaxChunkLen = padlen(chunkSize);
-    // The size of the heap is the sum of:
-    // 1. The padded input message size
-    // 2. The extended space the algorithm needs (320 byte)
-    // 3. The 160 bit state the algoritm uses
-    this._heap = new ArrayBuffer(ceilHeapSize(this._padMaxChunkLen + 320 + 20));
-    this._h32 = new Int32Array(this._heap);
-    this._h8 = new Int8Array(this._heap);
-    this._core = new RushaCore({ Int32Array: Int32Array }, {}, this._heap);
-  }
-
-  Rusha.prototype._initState = function _initState(heap, padMsgLen) {
-    this._offset = 0;
-    var io = new Int32Array(heap, padMsgLen + 320, 5);
-    io[0] = 1732584193;
-    io[1] = -271733879;
-    io[2] = -1732584194;
-    io[3] = 271733878;
-    io[4] = -1009589776;
-  };
-
-  Rusha.prototype._padChunk = function _padChunk(chunkLen, msgLen) {
-    var padChunkLen = padlen(chunkLen);
-    var view = new Int32Array(this._heap, 0, padChunkLen >> 2);
-    padZeroes(view, chunkLen);
-    padData(view, chunkLen, msgLen);
-    return padChunkLen;
-  };
-
-  Rusha.prototype._write = function _write(data, chunkOffset, chunkLen, off) {
-    conv(data, this._h8, this._h32, chunkOffset, chunkLen, off || 0);
-  };
-
-  Rusha.prototype._coreCall = function _coreCall(data, chunkOffset, chunkLen, msgLen, finalize) {
-    var padChunkLen = chunkLen;
-    this._write(data, chunkOffset, chunkLen);
-    if (finalize) {
-      padChunkLen = this._padChunk(chunkLen, msgLen);
-    }
-    this._core.hash(padChunkLen, this._padMaxChunkLen);
-  };
-
-  Rusha.prototype.rawDigest = function rawDigest(str) {
-    var msgLen = str.byteLength || str.length || str.size || 0;
-    this._initState(this._heap, this._padMaxChunkLen);
-    var chunkOffset = 0,
-        chunkLen = this._maxChunkLen;
-    for (chunkOffset = 0; msgLen > chunkOffset + chunkLen; chunkOffset += chunkLen) {
-      this._coreCall(str, chunkOffset, chunkLen, msgLen, false);
-    }
-    this._coreCall(str, chunkOffset, msgLen - chunkOffset, msgLen, true);
-    return getRawDigest(this._heap, this._padMaxChunkLen);
-  };
-
-  Rusha.prototype.digest = function digest(str) {
-    return toHex(this.rawDigest(str).buffer);
-  };
-
-  Rusha.prototype.digestFromString = function digestFromString(str) {
-    return this.digest(str);
-  };
-
-  Rusha.prototype.digestFromBuffer = function digestFromBuffer(str) {
-    return this.digest(str);
-  };
-
-  Rusha.prototype.digestFromArrayBuffer = function digestFromArrayBuffer(str) {
-    return this.digest(str);
-  };
-
-  Rusha.prototype.resetState = function resetState() {
-    this._initState(this._heap, this._padMaxChunkLen);
-    return this;
-  };
-
-  Rusha.prototype.append = function append(chunk) {
-    var chunkOffset = 0;
-    var chunkLen = chunk.byteLength || chunk.length || chunk.size || 0;
-    var turnOffset = this._offset % this._maxChunkLen;
-    var inputLen = void 0;
-
-    this._offset += chunkLen;
-    while (chunkOffset < chunkLen) {
-      inputLen = Math.min(chunkLen - chunkOffset, this._maxChunkLen - turnOffset);
-      this._write(chunk, chunkOffset, inputLen, turnOffset);
-      turnOffset += inputLen;
-      chunkOffset += inputLen;
-      if (turnOffset === this._maxChunkLen) {
-        this._core.hash(this._maxChunkLen, this._padMaxChunkLen);
-        turnOffset = 0;
-      }
-    }
-    return this;
-  };
-
-  Rusha.prototype.getState = function getState() {
-    var turnOffset = this._offset % this._maxChunkLen;
-    var heap = void 0;
-    if (!turnOffset) {
-      var io = new Int32Array(this._heap, this._padMaxChunkLen + 320, 5);
-      heap = io.buffer.slice(io.byteOffset, io.byteOffset + io.byteLength);
-    } else {
-      heap = this._heap.slice(0);
-    }
-    return {
-      offset: this._offset,
-      heap: heap
-    };
-  };
-
-  Rusha.prototype.setState = function setState(state) {
-    this._offset = state.offset;
-    if (state.heap.byteLength === 20) {
-      var io = new Int32Array(this._heap, this._padMaxChunkLen + 320, 5);
-      io.set(new Int32Array(state.heap));
-    } else {
-      this._h32.set(new Int32Array(state.heap));
-    }
-    return this;
-  };
-
-  Rusha.prototype.rawEnd = function rawEnd() {
-    var msgLen = this._offset;
-    var chunkLen = msgLen % this._maxChunkLen;
-    var padChunkLen = this._padChunk(chunkLen, msgLen);
-    this._core.hash(padChunkLen, this._padMaxChunkLen);
-    var result = getRawDigest(this._heap, this._padMaxChunkLen);
-    this._initState(this._heap, this._padMaxChunkLen);
-    return result;
-  };
-
-  Rusha.prototype.end = function end() {
-    return toHex(this.rawEnd().buffer);
-  };
-
-  return Rusha;
-}();
-
-module.exports = Rusha;
-module.exports._core = RushaCore;
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports) {
-
-/* eslint-env commonjs, browser */
-
-//
-// toHex
-//
-
-var precomputedHex = new Array(256);
-for (var i = 0; i < 256; i++) {
-  precomputedHex[i] = (i < 0x10 ? '0' : '') + i.toString(16);
-}
-
-module.exports.toHex = function (arrayBuffer) {
-  var binarray = new Uint8Array(arrayBuffer);
-  var res = new Array(arrayBuffer.byteLength);
-  for (var _i = 0; _i < res.length; _i++) {
-    res[_i] = precomputedHex[binarray[_i]];
-  }
-  return res.join('');
-};
-
-//
-// ceilHeapSize
-//
-
-module.exports.ceilHeapSize = function (v) {
-  // The asm.js spec says:
-  // The heap object's byteLength must be either
-  // 2^n for n in [12, 24) or 2^24 * n for n ≥ 1.
-  // Also, byteLengths smaller than 2^16 are deprecated.
-  var p = 0;
-  // If v is smaller than 2^16, the smallest possible solution
-  // is 2^16.
-  if (v <= 65536) return 65536;
-  // If v < 2^24, we round up to 2^n,
-  // otherwise we round up to 2^24 * n.
-  if (v < 16777216) {
-    for (p = 1; p < v; p = p << 1) {}
-  } else {
-    for (p = 16777216; p < v; p += 16777216) {}
-  }
-  return p;
-};
-
-//
-// isDedicatedWorkerScope
-//
-
-module.exports.isDedicatedWorkerScope = function (self) {
-  var isRunningInWorker = 'WorkerGlobalScope' in self && self instanceof self.WorkerGlobalScope;
-  var isRunningInSharedWorker = 'SharedWorkerGlobalScope' in self && self instanceof self.SharedWorkerGlobalScope;
-  var isRunningInServiceWorker = 'ServiceWorkerGlobalScope' in self && self instanceof self.ServiceWorkerGlobalScope;
-
-  // Detects whether we run inside a dedicated worker or not.
-  //
-  // We can't just check for `DedicatedWorkerGlobalScope`, since IE11
-  // has a bug where it only supports `WorkerGlobalScope`.
-  //
-  // Therefore, we consider us as running inside a dedicated worker
-  // when we are running inside a worker, but not in a shared or service worker.
-  //
-  // When new types of workers are introduced, we will need to adjust this code.
-  return isRunningInWorker && !isRunningInSharedWorker && !isRunningInServiceWorker;
-};
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* eslint-env commonjs, worker */
-
-module.exports = function () {
-  var Rusha = __webpack_require__(0);
-
-  var hashData = function (hasher, data, cb) {
-    try {
-      return cb(null, hasher.digest(data));
-    } catch (e) {
-      return cb(e);
-    }
-  };
-
-  var hashFile = function (hasher, readTotal, blockSize, file, cb) {
-    var reader = new self.FileReader();
-    reader.onloadend = function onloadend() {
-      if (reader.error) {
-        return cb(reader.error);
-      }
-      var buffer = reader.result;
-      readTotal += reader.result.byteLength;
-      try {
-        hasher.append(buffer);
-      } catch (e) {
-        cb(e);
-        return;
-      }
-      if (readTotal < file.size) {
-        hashFile(hasher, readTotal, blockSize, file, cb);
-      } else {
-        cb(null, hasher.end());
-      }
-    };
-    reader.readAsArrayBuffer(file.slice(readTotal, readTotal + blockSize));
-  };
-
-  var workerBehaviourEnabled = true;
-
-  self.onmessage = function (event) {
-    if (!workerBehaviourEnabled) {
-      return;
-    }
-
-    var data = event.data.data,
-        file = event.data.file,
-        id = event.data.id;
-    if (typeof id === 'undefined') return;
-    if (!file && !data) return;
-    var blockSize = event.data.blockSize || 4 * 1024 * 1024;
-    var hasher = new Rusha(blockSize);
-    hasher.resetState();
-    var done = function (err, hash) {
-      if (!err) {
-        self.postMessage({ id: id, hash: hash });
-      } else {
-        self.postMessage({ id: id, error: err.name });
-      }
-    };
-    if (data) hashData(hasher, data, done);
-    if (file) hashFile(hasher, 0, blockSize, file, done);
-  };
-
-  return function () {
-    workerBehaviourEnabled = false;
-  };
-};
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* eslint-env commonjs, browser */
-
-var work = __webpack_require__(4);
-var Rusha = __webpack_require__(0);
-var createHash = __webpack_require__(7);
-var runWorker = __webpack_require__(2);
-
-var _require = __webpack_require__(1),
-    isDedicatedWorkerScope = _require.isDedicatedWorkerScope;
-
-var isRunningInDedicatedWorker = typeof self !== 'undefined' && isDedicatedWorkerScope(self);
-
-Rusha.disableWorkerBehaviour = isRunningInDedicatedWorker ? runWorker() : function () {};
-
-Rusha.createWorker = function () {
-  var worker = work(/*require.resolve*/(2));
-  var terminate = worker.terminate;
-  worker.terminate = function () {
-    URL.revokeObjectURL(worker.objectURL);
-    terminate.call(worker);
-  };
-  return worker;
-};
-
-Rusha.createHash = createHash;
-
-module.exports = Rusha;
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-function webpackBootstrapFunc (modules) {
-/******/  // The module cache
-/******/  var installedModules = {};
-
-/******/  // The require function
-/******/  function __webpack_require__(moduleId) {
-
-/******/    // Check if module is in cache
-/******/    if(installedModules[moduleId])
-/******/      return installedModules[moduleId].exports;
-
-/******/    // Create a new module (and put it into the cache)
-/******/    var module = installedModules[moduleId] = {
-/******/      i: moduleId,
-/******/      l: false,
-/******/      exports: {}
-/******/    };
-
-/******/    // Execute the module function
-/******/    modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-
-/******/    // Flag the module as loaded
-/******/    module.l = true;
-
-/******/    // Return the exports of the module
-/******/    return module.exports;
-/******/  }
-
-/******/  // expose the modules object (__webpack_modules__)
-/******/  __webpack_require__.m = modules;
-
-/******/  // expose the module cache
-/******/  __webpack_require__.c = installedModules;
-
-/******/  // identity function for calling harmony imports with the correct context
-/******/  __webpack_require__.i = function(value) { return value; };
-
-/******/  // define getter function for harmony exports
-/******/  __webpack_require__.d = function(exports, name, getter) {
-/******/    if(!__webpack_require__.o(exports, name)) {
-/******/      Object.defineProperty(exports, name, {
-/******/        configurable: false,
-/******/        enumerable: true,
-/******/        get: getter
-/******/      });
-/******/    }
-/******/  };
-
-/******/  // define __esModule on exports
-/******/  __webpack_require__.r = function(exports) {
-/******/    Object.defineProperty(exports, '__esModule', { value: true });
-/******/  };
-
-/******/  // getDefaultExport function for compatibility with non-harmony modules
-/******/  __webpack_require__.n = function(module) {
-/******/    var getter = module && module.__esModule ?
-/******/      function getDefault() { return module['default']; } :
-/******/      function getModuleExports() { return module; };
-/******/    __webpack_require__.d(getter, 'a', getter);
-/******/    return getter;
-/******/  };
-
-/******/  // Object.prototype.hasOwnProperty.call
-/******/  __webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-
-/******/  // __webpack_public_path__
-/******/  __webpack_require__.p = "/";
-
-/******/  // on error function for async loading
-/******/  __webpack_require__.oe = function(err) { console.error(err); throw err; };
-
-  var f = __webpack_require__(__webpack_require__.s = ENTRY_MODULE)
-  return f.default || f // try to call default if defined to also support babel esmodule exports
-}
-
-var moduleNameReqExp = '[\\.|\\-|\\+|\\w|\/|@]+'
-var dependencyRegExp = '\\((\/\\*.*?\\*\/)?\s?.*?(' + moduleNameReqExp + ').*?\\)' // additional chars when output.pathinfo is true
-
-// http://stackoverflow.com/a/2593661/130442
-function quoteRegExp (str) {
-  return (str + '').replace(/[.?*+^$[\]\\(){}|-]/g, '\\$&')
-}
-
-function getModuleDependencies (sources, module, queueName) {
-  var retval = {}
-  retval[queueName] = []
-
-  var fnString = module.toString()
-  var wrapperSignature = fnString.match(/^function\s?\(\w+,\s*\w+,\s*(\w+)\)/)
-  if (!wrapperSignature) return retval
-  var webpackRequireName = wrapperSignature[1]
-
-  // main bundle deps
-  var re = new RegExp('(\\\\n|\\W)' + quoteRegExp(webpackRequireName) + dependencyRegExp, 'g')
-  var match
-  while ((match = re.exec(fnString))) {
-    if (match[3] === 'dll-reference') continue
-    retval[queueName].push(match[3])
-  }
-
-  // dll deps
-  re = new RegExp('\\(' + quoteRegExp(webpackRequireName) + '\\("(dll-reference\\s(' + moduleNameReqExp + '))"\\)\\)' + dependencyRegExp, 'g')
-  while ((match = re.exec(fnString))) {
-    if (!sources[match[2]]) {
-      retval[queueName].push(match[1])
-      sources[match[2]] = __webpack_require__(match[1]).m
-    }
-    retval[match[2]] = retval[match[2]] || []
-    retval[match[2]].push(match[4])
-  }
-
-  return retval
-}
-
-function hasValuesInQueues (queues) {
-  var keys = Object.keys(queues)
-  return keys.reduce(function (hasValues, key) {
-    return hasValues || queues[key].length > 0
-  }, false)
-}
-
-function getRequiredModules (sources, moduleId) {
-  var modulesQueue = {
-    main: [moduleId]
-  }
-  var requiredModules = {
-    main: []
-  }
-  var seenModules = {
-    main: {}
-  }
-
-  while (hasValuesInQueues(modulesQueue)) {
-    var queues = Object.keys(modulesQueue)
-    for (var i = 0; i < queues.length; i++) {
-      var queueName = queues[i]
-      var queue = modulesQueue[queueName]
-      var moduleToCheck = queue.pop()
-      seenModules[queueName] = seenModules[queueName] || {}
-      if (seenModules[queueName][moduleToCheck] || !sources[queueName][moduleToCheck]) continue
-      seenModules[queueName][moduleToCheck] = true
-      requiredModules[queueName] = requiredModules[queueName] || []
-      requiredModules[queueName].push(moduleToCheck)
-      var newModules = getModuleDependencies(sources, sources[queueName][moduleToCheck], queueName)
-      var newModulesKeys = Object.keys(newModules)
-      for (var j = 0; j < newModulesKeys.length; j++) {
-        modulesQueue[newModulesKeys[j]] = modulesQueue[newModulesKeys[j]] || []
-        modulesQueue[newModulesKeys[j]] = modulesQueue[newModulesKeys[j]].concat(newModules[newModulesKeys[j]])
-      }
-    }
-  }
-
-  return requiredModules
-}
-
-module.exports = function (moduleId, options) {
-  options = options || {}
-  var sources = {
-    main: __webpack_require__.m
-  }
-
-  var requiredModules = options.all ? { main: Object.keys(sources) } : getRequiredModules(sources, moduleId)
-
-  var src = ''
-
-  Object.keys(requiredModules).filter(function (m) { return m !== 'main' }).forEach(function (module) {
-    var entryModule = 0
-    while (requiredModules[module][entryModule]) {
-      entryModule++
-    }
-    requiredModules[module].push(entryModule)
-    sources[module][entryModule] = '(function(module, exports, __webpack_require__) { module.exports = __webpack_require__; })'
-    src = src + 'var ' + module + ' = (' + webpackBootstrapFunc.toString().replace('ENTRY_MODULE', JSON.stringify(entryModule)) + ')({' + requiredModules[module].map(function (id) { return '' + JSON.stringify(id) + ': ' + sources[module][id].toString() }).join(',') + '});\n'
-  })
-
-  src = src + '(' + webpackBootstrapFunc.toString().replace('ENTRY_MODULE', JSON.stringify(moduleId)) + ')({' + requiredModules.main.map(function (id) { return '' + JSON.stringify(id) + ': ' + sources.main[id].toString() }).join(',') + '})(self);'
-
-  var blob = new window.Blob([src], { type: 'text/javascript' })
-  if (options.bare) { return blob }
-
-  var URL = window.URL || window.webkitURL || window.mozURL || window.msURL
-
-  var workerUrl = URL.createObjectURL(blob)
-  var worker = new window.Worker(workerUrl)
-  worker.objectURL = workerUrl
-
-  return worker
-}
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports) {
-
-// The low-level RushCore module provides the heart of Rusha,
-// a high-speed sha1 implementation working on an Int32Array heap.
-// At first glance, the implementation seems complicated, however
-// with the SHA1 spec at hand, it is obvious this almost a textbook
-// implementation that has a few functions hand-inlined and a few loops
-// hand-unrolled.
-module.exports = function RushaCore(stdlib$846, foreign$847, heap$848) {
-    'use asm';
-    var H$849 = new stdlib$846.Int32Array(heap$848);
-    function hash$850(k$851, x$852) {
-        // k in bytes
-        k$851 = k$851 | 0;
-        x$852 = x$852 | 0;
-        var i$853 = 0, j$854 = 0, y0$855 = 0, z0$856 = 0, y1$857 = 0, z1$858 = 0, y2$859 = 0, z2$860 = 0, y3$861 = 0, z3$862 = 0, y4$863 = 0, z4$864 = 0, t0$865 = 0, t1$866 = 0;
-        y0$855 = H$849[x$852 + 320 >> 2] | 0;
-        y1$857 = H$849[x$852 + 324 >> 2] | 0;
-        y2$859 = H$849[x$852 + 328 >> 2] | 0;
-        y3$861 = H$849[x$852 + 332 >> 2] | 0;
-        y4$863 = H$849[x$852 + 336 >> 2] | 0;
-        for (i$853 = 0; (i$853 | 0) < (k$851 | 0); i$853 = i$853 + 64 | 0) {
-            z0$856 = y0$855;
-            z1$858 = y1$857;
-            z2$860 = y2$859;
-            z3$862 = y3$861;
-            z4$864 = y4$863;
-            for (j$854 = 0; (j$854 | 0) < 64; j$854 = j$854 + 4 | 0) {
-                t1$866 = H$849[i$853 + j$854 >> 2] | 0;
-                t0$865 = ((y0$855 << 5 | y0$855 >>> 27) + (y1$857 & y2$859 | ~y1$857 & y3$861) | 0) + ((t1$866 + y4$863 | 0) + 1518500249 | 0) | 0;
-                y4$863 = y3$861;
-                y3$861 = y2$859;
-                y2$859 = y1$857 << 30 | y1$857 >>> 2;
-                y1$857 = y0$855;
-                y0$855 = t0$865;
-                H$849[k$851 + j$854 >> 2] = t1$866;
-            }
-            for (j$854 = k$851 + 64 | 0; (j$854 | 0) < (k$851 + 80 | 0); j$854 = j$854 + 4 | 0) {
-                t1$866 = (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) << 1 | (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) >>> 31;
-                t0$865 = ((y0$855 << 5 | y0$855 >>> 27) + (y1$857 & y2$859 | ~y1$857 & y3$861) | 0) + ((t1$866 + y4$863 | 0) + 1518500249 | 0) | 0;
-                y4$863 = y3$861;
-                y3$861 = y2$859;
-                y2$859 = y1$857 << 30 | y1$857 >>> 2;
-                y1$857 = y0$855;
-                y0$855 = t0$865;
-                H$849[j$854 >> 2] = t1$866;
-            }
-            for (j$854 = k$851 + 80 | 0; (j$854 | 0) < (k$851 + 160 | 0); j$854 = j$854 + 4 | 0) {
-                t1$866 = (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) << 1 | (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) >>> 31;
-                t0$865 = ((y0$855 << 5 | y0$855 >>> 27) + (y1$857 ^ y2$859 ^ y3$861) | 0) + ((t1$866 + y4$863 | 0) + 1859775393 | 0) | 0;
-                y4$863 = y3$861;
-                y3$861 = y2$859;
-                y2$859 = y1$857 << 30 | y1$857 >>> 2;
-                y1$857 = y0$855;
-                y0$855 = t0$865;
-                H$849[j$854 >> 2] = t1$866;
-            }
-            for (j$854 = k$851 + 160 | 0; (j$854 | 0) < (k$851 + 240 | 0); j$854 = j$854 + 4 | 0) {
-                t1$866 = (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) << 1 | (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) >>> 31;
-                t0$865 = ((y0$855 << 5 | y0$855 >>> 27) + (y1$857 & y2$859 | y1$857 & y3$861 | y2$859 & y3$861) | 0) + ((t1$866 + y4$863 | 0) - 1894007588 | 0) | 0;
-                y4$863 = y3$861;
-                y3$861 = y2$859;
-                y2$859 = y1$857 << 30 | y1$857 >>> 2;
-                y1$857 = y0$855;
-                y0$855 = t0$865;
-                H$849[j$854 >> 2] = t1$866;
-            }
-            for (j$854 = k$851 + 240 | 0; (j$854 | 0) < (k$851 + 320 | 0); j$854 = j$854 + 4 | 0) {
-                t1$866 = (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) << 1 | (H$849[j$854 - 12 >> 2] ^ H$849[j$854 - 32 >> 2] ^ H$849[j$854 - 56 >> 2] ^ H$849[j$854 - 64 >> 2]) >>> 31;
-                t0$865 = ((y0$855 << 5 | y0$855 >>> 27) + (y1$857 ^ y2$859 ^ y3$861) | 0) + ((t1$866 + y4$863 | 0) - 899497514 | 0) | 0;
-                y4$863 = y3$861;
-                y3$861 = y2$859;
-                y2$859 = y1$857 << 30 | y1$857 >>> 2;
-                y1$857 = y0$855;
-                y0$855 = t0$865;
-                H$849[j$854 >> 2] = t1$866;
-            }
-            y0$855 = y0$855 + z0$856 | 0;
-            y1$857 = y1$857 + z1$858 | 0;
-            y2$859 = y2$859 + z2$860 | 0;
-            y3$861 = y3$861 + z3$862 | 0;
-            y4$863 = y4$863 + z4$864 | 0;
-        }
-        H$849[x$852 + 320 >> 2] = y0$855;
-        H$849[x$852 + 324 >> 2] = y1$857;
-        H$849[x$852 + 328 >> 2] = y2$859;
-        H$849[x$852 + 332 >> 2] = y3$861;
-        H$849[x$852 + 336 >> 2] = y4$863;
-    }
-    return { hash: hash$850 };
-};
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports) {
-
-var _this = this;
-
-/* eslint-env commonjs, browser */
-
-var reader = void 0;
-if (typeof self !== 'undefined' && typeof self.FileReaderSync !== 'undefined') {
-  reader = new self.FileReaderSync();
-}
-
-// Convert a binary string and write it to the heap.
-// A binary string is expected to only contain char codes < 256.
-var convStr = function (str, H8, H32, start, len, off) {
-  var i = void 0,
-      om = off % 4,
-      lm = (len + om) % 4,
-      j = len - lm;
-  switch (om) {
-    case 0:
-      H8[off] = str.charCodeAt(start + 3);
-    case 1:
-      H8[off + 1 - (om << 1) | 0] = str.charCodeAt(start + 2);
-    case 2:
-      H8[off + 2 - (om << 1) | 0] = str.charCodeAt(start + 1);
-    case 3:
-      H8[off + 3 - (om << 1) | 0] = str.charCodeAt(start);
-  }
-  if (len < lm + (4 - om)) {
-    return;
-  }
-  for (i = 4 - om; i < j; i = i + 4 | 0) {
-    H32[off + i >> 2] = str.charCodeAt(start + i) << 24 | str.charCodeAt(start + i + 1) << 16 | str.charCodeAt(start + i + 2) << 8 | str.charCodeAt(start + i + 3);
-  }
-  switch (lm) {
-    case 3:
-      H8[off + j + 1 | 0] = str.charCodeAt(start + j + 2);
-    case 2:
-      H8[off + j + 2 | 0] = str.charCodeAt(start + j + 1);
-    case 1:
-      H8[off + j + 3 | 0] = str.charCodeAt(start + j);
-  }
-};
-
-// Convert a buffer or array and write it to the heap.
-// The buffer or array is expected to only contain elements < 256.
-var convBuf = function (buf, H8, H32, start, len, off) {
-  var i = void 0,
-      om = off % 4,
-      lm = (len + om) % 4,
-      j = len - lm;
-  switch (om) {
-    case 0:
-      H8[off] = buf[start + 3];
-    case 1:
-      H8[off + 1 - (om << 1) | 0] = buf[start + 2];
-    case 2:
-      H8[off + 2 - (om << 1) | 0] = buf[start + 1];
-    case 3:
-      H8[off + 3 - (om << 1) | 0] = buf[start];
-  }
-  if (len < lm + (4 - om)) {
-    return;
-  }
-  for (i = 4 - om; i < j; i = i + 4 | 0) {
-    H32[off + i >> 2 | 0] = buf[start + i] << 24 | buf[start + i + 1] << 16 | buf[start + i + 2] << 8 | buf[start + i + 3];
-  }
-  switch (lm) {
-    case 3:
-      H8[off + j + 1 | 0] = buf[start + j + 2];
-    case 2:
-      H8[off + j + 2 | 0] = buf[start + j + 1];
-    case 1:
-      H8[off + j + 3 | 0] = buf[start + j];
-  }
-};
-
-var convBlob = function (blob, H8, H32, start, len, off) {
-  var i = void 0,
-      om = off % 4,
-      lm = (len + om) % 4,
-      j = len - lm;
-  var buf = new Uint8Array(reader.readAsArrayBuffer(blob.slice(start, start + len)));
-  switch (om) {
-    case 0:
-      H8[off] = buf[3];
-    case 1:
-      H8[off + 1 - (om << 1) | 0] = buf[2];
-    case 2:
-      H8[off + 2 - (om << 1) | 0] = buf[1];
-    case 3:
-      H8[off + 3 - (om << 1) | 0] = buf[0];
-  }
-  if (len < lm + (4 - om)) {
-    return;
-  }
-  for (i = 4 - om; i < j; i = i + 4 | 0) {
-    H32[off + i >> 2 | 0] = buf[i] << 24 | buf[i + 1] << 16 | buf[i + 2] << 8 | buf[i + 3];
-  }
-  switch (lm) {
-    case 3:
-      H8[off + j + 1 | 0] = buf[j + 2];
-    case 2:
-      H8[off + j + 2 | 0] = buf[j + 1];
-    case 1:
-      H8[off + j + 3 | 0] = buf[j];
-  }
-};
-
-module.exports = function (data, H8, H32, start, len, off) {
-  if (typeof data === 'string') {
-    return convStr(data, H8, H32, start, len, off);
-  }
-  if (data instanceof Array) {
-    return convBuf(data, H8, H32, start, len, off);
-  }
-  // Safely doing a Buffer check using "this" to avoid Buffer polyfill to be included in the dist
-  if (_this && _this.Buffer && _this.Buffer.isBuffer(data)) {
-    return convBuf(data, H8, H32, start, len, off);
-  }
-  if (data instanceof ArrayBuffer) {
-    return convBuf(new Uint8Array(data), H8, H32, start, len, off);
-  }
-  if (data.buffer instanceof ArrayBuffer) {
-    return convBuf(new Uint8Array(data.buffer, data.byteOffset, data.byteLength), H8, H32, start, len, off);
-  }
-  if (data instanceof Blob) {
-    return convBlob(data, H8, H32, start, len, off);
-  }
-  throw new Error('Unsupported data type.');
-};
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/* eslint-env commonjs, browser */
-
-var Rusha = __webpack_require__(0);
-
-var _require = __webpack_require__(1),
-    toHex = _require.toHex;
-
-var Hash = function () {
-  function Hash() {
-    _classCallCheck(this, Hash);
-
-    this._rusha = new Rusha();
-    this._rusha.resetState();
-  }
-
-  Hash.prototype.update = function update(data) {
-    this._rusha.append(data);
-    return this;
-  };
-
-  Hash.prototype.digest = function digest(encoding) {
-    var digest = this._rusha.rawEnd().buffer;
-    if (!encoding) {
-      return digest;
-    }
-    if (encoding === 'hex') {
-      return toHex(digest);
-    }
-    throw new Error('unsupported digest encoding');
-  };
-
-  return Hash;
-}();
-
-module.exports = function () {
-  return new Hash();
-};
-
-/***/ })
-/******/ ]);
+Object.defineProperty(exports, "__esModule", {
+    value: true
 });
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /**
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Created by xieting on 2018/4/16.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
+
+
+var _reconnectingWebsocket = __webpack_require__(10);
+
+var _reconnectingWebsocket2 = _interopRequireDefault(_reconnectingWebsocket);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var logTypes = {
+    debug: 0,
+    info: 1,
+    warn: 2,
+    error: 3,
+    none: 4
+};
+
+var typesP = ['_debugP', '_infoP', '_warnP', '_errorP'];
+var typesU = ['_debugU', '_infoU', '_warnU', '_errorU'];
+
+var Logger = function () {
+    function Logger(config) {
+        _classCallCheck(this, Logger);
+
+        this.config = config;
+        this.connected = false;
+        if (config.enableLogUpload) {
+            this._ws = this._initWs();
+        }
+        if (!(config.logLevel in logTypes)) config.logLevel = 'none';
+        if (!(config.logUploadLevel in logTypes)) config.logUploadLevel = 'none';
+        for (var i = 0; i < logTypes[config.logLevel]; i++) {
+            this[typesP[i]] = noop;
+        }
+        for (var _i = 0; _i < logTypes[config.logUploadLevel]; _i++) {
+            this[typesU[_i]] = noop;
+        }
+    }
+
+    _createClass(Logger, [{
+        key: 'debug',
+        value: function debug(msg) {
+            this._debugP(msg);
+            this._debugU(msg);
+        }
+    }, {
+        key: 'info',
+        value: function info(msg) {
+            this._infoP(msg);
+            this._infoU(msg);
+        }
+    }, {
+        key: 'warn',
+        value: function warn(msg) {
+            this._warnP(msg);
+            this._warnU(msg);
+        }
+    }, {
+        key: 'error',
+        value: function error(msg) {
+            this._errorP(msg);
+            this._errorU(msg);
+        }
+    }, {
+        key: '_debugP',
+        value: function _debugP(msg) {
+            console.log(msg);
+        }
+    }, {
+        key: '_infoP',
+        value: function _infoP(msg) {
+            console.info(msg);
+        }
+    }, {
+        key: '_warnP',
+        value: function _warnP(msg) {
+            console.warn(msg);
+        }
+    }, {
+        key: '_errorP',
+        value: function _errorP(msg) {
+            console.error(msg);
+        }
+    }, {
+        key: '_debugU',
+        value: function _debugU(msg) {
+            console.log('_debugU');
+        }
+    }, {
+        key: '_infoU',
+        value: function _infoU(msg) {
+            console.log('_infoU');
+        }
+    }, {
+        key: '_warnU',
+        value: function _warnU(msg) {
+            console.log('_warnU');
+        }
+    }, {
+        key: '_errorU',
+        value: function _errorU(msg) {
+            console.log('_errorU');
+        }
+    }, {
+        key: '_initWs',
+        value: function _initWs() {
+            var _this = this;
+
+            var wsOptions = {
+                maxRetries: this.config.wsMaxRetries,
+                minReconnectionDelay: this.config.wsReconnectInterval * 1000
+            };
+            var ws = new _reconnectingWebsocket2.default(this.config.logUploadAddr, undefined, wsOptions);
+            ws.onopen = function () {
+                console.log('Log websocket connection opened');
+
+                _this.connected = true;
+            };
+
+            ws.push = ws.send;
+            ws.send = function (msg) {
+                if (ws.readyState !== 1) {
+                    console.warn('websocket connection is not opened yet.');
+                    return setTimeout(function () {
+                        ws.send(msg);
+                    }, 1000);
+                }
+                ws.push(msg);
+            };
+            ws.onmessage = function (e) {};
+            ws.onclose = function () {
+                //websocket断开时清除datachannel
+                console.warn('Log websocket closed');
+                _this.connected = false;
+            };
+            return ws;
+        }
+    }]);
+
+    return Logger;
+}();
+
+function noop() {}
+
+exports.default = Logger;
+module.exports = exports['default'];
 
 /***/ })
 /******/ ]);

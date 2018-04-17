@@ -28,17 +28,9 @@
         var p2pConfig = {
             key: 'free',
 //            engine: 'bt',
-//            wsSchedulerAddr: `ws://211.159.220.166:8080/ws`,
-            wsSchedulerAddr: `ws://127.0.0.1:8080/ws`,
-            wsSignalerAddr: 'ws://120.78.168.126:8081/ws',
-            reportInterval: 30,
-//            defaultUploadBW: 2561241,
-//            defaultUploadBW: 2561241 + 100,
-//            defaultUploadBW: 853290*3+1000,
-            defaultUploadBW: 798032/3*5+100,
-            transitionEnabled: true,
-//            transitionEnabled: false,
-            transitionCheckInterval: 30
+
+            logLevel: 'debug',
+            logUploadLevel: 'none',
         };
 
         var hls = new Hls(hlsjsConfig);
@@ -56,22 +48,6 @@
 
             hls.loadLevel = 0;
             video.play();
-        });
-
-        hls.on(Hls.Events.ERROR, function (event, data) {
-            var errorType = data.type;
-            var errorDetails = data.details;
-            var errorFatal = data.fatal;
-            console.warn('error errorType:'+errorType);
-            console.warn('error details:'+errorDetails);
-            console.warn('error errorFatal:'+errorFatal);
-//      switch(data.details) {
-//        case hls.ErrorDetails.FRAG_LOAD_ERROR:
-//          // ....
-//          break;
-//        default:
-//          break;
-//      }
         });
 
         hls.on(Hls.Events.FRAG_LOADED, function (e, data) {
