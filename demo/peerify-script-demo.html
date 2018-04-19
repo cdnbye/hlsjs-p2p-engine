@@ -30,7 +30,7 @@
 //            engine: 'bt',
 
             logLevel: 'debug',
-            logUploadLevel: 'none',
+            logUploadLevel: 'info',
         };
 
         var hls = new Hls(hlsjsConfig);
@@ -51,7 +51,7 @@
         });
 
         hls.on(Hls.Events.FRAG_LOADED, function (e, data) {
-            var frag = data.frag;
+//            var frag = data.frag;
 
 //            console.warn(`frag ${JSON.stringify(frag)}`);
         });

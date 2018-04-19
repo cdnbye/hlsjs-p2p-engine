@@ -5585,12 +5585,6 @@ var SignalClient = function (_EventEmitter) {
             websocket.push = websocket.send;
             websocket.send = function (msg) {
                 var msgStr = JSON.stringify(Object.assign({ peer_id: id }, msg));
-                if (websocket.readyState !== 1) {
-                    logger.warn('websocket connection is not opened yet.');
-                    return setTimeout(function () {
-                        websocket.send(msgStr);
-                    }, 1000);
-                }
                 websocket.push(msgStr);
             };
             websocket.onmessage = function (e) {
@@ -5749,18 +5743,18 @@ var HlsPeerify = function (_EventEmitter) {
         _this.hlsjs = hlsjs;
         _this.p2pEnabled = _this.config.disableP2P === false ? false : true; //默认开启P2P
 
-        //初始化logger
-        var logger = new _logger2.default(_this.config);
-        window.logger = logger;
-
         hlsjs.config.currLoaded = hlsjs.config.currPlay = 0;
 
         var onLevelLoaded = function onLevelLoaded(event, data) {
 
             var isLive = data.details.live;
-            logger.info('live ' + isLive);
             _this.config.live = isLive;
             var channel = hlsjs.url.split('?')[0];
+
+            //初始化logger
+            var logger = new _logger2.default(_this.config, channel);
+            window.logger = logger;
+
             _this._init(channel);
 
             hlsjs.off(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
@@ -5868,7 +5862,7 @@ var HlsPeerify = function (_EventEmitter) {
         key: 'disableP2P',
         value: function disableP2P() {
             //停止p2p
-            logger.debug('disableP2P');
+            console.log('disableP2P');
             if (this.p2pEnabled) {
                 this.p2pEnabled = false;
                 this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
@@ -5881,7 +5875,7 @@ var HlsPeerify = function (_EventEmitter) {
         key: 'enableP2P',
         value: function enableP2P() {
             //在停止的情况下重新启动P2P
-            logger.debug('enableP2P');
+            console.log('enableP2P');
             if (!this.p2pEnabled) {
                 this.p2pEnabled = true;
                 this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
@@ -5939,8 +5933,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Buffer = __webpack_require__(6).Buffer;
 
-var log = console.log;
-
 var DataChannel = function (_EventEmitter) {
     _inherits(DataChannel, _EventEmitter);
 
@@ -5981,17 +5973,16 @@ var DataChannel = function (_EventEmitter) {
             var _this2 = this;
 
             datachannel.on('error', function (err) {
-                log('datachannel error', err);
+                logger.error('datachannel error', err);
                 _this2.emit(_events4.default.DC_ERROR);
             });
 
             datachannel.on('signal', function (data) {
-                // log('SIGNAL', JSON.stringify(data));
                 _this2.emit(_events4.default.DC_SIGNAL, data);
             });
 
             var _onConnect = function _onConnect() {
-                log('datachannel CONNECTED to ' + _this2.remotePeerId);
+                logger.info('datachannel CONNECTED to ' + _this2.remotePeerId);
                 _this2.connected = true;
                 _this2.emit(_events4.default.DC_OPEN);
                 //测试延迟
@@ -6007,7 +5998,7 @@ var DataChannel = function (_EventEmitter) {
 
             datachannel.on('data', function (data) {
                 if (typeof data === 'string') {
-                    log('datachannel receive string: ' + data + 'from ' + _this2.remotePeerId);
+                    logger.info('datachannel receive string: ' + data + 'from ' + _this2.remotePeerId);
 
                     var msg = JSON.parse(data);
                     //如果还没连接，则先保存在消息队列中
@@ -6253,7 +6244,7 @@ var DataChannel = function (_EventEmitter) {
         key: '_loadtimeout',
         value: function _loadtimeout() {
             //下载超时
-            log('datachannel timeout while downloading');
+            logger.warn('datachannel timeout while downloading');
             this.emit(_events4.default.DC_TIMEOUT);
             this.requestTimeout = null;
             this.downloading = false;
@@ -6270,7 +6261,7 @@ var DataChannel = function (_EventEmitter) {
         key: '_uploadtimeout',
         value: function _uploadtimeout() {
             //上传超时
-            log('datachannel timeout while uploading');
+            logger.warn('datachannel timeout while uploading');
             this.uploading = false;
             if (this.rcvdReqQueue.length > 0) {
                 var sn = this.rcvdReqQueue.pop();
@@ -6283,7 +6274,7 @@ var DataChannel = function (_EventEmitter) {
             var _this4 = this;
 
             this.ping = performance.now();
-            for (var i = 0; i < this.config.dcPingPackets; i++) {
+            for (var i = 0; i < this.config.dcPings; i++) {
                 this.sendJson({
                     event: _events4.default.DC_PING
                 });
@@ -8700,7 +8691,7 @@ var defaultP2PConfig = {
     dcKeepAliveAckTimeout: 2, //datachannel接收keep-alive-ack信息的超时时间，超时则认为连接失败并主动关闭
     dcRequestTimeout: 3, //datachannel接收二进制数据的超时时间
     dcUploadTimeout: 3, //datachannel上传二进制数据的超时时间
-    dcPingPackets: 10, //datachannel发送ping数据包的数量
+    dcPings: 5, //datachannel发送ping数据包的数量
     dcTolerance: 4, //请求超时或错误多少次淘汰该peer
 
     packetSize: 16 * 1024, //每次通过datachannel发送的包的大小
@@ -8708,9 +8699,9 @@ var defaultP2PConfig = {
     loadTimeout: 5, //p2p下载的超时时间
     reportInterval: 20, //统计信息上报的时间间隔(废弃)
 
-    enableLogUpload: false, //上传log到服务器，默认true
-    logUploadAddr: 'ws://120.78.168.126:8081/ws', //log上传地址
-    logUploadLevel: 'warn', //log上传level，默认warn
+    enableLogUpload: true, //上传log到服务器，默认true
+    logUploadAddr: 'ws://localhost:3389/ws', //log上传地址
+    logUploadLevel: 'info', //log上传level，默认info
     logLevel: 'warn' //log的level，默认warn
 
 };
@@ -12306,13 +12297,17 @@ var typesP = ['_debugP', '_infoP', '_warnP', '_errorP'];
 var typesU = ['_debugU', '_infoU', '_warnU', '_errorU'];
 
 var Logger = function () {
-    function Logger(config) {
+    function Logger(config, channel) {
         _classCallCheck(this, Logger);
 
         this.config = config;
         this.connected = false;
         if (config.enableLogUpload) {
-            this._ws = this._initWs();
+            try {
+                this._ws = this._initWs(channel);
+            } catch (e) {
+                this._ws = null;
+            }
         }
         if (!(config.logLevel in logTypes)) config.logLevel = 'none';
         if (!(config.logUploadLevel in logTypes)) config.logUploadLevel = 'none';
@@ -12322,6 +12317,7 @@ var Logger = function () {
         for (var _i = 0; _i < logTypes[config.logUploadLevel]; _i++) {
             this[typesU[_i]] = noop;
         }
+        this.timestamp = parseInt(new Date().valueOf() / 1000);
     }
 
     _createClass(Logger, [{
@@ -12371,53 +12367,54 @@ var Logger = function () {
     }, {
         key: '_debugU',
         value: function _debugU(msg) {
-            console.log('_debugU');
+            msg = '[' + this.timestamp + ' debug] > ' + msg;
+            this._uploadLog(msg);
         }
     }, {
         key: '_infoU',
         value: function _infoU(msg) {
-            console.log('_infoU');
+            msg = '[' + this.timestamp + ' info] > ' + msg;
+            this._uploadLog(msg);
         }
     }, {
         key: '_warnU',
         value: function _warnU(msg) {
-            console.log('_warnU');
+            msg = '[' + this.timestamp + ' warn] > ' + msg;
+            this._uploadLog(msg);
         }
     }, {
         key: '_errorU',
         value: function _errorU(msg) {
-            console.log('_errorU');
+            msg = '[' + this.timestamp + ' error] > ' + msg;
+            this._uploadLog(msg);
+        }
+    }, {
+        key: '_uploadLog',
+        value: function _uploadLog(msg) {
+            if (!this.connected) return;
+            this._ws.send(msg);
         }
     }, {
         key: '_initWs',
-        value: function _initWs() {
+        value: function _initWs(channel) {
             var _this = this;
 
             var wsOptions = {
                 maxRetries: this.config.wsMaxRetries,
                 minReconnectionDelay: this.config.wsReconnectInterval * 1000
             };
-            var ws = new _reconnectingWebsocket2.default(this.config.logUploadAddr, undefined, wsOptions);
+            var ws = new _reconnectingWebsocket2.default(this.config.logUploadAddr + ('?info_hash=' + window.encodeURIComponent(channel)), undefined, wsOptions);
             ws.onopen = function () {
-                console.log('Log websocket connection opened');
-
+                _this.debug('Log websocket connection opened');
                 _this.connected = true;
             };
-
-            ws.push = ws.send;
-            ws.send = function (msg) {
-                if (ws.readyState !== 1) {
-                    console.warn('websocket connection is not opened yet.');
-                    return setTimeout(function () {
-                        ws.send(msg);
-                    }, 1000);
-                }
-                ws.push(msg);
-            };
-            ws.onmessage = function (e) {};
+            // ws.onmessage = (e) => {
+            //
+            //
+            // };
             ws.onclose = function () {
                 //websocket断开时清除datachannel
-                console.warn('Log websocket closed');
+                _this.warn('Log websocket closed');
                 _this.connected = false;
             };
             return ws;
