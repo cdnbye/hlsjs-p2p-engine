@@ -97,6 +97,7 @@ const multiConfig = [
                 filename: './hls-peerify.js',
                 sourceMapFilename: './hls-peerify.js.map',
                 path: path.resolve(__dirname),
+                // path: path.resolve(__dirname, 'dist'),
                 // publicPath: '/src/',
                 library: ['HlsPeerify'],
                 libraryTarget: 'umd'

@@ -41,7 +41,7 @@
 }
 ```
 
-### POST /stats (向tracker请求peers)
+### POST /stats (向tracker上报信息)
 #### 参数
 ```javastript
 {  
@@ -56,6 +56,9 @@
     p2p: number
     conns: number                 //连接的peer数量
     failConns: number             //连接失败的数量
+    errsFragLoad: number
+    errsBufStalled: number
+    errsInternalExcpt: number
 }
 ```
 #### 返回

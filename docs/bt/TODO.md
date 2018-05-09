@@ -1,8 +1,11 @@
 ## web端
 - ua-parser
-- arraybuffer代替buffer
+- Uint8Array代替buffer
 - 分散peer请求
+- 拥塞控制
 
 ## tracker
-- connects
-- 统计信息
+- ISP 地域调度(geoip2-golang)
+
+
+

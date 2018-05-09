@@ -22,7 +22,7 @@ new WebSocketServer({
 
 function onRequest(socket) {
     var origin = socket.origin + socket.resource;
-    console.log(origin);
+    // console.log(origin);
     var websocket = socket.accept(null, origin);
 
     //在websocket加上room属性
@@ -32,23 +32,23 @@ function onRequest(socket) {
     websocket.on('message', function(message) {
 
         if (message.type === 'utf8') {
-            var msg = `ip ${socket.remoteAddress} ` + message.utf8Data;
+            var timestamp = parseInt((new Date()).valueOf()/1000);
+            var msg = `time ${timestamp} ip ${socket.remoteAddress} ` + message.utf8Data;
             onMessage(msg, websocket);
         }
     });
 
     websocket.on('close', function() {
-        console.log('delete node: ' + websocket.peerId);
+        // console.log('delete node: ' + websocket.peerId);
     });
 }
 
-app.listen(3389);
+app.listen(8803, '0.0.0.0');
 
-console.log('Please open NON-SSL URL: http://localhost:3389/');
 
 function onMessage(message, websocket) {
 
-    console.log(`onMessage ${message}`);
+    // console.log(`onMessage ${message}`);
     const room = websocket.room ? websocket.room : 'others';
     const filename = `./logs/${room}`;
     fs.appendFileSync(filename, message + '\n');

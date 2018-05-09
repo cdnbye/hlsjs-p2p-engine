@@ -92,7 +92,7 @@
         hls.on(Hls.Events.FRAG_LOADED, (id, data) => {
             var frag = data.frag;
 //            console.warn(`sn ${frag.sn} relurl ${frag.relurl} level ${frag.level} downloaded ${frag.loaded} source ${frag.loadByXhr?'CDN':'P2P'}`);
-            var source = frag.loadByXhr?'CDN':'P2P';
+            var source = frag.loadByP2P === true ?'P2P':'CDN';
             addToTable(frag.sn, frag.relurl, frag.level, frag.loaded, source);
         });
 

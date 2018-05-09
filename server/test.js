@@ -81,7 +81,7 @@
 //
 // console.log('123'+`456`)
 
-var BitSet = require('bitset');
+// var BitSet = require('bitset');
 //
 // var bs = new BitSet;
 // bs.setRange(1, 18, 1); //
@@ -137,9 +137,33 @@ var BitSet = require('bitset');
 // console.log(c.array());// should display {1,2}
 // console.log(c.has(9));// should display {1,2}
 
-let m = new Map();
-m.set(2,8);
-m.set(0,7);
-m.set(3,0);
-console.log([...m.entries()].slice(0,6))
-console.log([1,3].includes(2))
+// let m = new Map();
+// m.set(2,8);
+// m.set(0,7);
+// m.set(3,0);
+// console.log([...m.entries()].slice(0,6))
+// console.log([1,3].includes(2))
+
+// switch (7) {
+//     case 1:
+//     case 2:
+//         console.log(1)
+//         break;
+//     case 3:
+//         console.log(3)
+//         break;
+//     case 4:
+//         console.log(4)
+//         break;
+//     default:
+//         console.log(5)
+// }
+
+function ff(a, b, c) {
+    for (let arg in arguments) {
+        console.log(arguments[arg])
+        console.log(arg)
+    }
+}
+
+ff(true, false, false)

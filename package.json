@@ -13,7 +13,7 @@
     "test": "webpack --progress --env.test-bundle",
     "push_to_gitee": "git add . && git commit -m 'update' && git push",
     "copy_demo_to_remote": "scp -r ./demo/* root@120.78.168.126:/var/www/html/hls-frontend/demo",
-    "copy_dist_to_remote": "scp -r ./dist/* root@120.78.168.126:/var/www/html/hls-frontend/dist"
+    "copy_hls-peerify_to_remote": "scp -r ./hls-peerify.js root@120.78.168.126:/var/www/html/hls-frontend/dist"
   },
   "repository": {
     "type": "git",
