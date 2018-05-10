@@ -5813,6 +5813,15 @@ var HlsPeerify = function (_EventEmitter) {
                 this.hlsjs.config.scheduler = this.signaler.scheduler;
                 //在fLoader中使用fetcher
                 this.hlsjs.config.fetcher = fetcher;
+
+                //统计下载和上次信息
+                this.signaler.on('download', function (info) {
+                    _this2.emit('download', info);
+                }).on('upload', function (info) {
+                    _this2.emit('upload', info);
+                }).on('stats', function (info) {
+                    _this2.emit('stats', info);
+                });
             }
 
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADING, function (id, data) {
@@ -5827,11 +5836,13 @@ var HlsPeerify = function (_EventEmitter) {
                 _this2.hlsjs.config.currLoaded = sn;
                 _this2.signaler.currentLoadedSN = sn; //用于BT算法
                 _this2.hlsjs.config.currLoadedDuration = data.frag.duration;
+                var bitrate = Math.round(data.frag.loaded * 8 / data.frag.duration);
+                _this2.emit('stats', { bitrate: bitrate });
                 if (!_this2.signalTried && !_this2.signaler.connected && _this2.config.p2pEnabled) {
                     //用一个ts的大小和时长来代表平均streaming rate
-                    var bitrate = data.frag.loaded * 8 / data.frag.duration;
+
                     //计算子流码率
-                    _this2.signaler.scheduler.bitrate = Math.round(bitrate);
+                    _this2.signaler.scheduler.bitrate = bitrate;
                     logger.info('FRAG_LOADED bitrate ' + bitrate);
 
                     _this2.signaler.resumeP2P();
@@ -10311,6 +10322,7 @@ var BTTracker = function (_EventEmitter) {
                 _this2.fetcher.btStatsStart(json.report_interval);
                 _this2.signalerWs = _this2._initSignalerWs(); //连上tracker后开始连接信令服务器
                 _this2._handlePeers(json.peers);
+                _this2.emit('stats', { peerId: _this2.peerId });
             }).catch(function (err) {});
         }
     }, {
@@ -10412,6 +10424,7 @@ var BTTracker = function (_EventEmitter) {
                         _this4.fetcher.increFailConns();
                     }
                 }
+                _this4.emit('stats', { failConn: true });
             }).once(_pear.Events.DC_CLOSE, function () {
 
                 logger.warn('datachannel closed ' + datachannel.channelId + ' ');
@@ -10426,6 +10439,8 @@ var BTTracker = function (_EventEmitter) {
 
                 //更新conns
                 _this4.fetcher.decreConns();
+
+                _this4.emit('stats', { closedConn: true });
             }).once(_pear.Events.DC_OPEN, function () {
 
                 _this4.scheduler.handshakePeer(datachannel);
@@ -10437,6 +10452,8 @@ var BTTracker = function (_EventEmitter) {
 
                 //更新conns
                 _this4.fetcher.increConns();
+
+                _this4.emit('stats', { openedConn: true });
             });
         }
     }, {
@@ -10504,26 +10521,34 @@ var BTTracker = function (_EventEmitter) {
         }
     }, {
         key: '_setupScheduler',
-        value: function _setupScheduler(s) {}
+        value: function _setupScheduler(s) {
+            var _this6 = this;
+
+            s.on('download', function (info) {
+                _this6.emit('download', info);
+            }).on('upload', function (info) {
+                _this6.emit('upload', info);
+            });
+        }
     }, {
         key: '_heartbeat',
         value: function _heartbeat() {
-            var _this6 = this;
+            var _this7 = this;
 
             this.heartbeater = window.setInterval(function () {
-                _this6.fetcher.btHeartbeat();
+                _this7.fetcher.btHeartbeat();
             }, this.heartbeatInterval * 1000);
         }
     }, {
         key: '_requestMorePeers',
         value: function _requestMorePeers() {
-            var _this7 = this;
+            var _this8 = this;
 
             if (this.scheduler.peerMap.size <= Math.floor(this.config.neighbours / 2)) {
                 this.fetcher.btGetPeers().then(function (json) {
                     logger.info('_requestMorePeers ' + JSON.stringify(json));
-                    _this7._handlePeers(json.peers);
-                    _this7._tryConnectToPeer();
+                    _this8._handlePeers(json.peers);
+                    _this8._tryConnectToPeer();
                 });
             }
         }
@@ -10833,6 +10858,7 @@ var BTScheduler = function (_EventEmitter) {
                     _this3.bufMgr.addBuffer(response.sn, response.url, response.data);
                 }
                 _this3.updateLoadedSN(response.sn);
+                _this3.emit('download', { size: response.data.byteLength, from: dc.remotePeerId, url: response.url, sn: response.sn });
             }).on(_pear.Events.DC_REQUEST, function (msg) {
                 var url = '';
                 if (!msg.url) {
@@ -10845,6 +10871,7 @@ var BTScheduler = function (_EventEmitter) {
                 if (url && _this3.bufMgr.hasSegOfURL(url)) {
                     var seg = _this3.bufMgr.getSegByURL(url);
                     dc.sendBuffer(msg.sn, seg.relurl, seg.data);
+                    _this3.emit('upload', { size: seg.size, from: dc.remotePeerId, url: seg.relurl, sn: msg.sn });
                 } else {
                     dc.sendJson({
                         event: _pear.Events.DC_PIECE_NOT_FOUND,
