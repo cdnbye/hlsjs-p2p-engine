@@ -17,9 +17,11 @@ npm install cdnbye --save
 ## usage
 coming soon...
 
-## API
-coming soon...
+## API and Configuration
+See [API.md](docs/English/API.md)
 
+## Design
+See [design.md](docs/English/design.md)
 
 
 
