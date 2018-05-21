@@ -1,38 +1,34 @@
 {
-  "name": "hls-peerify",
-  "version": "0.0.1",
-  "description": "通过WebRTC datachannel技术来实现hls的p2p传输",
-  "main": "./dist/hls-peerify.js",
+  "name": "cdnbye",
+  "version": "0.0.2",
+  "description": "This JS library implements WebRTC datachannel to scale live/vod video streaming by peer-to-peer network using bittorrent-like protocol",
+  "main": "./dist/hls.min.js",
   "scripts": {
-    "build-hls-peerify": "webpack --progress --env.build-hls-peerify",
-    "bundle-peerify-hls": "webpack --progress --env.bundle-peerify-hls",
-    "release-hls-peerify": "webpack --progress --env.release-hls-peerify",
-    "release-hls-peerify-vod": "webpack --progress --env.release-hls-peerify-vod",
-    "release-hls-peerify-live": "webpack --progress --env.release-hls-peerify-live",
-    "release-peerify-hls": "webpack --progress --env.release-peerify-hls",
-    "test": "webpack --progress --env.test-bundle",
-    "push_to_gitee": "git add . && git commit -m 'update' && git push",
-    "copy_demo_to_remote": "scp -r ./demo/* root@120.78.168.126:/var/www/html/hls-frontend/demo",
-    "copy_hls-peerify_to_remote": "scp -r ./hls-peerify.js root@120.78.168.126:/var/www/html/hls-frontend/dist"
+    "bundle-engine": "webpack --progress --env.bundle-engine",
+    "bundle-hlsjs": "webpack --progress --env.bundle-hlsjs",
+    "release-engine": "webpack --progress --env.release-engine",
+    "release-hlsjs": "webpack --progress --env.release-hlsjs",
+    "publish": "npm publish",
+    "git-push": "git add . && git commit -m 'update' && git push",
+    "test": "webpack --progress --env.test-bundle"
   },
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/PearInc/hls-peerify.git"
+    "url": "https://github.com/cdnbye/hlsjs-p2p-engine.git"
   },
-  "author": "Xie Ting",
-  "license": "ISC",
+  "author": "TimmyXie",
+  "license": "MIT",
   "dependencies": {
-    "buffer": "^5.0.8",
+    "cdnbye-core": "^0.0.4",
     "hls.js": "^0.8.9",
     "reconnecting-websocket": "^3.2.2",
-    "simple-peer": "^9.0.0",
-    "simple-sha1": "^2.1.0",
     "ua-parser-js": "^0.7.17"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-es2015": "^6.24.1",
     "babili-webpack-plugin": "^0.1.2",

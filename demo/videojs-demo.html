@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>p2p hls in videojs5</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name=”renderer” content=”webkit” />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style>
+        #main {
+            margin: 40px auto;
+            width: 1000px;
+        }
+        /*.table {*/
+        /*height:150px;*/
+        /*overflow: scroll;*/
+        /*}*/
+    </style>
+</head>
+
+<!--<script src="../dist/hls-peerify-bundle.js"></script>-->
+<!--<script src="../dist/hls-peerify-bundle.min.js"></script>-->
+<link href="http://vjs.zencdn.net/5.19.2/video-js.css" rel="stylesheet">
+<script src="http://vjs.zencdn.net/5.19.2/video.js"></script>
+<script src="../dist/videojs-contrib-hlsjs.min.js"></script>
+<script src="../dist/hlsjs-p2p-engine.js"></script>
+<!--<script src="../dist/hlsjs-p2p-engine.min.js"></script>-->
+<body>
+<div id="main">
+    <video id="player" class="video-js vjs-default-skin" height="360" width="640" controls preload="none">
+        <!--<source src="http://wowza.peer5.com/live/smil:bbb_abr.smil/chunklist_w794046364_b2204000.m3u8"-->
+                <!--type="application/x-mpegURL"/>-->
+        <!--<source src="http://120.79.51.249:8080/hls/stream.m3u8"-->
+                <!--type="application/x-mpegURL"/>-->
+        <source src="https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8"
+                type="application/x-mpegURL"/>
+    </video>
+    <table class="table table-hover" style="border: 0; margin: 0">
+        <thead>
+        <tr style="text-align: center">
+            <td width="129" style="margin: 0">sn</td>
+            <td width="578" style="margin: 0">url</td>
+            <td width="49">level</td>
+            <td width="146">size</td>
+            <td width="98">source</td>
+        </tr>
+        </thead>
+    </table>
+    <div class="sr-only cpm-downloadresult"  style="height:360px; overflow:auto;">
+
+        <!--<p class="help-block">Downloading...</p>-->
+        <table id="table-body" class="table table-hover">
+            <tbody ></tbody>
+        </table>
+    </div>
+</div>
+<script>
+    //view
+
+    var cpm = {
+        downloadresult: document.querySelectorAll('.cpm-downloadresult')[0],
+        table: document.querySelectorAll('#table-body tbody')[0]
+    };
+    var  addToTable = function (sn, url, level, downloaded, source) {
+        cpm.table.innerHTML +=
+            `<tr style="text-align: center">
+                    <td>${sn}</td>
+                    <td>${url}</td>
+                    <td>${level}</td>
+                    <td>${downloaded}</td>
+                    <td>${source}</td>
+                </tr>`
+    };
+
+    //controller
+    var player = videojs('#player', {
+        autoplay: true,
+        html5: {
+            hlsjsConfig: {
+                maxBufferSize: 0,
+                liveSyncDurationCount: 10,
+                fragLoadingTimeOut: 4000,              // used by fragment-loader
+            }
+        }
+    });
+
+    var p2pConfig = {
+        key: 'free',
+        enableLogUpload: false,
+        logLevel: 'debug',
+
+    };
+    new CDNBye(player.tech_.sourceHandler_.hls, p2pConfig);
+
+    player.tech_.on(Hls.Events.MANIFEST_LOADED, function (e) {
+        player.tech_.sourceHandler_.hls.loadLevel = 0;
+        cpm.downloadresult.classList.remove('sr-only');
+    });
+
+    player.tech_.on(Hls.Events.FRAG_LOADED, function (e, data) {
+        var frag = data.frag;
+//            console.warn(`sn ${frag.sn} relurl ${frag.relurl} level ${frag.level} downloaded ${frag.loaded} source ${frag.loadByXhr?'CDN':'P2P'}`);
+        var source = frag.loadByP2P === true ?'P2P':'CDN';
+        addToTable(frag.sn, frag.relurl, frag.level, frag.loaded, source);
+    });
+
+</script>
+</body>
+</html>

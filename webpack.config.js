@@ -55,7 +55,7 @@ function getPluginsForConfig(minify = false, type) {
             new webpack.optimize.UglifyJsPlugin(uglifyJsOptions),
             new webpack.LoaderOptionsPlugin({
                 minimize: true,
-                debug: false
+                debug: true
             })
         ]);
     }
@@ -91,28 +91,26 @@ function getAliasesForLightDist(target = 'vod') {
 
 const multiConfig = [
         {
-            name: 'build-hls-peerify',
-            entry: './lib/index.hls-peerify.js',
+            name: 'bundle-engine',
+            entry: './src/index.engine.js',
             output: {
-                filename: './hls-peerify.js',
-                sourceMapFilename: './hls-peerify.js.map',
-                path: path.resolve(__dirname),
-                // path: path.resolve(__dirname, 'dist'),
+                filename: './hlsjs-p2p-engine.js',
+                sourceMapFilename: './hlsjs-p2p-engine.js.map',
+                path: path.resolve(__dirname, 'dist'),
                 // publicPath: '/src/',
-                library: ['HlsPeerify'],
+                library: ['CDNBye'],
                 libraryTarget: 'umd'
             },
             plugins: getPluginsForConfig(),
             devtool: 'source-map',
         },
         {
-            name: 'bundle-peerify-hls',
-            entry: './peerify-hls.js',
+            name: 'bundle-hlsjs',
+            entry: './src/index.hls.js',
             output: {
-                filename: 'peerify-hls-bundle.js',
-                sourceMapFilename: './peerify-hls-bundle.js.map',
-                path: path.resolve(__dirname),
-                // publicPath: '/dist/',
+                filename: 'hls.js',
+                sourceMapFilename: './hls.js.map',
+                path: path.resolve(__dirname, 'dist'),
                 library: ['Hls'],
                 libraryTarget: 'umd'
             },
@@ -120,59 +118,28 @@ const multiConfig = [
             devtool: 'source-map',
         },
         {
-            name: 'release-hls-peerify',
-            entry: './lib/index.hls-peerify.js',
+            name: 'release-engine',
+            entry: './src/index.engine.js',
             output: {
-                filename: 'hls-peerify.min.js',
+                filename: 'hlsjs-p2p-engine.min.js',
                 path: path.resolve(__dirname, 'dist'),
                 // publicPath: '/src/',
-                library: ['HlsPeerify'],
+                library: ['CDNBye'],
                 libraryTarget: 'umd'
             },
             plugins: getPluginsForConfig(true)
         },
         {
-            name: 'release-hls-peerify-vod',
-            entry: './lib/index.hls-peerify.js',
+            name: 'release-hlsjs',
+            entry: './src/index.hls.js',
             output: {
-               filename: 'hls-peerify-vod.min.js',
+               filename: 'hls.min.js',
                path: path.resolve(__dirname, 'dist'),
-                // publicPath: '/src/',
-               library: ['HlsPeerify'],
+               library: ['Hls'],
                libraryTarget: 'umd'
             },
-            resolve: {
-                alias: getAliasesForLightDist('vod')
-            },
-            plugins: getPluginsForConfig(true, 'vod')
-         },
-        {
-            name: 'release-hls-peerify-live',
-            entry: './lib/index.hls-peerify.js',
-            output: {
-                filename: 'hls-peerify-live.min.js',
-                path: path.resolve(__dirname, 'dist'),
-                // publicPath: '/src/',
-                library: ['HlsPeerify'],
-                libraryTarget: 'umd'
-            },
-            resolve: {
-                alias: getAliasesForLightDist('live')
-            },
-            plugins: getPluginsForConfig(true, 'live')
-        },
-        {
-            name: 'release-peerify-hls',
-            entry: './peerify-hls.js',
-            output: {
-                filename: 'peerify-hls-bundle.js',
-                path: path.resolve(__dirname, 'dist'),
-                // publicPath: '/dist/',
-                library: ['Hls'],
-                libraryTarget: 'umd'
-            },
             plugins: getPluginsForConfig(true)
-        },
+         },
         //test
         {
             name: 'test-bundle',
