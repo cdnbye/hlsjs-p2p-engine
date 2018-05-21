@@ -3,6 +3,6 @@
 /node_modules
 /test
 /server
-/src/cdnbye-core/
+/src/cdnbye-core/*
 !/src/cdnbye-core/index.js
 /docs/Private
