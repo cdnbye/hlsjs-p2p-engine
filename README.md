@@ -1,4 +1,4 @@
-<h1 align="center"><a href="" target="_blank" rel="noopener noreferrer"><img width="250" src="http://120.78.168.126/logo/cdnbye.png" alt="cdnbye logo"></a></h1>
+<h1 align="center"><a href="" target="_blank" rel="noopener noreferrer"><img width="250" src="figs/cdnbye.png" alt="cdnbye logo"></a></h1>
 <h4 align="center">It's time to say bye to CDN.</h4>
 
 
