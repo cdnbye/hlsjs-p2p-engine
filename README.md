@@ -94,7 +94,7 @@ coming soon...
 
 ## Donation
 If you find CDNBye useful, you can buy me a cup of coffee<br>
-<img width="250" src="figs/pay.jpeg" alt="donation">
+<img width="200" src="figs/pay.jpeg" alt="donation">
 
 
 
