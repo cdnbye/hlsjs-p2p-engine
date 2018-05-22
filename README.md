@@ -10,8 +10,27 @@ This JS library implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC) datach
 Put the [quick-start.html](demo/quick-start.html) in your web page, run it(the seed, if no one else in the channel). Wait for a few seconds，then open the same page from another browser(the receiver). Now you have a direct P2P connection between two browsers without plugin!
 
 ## Installation
+
+### Pre-built Script
+Include the latest version bundled with hls.js(recommended): 
+```javascript
+<script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
+```
+Or include the latest version without hls.js:
+```javascript
+<script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
+```
+
+### Via NPM
 ```
 npm install cdnbye --save
+```
+In your application import/require the package you want to use as the following examples:
+```javascript
+import Hls from 'cdnbye/src/index.hls';   //the package with hls.js
+```
+```javascript
+import CDNBye from 'cdnbye/src/index.engine';   //the package without hls.js
 ```
 
 ## usage
