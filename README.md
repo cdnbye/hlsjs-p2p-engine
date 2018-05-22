@@ -4,7 +4,7 @@
 
 **[中文](docs/中文/README_CH.md)**
 
-This JS library implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC) datachannel to scale live/vod video streaming by peer-to-peer network using bittorrent-like protocol. Powed by [hls.js](https://github.com/video-dev/hls.js), it can play HLS on any platform with many popular HTML5 players such as video.js, Clappr and Flowplayer.  This library is a part of CDNBye project which attempts to deliver high quality video streams， decreasing the number of requests to CDN servers, reducing the cost of transmission and enhancing system’s scalability. As the name suggests, CDNBye will help you offload bandwidth from expensive traditional CDNs，while also maximizing a user’s viewing experience.
+This JS library implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC) datachannel to scale live/vod video streaming by peer-to-peer network using bittorrent-like protocol. Powered by [hls.js](https://github.com/video-dev/hls.js), it can play HLS on any platform with many popular HTML5 players such as video.js, Clappr and Flowplayer. This library is a part of CDNBye project which attempts to deliver high quality video streams, decreasing the number of requests to CDN servers, reducing the cost of transmission and enhancing system’s scalability. As the name suggests, CDNBye will help you offload bandwidth from expensive traditional CDNs，while also maximizing a user’s viewing experience.
 
 ## Playground
 coming soon...
@@ -13,7 +13,7 @@ coming soon...
 Put the [quick-start.html](demo/quick-start.html) in your web page, run it(the seed, if no one else in the channel). Wait for a few seconds，then open the same page from another browser(the receiver). Now you have a direct P2P connection between two browsers without plugin!
 
 ## Browser Support
-WebRTC has already been incorporated into the HTML5 standard and it is broadly deployed in many modern browsers.
+WebRTC has already been incorporated into the HTML5 standard and it is broadly deployed in modern browsers.
 
  Browser|Chrome | Firefox | Safari | Opera | IE | Edge|   
 :-: | :-: | :-: | :-: | :-: | :-: | :-:
