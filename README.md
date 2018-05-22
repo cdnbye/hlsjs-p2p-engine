@@ -14,7 +14,7 @@ Put the [quick-start.html](demo/quick-start.html) in your web page, run it(the s
 
 ## Installation
 
-### Pre-built Script
+#### Pre-built Script
 Include the latest version bundled with hls.js(recommended): 
 ```javascript
 <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
@@ -24,7 +24,7 @@ Or include the latest version without hls.js:
 <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
 ```
 
-### Via NPM
+#### Via NPM
 ```
 cd yourProject && npm install cdnbye --save
 ```
@@ -36,8 +36,8 @@ import Hls from 'cdnbye/src/index.hls';   //the package with hls.js
 import CDNBye from 'cdnbye/src/index.engine';   //the package without hls.js
 ```
 
-## usage
-### Bundle
+## Usage
+#### Bundle
 Add p2pConfig as a property of hlsjsConfig, then Create hls.js instance passing hlsjsConfig as constructor param.
 ```javascript
 var hlsjsConfig = {
@@ -52,7 +52,7 @@ var hlsjsConfig = {
 var hls = new Hls(hlsjsConfig);
 // Use `hls` just like the usual hls.js ...
 ```
-### Engine(the library without hls.js)
+#### Engine(the library without hls.js)
 Create hls.js instance passsing hlsjsConfig as param. Create CDNbye instance passing hls.js instance and p2pConfig as params. Call hls.js loadSource and attachMedia methods.
 ```javascript
 var hlsjsConfig = {
