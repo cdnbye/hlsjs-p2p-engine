@@ -83,6 +83,12 @@ See [API.md](docs/English/API.md)
 ## Design
 See [design.md](docs/English/design.md)
 
+## Player integration
+coming soon...
+
+
+
+
 
 
 
