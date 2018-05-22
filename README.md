@@ -13,7 +13,8 @@ coming soon...
 Put the [quick-start.html](demo/quick-start.html) in your web page, run it(the seed, if no one else in the channel). Wait for a few seconds，then open the same page from another browser(the receiver). Now you have a direct P2P connection between two browsers without plugin!
 
 ## Browser Support
- Platform|Chrome | Firefox | Safari | Opera | IE | Edge|   
+WebRTC has already been incorporated into the HTML5 standard and it is broadly deployed in many modern browsers.
+ Browser|Chrome | Firefox | Safari | Opera | IE | Edge|   
 :-: | :-: | :-: | :-: | :-: | :-: | :-:
 Support | Yes | Yes | Yes | Yes | No | No 
 
