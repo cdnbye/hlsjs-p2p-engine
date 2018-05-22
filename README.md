@@ -12,6 +12,8 @@ coming soon...
 ## Quick Start
 Put the [quick-start.html](demo/quick-start.html) in your web page, run it(the seed, if no one else in the channel). Wait for a few seconds，then open the same page from another browser(the receiver). Now you have a direct P2P connection between two browsers without plugin!
 
+## Browser Support
+
 ## Installation
 
 #### Pre-built Script
@@ -34,7 +36,7 @@ import Hls from 'cdnbye/src/index.hls';   // the package with hls.js
 ```
 Or 
 ```javascript
-import CDNBye from 'cdnbye/src/index.engine';   // the package without hls.js
+import CDNBye from 'cdnbye/dist/hlsjs-p2p-engine';   // the package without hls.js
 ```
 
 ## Usage
@@ -84,9 +86,15 @@ See [API.md](docs/English/API.md)
 ## Design
 See [design.md](docs/English/design.md)
 
+## FAQ
+We have collected some [frequently asked questions](docs/English/FAQ.md). Before reporting an issue, please search if the FAQ has the answer to your problem.
+
 ## Player integration
 coming soon...
 
+## Donation
+If you find CDNBye useful, you can buy me a cup of coffee
+<img src="figs/pay.jpeg" alt="donation">
 
 
 
