@@ -30,10 +30,11 @@ cd yourProject && npm install cdnbye --save
 ```
 In your application import/require the package you want to use as the following examples:
 ```javascript
-import Hls from 'cdnbye/src/index.hls';   //the package with hls.js
+import Hls from 'cdnbye/src/index.hls';   // the package with hls.js
 ```
+Or 
 ```javascript
-import CDNBye from 'cdnbye/src/index.engine';   //the package without hls.js
+import CDNBye from 'cdnbye/src/index.engine';   // the package without hls.js
 ```
 
 ## Usage
@@ -67,7 +68,7 @@ var p2pConfig = {
 };
 
 var hls = new Hls(hlsjsConfig);
-var p2pEngine = new CDNbye(hls, p2pConfig);
+var p2pEngine = new CDNbye(hls, p2pConfig);        // Key step
 
 // Use `hls` just like your usual hls.js…
 hls.loadSource(contentUrl);
