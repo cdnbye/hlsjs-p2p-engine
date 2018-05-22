@@ -16,11 +16,11 @@ The first web peer will serve as a seed, if no one else in the same channel.
 ## Browser Support
 WebRTC has already been incorporated into the HTML5 standard and it is broadly deployed in modern browsers. The compatibility of CDNBye depends on the browser support of WebRTC and MSE. Please note that iOS Safari "Mobile" does not support the MediaSource API.
 
- Browser|Chrome | Firefox | Mac Safari| iOS Safari | Opera | IE | Edge|   
+ Compatibility|Chrome | Firefox | Mac Safari| iOS Safari | Opera | IE | Edge|   
 :-: | :-: | :-: | :-: | :-: | :-: | :-:| :-:
 WebRTC | Yes | Yes | Yes | Yes | Yes | No | No
 MSE | Yes | Yes | Yes | No | Yes | Yes | Yes
-Support | Yes | Yes | Yes | No | Yes | No | No 
+CDNBye | Yes | Yes | Yes | No | Yes | No | No 
 
 ## Installation
 
