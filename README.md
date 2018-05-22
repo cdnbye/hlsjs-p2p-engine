@@ -14,6 +14,7 @@ Put the [quick-start.html](demo/quick-start.html) in your web page, run it(the s
 
 ## Browser Support
 WebRTC has already been incorporated into the HTML5 standard and it is broadly deployed in many modern browsers.
+
  Browser|Chrome | Firefox | Safari | Opera | IE | Edge|   
 :-: | :-: | :-: | :-: | :-: | :-: | :-:
 Support | Yes | Yes | Yes | Yes | No | No 
