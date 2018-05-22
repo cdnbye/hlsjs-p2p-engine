@@ -13,9 +13,9 @@ coming soon...
 Put the [quick-start.html](demo/quick-start.html) in your web page, run it(the seed, if no one else in the channel). Wait for a few seconds，then open the same page from another browser(the receiver). Now you have a direct P2P connection between two browsers without plugin!
 
 ## Browser Support
- \/|总样本 |有效样本 | 无效样本 
-:-: | :-: | :-: | :-: 
-数量 | 68| 60 | 8 
+ Platform|Chrome | Firefox | Safari | Opera | IE | Edge|   
+:-: | :-: | :-: | :-: | :-: | :-: | :-:
+Support | Yes | Yes | Yes | Yes | No | No 
 
 ## Installation
 
