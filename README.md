@@ -44,7 +44,7 @@ import Hls from 'cdnbye';   // the package with hls.js
 ```
 Or 
 ```javascript
-import Hls from 'hls.js';     //run "npm install --save hls.js" first
+import Hls from 'hls.js';     //please run "npm install --save hls.js" first
 import P2PEngine from 'cdnbye/dist/hlsjs-p2p-engine';   // the package without hls.js
 ```
 
