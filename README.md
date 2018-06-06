@@ -44,7 +44,7 @@ import Hls from 'cdnbye';   // the package with hls.js
 ```
 Or 
 ```javascript
-import CDNBye from 'cdnbye/dist/hlsjs-p2p-engine';   // the package without hls.js
+import P2PEngine from 'cdnbye/dist/hlsjs-p2p-engine';   // the package without hls.js
 ```
 
 ## Usage
@@ -78,7 +78,7 @@ var p2pConfig = {
 };
 
 var hls = new Hls(hlsjsConfig);
-var p2pEngine = new CDNbye(hls, p2pConfig);        // Key step
+var p2pEngine = new P2PEngine(hls, p2pConfig);        // Key step
 
 // Use `hls` just like your usual hls.js…
 hls.loadSource(contentUrl);
