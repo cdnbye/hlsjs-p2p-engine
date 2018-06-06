@@ -40,7 +40,7 @@ cd yourProject && npm install cdnbye --save
 ```
 In your application import/require the package you want to use as the following examples:
 ```javascript
-import Hls from 'cdnbye/src/index.hls';   // the package with hls.js
+import Hls from 'cdnbye';   // the package with hls.js
 ```
 Or 
 ```javascript
