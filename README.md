@@ -9,9 +9,16 @@ This JS library implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC) datach
 ## Playground
 coming soon...
 
-## Quick Start
+## Getting Started
+#### Quick Start Demo
 Put the [quick-start.html](demo/quick-start.html) in your web page, run it. Wait for a few seconds，then open the same page from another browser(the receiver). Now you have a direct P2P connection between two browsers without plugin!
 The first web peer will serve as a seed, if no one else in the same channel.
+#### Integrate to Your Hls.js project
+Simply replace the hls.js script tag(eg: <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>) with 
+ ```javascript
+<script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
+```
+That's it!
 
 ## Browser Support
 WebRTC has already been incorporated into the HTML5 standard and it is broadly deployed in modern browsers. The compatibility of CDNBye depends on the browser support of WebRTC and MSE. Please note that iOS Safari "Mobile" does not support the MediaSource API.
