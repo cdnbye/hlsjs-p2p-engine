@@ -99,7 +99,7 @@ See [design.md](docs/English/design.md)
 We have collected some [frequently asked questions](docs/English/FAQ.md). Before reporting an issue, please search if the FAQ has the answer to your problem.
 
 ## Player integration
-coming soon...
+- [flowplayer](https://flowplayer.com/docs/player/setup#hlsjs-lite)
 
 ## Donation
 If you find CDNBye useful, you can buy me a cup of coffee :)<br>
