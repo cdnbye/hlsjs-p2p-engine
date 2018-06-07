@@ -13,7 +13,7 @@ coming soon...
 #### Quick Start Demo
 Put the [quick-start.html](demo/quick-start.html) in your web page, run it. Wait for a few seconds，then open the same page from another browser(the receiver). Now you have a direct P2P connection between two browsers without plugin!
 The first web peer will serve as a seed, if no one else in the same channel.
-#### Integrate to Your Hls.js project
+#### Integrate to Your Hls.js Project
 Simply replace the hls.js script tag like:
  ```javascript
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
