@@ -94,7 +94,12 @@
     player.tech_.on(Hls.Events.FRAG_LOADED, function (e, data) {
         var frag = data.frag;
 //            console.warn(`sn ${frag.sn} relurl ${frag.relurl} level ${frag.level} downloaded ${frag.loaded} source ${frag.loadByXhr?'CDN':'P2P'}`);
-        var source = frag.loadByP2P === true ?'P2P':'CDN';
+        var source = undefined;
+        if (frag.loadByHTTP === true) {
+            source = 'CDN';
+        } else if (frag.loadByP2P === true) {
+            source = 'P2P';
+        }
         addToTable(frag.sn, frag.relurl, frag.level, frag.loaded, source);
     });
 

@@ -42,6 +42,7 @@ class P2PEngine extends EventEmitter {
             //初始化logger
             let logger = new Logger(this.config, channel);
             window.logger = logger;
+            this.logger = logger;
 
             this._init(channel);
 
@@ -74,7 +75,7 @@ class P2PEngine extends EventEmitter {
 
 
         //实例化Fetcher
-        let fetcher = new Fetcher(this.config.key, window.encodeURIComponent(channel), this.config.announce, browserInfo);
+        let fetcher = new Fetcher(this, this.config.key, window.encodeURIComponent(channel), this.config.announce, browserInfo);
         this.fetcher = fetcher;
         //实例化tracker服务器
         this.signaler = new Tracker(fetcher, this.config);
@@ -106,6 +107,7 @@ class P2PEngine extends EventEmitter {
         this.signalTried = false;                                                   //防止重复连接ws
         this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADED, (id, data) => {
             let sn = data.frag.sn;
+            console.warn(`data.frag.loadByHTTP ${data.frag.loadByHTTP}`);
             this.hlsjs.config.currLoaded = sn;
             this.signaler.currentLoadedSN = sn;                                //用于BT算法
             this.hlsjs.config.currLoadedDuration = data.frag.duration;

@@ -21,7 +21,12 @@
         var total = 0, p2p = 0;
         hls.on(Hls.Events.FRAG_LOADED, (id, data) => {
             var frag = data.frag;
-            var source = frag.loadByP2P === true ? 'P2P':'CDN';
+            var source = undefined;
+            if (frag.loadByHTTP === true) {
+                source = 'CDN';
+            } else if (frag.loadByP2P === true) {
+                source = 'P2P';
+            }
             addToTable(frag.relurl, frag.loaded, source);
             total += frag.loaded;
             if (source === 'P2P') p2p += frag.loaded;

@@ -34,6 +34,8 @@ class FragLoader extends EventEmitter {
      */
     load(context, config, callbacks) {
         const frag = context.frag;
+        frag.loadByP2P = false;                //初始化flag
+        frag.loadByHTTP = false;
         if (this.bufMgr.hasSegOfURL(frag.relurl)) {                                     //如果命中缓存
             logger.debug(`bufMgr found seg sn ${frag.sn} url ${frag.relurl}`);
             let seg = this.bufMgr.getSegByURL(frag.relurl);
@@ -42,7 +44,7 @@ class FragLoader extends EventEmitter {
             tfirst = tload = trequest + 50;
             loaded = total = frag.loaded = seg.size;
             let stats={ trequest, tfirst, tload, loaded, total, retry: 0 };
-            context.frag.loadByP2P = true;
+            frag.loadByP2P = true;
             window.setTimeout(() => {                                                   //必须是异步回调
                 this.fetcher.reportFlow(stats, true);
                 callbacks.onSuccess(response, stats, context);
@@ -53,7 +55,8 @@ class FragLoader extends EventEmitter {
             this.scheduler.load(context, config, callbacks);
             callbacks.onTimeout = (stats, context) => {                             //如果P2P下载超时则立即切换到xhr下载
                 logger.debug(`xhrLoader load ${frag.relurl} at ${frag.sn}`);
-                context.frag.loadByP2P = false;
+                frag.loadByP2P = false;
+                frag.loadByHTTP = true;
                 this.xhrLoader.load(context, config, callbacks);
             };
             const onSuccess = callbacks.onSuccess;
@@ -67,7 +70,7 @@ class FragLoader extends EventEmitter {
             };
         } else {
             logger.debug(`xhrLoader load ${frag.relurl} at ${frag.sn}`);
-            context.frag.loadByP2P = false;
+            context.frag.loadByHTTP = true;
             this.xhrLoader.load(context, config, callbacks);
             const onSuccess = callbacks.onSuccess;
             callbacks.onSuccess = (response, stats, context) => {                       //在onsucess回调中复制并缓存二进制数据
