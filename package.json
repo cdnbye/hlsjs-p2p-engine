@@ -8,8 +8,9 @@
     "bundle-hlsjs": "webpack --progress --env.bundle-hlsjs",
     "release-engine": "webpack --progress --env.release-engine",
     "release-hlsjs": "webpack --progress --env.release-hlsjs",
+    "release-hlsjs-light": "webpack --progress --env.release-hlsjs-light",
     "publish": "npm publish",
-    "git-push": "git add . && git commit -m 'update' && git push",
+    "git-push": "git add . && git commit -m 'add new demos' && git push",
     "test": "webpack --progress --env.test-bundle"
   },
   "repository": {

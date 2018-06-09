@@ -67,23 +67,15 @@ function getConstantsForConfig(type) {                                          
 
     return {
         __VERSION__: JSON.stringify(pkgJson.version),
-        __EXCLUDE_LIVE__: type === 'vod',
-        __EXCLUDE_VOD__: type === 'live'
     };
 }
 
-function getAliasesForLightDist(target = 'vod') {
+function getAliasesForLightDist() {
     let aliases = {};
 
-    if (target === 'vod') {
-        aliases = Object.assign({}, aliases, {
-            './fastmesh': './empty.js'
-        });
-    } else if (target === 'live') {
-        aliases = Object.assign({}, aliases, {
-            './bittorrent': './empty.js'
-        });
-    }
+    aliases = Object.assign({}, aliases, {
+        './bittorrent': './empty.js'
+    });
 
 
     return aliases;
@@ -140,6 +132,17 @@ const multiConfig = [
             },
             plugins: getPluginsForConfig(true)
          },
+         {
+            name: 'release-hlsjs-light',
+            entry: './src/index.hls.light.js',
+            output: {
+                filename: 'hls.light.min.js',
+                path: path.resolve(__dirname, 'dist'),
+                library: ['Hls'],
+                libraryTarget: 'umd'
+            },
+        plugins: getPluginsForConfig(true)
+    },
         //test
         {
             name: 'test-bundle',

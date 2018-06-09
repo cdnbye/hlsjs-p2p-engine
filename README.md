@@ -112,7 +112,19 @@ See [design.md](docs/English/design.md)
 We have collected some [frequently asked questions](docs/English/FAQ.md). Before reporting an issue, please search if the FAQ has the answer to your problem.
 
 ## Player integration
-- [flowplayer](https://flowplayer.com/docs/player/setup#hlsjs-lite)
+- [videojs](http://videojs.com/)
+    - See [videojs-demo.html](demo/videojs-demo.html)
+- [flowplayer](https://flowplayer.com/)
+    - See [flowplayer-demo.html](demo/flowplayer-demo.html)
+- [DPlayer](https://github.com/MoePlayer/DPlayer)
+    - See [dplayer-demo.html](demo/dplayer-demo.html)
+- [clappr](https://github.com/clappr/clappr)
+    - coming soon!
+- [MediaElement.js](http://www.mediaelementjs.com/)
+    - coming soon!
+- [Fluid Player](https://www.fluidplayer.com/)
+    - coming soon!
+
 
 ## Donation
 If you find CDNBye useful, you can buy me a cup of coffee :)<br>

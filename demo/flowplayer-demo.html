@@ -1,0 +1,24 @@
+<!-- head section -->
+<!-- skin -->
+<link rel="stylesheet" href="https://releases.flowplayer.org/7.2.6/skin/skin.css">
+<!-- hls.js -->
+<!--<script src="https://cdn.jsdelivr.net/npm/cdnbye@0.1.0"></script>-->
+<script src="../dist/hls.light.min.js"></script>
+<!-- flowplayer -->
+<script src="https://releases.flowplayer.org/7.2.6/flowplayer.min.js"></script>
+
+<!-- body section -->
+<div id="player"></div>
+
+<script>
+    flowplayer('#player', {
+        live: true,  // set if it's a live stream
+        ratio: 9/16, // set the aspect ratio of the stream
+        clip: {
+            sources: [
+                // path to the HLS m3u8
+                { type: "application/x-mpegurl", src: "https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8"},
+            ]
+        }
+    });
+</script>
