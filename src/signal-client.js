@@ -7,8 +7,9 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 
 
 class SignalClient extends EventEmitter{
-    constructor(peerId, config) {
+    constructor(engine, peerId, config) {
         super();
+        this.engine = engine;
         this.peerId = peerId;
         this.config = config;
         this.connected = false;
@@ -16,6 +17,7 @@ class SignalClient extends EventEmitter{
     }
 
     _init(id) {
+        const { logger } = this.engine;
         const wsOptions = {
             maxRetries: this.config.wsMaxRetries,
             minReconnectionDelay: this.config.wsReconnectInterval*1000

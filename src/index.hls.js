@@ -2,7 +2,7 @@
  * Created by xieting on 2018/1/2.
  */
 
-import CDNBye from './index.engine';
+import P2PEngine from './index.engine';
 import Hlsjs from 'hls.js';
 // import Hlsjs from 'hls.js/dist/hls.light';
 
@@ -16,11 +16,11 @@ let recommendedHlsjsConfig = {
 class CDNByeHlsjs extends Hlsjs{
 
     static get P2PEvents() {
-        return CDNBye.Events;
+        return P2PEngine.Events;
     }
 
     static get uaParserResult() {
-        return CDNBye.uaParserResult;
+        return P2PEngine.uaParserResult;
     }
 
     constructor(config = {}) {
@@ -32,24 +32,24 @@ class CDNByeHlsjs extends Hlsjs{
 
         super(mergedHlsjsConfig);
 
-        if (CDNBye.WEBRTC_SUPPORT) {
-            this.p2pPlugin = new CDNBye(this, p2pConfig);
+        if (P2PEngine.WEBRTC_SUPPORT) {
+            this.engine = new P2PEngine(this, p2pConfig);
         }
 
 
     }
 
     enableP2P() {
-        this.p2pPlugin.enableP2P();
+        this.engine.enableP2P();
     }
 
     disableP2P() {
-        this.p2pPlugin.disableP2P();
+        this.engine.disableP2P();
     }
 
 
 }
 
-CDNByeHlsjs.pluginVersion = CDNBye.version;
+CDNByeHlsjs.pluginVersion = P2PEngine.version;
 
 export default CDNByeHlsjs

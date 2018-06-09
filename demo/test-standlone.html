@@ -1,7 +1,6 @@
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <!--<script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>-->
 <script src="../dist/hlsjs-p2p-engine.js"></script>
-<!--<script src="../dist/hlsjs-p2p-engine.min.js"></script>-->
 <video id="video" controls></video>
 <p id="version"></p>
 <h3>download info:</h3>
@@ -13,7 +12,7 @@
     if(Hls.isSupported()) {
         var video = document.getElementById('video');
         var hls = new Hls({maxBufferSize: 0});
-        var engine = new CDNBye(hls, {logLevel: "debug"});
+        var engine = new CDNBye(hls, {logLevel: 'debug'});
         hls.loadSource('https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8');
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
@@ -41,5 +40,8 @@
                     <td>${infoStr}</td>
                 </tr>`
         };
+        engine.on('stats', (info) => {
+            console.warn(`stats ${JSON.stringify(info)}`);
+        })
     }
 </script>

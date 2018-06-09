@@ -5567,8 +5567,7 @@ var P2PEngine = function (_EventEmitter) {
 
             //初始化logger
             var logger = new _logger2.default(_this.config, channel);
-            window.logger = logger;
-            _this.logger = logger;
+            _this.hlsjs.config.logger = _this.logger = logger;
 
             _this._init(channel);
 
@@ -5588,7 +5587,9 @@ var P2PEngine = function (_EventEmitter) {
         value: function _init(channel) {
             var _this2 = this;
 
+            var logger = this.logger;
             //上传浏览器信息
+
             var browserInfo = {
                 browser: uaParserResult.browser.name,
                 device: uaParserResult.device.type === 'mobile' ? 'mobile' : 'PC',
@@ -5597,29 +5598,21 @@ var P2PEngine = function (_EventEmitter) {
 
             this.hlsjs.config.p2pEnabled = this.p2pEnabled;
             //实例化BufferManager
-            this.bufMgr = new _bufferManager2.default(this.config);
+            this.bufMgr = new _bufferManager2.default(this, this.config);
             this.hlsjs.config.bufMgr = this.bufMgr;
 
             //实例化Fetcher
             var fetcher = new _cdnbyeCore.Fetcher(this, this.config.key, window.encodeURIComponent(channel), this.config.announce, browserInfo);
             this.fetcher = fetcher;
             //实例化tracker服务器
-            this.signaler = new _bittorrent.Tracker(fetcher, this.config);
+            this.signaler = new _bittorrent.Tracker(this, fetcher, this.config);
             this.signaler.scheduler.bufferManager = this.bufMgr;
             //替换fLoader
             this.hlsjs.config.fLoader = _bittorrent.FragLoader;
-            //向loader导入scheduler
+            //向fLoader导入scheduler
             this.hlsjs.config.scheduler = this.signaler.scheduler;
             //在fLoader中使用fetcher
             this.hlsjs.config.fetcher = fetcher;
-            //统计下载和上次信息
-            this.signaler.on('download', function (info) {
-                _this2.emit('download', info);
-            }).on('upload', function (info) {
-                _this2.emit('upload', info);
-            }).on('stats', function (info) {
-                _this2.emit('stats', info);
-            });
 
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADING, function (id, data) {
                 // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
@@ -5630,12 +5623,10 @@ var P2PEngine = function (_EventEmitter) {
             this.signalTried = false; //防止重复连接ws
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADED, function (id, data) {
                 var sn = data.frag.sn;
-                console.warn('data.frag.loadByHTTP ' + data.frag.loadByHTTP);
                 _this2.hlsjs.config.currLoaded = sn;
                 _this2.signaler.currentLoadedSN = sn; //用于BT算法
                 _this2.hlsjs.config.currLoadedDuration = data.frag.duration;
                 var bitrate = Math.round(data.frag.loaded * 8 / data.frag.duration);
-                _this2.emit('stats', { bitrate: bitrate });
                 if (!_this2.signalTried && !_this2.signaler.connected && _this2.config.p2pEnabled) {
 
                     _this2.signaler.scheduler.bitrate = bitrate;
@@ -5646,6 +5637,10 @@ var P2PEngine = function (_EventEmitter) {
                 }
                 // this.streamingRate = (this.streamingRate*this.fragLoadedCounter + bitrate)/(++this.fragLoadedCounter);
                 // this.signaler.scheduler.streamingRate = Math.floor(this.streamingRate);
+                if (!data.frag.loadByHTTP) {
+                    data.frag.loadByP2P = false;
+                    data.frag.loadByHTTP = true;
+                }
             });
 
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_CHANGED, function (id, data) {
@@ -5684,7 +5679,9 @@ var P2PEngine = function (_EventEmitter) {
         key: 'disableP2P',
         value: function disableP2P() {
             //停止p2p
-            console.log('disableP2P');
+            var logger = this.logger;
+
+            logger.warn('disableP2P');
             if (this.p2pEnabled) {
                 this.p2pEnabled = false;
                 this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
@@ -5697,7 +5694,9 @@ var P2PEngine = function (_EventEmitter) {
         key: 'enableP2P',
         value: function enableP2P() {
             //在停止的情况下重新启动P2P
-            console.log('enableP2P');
+            var logger = this.logger;
+
+            logger.warn('enableP2P');
             if (!this.p2pEnabled) {
                 this.p2pEnabled = true;
                 this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
@@ -5713,7 +5712,7 @@ var P2PEngine = function (_EventEmitter) {
 
 P2PEngine.WEBRTC_SUPPORT = !!(0, _cdnbyeCore.getBrowserRTC)();
 
-P2PEngine.version = "0.0.2";
+P2PEngine.version = "0.1.0";
 
 exports.default = P2PEngine;
 module.exports = exports['default'];
@@ -5819,14 +5818,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var BTTracker = function (_EventEmitter) {
     _inherits(BTTracker, _EventEmitter);
 
-    function BTTracker(fetcher, config) {
+    function BTTracker(engine, fetcher, config) {
         _classCallCheck(this, BTTracker);
 
         var _this = _possibleConstructorReturn(this, (BTTracker.__proto__ || Object.getPrototypeOf(BTTracker)).call(this));
 
+        _this.engine = engine;
         _this.config = config;
         _this.connected = false;
-        _this.scheduler = new _btScheduler2.default(config);
+        _this.scheduler = new _btScheduler2.default(engine, config);
         _this.DCMap = new Map(); //{key: remotePeerId, value: DataChannnel} 目前已经建立连接或正在建立连接的dc
         _this.failedDCSet = new Set(); //{remotePeerId} 建立连接失败的dc
         _this.signalerWs = null; //信令服务器ws
@@ -5847,15 +5847,17 @@ var BTTracker = function (_EventEmitter) {
         value: function resumeP2P() {
             var _this2 = this;
 
+            var logger = this.engine.logger;
+
             this.fetcher.btAnnounce().then(function (json) {
                 logger.info('announceURL response ' + JSON.stringify(json));
                 _this2.peerId = json.peer_id;
                 logger.identifier = _this2.peerId;
                 _this2.fetcher.btHeartbeat(json.heartbeat_interval);
-                _this2.fetcher.btStatsStart(json.report_interval);
+                _this2.fetcher.btStatsStart(json.report_limit);
                 _this2.signalerWs = _this2._initSignalerWs(); //连上tracker后开始连接信令服务器
                 _this2._handlePeers(json.peers);
-                _this2.emit('stats', { peerId: _this2.peerId });
+                _this2.engine.emit('peerId', { peerId: _this2.peerId });
             }).catch(function (err) {});
         }
     }, {
@@ -5912,10 +5914,12 @@ var BTTracker = function (_EventEmitter) {
     }, {
         key: '_tryConnectToPeer',
         value: function _tryConnectToPeer() {
+            var logger = this.engine.logger;
+
             if (this.peers.length === 0) return;
             var remotePeerId = this.peers.pop().id;
             logger.info('tryConnectToPeer ' + remotePeerId);
-            var datachannel = new _cdnbyeCore.DataChannel(this.peerId, remotePeerId, true, this.config);
+            var datachannel = new _cdnbyeCore.DataChannel(this.engine, this.peerId, remotePeerId, true, this.config);
             this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
             this._setupDC(datachannel);
         }
@@ -5923,6 +5927,8 @@ var BTTracker = function (_EventEmitter) {
         key: '_setupDC',
         value: function _setupDC(datachannel) {
             var _this4 = this;
+
+            var logger = this.engine.logger;
 
             datachannel.on(_cdnbyeCore.Events.DC_SIGNAL, function (data) {
                 var remotePeerId = datachannel.remotePeerId;
@@ -5957,7 +5963,6 @@ var BTTracker = function (_EventEmitter) {
                         _this4.fetcher.increFailConns();
                     }
                 }
-                _this4.emit('stats', { failConn: true });
             }).once(_cdnbyeCore.Events.DC_CLOSE, function () {
 
                 logger.warn('datachannel closed ' + datachannel.channelId + ' ');
@@ -5972,8 +5977,6 @@ var BTTracker = function (_EventEmitter) {
 
                 //更新conns
                 _this4.fetcher.decreConns();
-
-                _this4.emit('stats', { closedConn: true });
             }).once(_cdnbyeCore.Events.DC_OPEN, function () {
 
                 _this4.scheduler.handshakePeer(datachannel);
@@ -5985,8 +5988,6 @@ var BTTracker = function (_EventEmitter) {
 
                 //更新conns
                 _this4.fetcher.increConns();
-
-                _this4.emit('stats', { openedConn: true });
             });
         }
     }, {
@@ -5994,7 +5995,9 @@ var BTTracker = function (_EventEmitter) {
         value: function _initSignalerWs() {
             var _this5 = this;
 
-            var websocket = new _signalClient2.default(this.peerId, this.config);
+            var logger = this.engine.logger;
+
+            var websocket = new _signalClient2.default(this.engine, this.peerId, this.config);
             websocket.onopen = function () {
                 _this5.connected = true;
                 _this5._tryConnectToPeer();
@@ -6006,7 +6009,7 @@ var BTTracker = function (_EventEmitter) {
                 switch (action) {
                     case 'signal':
                         if (_this5.failedDCSet.has(msg.from_peer_id)) return;
-                        logger.debug('start _handleSignal');
+                        logger.debug('start handle signal of ' + msg.from_peer_id);
                         window.clearTimeout(_this5.signalTimer); //接收到信令后清除定时器
                         _this5.signalTimer = null;
                         if (!msg.data) {
@@ -6037,6 +6040,8 @@ var BTTracker = function (_EventEmitter) {
     }, {
         key: '_handleSignal',
         value: function _handleSignal(remotePeerId, data) {
+            var logger = this.engine.logger;
+
             var datachannel = this.DCMap.get(remotePeerId);
             if (datachannel && datachannel.connected) {
                 logger.info('datachannel had connected, signal ignored');
@@ -6044,9 +6049,9 @@ var BTTracker = function (_EventEmitter) {
             }
             if (!datachannel) {
                 //收到子节点连接请求
-                logger.debug('receive child node connection request');
+                logger.debug('receive node ' + remotePeerId + ' connection request');
                 if (this.failedDCSet.has(remotePeerId)) return;
-                datachannel = new _cdnbyeCore.DataChannel(this.peerId, remotePeerId, false, this.config);
+                datachannel = new _cdnbyeCore.DataChannel(this.engine, this.peerId, remotePeerId, false, this.config);
                 this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
                 this._setupDC(datachannel);
             }
@@ -6054,34 +6059,28 @@ var BTTracker = function (_EventEmitter) {
         }
     }, {
         key: '_setupScheduler',
-        value: function _setupScheduler(s) {
-            var _this6 = this;
-
-            s.on('download', function (info) {
-                _this6.emit('download', info);
-            }).on('upload', function (info) {
-                _this6.emit('upload', info);
-            });
-        }
+        value: function _setupScheduler(s) {}
     }, {
         key: '_heartbeat',
         value: function _heartbeat() {
-            var _this7 = this;
+            var _this6 = this;
 
             this.heartbeater = window.setInterval(function () {
-                _this7.fetcher.btHeartbeat();
+                _this6.fetcher.btHeartbeat();
             }, this.heartbeatInterval * 1000);
         }
     }, {
         key: '_requestMorePeers',
         value: function _requestMorePeers() {
-            var _this8 = this;
+            var _this7 = this;
+
+            var logger = this.engine.logger;
 
             if (this.scheduler.peerMap.size <= Math.floor(this.config.neighbours / 2)) {
                 this.fetcher.btGetPeers().then(function (json) {
                     logger.info('_requestMorePeers ' + JSON.stringify(json));
-                    _this8._handlePeers(json.peers);
-                    _this8._tryConnectToPeer();
+                    _this7._handlePeers(json.peers);
+                    _this7._tryConnectToPeer();
                 });
             }
         }
@@ -6142,11 +6141,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var BTScheduler = function (_EventEmitter) {
     _inherits(BTScheduler, _EventEmitter);
 
-    function BTScheduler(config) {
+    function BTScheduler(engine, config) {
         _classCallCheck(this, BTScheduler);
 
         var _this = _possibleConstructorReturn(this, (BTScheduler.__proto__ || Object.getPrototypeOf(BTScheduler)).call(this));
 
+        _this.engine = engine;
         _this.config = config;
         _this.bufMgr = null;
         _this.peerMap = new Map(); // remotePeerId -> dc
@@ -6180,6 +6180,8 @@ var BTScheduler = function (_EventEmitter) {
     }, {
         key: 'updatePlaySN',
         value: function updatePlaySN(sn) {
+            var logger = this.engine.logger;
+
             if (this.config.live) return; //rearest first只用于vod
             if (!this.hasPeers) return;
             var requested = [];
@@ -6272,6 +6274,7 @@ var BTScheduler = function (_EventEmitter) {
                 });
                 this.peerMap.delete(dc.remotePeerId);
             }
+            this.engine.emit('peers', [].concat(_toConsumableArray(this.peerMap.keys())));
         }
     }, {
         key: 'handshakePeer',
@@ -6282,8 +6285,12 @@ var BTScheduler = function (_EventEmitter) {
     }, {
         key: 'addPeer',
         value: function addPeer(peer) {
+            var logger = this.engine.logger;
+
             logger.info('add peer ' + peer.remotePeerId);
             this.peerMap.set(peer.remotePeerId, peer);
+
+            this.engine.emit('peers', [].concat(_toConsumableArray(this.peerMap.keys())));
         }
     }, {
         key: 'peersHasSN',
@@ -6293,6 +6300,8 @@ var BTScheduler = function (_EventEmitter) {
     }, {
         key: 'load',
         value: function load(context, config, callbacks) {
+            var logger = this.engine.logger;
+
             this.context = context;
             var frag = context.frag;
             this.callbacks = callbacks;
@@ -6338,6 +6347,8 @@ var BTScheduler = function (_EventEmitter) {
         key: '_setupDC',
         value: function _setupDC(dc) {
             var _this3 = this;
+
+            var logger = this.engine.logger;
 
             dc.on(_cdnbyeCore.Events.DC_BITFIELD, function (msg) {
                 if (!msg.field) return;
@@ -6391,7 +6402,6 @@ var BTScheduler = function (_EventEmitter) {
                     _this3.bufMgr.addBuffer(response.sn, response.url, response.data);
                 }
                 _this3.updateLoadedSN(response.sn);
-                _this3.emit('download', { size: response.data.byteLength, from: dc.remotePeerId, url: response.url, sn: response.sn });
             }).on(_cdnbyeCore.Events.DC_REQUEST, function (msg) {
                 var url = '';
                 if (!msg.url) {
@@ -6404,7 +6414,6 @@ var BTScheduler = function (_EventEmitter) {
                 if (url && _this3.bufMgr.hasSegOfURL(url)) {
                     var seg = _this3.bufMgr.getSegByURL(url);
                     dc.sendBuffer(msg.sn, seg.relurl, seg.data);
-                    _this3.emit('upload', { size: seg.size, from: dc.remotePeerId, url: seg.relurl, sn: msg.sn });
                 } else {
                     dc.sendJson({
                         event: _cdnbyeCore.Events.DC_PIECE_NOT_FOUND,
@@ -6480,6 +6489,8 @@ var BTScheduler = function (_EventEmitter) {
     }, {
         key: '_criticaltimeout',
         value: function _criticaltimeout() {
+            var logger = this.engine.logger;
+
             logger.warn('_criticaltimeout');
             this.criticalSeg = null;
             this.callbacks.onTimeout(this.stats, this.context, null);
@@ -6553,11 +6564,12 @@ var Buffer = __webpack_require__(2).Buffer;
 var DataChannel = function (_EventEmitter) {
     _inherits(DataChannel, _EventEmitter);
 
-    function DataChannel(peerId, remotePeerId, isInitiator, config) {
+    function DataChannel(engine, peerId, remotePeerId, isInitiator, config) {
         _classCallCheck(this, DataChannel);
 
         var _this = _possibleConstructorReturn(this, (DataChannel.__proto__ || Object.getPrototypeOf(DataChannel)).call(this));
 
+        _this.engine = engine;
         _this.config = config;
         _this.remotePeerId = remotePeerId;
         _this.channelId = isInitiator ? peerId + '-' + remotePeerId : remotePeerId + '-' + peerId; //标识该channel
@@ -6590,6 +6602,8 @@ var DataChannel = function (_EventEmitter) {
         value: function _init(datachannel) {
             var _this2 = this;
 
+            var logger = this.engine.logger;
+
             datachannel.on('error', function (err) {
                 // logger.warn('datachannel error', err);
                 _this2.emit(_events4.default.DC_ERROR);
@@ -6600,6 +6614,7 @@ var DataChannel = function (_EventEmitter) {
             });
 
             var _onConnect = function _onConnect() {
+
                 logger.info('datachannel CONNECTED to ' + _this2.remotePeerId);
                 _this2.connected = true;
                 _this2.emit(_events4.default.DC_OPEN);
@@ -6866,6 +6881,8 @@ var DataChannel = function (_EventEmitter) {
         key: '_loadtimeout',
         value: function _loadtimeout() {
             //下载超时
+            var logger = this.engine.logger;
+
             logger.warn('datachannel timeout while downloading from ' + this.remotePeerId);
             this.emit(_events4.default.DC_TIMEOUT);
             this.requestTimeout = null;
@@ -6884,6 +6901,8 @@ var DataChannel = function (_EventEmitter) {
         key: '_uploadtimeout',
         value: function _uploadtimeout() {
             //上传超时
+            var logger = this.engine.logger;
+
             logger.warn('datachannel timeout while uploading to ' + this.remotePeerId);
             this.uploading = false;
             // if (this.rcvdReqQueue.length > 0) {
@@ -6946,6 +6965,8 @@ var DataChannel = function (_EventEmitter) {
         key: 'setupStats',
         value: function setupStats() {
             var _this5 = this;
+
+            var logger = this.engine.logger;
 
             setInterval(function () {
 
@@ -9267,12 +9288,17 @@ var Fetcher = function () {
         this.getPeersURL = baseUrl + '/get_peers/' + queryStr;
         this.statsURL = baseUrl + '/stats/' + queryStr;
 
+        //上报参数
+        this.limit = 10 * 1024; //上报流量的阈值（单位：KB）
+
         //连接情况上报
         this.conns = 0; //连接的peer的增量
         this.failConns = 0; //连接失败的peer的增量
 
-        //流量上报
-        this.cdnDownloaded = 0;
+        //流量上报(单位：KB)
+        this.totalHTTPDownloaded = 0; //HTTP累积量
+        this.totalP2PDownloaded = 0; //P2P累积量
+        this.httpDownloaded = 0;
         this.p2pDownloaded = 0;
 
         //播放情况上报
@@ -9350,61 +9376,25 @@ var Fetcher = function () {
         }
     }, {
         key: 'btStatsStart',
-        value: function btStatsStart(interval) {
-            var _this4 = this;
-
-            var logger = this.engine.logger;
-
-            this.statser = window.setInterval(function () {
-                var body = {
-                    source: Math.round(_this4.cdnDownloaded / 1024),
-                    p2p: Math.round(_this4.p2pDownloaded / 1024)
-                };
-                if (_this4.conns !== 0) {
-                    body.conns = _this4.conns;
-                }
-                if (_this4.failConns > 0) {
-                    body.failConns = _this4.failConns;
-                }
-                if (_this4.errsFragLoad > 0) {
-                    body.errsFragLoad = _this4.errsFragLoad;
-                }
-                if (_this4.errsBufStalled > 0) {
-                    body.errsBufStalled = _this4.errsBufStalled;
-                }
-                if (_this4.errsInternalExpt > 0) {
-                    body.errsInternalExpt = _this4.errsInternalExpt;
-                }
-                fetch(_this4.statsURL + ('&peer_id=' + _this4.peerId), {
-                    method: 'POST', // 指定是POST请求
-                    body: JSON.stringify(body)
-                }).then(function (response) {
-                    if (response.ok) {
-                        _this4.cdnDownloaded = 0;
-                        _this4.p2pDownloaded = 0;
-                        _this4.conns = 0;
-                        _this4.failConns = 0;
-                        _this4.errsFragLoad = 0;
-                        _this4.errsBufStalled = 0;
-                        _this4.errsInternalExpt = 0;
-                    }
-                }).catch(function (err) {
-                    logger.error('[fetcher] stats upload error ' + err);
-                    window.clearInterval(_this4.statser);
-                });
-            }, interval * 1000);
+        value: function btStatsStart(limit) {
+            this.limit = limit * 1024; //MB转KB
         }
     }, {
         key: 'reportFlow',
         value: function reportFlow(stats) {
             var p2p = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-
+            var flow = Math.round(stats.total / 1024);
             if (p2p) {
-                this.p2pDownloaded += stats.total;
+                this.p2pDownloaded += flow;
+                this.totalP2PDownloaded += flow;
+                this.engine.emit('stats', { totalP2PDownloaded: this.totalP2PDownloaded });
             } else {
-                this.cdnDownloaded += stats.total;
+                this.httpDownloaded += flow;
+                this.totalHTTPDownloaded += flow;
+                this.engine.emit('stats', { totalHTTPDownloaded: this.totalHTTPDownloaded });
             }
+            this._checkFlowLimit();
             // log(`cdnDownloaded ${this.cdnDownloaded} p2pDownloaded ${this.p2pDownloaded}`)
         }
 
@@ -9417,8 +9407,56 @@ var Fetcher = function () {
     }, {
         key: 'destroy',
         value: function destroy() {
-            window.clearInterval(this.statser);
             window.clearInterval(this.heartbeater);
+        }
+    }, {
+        key: '_checkFlowLimit',
+        value: function _checkFlowLimit() {
+            var _this4 = this;
+
+            //检查是否需要上报流量
+            var logger = this.engine.logger;
+
+            if (this.p2pDownloaded >= this.limit || this.httpDownloaded >= this.limit) {
+                //只有流量达到阈值才上报(单位：KB)
+                var body = {
+                    source: Math.round(this.httpDownloaded), //上报以KB为单位
+                    p2p: Math.round(this.p2pDownloaded)
+                };
+                if (this.conns !== 0) {
+                    body.conns = this.conns;
+                }
+                if (this.failConns > 0) {
+                    body.failConns = this.failConns;
+                }
+                if (this.errsFragLoad > 0) {
+                    body.errsFragLoad = this.errsFragLoad;
+                }
+                if (this.errsBufStalled > 0) {
+                    body.errsBufStalled = this.errsBufStalled;
+                }
+                if (this.errsInternalExpt > 0) {
+                    body.errsInternalExpt = this.errsInternalExpt;
+                }
+                logger.info('reporting flow p2p ' + this.p2pDownloaded + ' http ' + this.httpDownloaded);
+                fetch(this.statsURL + ('&peer_id=' + this.peerId), {
+                    method: 'POST', // 指定是POST请求
+                    body: JSON.stringify(body)
+                }).then(function (response) {
+                    if (response.ok) {
+                        logger.info('sucessfully report flow');
+                        _this4.httpDownloaded = 0;
+                        _this4.p2pDownloaded = 0;
+                        _this4.conns = 0;
+                        _this4.failConns = 0;
+                        _this4.errsFragLoad = 0;
+                        _this4.errsBufStalled = 0;
+                        _this4.errsInternalExpt = 0;
+                    }
+                }).catch(function (err) {
+                    logger.error('[fetcher] stats upload error ' + err);
+                });
+            }
         }
     }]);
 
@@ -9483,11 +9521,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var SignalClient = function (_EventEmitter) {
     _inherits(SignalClient, _EventEmitter);
 
-    function SignalClient(peerId, config) {
+    function SignalClient(engine, peerId, config) {
         _classCallCheck(this, SignalClient);
 
         var _this = _possibleConstructorReturn(this, (SignalClient.__proto__ || Object.getPrototypeOf(SignalClient)).call(this));
 
+        _this.engine = engine;
         _this.peerId = peerId;
         _this.config = config;
         _this.connected = false;
@@ -9499,6 +9538,8 @@ var SignalClient = function (_EventEmitter) {
         key: '_init',
         value: function _init(id) {
             var _this2 = this;
+
+            var logger = this.engine.logger;
 
             var wsOptions = {
                 maxRetries: this.config.wsMaxRetries,
@@ -9593,9 +9634,10 @@ var FragLoader = function (_EventEmitter) {
     function FragLoader(config) {
         _classCallCheck(this, FragLoader);
 
-        //denoted by sn
         var _this = _possibleConstructorReturn(this, (FragLoader.__proto__ || Object.getPrototypeOf(FragLoader)).call(this));
 
+        _this.logger = config.logger;
+        //denoted by sn
         _this.currLoaded = config.currLoaded;
         _this.currLoadedDuration = config.currLoadedDuration; //最新下载的块的时长
         _this.currPlay = config.currPlay;
@@ -9627,6 +9669,8 @@ var FragLoader = function (_EventEmitter) {
         key: 'load',
         value: function load(context, config, callbacks) {
             var _this2 = this;
+
+            var logger = this.logger;
 
             var frag = context.frag;
             frag.loadByP2P = false; //初始化flag
@@ -9730,11 +9774,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var BufferManager = function (_EventEmitter) {
     _inherits(BufferManager, _EventEmitter);
 
-    function BufferManager(config) {
+    function BufferManager(engine, config) {
         _classCallCheck(this, BufferManager);
 
         var _this = _possibleConstructorReturn(this, (BufferManager.__proto__ || Object.getPrototypeOf(BufferManager)).call(this));
 
+        _this.engine = engine;
         _this.config = config;
         /* segment
         sn: number
@@ -9790,6 +9835,8 @@ var BufferManager = function (_EventEmitter) {
     }, {
         key: 'addSeg',
         value: function addSeg(seg) {
+            var logger = this.engine.logger;
+
             this._segPool.set(seg.relurl, seg);
             // this.urlSet.add(seg.relurl);
             this._currBufSize += parseInt(seg.size);

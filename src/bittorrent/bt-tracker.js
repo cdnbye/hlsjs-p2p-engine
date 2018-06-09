@@ -8,12 +8,13 @@ import SignalClient from '../signal-client';
 import {DataChannel, Events} from '../cdnbye-core';
 
 class BTTracker extends EventEmitter {
-    constructor(fetcher, config) {
+    constructor(engine, fetcher, config) {
         super();
 
+        this.engine = engine;
         this.config = config;
         this.connected = false;
-        this.scheduler = new BTScheduler(config);
+        this.scheduler = new BTScheduler(engine, config);
         this.DCMap = new Map();                                  //{key: remotePeerId, value: DataChannnel} 目前已经建立连接或正在建立连接的dc
         this.failedDCSet= new Set();                            //{remotePeerId} 建立连接失败的dc
         this.signalerWs = null;                                  //信令服务器ws
@@ -41,16 +42,16 @@ class BTTracker extends EventEmitter {
     }
 
     resumeP2P() {
-
+        const { logger } = this.engine;
         this.fetcher.btAnnounce().then(json => {
             logger.info(`announceURL response ${JSON.stringify(json)}`)
             this.peerId = json.peer_id;
             logger.identifier = this.peerId;
             this.fetcher.btHeartbeat(json.heartbeat_interval);
-            this.fetcher.btStatsStart(json.report_interval);
+            this.fetcher.btStatsStart(json.report_limit);
             this.signalerWs = this._initSignalerWs();                         //连上tracker后开始连接信令服务器
             this._handlePeers(json.peers);
-            this.emit('stats', {peerId: this.peerId});
+            this.engine.emit('peerId', {peerId: this.peerId});
         }).catch(err => {
 
         })
@@ -79,15 +80,17 @@ class BTTracker extends EventEmitter {
     }
 
     _tryConnectToPeer() {
+        const { logger } = this.engine;
         if (this.peers.length === 0) return;
         let remotePeerId = this.peers.pop().id;
         logger.info(`tryConnectToPeer ${remotePeerId}`);
-        let datachannel = new DataChannel(this.peerId, remotePeerId, true, this.config);
+        let datachannel = new DataChannel(this.engine, this.peerId, remotePeerId, true, this.config);
         this.DCMap.set(remotePeerId, datachannel);                                  //将对等端Id作为键
         this._setupDC(datachannel);
     }
 
     _setupDC(datachannel) {
+        const { logger } = this.engine;
         datachannel.on(Events.DC_SIGNAL, data => {
             const remotePeerId = datachannel.remotePeerId;
             this.signalerWs.sendSignal(remotePeerId, data);
@@ -122,7 +125,6 @@ class BTTracker extends EventEmitter {
                         this.fetcher.increFailConns();
                     }
                 }
-                this.emit('stats', {failConn: true});
             })
             .once(Events.DC_CLOSE, () => {
 
@@ -139,7 +141,6 @@ class BTTracker extends EventEmitter {
                 //更新conns
                 this.fetcher.decreConns();
 
-                this.emit('stats', {closedConn: true});
 
             })
             .once(Events.DC_OPEN, () => {
@@ -154,13 +155,12 @@ class BTTracker extends EventEmitter {
                 //更新conns
                 this.fetcher.increConns();
 
-                this.emit('stats', {openedConn: true});
             })
     }
 
     _initSignalerWs() {
-
-        let websocket = new SignalClient(this.peerId, this.config);
+        const { logger } = this.engine;
+        let websocket = new SignalClient(this.engine, this.peerId, this.config);
         websocket.onopen = () => {
             this.connected = true;
             this._tryConnectToPeer();
@@ -172,7 +172,7 @@ class BTTracker extends EventEmitter {
             switch (action) {
                 case 'signal':
                     if (this.failedDCSet.has(msg.from_peer_id)) return;
-                    logger.debug('start _handleSignal');
+                    logger.debug(`start handle signal of ${msg.from_peer_id}`);
                     window.clearTimeout(this.signalTimer);                       //接收到信令后清除定时器
                     this.signalTimer = null;
                     if (!msg.data) {                                             //如果对等端已不在线
@@ -201,15 +201,16 @@ class BTTracker extends EventEmitter {
     }
 
     _handleSignal(remotePeerId, data) {
+        const { logger } = this.engine;
         let datachannel = this.DCMap.get(remotePeerId);
         if (datachannel && datachannel.connected) {
             logger.info(`datachannel had connected, signal ignored`);
             return
         }
         if (!datachannel) {                                               //收到子节点连接请求
-            logger.debug(`receive child node connection request`);
+            logger.debug(`receive node ${remotePeerId} connection request`);
             if (this.failedDCSet.has(remotePeerId)) return;
-            datachannel = new DataChannel(this.peerId, remotePeerId, false, this.config);
+            datachannel = new DataChannel(this.engine, this.peerId, remotePeerId, false, this.config);
             this.DCMap.set(remotePeerId, datachannel);                                  //将对等端Id作为键
             this._setupDC(datachannel);
         }
@@ -217,12 +218,7 @@ class BTTracker extends EventEmitter {
     }
 
     _setupScheduler(s) {
-        s.on('download', info => {
-            this.emit('download', info);
-        })
-            .on('upload', info => {
-                this.emit('upload', info);
-            })
+
     }
 
     _heartbeat() {
@@ -232,6 +228,7 @@ class BTTracker extends EventEmitter {
     }
 
     _requestMorePeers() {
+        const { logger } = this.engine;
         if (this.scheduler.peerMap.size <= Math.floor(this.config.neighbours/2)) {
             this.fetcher.btGetPeers().then(json => {
                 logger.info(`_requestMorePeers ${JSON.stringify(json)}`);

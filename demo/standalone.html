@@ -1,6 +1,5 @@
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
-<!--<script src="../dist/hlsjs-p2p-engine.min.js"></script>-->
 <video id="video" controls></video>
 <p id="version"></p>
 <h3>download info:</h3>
@@ -23,7 +22,7 @@
             var frag = data.frag;
             var source = undefined;
             if (frag.loadByHTTP === true) {
-                source = 'CDN';
+                source = 'HTTP';
             } else if (frag.loadByP2P === true) {
                 source = 'P2P';
             }

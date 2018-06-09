@@ -9,6 +9,7 @@ class FragLoader extends EventEmitter {
     constructor(config) {
         super();
 
+        this.logger = config.logger;
         //denoted by sn
         this.currLoaded = config.currLoaded;
         this.currLoadedDuration = config.currLoadedDuration;              //最新下载的块的时长
@@ -33,6 +34,7 @@ class FragLoader extends EventEmitter {
      首先从缓存中寻找请求的seg，如果缓存中找不到则用http请求。
      */
     load(context, config, callbacks) {
+        const { logger } = this;
         const frag = context.frag;
         frag.loadByP2P = false;                //初始化flag
         frag.loadByHTTP = false;

@@ -6,9 +6,10 @@ import EventEmitter from 'events';
 import {Events} from '../cdnbye-core';
 
 class BTScheduler extends EventEmitter {
-    constructor(config) {
+    constructor(engine, config) {
         super();
 
+        this.engine = engine;
         this.config = config;
         this.bufMgr = null;
         this.peerMap = new Map();                 // remotePeerId -> dc
@@ -36,6 +37,7 @@ class BTScheduler extends EventEmitter {
     }
 
     updatePlaySN(sn) {
+        const { logger } = this.engine;
         if (this.config.live) return;                                                 //rearest first只用于vod
         if (!this.hasPeers) return;
         let requested = [];
@@ -82,6 +84,7 @@ class BTScheduler extends EventEmitter {
             });
             this.peerMap.delete(dc.remotePeerId);
         }
+        this.engine.emit('peers', [...this.peerMap.keys()]);
     }
 
     handshakePeer(dc) {
@@ -90,8 +93,11 @@ class BTScheduler extends EventEmitter {
     }
 
     addPeer(peer) {
+        const { logger } = this.engine;
         logger.info(`add peer ${peer.remotePeerId}`);
         this.peerMap.set(peer.remotePeerId, peer);
+
+        this.engine.emit('peers', [...this.peerMap.keys()]);
     }
 
     peersHasSN(sn) {
@@ -99,6 +105,7 @@ class BTScheduler extends EventEmitter {
     }
 
     load(context, config, callbacks) {
+        const { logger } = this.engine;
         this.context = context;
         const frag = context.frag;
         this.callbacks = callbacks;
@@ -137,6 +144,7 @@ class BTScheduler extends EventEmitter {
     }
 
     _setupDC(dc) {
+        const { logger } = this.engine;
         dc.on(Events.DC_BITFIELD, msg => {
             if (!msg.field) return;
             let bitset = new Set(msg.field);
@@ -188,7 +196,6 @@ class BTScheduler extends EventEmitter {
                     this.bufMgr.addBuffer(response.sn, response.url, response.data);
                 }
                 this.updateLoadedSN(response.sn);
-                this.emit('download', {size: response.data.byteLength, from: dc.remotePeerId, url: response.url, sn: response.sn});
             })
             .on(Events.DC_REQUEST, msg => {
                 let url = '';
@@ -200,7 +207,6 @@ class BTScheduler extends EventEmitter {
                 if (url && this.bufMgr.hasSegOfURL(url)) {
                     let seg = this.bufMgr.getSegByURL(url);
                     dc.sendBuffer(msg.sn, seg.relurl, seg.data);
-                    this.emit('upload', {size: seg.size, from: dc.remotePeerId, url: seg.relurl, sn: msg.sn});
                 } else {
                     dc.sendJson({
                         event: Events.DC_PIECE_NOT_FOUND,
@@ -251,6 +257,7 @@ class BTScheduler extends EventEmitter {
     }
 
     _criticaltimeout() {
+        const { logger } = this.engine;
         logger.warn(`_criticaltimeout`);
         this.criticalSeg = null;
         this.callbacks.onTimeout(this.stats, this.context, null);

@@ -7,9 +7,10 @@ import {Events, Buffer} from './cdnbye-core';
 
 
 class BufferManager extends EventEmitter {
-    constructor(config) {
+    constructor(engine, config) {
         super();
 
+        this.engine = engine;
         this.config = config;
         /* segment
         sn: number
@@ -55,11 +56,12 @@ class BufferManager extends EventEmitter {
             data: buf,
             size: buf.byteLength
         };
-       this.addSeg(segment);
+        this.addSeg(segment);
         this.sn2Url.set(sn, url);
     }
 
     addSeg(seg) {
+        const { logger } = this.engine;
         this._segPool.set(seg.relurl, seg);
         // this.urlSet.add(seg.relurl);
         this._currBufSize += parseInt(seg.size);
