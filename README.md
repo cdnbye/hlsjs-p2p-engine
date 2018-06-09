@@ -27,12 +27,12 @@ with
 That's it!
 
 ## Browser Support
-WebRTC has already been incorporated into the HTML5 standard and it is broadly deployed in modern browsers. The compatibility of CDNBye depends on the browser support of WebRTC and MSE. Please note that iOS Safari "Mobile" does not support the MediaSource API.
+WebRTC has already been incorporated into the HTML5 standard and it is broadly deployed in modern browsers. The compatibility of CDNBye depends on the browser support of WebRTC and Hls.js. Please note that iOS Safari "Mobile" does not support the MediaSource API.
 
  Compatibility|Chrome | Firefox | Mac Safari| iOS Safari | Opera | IE | Edge|   
 :-: | :-: | :-: | :-: | :-: | :-: | :-:| :-:
 WebRTC | Yes | Yes | Yes | Yes | Yes | No | No
-+MSE | Yes | Yes | Yes | No | Yes | Yes | Yes
++Hls.js | Yes | Yes | Yes | No | Yes | Yes | Yes
 =CDNBye | Yes | Yes | Yes | No | Yes | No | No 
 
 ## Installation
