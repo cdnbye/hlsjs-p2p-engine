@@ -6,5 +6,5 @@
 /src/cdnbye-core/*
 !/src/cdnbye-core/index.js
 /docs/Private
-/demo/test-standlone.html
+/demo/test-standalone.html
 /demo/test-quick-start.html
