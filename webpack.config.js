@@ -90,7 +90,7 @@ const multiConfig = [
                 sourceMapFilename: './hlsjs-p2p-engine.js.map',
                 path: path.resolve(__dirname, 'dist'),
                 // publicPath: '/src/',
-                library: ['CDNBye'],
+                library: ['P2PEngine'],
                 libraryTarget: 'umd'
             },
             plugins: getPluginsForConfig(),
@@ -116,7 +116,7 @@ const multiConfig = [
                 filename: 'hlsjs-p2p-engine.min.js',
                 path: path.resolve(__dirname, 'dist'),
                 // publicPath: '/src/',
-                library: ['CDNBye'],
+                library: ['P2PEngine'],
                 libraryTarget: 'umd'
             },
             plugins: getPluginsForConfig(true)

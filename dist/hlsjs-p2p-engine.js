@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["CDNBye"] = factory();
+		exports["P2PEngine"] = factory();
 	else
-		root["CDNBye"] = factory();
+		root["P2PEngine"] = factory();
 })(typeof self !== 'undefined' ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache

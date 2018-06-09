@@ -84,7 +84,7 @@
         logLevel: 'debug',
 
     };
-    new CDNBye(player.tech_.sourceHandler_.hls, p2pConfig);
+    new P2PEngine(player.tech_.sourceHandler_.hls, p2pConfig);
 
     player.tech_.on(Hls.Events.MANIFEST_LOADED, function (e) {
         player.tech_.sourceHandler_.hls.loadLevel = 0;

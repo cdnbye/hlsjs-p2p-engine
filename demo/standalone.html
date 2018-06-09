@@ -1,5 +1,5 @@
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cdnbye@0.1.1/dist/hlsjs-p2p-engine.min.js"></script>
 <video id="video" controls></video>
 <p id="version"></p>
 <h3>download info:</h3>
@@ -11,7 +11,7 @@
     if(Hls.isSupported()) {
         var video = document.getElementById('video');
         var hls = new Hls({maxBufferSize: 0});
-        var engine = new CDNBye(hls);
+        var engine = new P2PEngine(hls);
         hls.loadSource('https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8');
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
@@ -31,7 +31,7 @@
             if (source === 'P2P') p2p += frag.loaded;
             document.querySelector('#info').innerText = `p2p ratio: ${Math.round(p2p/total*100)}%   saved traffic: ${Math.round(p2p/1024)}KB`;
         });
-        document.querySelector('#version').innerText = `hls.js version: ${Hls.version}  cdnbye version: ${CDNBye.version}`;
+        document.querySelector('#version').innerText = `hls.js version: ${Hls.version}  cdnbye version: ${P2PEngine.version}`;
         function addToTable(url, downloaded, source) {
             var infoStr = `download ${url}(size:${downloaded}B) by ${source}`;
             document.querySelector('#table-body tbody').innerHTML +=
