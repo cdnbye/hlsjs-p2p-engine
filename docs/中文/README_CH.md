@@ -1,8 +1,8 @@
-<h1 align="center"><a href="" target="_blank" rel="noopener noreferrer"><img width="250" src="figs/cdnbye.png" alt="cdnbye logo"></a></h1>
+<h1 align="center"><a href="" target="_blank" rel="noopener noreferrer"><img width="250" src="https://github.com/cdnbye/hlsjs-p2p-engine/blob/master/figs/cdnbye.png" alt="cdnbye logo"></a></h1>
 <h4 align="center">It's time to say bye to CDN.</h4>
 
 
-**[English](../../README.md)**
+**[English](https://github.com/cdnbye/hlsjs-p2p-engine/blob/master/README.md)**
 
 
 随着H5的普及，flash逐渐被淘汰已成为不可逆转的趋势。而在H5采用的视频传输格式中，hls由于兼容ios
@@ -126,11 +126,11 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 
 ## 播放器集成
 - [videojs](http://videojs.com/)
-    - 参见 [videojs-demo.html](demo/videojs-demo.html)
+    - 参见 [videojs-demo.html](https://github.com/cdnbye/hlsjs-p2p-engine/blob/master/demo/videojs-demo.html)
 - [flowplayer](https://flowplayer.com/)
-    - 参见 [flowplayer-demo.html](demo/flowplayer-demo.html)
+    - 参见 [flowplayer-demo.html](https://github.com/cdnbye/hlsjs-p2p-engine/blob/master/demo/flowplayer-demo.html)
 - [DPlayer](https://github.com/MoePlayer/DPlayer)
-    - 参见 [dplayer-demo.html](demo/dplayer-demo.html)
+    - 参见 [dplayer-demo.html](https://github.com/cdnbye/hlsjs-p2p-engine/blob/master/demo/dplayer-demo.html)
 - [clappr](https://github.com/clappr/clappr)
     - coming soon!
 - [MediaElement.js](http://www.mediaelementjs.com/)
