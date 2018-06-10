@@ -32,8 +32,8 @@ WebRTC has already been incorporated into the HTML5 standard and it is broadly d
  Compatibility|Chrome | Firefox | Mac Safari| iOS Safari | Opera | IE | Edge|   
 :-: | :-: | :-: | :-: | :-: | :-: | :-:| :-:
 WebRTC | Yes | Yes | Yes | Yes | Yes | No | No
-+Hls.js | Yes | Yes | Yes | No | Yes | Yes | Yes
-=CDNBye | Yes | Yes | Yes | No | Yes | No | No 
+Hls.js | Yes | Yes | Yes | No | Yes | Yes | Yes
+CDNBye | Yes | Yes | Yes | No | Yes | No | No 
 
 ## Installation
 
