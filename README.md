@@ -13,7 +13,7 @@ coming soon...
 
 ## Getting Started
 #### Quick Start Demo
-Put the [quick-start.html](demo/quick-start.html) in your web page, run it. Wait for a few seconds，then open the same page from another browser(the receiver). Now you have a direct P2P connection between two browsers without plugin!
+Put the [quick-start.html](demo/quick-start.html) in your web page, run it. Wait for a few seconds，then open the same page from another browser. Now you have a direct P2P connection between two browsers without plugin!
 The first web peer will serve as a seed, if no one else in the same channel.
 #### Integrate to Your Hls.js Project
 Simply replace the hls.js script tag like:
@@ -57,7 +57,7 @@ import Hls from 'cdnbye';   // the package with hls.js
 ```
 Or 
 ```javascript
-import Hls from 'hls.js';     //please run "npm install --save hls.js" first
+import Hls from 'hls.js';     // please run "npm install --save hls.js" first
 import P2PEngine from 'cdnbye/dist/hlsjs-p2p-engine';   // the package without hls.js
 ```
 
@@ -78,7 +78,7 @@ var hls = new Hls(hlsjsConfig);
 // Use `hls` just like the usual hls.js ...
 ```
 #### Engine(the library without hls.js)
-Create hls.js instance passsing hlsjsConfig as param. Create CDNbye instance passing hls.js instance and p2pConfig as params. Call hls.js loadSource and attachMedia methods.
+Create hls.js instance passsing hlsjsConfig as param. Create P2PEngine instance passing hls.js instance and p2pConfig as params. Call hls.js loadSource and attachMedia methods.
 ```javascript
 var hlsjsConfig = {
     maxBufferSize: 0,       // Highly recommended setting
