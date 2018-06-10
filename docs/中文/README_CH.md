@@ -20,7 +20,7 @@ coming soon...
 
 ## 快速入门
 #### 快速入门Demo
-将[quick-start.html](demo/quick-start.html)拷贝到您的网页中并运行。再打开另一个相同的网页。见证奇迹的时候到了！您已在两个网页之间建立了一个P2P连接，在不安装任何插件的情况下。如果在这个频道中（一个m3u8标识了一个频道）没有其它参与者，那么您打开的第一个网页将作为种子为第二个网页提供数据。
+将[quick-start.html](https://github.com/cdnbye/hlsjs-p2p-engine/blob/master/demo/quick-start.html)拷贝到您的网页中并运行。再打开另一个相同的网页。见证奇迹的时候到了！您已在两个网页之间建立了一个P2P连接，在不安装任何插件的情况下。如果在这个频道中（一个m3u8标识了一个频道）没有其它参与者，那么您打开的第一个网页将作为种子为第二个网页提供数据。
 
 #### 在现有的hls.js项目中集成
 只需要将原有的引入hls.js的script标签如：

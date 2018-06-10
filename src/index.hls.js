@@ -4,7 +4,6 @@
 
 import P2PEngine from './index.engine';
 import Hlsjs from 'hls.js';
-// import Hlsjs from 'hls.js/dist/hls.light';
 
 let recommendedHlsjsConfig = {
     maxBufferSize: 0,
@@ -50,6 +49,8 @@ class CDNByeHlsjs extends Hlsjs{
 
 }
 
-CDNByeHlsjs.pluginVersion = P2PEngine.version;
+CDNByeHlsjs.engineVersion = P2PEngine.version;           //the current version of p2p engine
+
+CDNByeHlsjs.WEBRTC_SUPPORT = P2PEngine.WEBRTC_SUPPORT;   //check if webrtc is supported in this browser
 
 export default CDNByeHlsjs
