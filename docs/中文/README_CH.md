@@ -141,7 +141,7 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 
 ## 打赏
 如果CDNBye对您有用，请我喝一杯咖啡如何:)<br>
-<img width="200" src="figs/pay.jpeg" alt="donation">
+<img width="200" src="https://github.com/cdnbye/hlsjs-p2p-engine/blob/master/figs/pay.jpeg" alt="donation">
 
 
 
