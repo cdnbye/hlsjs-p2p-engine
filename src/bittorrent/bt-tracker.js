@@ -51,10 +51,15 @@ class BTTracker extends EventEmitter {
             this.fetcher.btStatsStart(json.report_limit);
             this.signalerWs = this._initSignalerWs();                         //连上tracker后开始连接信令服务器
             this._handlePeers(json.peers);
-            this.engine.emit('peerId', {peerId: this.peerId});
+            this.engine.emit('peerId', this.peerId);
         }).catch(err => {
 
         })
+    }
+
+    stopP2P() {
+        const { logger } = this.engine;
+        logger.warn(`未实现`);
     }
 
     destroy() {
@@ -237,6 +242,8 @@ class BTTracker extends EventEmitter {
             })
         }
     }
+
+
 }
 
 export default BTTracker;

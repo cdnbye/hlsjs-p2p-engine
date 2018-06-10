@@ -68,3 +68,23 @@ If `opts` is specified, then the default options (shown below) will be overridde
     }
 }
 ```
+
+## P2PEngine Events
+
+### `hls.engine.on('peerId', function (peerId) {})`
+Emitted when the peer Id of this client is obtained from server.
+
+### `hls.engine.on('peers', function (peers) {})`
+Emitted when successfully connected with new peer.
+
+### `hls.engine.on('stats', function ({totalHTTPDownloaded, totalP2PDownloaded}) {})`
+Emitted when data is downloaded by HTTP or P2P.
+
+## P2PEngine Runtime API
+
+### `hls.engine.enableP2P()`
+Resume P2P if it has been stopped.
+
+### `hls.engine.disableP2P()`
+Disable P2P if it is not stopped.
+

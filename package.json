@@ -20,7 +20,7 @@
   "author": "TimmyXie",
   "license": "MIT",
   "dependencies": {
-    "cdnbye-core": "^0.0.4",
+    "cdnbye-core": "^0.0.5",
     "hls.js": "^0.8.9",
     "reconnecting-websocket": "^3.2.2",
     "ua-parser-js": "^0.7.17"
