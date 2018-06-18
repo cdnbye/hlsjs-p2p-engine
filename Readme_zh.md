@@ -116,7 +116,7 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 参见 [设计.md](docs/中文/设计.md)
 
 ## FAQ
-我们收集了一些[常见问题](常见问题.md)。在报告issue之前请先查看一下。
+我们收集了一些[常见问题](docs/中文/常见问题.md)。在报告issue之前请先查看一下。
 
 ## 播放器集成
 - [videojs](http://videojs.com/)
