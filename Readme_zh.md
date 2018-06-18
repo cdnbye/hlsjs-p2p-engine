@@ -20,7 +20,7 @@
 
 ## 快速入门
 #### 快速入门Demo
-将[quick-start.html](https://github.com/cdnbye/hlsjs-p2p-engine/blob/master/demo/quick-start.html)拷贝到您的网页中并运行。再打开另一个相同的网页。见证奇迹的时候到了！您已在两个网页之间建立了一个P2P连接，在不安装任何插件的情况下。如果在这个频道中（一个m3u8标识了一个频道）没有其它参与者，那么您打开的第一个网页将作为种子为第二个网页提供数据。
+将[quick-start.html](demo/quick-start.html)拷贝到您的网页中并运行。再打开另一个相同的网页。见证奇迹的时候到了！您已在两个网页之间建立了一个P2P连接，在不安装任何插件的情况下。如果在这个频道中（一个m3u8标识了一个频道）没有其它参与者，那么您打开的第一个网页将作为种子为第二个网页提供数据。
 
 #### 在现有的hls.js项目中集成
 只需要将原有的引入hls.js的script标签如：
@@ -110,21 +110,21 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 ```
 
 ## API文档
-参见 [API.md](https://gitee.com/cdnbye/hlsjs-p2p-engine/blob/master/docs/English/API.md)
+参见 [API.md](docs/中文/API.md)
 
 ## 运作原理
-参见 [设计.md](https://gitee.com/cdnbye/hlsjs-p2p-engine/blob/master/docs/English/design.md)
+参见 [设计.md](docs/中文/设计.md)
 
 ## FAQ
 我们收集了一些[常见问题](常见问题.md)。在报告issue之前请先查看一下。
 
 ## 播放器集成
 - [videojs](http://videojs.com/)
-    - 参见 [videojs-demo.html](https://gitee.com/cdnbye/hlsjs-p2p-engine/blob/master/demo/videojs-demo.html)
+    - 参见 [videojs-demo.html](demo/videojs-demo.html)
 - [flowplayer](https://flowplayer.com/)
-    - 参见 [flowplayer-demo.html](https://gitee.com/cdnbye/hlsjs-p2p-engine/blob/master/demo/flowplayer-demo.html)
+    - 参见 [flowplayer-demo.html](demo/flowplayer-demo.html)
 - [DPlayer](https://github.com/MoePlayer/DPlayer)
-    - 参见 [dplayer-demo.html](https://gitee.com/cdnbye/hlsjs-p2p-engine/blob/master/demo/dplayer-demo.html)
+    - 参见 [dplayer-demo.html](demo/dplayer-demo.html)
 - [clappr](https://github.com/clappr/clappr)
     - coming soon!
 - [MediaElement.js](http://www.mediaelementjs.com/)
