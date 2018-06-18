@@ -1,6 +1,3 @@
-/**
- * Created by xieting on 2018/1/2.
- */
 
 const pkgJson = require('./package.json');
 const path = require('path');
@@ -20,7 +17,7 @@ const uglifyJsOptions = {
     },
     output: {
         comments: false,  // remove all comments
-        preamble: "/* A P2P-CDN supporting hls player built on WebRTC Data Channels API. @author XieTing <86755838@qq.com> <https://github.com/snowinszu> */"
+        // preamble: "Email <86755838@qq.com>*/"
     }
 };
 
@@ -41,12 +38,12 @@ const commonConfig = {
     }
 };
 
-function getPluginsForConfig(minify = false, type) {
+function getPluginsForConfig(minify = false, light = false) {
     // common plugins.
     const plugins = [
         new webpack.optimize.OccurrenceOrderPlugin(),
         new webpack.optimize.ModuleConcatenationPlugin(),
-        new webpack.DefinePlugin(getConstantsForConfig(type))
+        new webpack.DefinePlugin(getConstantsForConfig(light))
     ];
 
     if (minify) {
@@ -63,10 +60,11 @@ function getPluginsForConfig(minify = false, type) {
     return plugins;
 }
 
-function getConstantsForConfig(type) {                                             //嵌入全局变量
+function getConstantsForConfig(light = false) {                                             //嵌入全局变量
 
     return {
         __VERSION__: JSON.stringify(pkgJson.version),
+        __HLSJS_PATH__: light === true ? 'hls.js/dist/hls.light' : 'hls.js'
     };
 }
 
@@ -141,7 +139,7 @@ const multiConfig = [
                 library: ['Hls'],
                 libraryTarget: 'umd'
             },
-        plugins: getPluginsForConfig(true)
+        plugins: getPluginsForConfig(true, true)
     },
         //test
         {

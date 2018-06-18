@@ -1,6 +1,3 @@
-/**
- * Created by xieting on 2018/4/16.
- */
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
 const logTypes = {

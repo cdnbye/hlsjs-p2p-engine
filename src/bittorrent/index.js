@@ -1,6 +1,3 @@
-/**
- * Created by xieting on 2018/3/26.
- */
 
 import Tracker from './bt-tracker';
 import Loader from './bt-loader';

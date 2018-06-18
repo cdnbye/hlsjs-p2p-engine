@@ -1,8 +1,5 @@
-/**
- * Created by xieting on 2018/1/3.
- */
-import {config as btConfig} from './bittorrent';
 
+import {config as btConfig} from './bittorrent';
 
 //时间单位统一为秒
 let defaultP2PConfig = {

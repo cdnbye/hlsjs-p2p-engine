@@ -1,9 +1,11 @@
-/**
- * Created by xieting on 2018/1/2.
- */
+
+// var HLSJS_PATH = __HLSJS_PATH__
 
 import P2PEngine from './index.engine';
-import Hlsjs from 'hls.js';
+var a = false;
+const Hlsjs = (a === true ? require('hls.js') : require('hls.js/dist/hls.light.js'));
+
+// import Hlsjs from HLSJS_PATH;
 
 let recommendedHlsjsConfig = {
     maxBufferSize: 0,

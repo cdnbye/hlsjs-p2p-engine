@@ -1,6 +1,4 @@
-/**
- * Created by xieting on 2018/1/2.
- */
+
 
 import P2PEngine from './index.engine';
 import Hlsjs from 'hls.js/dist/hls.light';

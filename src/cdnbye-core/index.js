@@ -1,6 +1,3 @@
-/**
- * Created by xieting on 2018/4/3.
- */
 
 // import datachannel from './cdnbye-core/src/datachannel';
 // import events from './cdnbye-core/src/events';

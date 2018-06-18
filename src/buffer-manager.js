@@ -1,6 +1,3 @@
-/**
- * Created by xieting on 2018/1/9.
- */
 
 import EventEmitter from 'events';
 import {Events, Buffer} from './cdnbye-core';

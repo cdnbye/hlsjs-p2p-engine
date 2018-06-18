@@ -1,6 +1,3 @@
-/**
- * Created by xieting on 2018/1/2.
- */
 
 import EventEmitter from 'events';
 import defaultP2PConfig from './config';

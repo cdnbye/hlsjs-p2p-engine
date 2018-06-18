@@ -1,6 +1,3 @@
-/**
- * Created by xieting on 2018/3/23.
- */
 
 import EventEmitter from 'events';
 import ReconnectingWebSocket from 'reconnecting-websocket';
