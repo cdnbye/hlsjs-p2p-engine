@@ -11,6 +11,7 @@
     "release-hlsjs-light": "webpack --progress --env.release-hlsjs-light",
     "publish": "npm publish",
     "git-push": "git add . && git commit -m 'add API doc' && git push origin master",
+    "git-pull": "git pull origin master",
     "test": "webpack --progress --env.test-bundle"
   },
   "repository": {
