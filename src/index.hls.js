@@ -1,11 +1,12 @@
 
-// var HLSJS_PATH = __HLSJS_PATH__
 
 import P2PEngine from './index.engine';
-var a = false;
-const Hlsjs = (a === true ? require('hls.js') : require('hls.js/dist/hls.light.js'));
-
-// import Hlsjs from HLSJS_PATH;
+var Hlsjs;
+if (__IS_HLSJS_LIGHT__) {
+    Hlsjs = require('hls.js/dist/hls.light');
+} else {
+    Hlsjs = require('hls');
+}
 
 let recommendedHlsjsConfig = {
     maxBufferSize: 0,

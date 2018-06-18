@@ -60,7 +60,8 @@ class P2PEngine extends EventEmitter {
         let browserInfo = {
             browser: uaParserResult.browser.name,
             device: uaParserResult.device.type === 'mobile' ? 'mobile' : 'PC',
-            os: uaParserResult.os.name
+            os: uaParserResult.os.name,
+            host: window.location.host,
         };
 
 

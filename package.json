@@ -1,6 +1,6 @@
 {
   "name": "cdnbye",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "This JS library implements WebRTC datachannel to scale live/vod video streaming by peer-to-peer network using bittorrent-like protocol",
   "main": "./dist/hls.min.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "release-hlsjs": "webpack --progress --env.release-hlsjs",
     "release-hlsjs-light": "webpack --progress --env.release-hlsjs-light",
     "publish": "npm publish",
-    "git-push": "git add . && git commit -m 'make doc' && git push origin master",
+    "git-push": "git add . && git commit -m 'refactor' && git push origin master",
     "git-pull": "git pull origin master",
     "test": "webpack --progress --env.test-bundle"
   },
@@ -21,7 +21,7 @@
   "author": "TimmyXie",
   "license": "MIT",
   "dependencies": {
-    "cdnbye-core": "^0.0.5",
+    "cdnbye-core": "^0.0.6",
     "hls.js": "^0.8.9",
     "reconnecting-websocket": "^3.2.2",
     "ua-parser-js": "^0.7.17"

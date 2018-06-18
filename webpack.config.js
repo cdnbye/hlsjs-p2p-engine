@@ -8,8 +8,8 @@ const uglifyJsOptions = {
     stats: true,
     compress: {
         warnings: false,
-        drop_debugger: true,
-        drop_console: true
+        // drop_debugger: true,
+        // drop_console: true
     },
     mangle: {
         toplevel: true,
@@ -64,7 +64,7 @@ function getConstantsForConfig(light = false) {                                 
 
     return {
         __VERSION__: JSON.stringify(pkgJson.version),
-        __HLSJS_PATH__: light === true ? 'hls.js/dist/hls.light' : 'hls.js'
+        __IS_HLSJS_LIGHT__: light
     };
 }
 
@@ -128,11 +128,11 @@ const multiConfig = [
                library: ['Hls'],
                libraryTarget: 'umd'
             },
-            plugins: getPluginsForConfig(true)
+            plugins: getPluginsForConfig(true, false)
          },
          {
             name: 'release-hlsjs-light',
-            entry: './src/index.hls.light.js',
+            entry: './src/index.hls.js',
             output: {
                 filename: 'hls.light.min.js',
                 path: path.resolve(__dirname, 'dist'),
