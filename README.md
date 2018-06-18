@@ -2,7 +2,7 @@
 <h4 align="center">It's time to say bye to CDN.</h4>
 
 
-**[中文](docs/中文/README_CH.md)**
+**[中文](Readme_zh.md)**
 
 This JS library implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC) datachannel to scale live/vod video streaming by peer-to-peer network using bittorrent-like protocol. The forming peer network can be layed over other CDNs or on top of the origin server. Powered by [hls.js](https://github.com/video-dev/hls.js), it can play HLS on any platform with many popular HTML5 players such as video.js, Clappr and Flowplayer. 
 
