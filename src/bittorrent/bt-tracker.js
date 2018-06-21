@@ -3,6 +3,7 @@ import EventEmitter from 'events';
 import BTScheduler from './bt-scheduler';
 import SignalClient from '../signal-client';
 import {DataChannel, Events} from '../cdnbye-core';
+import {throttle} from '../utils/toolFuns';
 
 class BTTracker extends EventEmitter {
     constructor(engine, fetcher, config) {
@@ -22,6 +23,9 @@ class BTTracker extends EventEmitter {
         peers: Array<Object{id:string}>
          */
         this.peers = [];
+
+        // 防止调用频率过高
+        this.requestMorePeers = throttle(this._requestMorePeers, this);
 
         this._setupScheduler(this.scheduler);
     }
@@ -117,7 +121,7 @@ class BTTracker extends EventEmitter {
                 this._tryConnectToPeer();
                 datachannel.destroy();
 
-                this._requestMorePeers();
+                this.requestMorePeers();
 
                 //更新conns
                 if (datachannel.isInitiator) {
@@ -138,7 +142,7 @@ class BTTracker extends EventEmitter {
 
                 datachannel.destroy();
 
-                this._requestMorePeers();
+                this.requestMorePeers();
 
                 //更新conns
                 this.fetcher.decreConns();

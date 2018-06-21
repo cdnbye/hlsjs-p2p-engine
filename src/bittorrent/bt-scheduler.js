@@ -1,5 +1,6 @@
 import EventEmitter from 'events';
 import {Events} from '../cdnbye-core';
+import {handleTSUrl} from '../utils/toolFuns';
 
 class BTScheduler extends EventEmitter {
     constructor(engine, config) {
@@ -50,26 +51,26 @@ class BTScheduler extends EventEmitter {
             }
         }
 
-        //检查是否有空闲的节点，有的话采用rearest first策略下载
-        let idlePeers = this._getIdlePeer();
-        if (idlePeers.length === 0 || this.bitCounts.size === 0 || this.bufMgr.overflowed) return;        //缓存溢出则停止rearest first
-        let sortedArr = [...this.bitCounts.entries()].sort((item1, item2) => {
-            return item1[1] < item2[1];
-        });
-        if (sortedArr.length === 0) return;
-        //每次只下载一个rearest块
-        let rearest = sortedArr.pop()[0];
-        while (rearest === this.loadingSN || requested.includes(rearest)) {         //排除掉loading的和requested的
-            if (sortedArr.length === 0) return;
-            rearest = sortedArr.pop()[0];
-        }
-        for (let peer of idlePeers) {
-            if (peer.bitset.has(rearest)) {
-                peer.requestDataBySN(rearest, false);
-                logger.debug(`request rearest ${rearest} from peer ${peer.remotePeerId}`);
-                break;
-            }
-        }
+        //检查是否有空闲的节点，有的话采用rearest first策略下载(由于上行带宽有限，暂停这个策略)
+        // let idlePeers = this._getIdlePeer();
+        // if (idlePeers.length === 0 || this.bitCounts.size === 0 || this.bufMgr.overflowed) return;        //缓存溢出则停止rearest first
+        // let sortedArr = [...this.bitCounts.entries()].sort((item1, item2) => {
+        //     return item1[1] < item2[1];
+        // });
+        // if (sortedArr.length === 0) return;
+        // //每次只下载一个rearest块
+        // let rearest = sortedArr.pop()[0];
+        // while (rearest === this.loadingSN || requested.includes(rearest)) {         //排除掉loading的和requested的
+        //     if (sortedArr.length === 0) return;
+        //     rearest = sortedArr.pop()[0];
+        // }
+        // for (let peer of idlePeers) {
+        //     if (peer.bitset.has(rearest)) {
+        //         peer.requestDataBySN(rearest, false);
+        //         logger.debug(`request rearest ${rearest} from peer ${peer.remotePeerId}`);
+        //         break;
+        //     }
+        // }
 
     }
 
@@ -104,9 +105,10 @@ class BTScheduler extends EventEmitter {
         const { logger } = this.engine;
         this.context = context;
         const frag = context.frag;
+        const handledUrl = handleTSUrl(frag.relurl, this.config.tsStrictMatched);
         this.callbacks = callbacks;
         this.stats = {trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0};
-        this.criticalSeg = {sn: frag.sn, relurl: frag.relurl};
+        this.criticalSeg = {sn: frag.sn, relurl: handledUrl};
 
         let target;
         for (let peer of this.peerMap.values()) {
@@ -117,7 +119,7 @@ class BTScheduler extends EventEmitter {
 
         if (target) {
             // target.requestDataBySN(frag.sn, true);
-            target.requestDataByURL(frag.relurl, true);                            //critical的根据url请求
+            target.requestDataByURL(handledUrl, true);                            //critical的根据url请求
             logger.info(`request criticalSeg url ${frag.relurl} at ${frag.sn}`);
         }
         this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout*1000);
@@ -259,6 +261,11 @@ class BTScheduler extends EventEmitter {
         this.callbacks.onTimeout(this.stats, this.context, null);
         this.criticaltimeouter = null;
     }
+}
+
+function handleUrl(url) {
+    // return url;
+    return url.split("?")[0];
 }
 
 

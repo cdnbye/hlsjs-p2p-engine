@@ -1,17 +1,19 @@
 {
   "name": "cdnbye",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "This JS library implements WebRTC datachannel to scale live/vod video streaming by peer-to-peer network using bittorrent-like protocol",
   "main": "./dist/hls.min.js",
   "scripts": {
+    "release": "npm run bundle-engine && npm run bundle-hlsjs && npm run release-engine && npm run release-hlsjs && npm run release-hlsjs-light && npm run git-push && npm run publish",
     "bundle-engine": "webpack --progress --env.bundle-engine",
     "bundle-hlsjs": "webpack --progress --env.bundle-hlsjs",
     "release-engine": "webpack --progress --env.release-engine",
     "release-hlsjs": "webpack --progress --env.release-hlsjs",
     "release-hlsjs-light": "webpack --progress --env.release-hlsjs-light",
     "publish": "npm publish",
-    "git-push": "git add . && git commit -m 'refactor' && git push origin master",
+    "git-push": "git add . && git commit -m 'improve schduling algorithm' && git push origin master",
     "git-pull": "git pull origin master",
+    "npm-install": "cnpm install",
     "test": "webpack --progress --env.test-bundle"
   },
   "repository": {
@@ -21,7 +23,7 @@
   "author": "TimmyXie",
   "license": "MIT",
   "dependencies": {
-    "cdnbye-core": "^0.0.6",
+    "cdnbye-core": "^0.0.7",
     "hls.js": "^0.8.9",
     "reconnecting-websocket": "^3.2.2",
     "ua-parser-js": "^0.7.17"

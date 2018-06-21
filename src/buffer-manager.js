@@ -1,7 +1,7 @@
 
 import EventEmitter from 'events';
 import {Events, Buffer} from './cdnbye-core';
-
+import {handleTSUrl} from './utils/toolFuns';
 
 class BufferManager extends EventEmitter {
     constructor(engine, config) {
@@ -30,6 +30,7 @@ class BufferManager extends EventEmitter {
     }
 
     copyAndAddBuffer(data, url, sn) {                                       //先复制再缓存
+        const handledUrl = handleTSUrl(url, this.config.tsStrictMatched);
         let payloadBuf = Buffer.from(data);
         let byteLength = payloadBuf.byteLength;
         let targetBuffer = new Buffer(byteLength);
@@ -37,24 +38,25 @@ class BufferManager extends EventEmitter {
 
         let segment = {
             sn: sn,
-            relurl: url,
+            relurl: handledUrl,
             data: targetBuffer,
             size: byteLength
         };
 
         this.addSeg(segment);
-        this.sn2Url.set(sn, url);
+        this.sn2Url.set(sn, handledUrl);
     }
 
     addBuffer(sn, url, buf) {                                             //直接缓存
+        const handledUrl = handleTSUrl(url, this.config.tsStrictMatched);
         let segment = {
             sn: sn,
-            relurl: url,
+            relurl: handledUrl,
             data: buf,
             size: buf.byteLength
         };
         this.addSeg(segment);
-        this.sn2Url.set(sn, url);
+        this.sn2Url.set(sn, handledUrl);
     }
 
     addSeg(seg) {
