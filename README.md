@@ -130,10 +130,6 @@ We have collected some [frequently asked questions](docs/English/FAQ.md). Before
     - coming soon!
 
 
-## Donation
-If you find CDNBye useful, you can buy me a cup of coffee :)<br>
-<img width="200" src="figs/pay.jpeg" alt="donation">
-
 
 
 
