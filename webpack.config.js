@@ -2,6 +2,7 @@
 const pkgJson = require('./package.json');
 const path = require('path');
 const webpack = require('webpack');
+const fs= require('fs');
 
 const uglifyJsOptions = {
     screwIE8: true,
@@ -21,6 +22,9 @@ const uglifyJsOptions = {
     }
 };
 
+const prodCorePath = path.resolve(__dirname, 'src/cdnbye-core/cdnbye-core');
+const devCorePath = path.resolve(__dirname, 'src/cdnbye-core/_index.js');
+
 const commonConfig = {
 
     module: {
@@ -35,6 +39,12 @@ const commonConfig = {
                 }
             }
         ]
+    },
+    resolve: {
+        extensions: ['.js'],
+        alias: {
+            core: fs.existsSync(devCorePath) ? devCorePath : prodCorePath
+        }
     }
 };
 
@@ -61,10 +71,9 @@ function getPluginsForConfig(minify = false, light = false) {
 }
 
 function getConstantsForConfig(light = false) {                                             //嵌入全局变量
-
     return {
         __VERSION__: JSON.stringify(pkgJson.version),
-        __IS_HLSJS_LIGHT__: light
+        __IS_HLSJS_LIGHT__: light,
     };
 }
 

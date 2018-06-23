@@ -16,7 +16,7 @@ let defaultP2PConfig = {
     dcPings: 5,                          //datachannel发送ping数据包的数量
     dcTolerance: 4,                             //请求超时或错误多少次淘汰该peer
 
-    packetSize: 16*1024,                        //每次通过datachannel发送的包的大小
+    packetSize: 64*1024,                        //每次通过datachannel发送的包的大小
     maxBufSize: 1024*1024*50,                   //p2p缓存的最大数据量
     loadTimeout: 5,                             //p2p下载的超时时间
     tsStrictMatched: false,                     //p2p传输的ts是否要严格匹配（去掉查询参数），默认false

@@ -21,7 +21,7 @@
         hls.on(Hls.Events.FRAG_LOADED, (id, data) => {
             var frag = data.frag;
             var source = undefined;
-            if (frag.loadByHTTP === true) {
+            if (frag.loadByHTTP === true || frag.loadByHTTP === undefined) {
                 source = 'HTTP';
             } else if (frag.loadByP2P === true) {
                 source = 'P2P';

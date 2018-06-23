@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>CDNBye JWPlayer Demo</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
+
+    <!-- CDNBye Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
+    <!-- JW Player Builds -->
+    <script src="//ssl.p.jwpcdn.com/player/v/8.3.0/jwplayer.js"></script>
+    <!-- JWPlayer Hlsjs Provider -->
+    <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/jwplayer.hlsjs.provider.min.js"></script>
+
+
+</head>
+
+<body>
+<header></header>
+<center>
+    <div id="demoplayer"></div>
+</center>
+<script>
+    jwplayer.key = "uoW6qHjBL3KNudxKVnwa3rt5LlTakbko9e6aQ6VUyKQ=";
+
+    jwplayer('demoplayer').setup({
+        file: 'https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8',
+        dnaConfig: {},
+        width: 512,
+        height: 288,
+        autostart: true,
+        hlsjsConfig: {
+            debug: false,
+            // Other hlsjsConfig options provided by hls.js
+            p2pConfig: {
+                logLevel: 'debug',
+                // Other p2pConfig options provided by CDNBye
+            }
+        },
+    });
+</script>
+</body>
+
+</html>
+​

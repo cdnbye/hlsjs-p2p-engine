@@ -18,6 +18,14 @@
                 // path to the HLS m3u8
                 { type: "application/x-mpegurl", src: "https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8"},
             ]
+        },
+        hlsjs: {
+            debug: false,
+            // Other hlsjsConfig options provided by hls.js
+            p2pConfig: {
+                logLevel: 'debug',
+                // Other p2pConfig options provided by CDNBye
+            }
         }
     });
 </script>
