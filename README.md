@@ -13,7 +13,7 @@ This JS library implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC) datach
 This library is a part of CDNBye project which attempts to deliver high quality video streams, decreasing the number of requests to CDN servers, reducing the cost of transmission and enhancing system’s scalability. As the name suggests, CDNBye will help you offload bandwidth from expensive traditional CDNs，while also maximizing a user’s viewing experience.
 
 ## Playground
-coming soon...
+Open at least tow tap in your browser: [demo](http://cdnbye.gitee.io/hlsjs-p2p-engine/videojs-demo.html)
 
 ## Getting Started
 #### Quick Start Demo
@@ -130,6 +130,8 @@ We have collected some [frequently asked questions](docs/English/FAQ.md). Before
     - coming soon!
 - [Fluid Player](https://www.fluidplayer.com/)
     - coming soon!
+- Add your player here
+    - CDNBye can be integrated into any HTML5 video player that with hls.js built in.
 
 
 

@@ -3,21 +3,14 @@ import EventEmitter from 'events';
 import defaultP2PConfig from './config';
 import {Tracker, FragLoader} from './bittorrent';
 import BufferManager from './buffer-manager';
-import UAParser from 'ua-parser-js';
 import {Events, Fetcher, getBrowserRTC} from './cdnbye-core';
 import Logger from './utils/logger';
-
-const uaParserResult = (new UAParser()).getResult();
-// let logger;
+import platform from './utils/platform';
 
 class P2PEngine extends EventEmitter {
 
     static get Events() {
         return Events;
-    }
-
-    static get uaParserResult() {
-        return uaParserResult;
     }
 
     constructor(hlsjs, p2pConfig) {
@@ -47,20 +40,18 @@ class P2PEngine extends EventEmitter {
 
         hlsjs.on(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
 
-
-
-        //streaming rate
-        // this.streamingRate = 0;                        //单位bps
-        // this.fragLoadedCounter = 0;
+        // 免费版需要打印版本信息
+        if (this.config.key === 'free') {
+            console.log(`CDNBye version ${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P-CDN. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
+        }
     }
 
     _init(channel) {
         const { logger } = this;
         //上传浏览器信息
         let browserInfo = {
-            browser: uaParserResult.browser.name,
-            device: uaParserResult.device.type === 'mobile' ? 'mobile' : 'PC',
-            // os: uaParserResult.os.name,
+            device: platform.getPlatform(),
+            netType: platform.getNetType(),
             host: window.location.host,
             version: P2PEngine.version,
         };
@@ -174,7 +165,9 @@ class P2PEngine extends EventEmitter {
         }
     }
 
-
+    get version() {
+        return P2PEngine.version;
+    }
 
 }
 

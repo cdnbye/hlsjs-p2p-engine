@@ -36,7 +36,7 @@
  ```javascript
 <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
 ```
-真理从来都是如此简单！
+就是这么简单！
 
 ## 浏览器支持情况
 由于WebRTC已成为HTML5标准，目前大部分主流浏览器都已经支持。CDNBye的浏览器兼容性取决于WebRTC和hls.js。需要注意的是iOS版Safari由于不支持MediaSource API，因此也不支持hls.js(不过Safari原生支持HLS播放)。
@@ -89,7 +89,7 @@ var hlsjsConfig = {
 var hls = new Hls(hlsjsConfig);
 // Use `hls` just like the usual hls.js ...
 ```
-#### Engine(the library without hls.js)
+#### Engine(没有打包hls.js的插件，需要自己引入hls.js)
 实例化hls.js并将hlsjsConfig作为参数传入。然后实例化P2PEngine并将p2pConfig作为参数传入。调用hls.js的loadSource和attachMedia方法。
 ```javascript
 var hlsjsConfig = {
@@ -128,6 +128,8 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
     - 参见 [videojs-demo.html](demo/videojs-demo.html)
 - [flowplayer](https://flowplayer.com/)
     - 参见 [flowplayer-demo.html](demo/flowplayer-demo.html)
+- [jwplayer](https://www.jwplayer.com/)
+    - 参见 [jwplayer-demo.html](demo/jwplayer-demo.html)
 - [DPlayer](https://github.com/MoePlayer/DPlayer)
     - 参见 [dplayer-demo.html](demo/dplayer-demo.html)
 - [clappr](https://github.com/clappr/clappr)
@@ -136,9 +138,6 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
     - coming soon!
 - [Fluid Player](https://www.fluidplayer.com/)
     - coming soon!
-
-
-## 打赏
-如果CDNBye对您有用，请我喝一杯咖啡如何:)<br>
-<img width="200" src="figs/pay.jpeg" alt="donation">
+- 欢迎贡献您的播放器demo
+    - CDNBye可以集成到内置hls.js的任何H5播放器中！
 

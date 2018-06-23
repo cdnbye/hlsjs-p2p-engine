@@ -11,7 +11,7 @@
     "release-hlsjs": "webpack --progress --env.release-hlsjs",
     "release-hlsjs-light": "webpack --progress --env.release-hlsjs-light",
     "publish": "npm publish",
-    "git-push": "git add . && git commit -m 'update demos' && git push origin master",
+    "git-push": "git add . && git commit -m 'update utils and demo' && git push origin master",
     "git-pull": "git pull origin master",
     "install-core": "cnpm install cdnbye-core@latest",
     "update-core": "npm update cdnbye-core --save",
@@ -21,13 +21,12 @@
     "type": "git",
     "url": "https://github.com/cdnbye/hlsjs-p2p-engine.git"
   },
-  "author": "TimmyXie",
+  "author": "cdnbye",
   "license": "MIT",
   "dependencies": {
     "cdnbye-core": "^0.0.8",
     "hls.js": "^0.8.9",
-    "reconnecting-websocket": "^3.2.2",
-    "ua-parser-js": "^0.7.17"
+    "reconnecting-websocket": "^3.2.2"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
