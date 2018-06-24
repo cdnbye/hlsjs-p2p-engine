@@ -56,13 +56,13 @@ If `opts` is specified, then the default options (shown below) will be overridde
         dcUploadTimeout: 3,                               // The upload timeout of datachannel (default=3)
         dcPings: 5,                                       // The ping times of datachannel (default=5)
         dcTolerance: 4,                                   // The maximum times of request timeout or errors allowed to make by peer before eliminating (default=4)
-        packetSize: 16*1024,                              // The maximum package size sent by datachannel per time (default=16KB)
+        packetSize: 64*1024,                              // The maximum package size sent by datachannel per time (default=64KB)
         maxBufSize: 1024*1024*50,                         // The cache size of binary data (default=50MB)
-        loadTimeout: 5,                                   // Timeout of downloading by p2p (default=5)
+        loadTimeout: 3,                                   // Timeout of downloading by p2p (default=3)
         enableLogUpload: false,                           // Enable upload logs to server (default=false)
         logUploadAddr: "wss://api.cdnbye.com/trace",      // Log upload address
         logUploadLevel: 'warn',                           // Log upload level(debug, info, warn, error, none) (default=warn)
-        logLevel: 'none',                                 // Print log level(debug, info, warn, error, none) (default=none)
+        logLevel: 'none',                                 // Print log level(debug, info, warn, error, none，false=none, true=debug) (default='none')
         announce: "https://tracker.cdnbye.com",           // The address of tracker server
         neighbours: 12,                                   // The maximum number of peers allowed to connect (default=12)                             
     }

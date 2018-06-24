@@ -133,11 +133,11 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 - [DPlayer](https://github.com/MoePlayer/DPlayer)
     - 参见 [dplayer-demo.html](demo/dplayer-demo.html)
 - [clappr](https://github.com/clappr/clappr)
-    - coming soon!
+    - 参见 [clappr-demo.html](demo/clappr-demo.html)
 - [MediaElement.js](http://www.mediaelementjs.com/)
-    - coming soon!
+    - 参见 [mediaelement-demo.html](demo/mediaelement-demo.html)
 - [Fluid Player](https://www.fluidplayer.com/)
     - coming soon!
-- 欢迎贡献您的播放器demo
-    - CDNBye可以集成到内置hls.js的任何H5播放器中！
+- `欢迎贡献您的播放器demo`
+    - CDNBye可以集成到内置hls.js的任何H5视频播放器中！
 

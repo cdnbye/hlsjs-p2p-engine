@@ -125,12 +125,12 @@ We have collected some [frequently asked questions](docs/English/FAQ.md). Before
 - [DPlayer](https://github.com/MoePlayer/DPlayer)
     - See [dplayer-demo.html](demo/dplayer-demo.html)
 - [clappr](https://github.com/clappr/clappr)
-    - coming soon!
+    - See [clappr-demo.html](demo/clappr-demo.html)
 - [MediaElement.js](http://www.mediaelementjs.com/)
-    - coming soon!
+    - See [mediaelement-demo.html](demo/mediaelement-demo.html)
 - [Fluid Player](https://www.fluidplayer.com/)
     - coming soon!
-- Add your player here
+- `Add your customized player here`
     - CDNBye can be integrated into any HTML5 video player that with hls.js built in.
 
 

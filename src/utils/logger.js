@@ -23,7 +23,11 @@ class Logger {
                 this._ws = null;
             }
         }
-        if (!(config.logLevel in logTypes)) config.logLevel = 'none';
+        if (config.logLevel === true) {
+            config.logLevel = 'debug';
+        } else if (!(config.logLevel in logTypes) || config.logLevel === false) {
+            config.logLevel = 'none';
+        }
         if (!(config.logUploadLevel in logTypes)) config.logUploadLevel = 'none';
         for (let i=0;i<logTypes[config.logLevel];i++) {
             this[typesP[i]] = noop;

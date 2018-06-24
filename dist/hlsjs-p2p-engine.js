@@ -5709,7 +5709,7 @@ var P2PEngine = function (_EventEmitter) {
 
 P2PEngine.WEBRTC_SUPPORT = !!(0, _cdnbyeCore.getBrowserRTC)();
 
-P2PEngine.version = "0.1.4";
+P2PEngine.version = "0.1.5";
 
 exports.default = P2PEngine;
 module.exports = exports['default'];
@@ -5746,7 +5746,7 @@ var defaultP2PConfig = _extends({
 
     packetSize: 64 * 1024, //每次通过datachannel发送的包的大小
     maxBufSize: 1024 * 1024 * 50, //p2p缓存的最大数据量
-    loadTimeout: 5, //p2p下载的超时时间
+    loadTimeout: 3, //p2p下载的超时时间
     tsStrictMatched: false, //p2p传输的ts是否要严格匹配（去掉查询参数），默认false
 
     enableLogUpload: false, //上传log到服务器，默认true
@@ -9944,7 +9944,11 @@ var Logger = function () {
                 this._ws = null;
             }
         }
-        if (!(config.logLevel in logTypes)) config.logLevel = 'none';
+        if (config.logLevel === true) {
+            config.logLevel = 'debug';
+        } else if (!(config.logLevel in logTypes) || config.logLevel === false) {
+            config.logLevel = 'none';
+        }
         if (!(config.logUploadLevel in logTypes)) config.logUploadLevel = 'none';
         for (var i = 0; i < logTypes[config.logLevel]; i++) {
             this[typesP[i]] = noop;
