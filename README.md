@@ -128,8 +128,6 @@ We have collected some [frequently asked questions](docs/English/FAQ.md). Before
     - See [clappr-demo.html](demo/clappr-demo.html)
 - [MediaElement.js](http://www.mediaelementjs.com/)
     - See [mediaelement-demo.html](demo/mediaelement-demo.html)
-- [Fluid Player](https://www.fluidplayer.com/)
-    - coming soon!
 - `Add your customized player here`
     - CDNBye can be integrated into any HTML5 video player that with hls.js built in.
 
