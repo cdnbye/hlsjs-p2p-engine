@@ -109,13 +109,13 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 ## API and Configuration
 See [API.md](docs/English/API.md)
 
-## How it works
+## How It Works
 See [design.md](docs/English/design.md)
 
 ## FAQ
 We have collected some [frequently asked questions](docs/English/FAQ.md). Before reporting an issue, please search if the FAQ has the answer to your problem.
 
-## Player integration
+## Player Integration
 - [videojs](http://videojs.com/)
     - See [videojs-demo.html](demo/videojs-demo.html)
 - [flowplayer](https://flowplayer.com/)

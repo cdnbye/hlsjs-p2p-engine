@@ -5,7 +5,7 @@ var Hlsjs;
 if (__IS_HLSJS_LIGHT__) {
     Hlsjs = require('hls.js/dist/hls.light');
 } else {
-    Hlsjs = require('hls');
+    Hlsjs = require('hls.js');
 }
 
 let recommendedHlsjsConfig = {
