@@ -3,7 +3,7 @@
 /node_modules
 /test
 /server
-/src/cdnbye-core/*
+/src/core
 !/src/cdnbye-core/index.js
 /docs/Private
 /demo/test-standalone.html
