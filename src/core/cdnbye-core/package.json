@@ -1,0 +1,32 @@
+{
+  "name": "cdnbye-core",
+  "version": "0.0.8",
+  "description": "The core component of cdnbye project",
+  "main": "./dist/cdnbye-core.js",
+  "scripts": {
+    "build": "webpack --progress",
+    "publish": "npm publish",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "p2p",
+    "hls",
+    "video",
+    "cdn"
+  ],
+  "dependencies": {
+    "buffer": "^5.0.8",
+    "simple-peer": "^9.0.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015": "^6.24.1",
+    "mocha": "^4.1.0",
+    "webpack": "^3.10.0"
+  },
+  "author": "cdnbye",
+  "license": "ISC"
+}

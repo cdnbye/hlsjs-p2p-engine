@@ -23,7 +23,7 @@ const uglifyJsOptions = {
 };
 
 const prodCorePath = 'cdnbye-core';
-const devCorePath = path.resolve(__dirname, 'src/cdnbye-core/_index.js');
+const devCorePath = path.resolve(__dirname, 'src/core');
 
 const commonConfig = {
 

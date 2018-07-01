@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import {Events} from '../cdnbye-core';
+import {Events} from 'core';
 import {handleTSUrl} from '../utils/toolFuns';
 
 class BTScheduler extends EventEmitter {

@@ -1,6 +1,6 @@
 
 import EventEmitter from 'events';
-import {Events, Buffer} from './cdnbye-core';
+import {Events, Buffer} from 'core';
 import {handleTSUrl} from './utils/toolFuns';
 
 class BufferManager extends EventEmitter {

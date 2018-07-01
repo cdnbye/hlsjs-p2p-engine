@@ -2,7 +2,7 @@
 import EventEmitter from 'events';
 import BTScheduler from './bt-scheduler';
 import SignalClient from '../signal-client';
-import {DataChannel, Events} from '../cdnbye-core';
+import {DataChannel, Events} from 'core';
 import {throttle} from '../utils/toolFuns';
 
 class BTTracker extends EventEmitter {

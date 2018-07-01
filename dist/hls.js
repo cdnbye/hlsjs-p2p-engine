@@ -423,9 +423,9 @@ module.exports = g;
 
 
 
-var base64 = __webpack_require__(28)
-var ieee754 = __webpack_require__(29)
-var isArray = __webpack_require__(30)
+var base64 = __webpack_require__(27)
+var ieee754 = __webpack_require__(28)
+var isArray = __webpack_require__(29)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -2685,20 +2685,38 @@ function objectToString(o) {
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
+exports.getBrowserRTC = exports.Buffer = exports.Fetcher = exports.Events = exports.DataChannel = undefined;
 
-var _core = __webpack_require__(25);
+var _datachannel = __webpack_require__(25);
 
-Object.keys(_core).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _core[key];
-    }
-  });
-});
+var _datachannel2 = _interopRequireDefault(_datachannel);
+
+var _events = __webpack_require__(18);
+
+var _events2 = _interopRequireDefault(_events);
+
+var _fetcher = __webpack_require__(45);
+
+var _fetcher2 = _interopRequireDefault(_fetcher);
+
+var _getBrowserRtc = __webpack_require__(46);
+
+var _getBrowserRtc2 = _interopRequireDefault(_getBrowserRtc);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// export * from 'core';
+
+
+var Buffer = __webpack_require__(2).Buffer;
+
+exports.DataChannel = _datachannel2.default;
+exports.Events = _events2.default;
+exports.Fetcher = _fetcher2.default;
+exports.Buffer = Buffer;
+exports.getBrowserRTC = _getBrowserRtc2.default;
 
 /***/ }),
 /* 8 */
@@ -2872,7 +2890,7 @@ var _btTracker = __webpack_require__(23);
 
 var _btTracker2 = _interopRequireDefault(_btTracker);
 
-var _btLoader = __webpack_require__(49);
+var _btLoader = __webpack_require__(48);
 
 var _btLoader2 = _interopRequireDefault(_btLoader);
 
@@ -2925,7 +2943,7 @@ var pna = __webpack_require__(9);
 module.exports = Readable;
 
 /*<replacement>*/
-var isArray = __webpack_require__(37);
+var isArray = __webpack_require__(36);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -2965,7 +2983,7 @@ util.inherits = __webpack_require__(4);
 /*</replacement>*/
 
 /*<replacement>*/
-var debugUtil = __webpack_require__(38);
+var debugUtil = __webpack_require__(37);
 var debug = void 0;
 if (debugUtil && debugUtil.debuglog) {
   debug = debugUtil.debuglog('stream');
@@ -2974,7 +2992,7 @@ if (debugUtil && debugUtil.debuglog) {
 }
 /*</replacement>*/
 
-var BufferList = __webpack_require__(39);
+var BufferList = __webpack_require__(38);
 var destroyImpl = __webpack_require__(14);
 var StringDecoder;
 
@@ -4081,7 +4099,7 @@ util.inherits = __webpack_require__(4);
 
 /*<replacement>*/
 var internalUtil = {
-  deprecate: __webpack_require__(43)
+  deprecate: __webpack_require__(42)
 };
 /*</replacement>*/
 
@@ -4696,7 +4714,7 @@ Writable.prototype._destroy = function (err, cb) {
   this.end();
   cb(err);
 };
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(41).setImmediate, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(40).setImmediate, __webpack_require__(1)))
 
 /***/ }),
 /* 16 */
@@ -4728,7 +4746,7 @@ Writable.prototype._destroy = function (err, cb) {
 
 /*<replacement>*/
 
-var Buffer = __webpack_require__(44).Buffer;
+var Buffer = __webpack_require__(43).Buffer;
 /*</replacement>*/
 
 var isEncoding = Buffer.isEncoding || function (encoding) {
@@ -5512,7 +5530,7 @@ var Hlsjs;
 if (false) {
     Hlsjs = require('hls.js/dist/hls.light');
 } else {
-    Hlsjs = __webpack_require__(53);
+    Hlsjs = __webpack_require__(52);
 }
 
 var recommendedHlsjsConfig = {
@@ -5601,17 +5619,17 @@ var _config2 = _interopRequireDefault(_config);
 
 var _bittorrent = __webpack_require__(11);
 
-var _bufferManager = __webpack_require__(50);
+var _bufferManager = __webpack_require__(49);
 
 var _bufferManager2 = _interopRequireDefault(_bufferManager);
 
-var _cdnbyeCore = __webpack_require__(7);
+var _core = __webpack_require__(7);
 
-var _logger = __webpack_require__(51);
+var _logger = __webpack_require__(50);
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _platform = __webpack_require__(52);
+var _platform = __webpack_require__(51);
 
 var _platform2 = _interopRequireDefault(_platform);
 
@@ -5629,7 +5647,7 @@ var P2PEngine = function (_EventEmitter) {
     _createClass(P2PEngine, null, [{
         key: 'Events',
         get: function get() {
-            return _cdnbyeCore.Events;
+            return _core.Events;
         }
     }]);
 
@@ -5689,7 +5707,7 @@ var P2PEngine = function (_EventEmitter) {
             this.hlsjs.config.bufMgr = this.bufMgr;
 
             //实例化Fetcher
-            var fetcher = new _cdnbyeCore.Fetcher(this, this.config.key, window.encodeURIComponent(channel), this.config.announce, browserInfo);
+            var fetcher = new _core.Fetcher(this, this.config.key, window.encodeURIComponent(channel), this.config.announce, browserInfo);
             this.fetcher = fetcher;
             //实例化tracker服务器
             this.signaler = new _bittorrent.Tracker(this, fetcher, this.config);
@@ -5802,7 +5820,7 @@ var P2PEngine = function (_EventEmitter) {
     return P2PEngine;
 }(_events2.default);
 
-P2PEngine.WEBRTC_SUPPORT = !!(0, _cdnbyeCore.getBrowserRTC)();
+P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)();
 
 P2PEngine.version = "0.1.5";
 
@@ -5884,11 +5902,11 @@ var _btScheduler = __webpack_require__(24);
 
 var _btScheduler2 = _interopRequireDefault(_btScheduler);
 
-var _signalClient = __webpack_require__(48);
+var _signalClient = __webpack_require__(47);
 
 var _signalClient2 = _interopRequireDefault(_signalClient);
 
-var _cdnbyeCore = __webpack_require__(7);
+var _core = __webpack_require__(7);
 
 var _toolFuns = __webpack_require__(10);
 
@@ -6016,7 +6034,7 @@ var BTTracker = function (_EventEmitter) {
             if (this.peers.length === 0) return;
             var remotePeerId = this.peers.pop().id;
             logger.info('tryConnectToPeer ' + remotePeerId);
-            var datachannel = new _cdnbyeCore.DataChannel(this.engine, this.peerId, remotePeerId, true, this.config);
+            var datachannel = new _core.DataChannel(this.engine, this.peerId, remotePeerId, true, this.config);
             this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
             this._setupDC(datachannel);
         }
@@ -6027,7 +6045,7 @@ var BTTracker = function (_EventEmitter) {
 
             var logger = this.engine.logger;
 
-            datachannel.on(_cdnbyeCore.Events.DC_SIGNAL, function (data) {
+            datachannel.on(_core.Events.DC_SIGNAL, function (data) {
                 var remotePeerId = datachannel.remotePeerId;
                 _this4.signalerWs.sendSignal(remotePeerId, data);
                 //启动定时器，如果指定时间对方没有响应则连接下一个
@@ -6040,7 +6058,7 @@ var BTTracker = function (_EventEmitter) {
                         _this4._tryConnectToPeer();
                     }, 10000);
                 }
-            }).once(_cdnbyeCore.Events.DC_ERROR, function () {
+            }).once(_core.Events.DC_ERROR, function () {
                 logger.warn('datachannel error ' + datachannel.channelId);
                 _this4.scheduler.deletePeer(datachannel);
                 _this4.DCMap.delete(datachannel.remotePeerId);
@@ -6060,7 +6078,7 @@ var BTTracker = function (_EventEmitter) {
                         _this4.fetcher.increFailConns();
                     }
                 }
-            }).once(_cdnbyeCore.Events.DC_CLOSE, function () {
+            }).once(_core.Events.DC_CLOSE, function () {
 
                 logger.warn('datachannel closed ' + datachannel.channelId + ' ');
                 _this4.scheduler.deletePeer(datachannel);
@@ -6074,7 +6092,7 @@ var BTTracker = function (_EventEmitter) {
 
                 //更新conns
                 _this4.fetcher.decreConns();
-            }).once(_cdnbyeCore.Events.DC_OPEN, function () {
+            }).once(_core.Events.DC_OPEN, function () {
 
                 _this4.scheduler.handshakePeer(datachannel);
 
@@ -6148,7 +6166,7 @@ var BTTracker = function (_EventEmitter) {
                 //收到子节点连接请求
                 logger.debug('receive node ' + remotePeerId + ' connection request');
                 if (this.failedDCSet.has(remotePeerId)) return;
-                datachannel = new _cdnbyeCore.DataChannel(this.engine, this.peerId, remotePeerId, false, this.config);
+                datachannel = new _core.DataChannel(this.engine, this.peerId, remotePeerId, false, this.config);
                 this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
                 this._setupDC(datachannel);
             }
@@ -6221,7 +6239,7 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _cdnbyeCore = __webpack_require__(7);
+var _core = __webpack_require__(7);
 
 var _toolFuns = __webpack_require__(10);
 
@@ -6262,7 +6280,7 @@ var BTScheduler = function (_EventEmitter) {
             }
             if (this.peerMap.size > 0) {
                 var msg = {
-                    event: _cdnbyeCore.Events.DC_HAVE,
+                    event: _core.Events.DC_HAVE,
                     sn: sn
                 };
                 this._broadcastToPeers(msg);
@@ -6426,7 +6444,7 @@ var BTScheduler = function (_EventEmitter) {
 
             var logger = this.engine.logger;
 
-            dc.on(_cdnbyeCore.Events.DC_BITFIELD, function (msg) {
+            dc.on(_core.Events.DC_BITFIELD, function (msg) {
                 if (!msg.field) return;
                 var bitset = new Set(msg.field);
                 dc.bitset = bitset;
@@ -6437,7 +6455,7 @@ var BTScheduler = function (_EventEmitter) {
                     }
                 });
                 _this3.addPeer(dc); //只有获取bitfield之后才加入peerMap
-            }).on(_cdnbyeCore.Events.DC_HAVE, function (msg) {
+            }).on(_core.Events.DC_HAVE, function (msg) {
                 if (!msg.sn || !dc.bitset) return;
                 var sn = msg.sn;
                 dc.bitset.add(sn);
@@ -6445,25 +6463,25 @@ var BTScheduler = function (_EventEmitter) {
                     //防止重复下载
                     _this3._increBitCounts(sn);
                 }
-            }).on(_cdnbyeCore.Events.DC_LOST, function (msg) {
+            }).on(_core.Events.DC_LOST, function (msg) {
                 if (!msg.sn || !dc.bitset) return;
                 var sn = msg.sn;
                 dc.bitset.delete(sn);
                 _this3._decreBitCounts(sn);
-            }).on(_cdnbyeCore.Events.DC_PIECE, function (msg) {
+            }).on(_core.Events.DC_PIECE, function (msg) {
                 //接收到piece事件，即二进制包头
                 if (_this3.criticalSeg && _this3.criticalSeg.relurl === msg.url) {
                     //接收到critical的响应
                     _this3.stats.tfirst = Math.max(performance.now(), _this3.stats.trequest);
                 }
-            }).on(_cdnbyeCore.Events.DC_PIECE_NOT_FOUND, function (msg) {
+            }).on(_core.Events.DC_PIECE_NOT_FOUND, function (msg) {
                 if (_this3.criticalSeg && _this3.criticalSeg.relurl === msg.url) {
                     //接收到critical未找到的响应
                     window.clearTimeout(_this3.criticaltimeouter); //清除定时器
                     _this3.criticaltimeouter = null;
                     _this3._criticaltimeout(); //触发超时，由xhr下载
                 }
-            }).on(_cdnbyeCore.Events.DC_RESPONSE, function (response) {
+            }).on(_core.Events.DC_RESPONSE, function (response) {
                 //接收到完整二进制数据
                 if (_this3.criticalSeg && _this3.criticalSeg.relurl === response.url && _this3.criticaltimeouter) {
                     logger.info('receive criticalSeg url ' + response.url);
@@ -6478,7 +6496,7 @@ var BTScheduler = function (_EventEmitter) {
                     _this3.bufMgr.addBuffer(response.sn, response.url, response.data);
                 }
                 _this3.updateLoadedSN(response.sn);
-            }).on(_cdnbyeCore.Events.DC_REQUEST, function (msg) {
+            }).on(_core.Events.DC_REQUEST, function (msg) {
                 var url = '';
                 if (!msg.url) {
                     //请求sn的request
@@ -6492,12 +6510,12 @@ var BTScheduler = function (_EventEmitter) {
                     dc.sendBuffer(msg.sn, seg.relurl, seg.data);
                 } else {
                     dc.sendJson({
-                        event: _cdnbyeCore.Events.DC_PIECE_NOT_FOUND,
+                        event: _core.Events.DC_PIECE_NOT_FOUND,
                         url: url,
                         sn: msg.sn
                     });
                 }
-            }).on(_cdnbyeCore.Events.DC_TIMEOUT, function () {
+            }).on(_core.Events.DC_TIMEOUT, function () {
                 logger.warn('DC_TIMEOUT');
             });
         }
@@ -6584,9 +6602,9 @@ var BTScheduler = function (_EventEmitter) {
 
             this.bufMgr = bm;
 
-            bm.on(_cdnbyeCore.Events.BM_LOST, function (sn) {
+            bm.on(_core.Events.BM_LOST, function (sn) {
                 _this4._broadcastToPeers({ //向peers广播已经不缓存的sn
-                    event: _cdnbyeCore.Events.DC_LOST,
+                    event: _core.Events.DC_LOST,
                     sn: sn
                 });
                 _this4.bitset.delete(sn);
@@ -6615,48 +6633,10 @@ module.exports = exports['default'];
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.getBrowserRTC = exports.Buffer = exports.Fetcher = exports.Events = exports.DataChannel = undefined;
-
-var _datachannel = __webpack_require__(26);
-
-var _datachannel2 = _interopRequireDefault(_datachannel);
-
-var _events = __webpack_require__(18);
-
-var _events2 = _interopRequireDefault(_events);
-
-var _fetcher = __webpack_require__(46);
-
-var _fetcher2 = _interopRequireDefault(_fetcher);
-
-var _getBrowserRtc = __webpack_require__(47);
-
-var _getBrowserRtc2 = _interopRequireDefault(_getBrowserRtc);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var Buffer = __webpack_require__(2).Buffer;
-
-exports.DataChannel = _datachannel2.default;
-exports.Events = _events2.default;
-exports.Fetcher = _fetcher2.default;
-exports.Buffer = Buffer;
-exports.getBrowserRTC = _getBrowserRtc2.default;
-
-/***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _simpleChannel = __webpack_require__(27);
+var _simpleChannel = __webpack_require__(26);
 
 var _simpleChannel2 = _interopRequireDefault(_simpleChannel);
 
@@ -7112,7 +7092,7 @@ exports.default = DataChannel;
 module.exports = exports['default'];
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7122,11 +7102,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 module.exports = Peer;
 
-var debug = __webpack_require__(31)('simple-channel');
-var getBrowserRTC = __webpack_require__(34);
+var debug = __webpack_require__(30)('simple-channel');
+var getBrowserRTC = __webpack_require__(33);
 var inherits = __webpack_require__(4);
-var randombytes = __webpack_require__(35);
-var stream = __webpack_require__(36);
+var randombytes = __webpack_require__(34);
+var stream = __webpack_require__(35);
 
 var MAX_BUFFERED_AMOUNT = 64 * 1024;
 
@@ -7921,7 +7901,7 @@ function noop() {}
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2).Buffer))
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8044,7 +8024,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -8134,7 +8114,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -8145,7 +8125,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8159,7 +8139,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
  * Expose `debug()` as the module.
  */
 
-exports = module.exports = __webpack_require__(32);
+exports = module.exports = __webpack_require__(31);
 exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
@@ -8328,7 +8308,7 @@ function localstorage() {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8346,7 +8326,7 @@ exports.coerce = coerce;
 exports.disable = disable;
 exports.enable = enable;
 exports.enabled = enabled;
-exports.humanize = __webpack_require__(33);
+exports.humanize = __webpack_require__(32);
 
 /**
  * Active `debug` instances.
@@ -8561,7 +8541,7 @@ function coerce(val) {
 }
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8714,7 +8694,7 @@ function plural(ms, n, name) {
 }
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8734,7 +8714,7 @@ module.exports = function getBrowserRTC() {
 };
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8780,7 +8760,7 @@ function randomBytes(size, cb) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3)))
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8792,10 +8772,10 @@ exports.Readable = exports;
 exports.Writable = __webpack_require__(15);
 exports.Duplex = __webpack_require__(5);
 exports.Transform = __webpack_require__(17);
-exports.PassThrough = __webpack_require__(45);
+exports.PassThrough = __webpack_require__(44);
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8808,13 +8788,13 @@ module.exports = Array.isArray || function (arr) {
 };
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 39 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8827,7 +8807,7 @@ function _classCallCheck(instance, Constructor) {
 }
 
 var Buffer = __webpack_require__(8).Buffer;
-var util = __webpack_require__(40);
+var util = __webpack_require__(39);
 
 function copyBuffer(src, target, offset) {
   src.copy(target, offset);
@@ -8903,13 +8883,13 @@ if (util && util.inspect && util.inspect.custom) {
 }
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 41 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var apply = Function.prototype.apply;
@@ -8962,7 +8942,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(42);
+__webpack_require__(41);
 // On some exotic environments, it's not clear which object `setimmeidate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -8976,7 +8956,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 42 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -9169,7 +9149,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3)))
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9244,7 +9224,7 @@ function config(name) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-disable node/no-deprecated-api */
@@ -9312,7 +9292,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
 
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9365,7 +9345,7 @@ PassThrough.prototype._transform = function (chunk, encoding, cb) {
 };
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9581,7 +9561,7 @@ exports.default = Fetcher;
 module.exports = exports['default'];
 
 /***/ }),
-/* 47 */
+/* 46 */
 /***/ (function(module, exports) {
 
 // originally pulled out of simple-peer
@@ -9602,7 +9582,7 @@ module.exports = function getBrowserRTC () {
 
 
 /***/ }),
-/* 48 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9714,7 +9694,7 @@ exports.default = SignalClient;
 module.exports = exports['default'];
 
 /***/ }),
-/* 49 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9851,7 +9831,7 @@ exports.default = FragLoader;
 module.exports = exports['default'];
 
 /***/ }),
-/* 50 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9867,7 +9847,7 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _cdnbyeCore = __webpack_require__(7);
+var _core = __webpack_require__(7);
 
 var _toolFuns = __webpack_require__(10);
 
@@ -9915,9 +9895,9 @@ var BufferManager = function (_EventEmitter) {
         value: function copyAndAddBuffer(data, url, sn) {
             //先复制再缓存
             var handledUrl = (0, _toolFuns.handleTSUrl)(url, this.config.tsStrictMatched);
-            var payloadBuf = _cdnbyeCore.Buffer.from(data);
+            var payloadBuf = _core.Buffer.from(data);
             var byteLength = payloadBuf.byteLength;
-            var targetBuffer = new _cdnbyeCore.Buffer(byteLength);
+            var targetBuffer = new _core.Buffer(byteLength);
             payloadBuf.copy(targetBuffer);
 
             var segment = {
@@ -9961,7 +9941,7 @@ var BufferManager = function (_EventEmitter) {
                 this.sn2Url.delete(lastSeg.sn);
                 this._currBufSize -= parseInt(lastSeg.size);
                 if (!this.overflowed) this.overflowed = true;
-                this.emit(_cdnbyeCore.Events.BM_LOST, lastSeg.sn);
+                this.emit(_core.Events.BM_LOST, lastSeg.sn);
             }
         }
     }, {
@@ -9995,7 +9975,7 @@ exports.default = BufferManager;
 module.exports = exports['default'];
 
 /***/ }),
-/* 51 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10164,7 +10144,7 @@ exports.default = Logger;
 module.exports = exports['default'];
 
 /***/ }),
-/* 52 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10219,7 +10199,7 @@ function _toNum(str) {
 module.exports = os;
 
 /***/ }),
-/* 53 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function webpackUniversalModuleDefinition(root, factory) {

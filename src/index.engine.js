@@ -3,7 +3,7 @@ import EventEmitter from 'events';
 import defaultP2PConfig from './config';
 import {Tracker, FragLoader} from './bittorrent';
 import BufferManager from './buffer-manager';
-import {Events, Fetcher, getBrowserRTC} from './cdnbye-core';
+import {Events, Fetcher, getBrowserRTC} from 'core';
 import Logger from './utils/logger';
 import platform from './utils/platform';
 
