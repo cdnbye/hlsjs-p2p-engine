@@ -109,7 +109,10 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 ## API and Configuration
 See [API.md](docs/English/API.md)
 
-## How It Works
+## Signal Server
+Build and deploy your own [signal server](https://github.com/cdnbye/gosignaler)
+
+## How It Work
 See [design.md](docs/English/design.md)
 
 ## FAQ

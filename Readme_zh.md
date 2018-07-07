@@ -117,6 +117,9 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 ## API文档
 参见 [API.md](docs/中文/API.md)
 
+## 信令服务器
+信令服务器用于在WebRTC建立P2P连接过程中交换信令，推荐自行部署[信令服务器](https://github.com/cdnbye/gosignaler)
+
 ## 运作原理
 参见 [设计.md](docs/中文/设计.md)
 
