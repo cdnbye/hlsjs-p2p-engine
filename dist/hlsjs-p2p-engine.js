@@ -5586,7 +5586,7 @@ var P2PEngine = function (_EventEmitter) {
 
         // 免费版需要打印版本信息
         if (_this.config.key === 'free') {
-            console.log('CDNBye version ' + P2PEngine.version + ' -- A Free and Infinitely Scalable Video P2P-CDN. (https://github.com/cdnbye/hlsjs-p2p-engine)');
+            console.log('CDNBye v' + P2PEngine.version + ' -- A Free and Infinitely Scalable Video P2P-CDN. (https://github.com/cdnbye/hlsjs-p2p-engine)');
         }
         return _this;
     }
@@ -5603,7 +5603,8 @@ var P2PEngine = function (_EventEmitter) {
                 device: _platform2.default.getPlatform(),
                 netType: _platform2.default.getNetType(),
                 host: window.location.host,
-                version: P2PEngine.version
+                version: P2PEngine.version,
+                tag: this.config.tag || P2PEngine.version
             };
 
             this.hlsjs.config.p2pEnabled = this.p2pEnabled;
@@ -5767,10 +5768,12 @@ var defaultP2PConfig = _extends({
     loadTimeout: 3, //p2p下载的超时时间
     tsStrictMatched: false, //p2p传输的ts是否要严格匹配（去掉查询参数），默认false
 
-    enableLogUpload: false, //上传log到服务器，默认true
+    enableLogUpload: false, //上传log到服务器，默认false
     logUploadAddr: "wss://api.cdnbye.com/trace", //log上传地址
     logUploadLevel: 'warn', //log上传level，分为debug、info、warn、error、none，默认warn
-    logLevel: 'none' }, _bittorrent.config);
+    logLevel: 'none', //log的level，分为debug、info、warn、error、none，设为true等于debug，设为false等于none，默认none
+
+    tag: '' }, _bittorrent.config);
 
 // let p2pConfig;
 //

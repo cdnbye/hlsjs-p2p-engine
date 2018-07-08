@@ -42,7 +42,7 @@ class P2PEngine extends EventEmitter {
 
         // 免费版需要打印版本信息
         if (this.config.key === 'free') {
-            console.log(`CDNBye version ${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P-CDN. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
+            console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P-CDN. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
         }
     }
 
@@ -54,6 +54,7 @@ class P2PEngine extends EventEmitter {
             netType: platform.getNetType(),
             host: window.location.host,
             version: P2PEngine.version,
+            tag: this.config.tag || P2PEngine.version,
         };
 
 
