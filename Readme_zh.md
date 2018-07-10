@@ -121,7 +121,7 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 信令服务器用于在WebRTC建立P2P连接过程中交换信令，推荐自行部署[信令服务器](https://github.com/cdnbye/gosignaler)
 
 ## 用户案例
-[<img src="http://egame.gtimg.cn/club/pgg_pcweb/v2/img/logo.b32c58b.png" width="120">](http://egame.qq.com/)
+[<img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531253035445&di=7af6cc9ad4abe3d06ba376af22d85131&imgtype=0&src=http%3A%2F%2Fimg.kuai8.com%2Fattaches%2Fintro%2F1213%2F201612131436417407.png" width="120">](http://egame.qq.com/)
 
 如果您也在使用这个开源项目，欢迎通过pull request提交您网站的logo和网址
 
