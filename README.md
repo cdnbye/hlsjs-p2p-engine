@@ -113,7 +113,12 @@ See [API.md](docs/English/API.md)
 ## Signal Server
 Build and deploy your own [signal server](https://github.com/cdnbye/gosignaler)
 
-## How It Work
+## They are using CDNBye
+[<img src="http://egame.gtimg.cn/club/pgg_pcweb/v2/img/logo.b32c58b.png" width="120">](http://egame.qq.com/)
+
+Your website here – Send a pull request with your logo and URL!
+
+## How It Works
 See [design.md](docs/English/design.md)
 
 ## FAQ

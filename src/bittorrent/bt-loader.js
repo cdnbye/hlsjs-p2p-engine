@@ -1,6 +1,5 @@
-
 import EventEmitter from 'events';
-
+import URLToolkit from 'url-toolkit';
 
 class FragLoader extends EventEmitter {
     constructor(config) {
@@ -33,6 +32,9 @@ class FragLoader extends EventEmitter {
     load(context, config, callbacks) {
         const { logger } = this;
         const frag = context.frag;
+        // 获取ts的正确相对路径 obtain the correct path. Issue: https://github.com/cdnbye/hlsjs-p2p-engine/issues/9
+        const urlObj = URLToolkit.parseURL(frag.url);
+        frag.relurl = urlObj.path + urlObj.query;
         frag.loadByP2P = false;                //初始化flag
         frag.loadByHTTP = false;
         if (this.bufMgr.hasSegOfURL(frag.relurl)) {                                     //如果命中缓存

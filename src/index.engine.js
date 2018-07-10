@@ -1,4 +1,3 @@
-
 import EventEmitter from 'events';
 import defaultP2PConfig from './config';
 import {Tracker, FragLoader} from './bittorrent';
