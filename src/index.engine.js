@@ -40,9 +40,9 @@ class P2PEngine extends EventEmitter {
         hlsjs.on(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
 
         // 免费版需要打印版本信息
-        if (this.config.key === 'free') {
-            console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P-CDN. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
-        }
+        // if (this.config.key === 'free') {
+        //     console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P-CDN. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
+        // }
     }
 
     _init(channel) {
