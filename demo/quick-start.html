@@ -16,10 +16,8 @@
         hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
             video.play();
         });
-        var total = 0, p2p = 0;
         hls.on(Hls.Events.FRAG_LOADED, (id, data) => {
             var frag = data.frag;
-            console.log(`frag.loadByP2P ${frag.loadByP2P} frag.loadByHTTP ${frag.loadByHTTP}`)
             var source = undefined;
             if (frag.loadByHTTP === true || frag.loadByHTTP === undefined) {
                 source = 'HTTP';
@@ -27,10 +25,11 @@
                 source = 'P2P';
             }
             addToTable(frag.relurl, frag.loaded, source);
-            total += frag.loaded;
-            if (source === 'P2P') p2p += frag.loaded;
-            document.querySelector('#info').innerText = `p2p ratio: ${Math.round(p2p/total*100)}%   saved traffic: ${Math.round(p2p/1024)}KB`;
         });
+        hls.engine.on('stats', function ({totalHTTPDownloaded, totalP2PDownloaded}) {
+            var total = totalHTTPDownloaded + totalP2PDownloaded;
+            document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%   saved traffic: ${totalP2PDownloaded}KB`;
+        })
         function addToTable(url, downloaded, source) {
             var infoStr = `download ${url}(size:${downloaded}B) by ${source}`;
             document.querySelector('#table-body tbody').innerHTML +=

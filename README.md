@@ -110,7 +110,7 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 ## API and Configuration
 See [API.md](docs/English/API.md)
 
-## Signal Server
+## Signaling Server
 Build and deploy your own [signal server](https://github.com/cdnbye/gosignaler)
 
 ## They are using CDNBye
