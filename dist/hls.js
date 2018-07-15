@@ -5680,9 +5680,9 @@ var P2PEngine = function (_EventEmitter) {
         hlsjs.on(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
 
         // 免费版需要打印版本信息
-        if (_this.config.key === 'free') {
-            console.log('CDNBye v' + P2PEngine.version + ' -- A Free and Infinitely Scalable Video P2P-CDN. (https://github.com/cdnbye/hlsjs-p2p-engine)');
-        }
+        // if (this.config.key === 'free') {
+        //     console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P-CDN. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
+        // }
         return _this;
     }
 
@@ -5823,7 +5823,7 @@ var P2PEngine = function (_EventEmitter) {
 
 P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)();
 
-P2PEngine.version = "0.1.5";
+P2PEngine.version = "0.1.6";
 
 exports.default = P2PEngine;
 module.exports = exports['default'];
@@ -5969,7 +5969,9 @@ var BTTracker = function (_EventEmitter) {
                 _this2.signalerWs = _this2._initSignalerWs(); //连上tracker后开始连接信令服务器
                 _this2._handlePeers(json.peers);
                 _this2.engine.emit('peerId', _this2.peerId);
-            }).catch(function (err) {});
+            }).catch(function (err) {
+                console.warn(err);
+            });
         }
     }, {
         key: 'stopP2P',
@@ -6660,6 +6662,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * Created by xieting on 2018/4/2.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
+
+// import SimpleChannel from 'simple-peer';
+
 
 var Buffer = __webpack_require__(2).Buffer;
 
@@ -9408,8 +9413,12 @@ var Fetcher = function () {
                 fetch(_this.announceURL).then(function (response) {
                     return response.json();
                 }).then(function (json) {
-                    _this.peerId = json.peer_id; //保存peerId
-                    resolve(json);
+                    if (json.ret && json.ret === -1) {
+                        reject(json.msg);
+                    } else {
+                        _this.peerId = json.peer_id; //保存peerId
+                        resolve(json);
+                    }
                 }).catch(function (err) {
                     logger.error('[fetcher] btAnnounce error ' + err);
                     reject(err);
@@ -9418,9 +9427,10 @@ var Fetcher = function () {
         }
     }, {
         key: 'btHeartbeat',
-        value: function btHeartbeat(interval) {
+        value: function btHeartbeat() {
             var _this2 = this;
 
+            var interval = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 10;
             var logger = this.engine.logger;
 
             this.heartbeater = window.setInterval(function () {

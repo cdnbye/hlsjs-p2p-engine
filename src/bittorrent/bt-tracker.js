@@ -54,7 +54,7 @@ class BTTracker extends EventEmitter {
             this._handlePeers(json.peers);
             this.engine.emit('peerId', this.peerId);
         }).catch(err => {
-
+            console.warn(err);
         })
     }
 
