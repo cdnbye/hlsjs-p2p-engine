@@ -168,6 +168,11 @@ class BTScheduler extends EventEmitter {
                 dc.bitset.delete(sn);
                 this._decreBitCounts(sn);
             })
+            .on(Events.DC_PIECE_ACK, msg => {
+                if (msg.size) {
+                    this.engine.fetcher.reportUploaded(msg.size);
+                }
+            })
             .on(Events.DC_PIECE, msg => {                                                  //接收到piece事件，即二进制包头
                 if (this.criticalSeg && this.criticalSeg.relurl === msg.url) {                    //接收到critical的响应
                     this.stats.tfirst = Math.max(performance.now(), this.stats.trequest);

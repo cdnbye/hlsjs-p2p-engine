@@ -72,7 +72,7 @@
                 debug: false,
                 // Other hlsjsConfig options provided by hls.js
                 p2pConfig: {
-                    logLevel: 'debug',
+                    logLevel: false,
                     // Other p2pConfig options provided by CDNBye
                 }
             }
@@ -94,7 +94,8 @@
         }
         addToTable(frag.sn, frag.relurl, frag.loaded, source);
     });
-    player.tech_.sourceHandler_.hls.engine.on('stats', function ({totalHTTPDownloaded, totalP2PDownloaded}) {
+    player.tech_.sourceHandler_.hls.engine.on('stats', function ({totalHTTPDownloaded=0, totalP2PDownloaded=0, totalP2PUploaded=0}) {
+//        console.warn(`totalHTTPDownloaded ${totalHTTPDownloaded} totalP2PDownloaded ${totalP2PDownloaded}`)
         var total = totalHTTPDownloaded + totalP2PDownloaded;
         document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%,  saved traffic: ${totalP2PDownloaded}KB`;
     })

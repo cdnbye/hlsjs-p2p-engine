@@ -6378,6 +6378,10 @@ var BTScheduler = function (_EventEmitter) {
                 var sn = msg.sn;
                 dc.bitset.delete(sn);
                 _this3._decreBitCounts(sn);
+            }).on(_core.Events.DC_PIECE_ACK, function (msg) {
+                if (msg.size) {
+                    _this3.engine.fetcher.reportUploaded(msg.size);
+                }
             }).on(_core.Events.DC_PIECE, function (msg) {
                 //接收到piece事件，即二进制包头
                 if (_this3.criticalSeg && _this3.criticalSeg.relurl === msg.url) {
@@ -6676,6 +6680,7 @@ var DataChannel = function (_EventEmitter) {
                             break;
                         case _events4.default.DC_PIECE_ACK:
                             _this2._handlePieceAck();
+                            _this2.emit(msg.event, msg);
                             break;
                         default:
                             _this2.emit(msg.event, msg);
@@ -6692,7 +6697,8 @@ var DataChannel = function (_EventEmitter) {
                         _this2.sendJson({ //发送给peer确认信息
                             event: _events4.default.DC_PIECE_ACK,
                             sn: _this2.bufSN,
-                            url: _this2.bufUrl
+                            url: _this2.bufUrl,
+                            size: _this2.expectedSize
                         });
                         _this2._handleBinaryData();
                     }
@@ -9296,8 +9302,9 @@ var Fetcher = function () {
         this.failConns = 0; //连接失败的peer的增量
 
         //流量上报(单位：KB)
-        this.totalHTTPDownloaded = 0; //HTTP累积量
-        this.totalP2PDownloaded = 0; //P2P累积量
+        this.totalHTTPDownloaded = 0; // HTTP累积量
+        this.totalP2PDownloaded = 0; // P2P下载累积量
+        this.totalP2PUploaded = 0; // P2P上传累积量
         this.httpDownloaded = 0;
         this.p2pDownloaded = 0;
 
@@ -9397,21 +9404,34 @@ var Fetcher = function () {
                 this.httpDownloaded += flow;
                 this.totalHTTPDownloaded += flow;
             }
-            this.engine.emit('stats', { totalHTTPDownloaded: this.totalHTTPDownloaded, totalP2PDownloaded: this.totalP2PDownloaded });
+            this._emitStats();
             this._checkFlowLimit();
             // log(`cdnDownloaded ${this.cdnDownloaded} p2pDownloaded ${this.p2pDownloaded}`)
         }
 
-        // reportError(errFragLoad = false, errBufStalled = false, errInternalExpt = false) {
-        //     if (errFragLoad) this.errsFragLoad ++;
-        //     if (errBufStalled) this.errsBufStalled ++;
-        //     if (errInternalExpt) this.errsInternalExpt ++;
-        // }
+        // 上报上传的数据量
 
+    }, {
+        key: 'reportUploaded',
+        value: function reportUploaded() {
+            var size = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+            this.totalP2PUploaded += Math.round(size / 1024);
+            this._emitStats();
+        }
     }, {
         key: 'destroy',
         value: function destroy() {
             window.clearInterval(this.heartbeater);
+        }
+    }, {
+        key: '_emitStats',
+        value: function _emitStats() {
+            this.engine.emit('stats', {
+                totalHTTPDownloaded: this.totalHTTPDownloaded,
+                totalP2PDownloaded: this.totalP2PDownloaded,
+                totalP2PUploaded: this.totalP2PUploaded
+            });
         }
     }, {
         key: '_checkFlowLimit',

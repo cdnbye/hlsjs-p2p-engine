@@ -26,9 +26,9 @@
             }
             addToTable(frag.relurl, frag.loaded, source);
         });
-        hls.engine.on('stats', function ({totalHTTPDownloaded, totalP2PDownloaded}) {
+        hls.engine.on('stats', function ({totalHTTPDownloaded=0, totalP2PDownloaded=0}) {
             var total = totalHTTPDownloaded + totalP2PDownloaded;
-            document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%   saved traffic: ${totalP2PDownloaded}KB`;
+            document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB, upload data: ${}`;
         })
         function addToTable(url, downloaded, source) {
             var infoStr = `download ${url}(size:${downloaded}B) by ${source}`;

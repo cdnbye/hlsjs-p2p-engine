@@ -61,8 +61,6 @@ If `opts` is specified, then the default options (shown below) will be overridde
         // advanced options
         dcRequestTimeout: 3,                              // The request timeout of datachannel (default=3)
         dcUploadTimeout: 3,                               // The upload timeout of datachannel (default=3)
-        dcPings: 5,                                       // The ping times of datachannel (default=5)
-        dcTolerance: 4,                                   // The maximum times of request timeout or errors allowed to make by peer before eliminating (default=4)
         packetSize: 64*1024,                              // The maximum package size sent by datachannel per time (default=64KB)
         enableLogUpload: false,                           // Enable upload logs to server (default=false)
         logUploadAddr: "wss://api.cdnbye.com/trace",      // Log upload address
@@ -80,8 +78,11 @@ Emitted when the peer Id of this client is obtained from server.
 ### `hls.engine.on('peers', function (peers) {})`
 Emitted when successfully connected with new peer.
 
-### `hls.engine.on('stats', function ({totalHTTPDownloaded, totalP2PDownloaded}) {})`
-Emitted when data is downloaded by HTTP or P2P.
+### `hls.engine.on('stats', function ({totalHTTPDownloaded, totalP2PDownloaded, totalP2PUploaded}) {})`
+Emitted when data is downloaded/uploaded.
+totalHTTPDownloaded: total data downloaded by HTTP(KB).
+totalP2PDownloaded: total data downloaded by P2P(KB).
+totalP2PUploaded: total data uploaded by P2P(KB).
 
 ## P2PEngine Runtime API
 
