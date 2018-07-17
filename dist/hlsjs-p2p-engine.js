@@ -5585,9 +5585,9 @@ var P2PEngine = function (_EventEmitter) {
         hlsjs.on(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
 
         // 免费版需要打印版本信息
-        // if (this.config.key === 'free') {
-        //     console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P-CDN. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
-        // }
+        if (_this.config.key === 'free') {
+            console.log('CDNBye v' + P2PEngine.version + ' -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)');
+        }
         return _this;
     }
 
@@ -5627,7 +5627,7 @@ var P2PEngine = function (_EventEmitter) {
 
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADING, function (id, data) {
                 // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
-                logger.debug('FRAG_LOADING: ' + data.frag.sn);
+                logger.debug('loading frag ' + data.frag.sn);
                 _this2.signaler.currentLoadingSN = data.frag.sn;
             });
 
@@ -5641,7 +5641,7 @@ var P2PEngine = function (_EventEmitter) {
                 if (!_this2.signalTried && !_this2.signaler.connected && _this2.config.p2pEnabled) {
 
                     _this2.signaler.scheduler.bitrate = bitrate;
-                    logger.info('FRAG_LOADED bitrate ' + bitrate);
+                    logger.info('bitrate ' + bitrate);
 
                     _this2.signaler.resumeP2P();
                     _this2.signalTried = true;
@@ -5656,7 +5656,7 @@ var P2PEngine = function (_EventEmitter) {
 
             this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_CHANGED, function (id, data) {
                 // log('FRAG_CHANGED: '+JSON.stringify(data.frag, null, 2));
-                logger.debug('FRAG_CHANGED: ' + data.frag.sn);
+                logger.debug('frag changed: ' + data.frag.sn);
                 var sn = data.frag.sn;
                 _this2.hlsjs.config.currPlay = sn;
                 _this2.signaler.currentPlaySN = sn;
@@ -5692,7 +5692,7 @@ var P2PEngine = function (_EventEmitter) {
             //停止p2p
             var logger = this.logger;
 
-            logger.warn('disableP2P');
+            logger.warn('disable P2P');
             if (this.p2pEnabled) {
                 this.p2pEnabled = false;
                 this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
@@ -5707,7 +5707,7 @@ var P2PEngine = function (_EventEmitter) {
             //在停止的情况下重新启动P2P
             var logger = this.logger;
 
-            logger.warn('enableP2P');
+            logger.warn('enable P2P');
             if (!this.p2pEnabled) {
                 this.p2pEnabled = true;
                 this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
@@ -5866,7 +5866,7 @@ var BTTracker = function (_EventEmitter) {
             var logger = this.engine.logger;
 
             this.fetcher.btAnnounce().then(function (json) {
-                logger.info('announceURL response ' + JSON.stringify(json));
+                logger.info('announce request response ' + JSON.stringify(json));
                 _this2.peerId = json.peer_id;
                 logger.identifier = _this2.peerId;
                 _this2.fetcher.btHeartbeat(json.heartbeat_interval);
@@ -5943,7 +5943,7 @@ var BTTracker = function (_EventEmitter) {
 
             if (this.peers.length === 0) return;
             var remotePeerId = this.peers.pop().id;
-            logger.info('tryConnectToPeer ' + remotePeerId);
+            logger.info('try connect to Peer ' + remotePeerId);
             var datachannel = new _core.DataChannel(this.engine, this.peerId, remotePeerId, true, this.config);
             this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
             this._setupDC(datachannel);
@@ -5969,7 +5969,7 @@ var BTTracker = function (_EventEmitter) {
                     }, 10000);
                 }
             }).once(_core.Events.DC_ERROR, function () {
-                logger.warn('datachannel error ' + datachannel.channelId);
+                logger.warn('datachannel connect ' + datachannel.channelId + ' failed');
                 _this4.scheduler.deletePeer(datachannel);
                 _this4.DCMap.delete(datachannel.remotePeerId);
                 _this4.failedDCSet.add(datachannel.remotePeerId); //记录失败的连接
@@ -5990,7 +5990,7 @@ var BTTracker = function (_EventEmitter) {
                 }
             }).once(_core.Events.DC_CLOSE, function () {
 
-                logger.warn('datachannel closed ' + datachannel.channelId + ' ');
+                logger.warn('datachannel ' + datachannel.channelId + ' closed');
                 _this4.scheduler.deletePeer(datachannel);
                 _this4.DCMap.delete(datachannel.remotePeerId);
                 _this4.failedDCSet.add(datachannel.remotePeerId); //记录断开的连接
@@ -6103,7 +6103,7 @@ var BTTracker = function (_EventEmitter) {
 
             if (this.scheduler.peerMap.size <= Math.floor(this.config.neighbours / 2)) {
                 this.fetcher.btGetPeers().then(function (json) {
-                    logger.info('_requestMorePeers ' + JSON.stringify(json));
+                    logger.info('request more peers ' + JSON.stringify(json));
                     _this7._handlePeers(json.peers);
                     _this7._tryConnectToPeer();
                 });
@@ -6499,7 +6499,7 @@ var BTScheduler = function (_EventEmitter) {
         value: function _criticaltimeout() {
             var logger = this.engine.logger;
 
-            logger.warn('_criticaltimeout');
+            logger.warn('critical request timeout');
             this.criticalSeg = null;
             this.callbacks.onTimeout(this.stats, this.context, null);
             this.criticaltimeouter = null;
@@ -6647,7 +6647,7 @@ var DataChannel = function (_EventEmitter) {
 
             datachannel.on('data', function (data) {
                 if (typeof data === 'string') {
-                    logger.debug('datachannel receive string: ' + data + 'from ' + _this2.remotePeerId);
+                    // logger.debug('datachannel receive string: ' + data + 'from ' + this.remotePeerId);
 
                     var msg = JSON.parse(data);
                     //如果还没连接，则先保存在消息队列中
@@ -9332,7 +9332,7 @@ var Fetcher = function () {
                         resolve(json);
                     }
                 }).catch(function (err) {
-                    logger.error('[fetcher] btAnnounce error ' + err);
+                    logger.error('btAnnounce error ' + err);
                     reject(err);
                 });
             });
@@ -9348,7 +9348,7 @@ var Fetcher = function () {
             this.heartbeater = window.setInterval(function () {
                 fetch(_this2.heartbeatURL + ('&peer_id=' + _this2.peerId)).then(function (response) {}).catch(function (err) {
                     window.clearInterval(_this2.heartbeater);
-                    logger.error('[fetcher] btHeartbeat error ' + err);
+                    logger.error('btHeartbeat error ' + err);
                 });
             }, interval * 1000);
         }
@@ -9365,7 +9365,7 @@ var Fetcher = function () {
                 }).then(function (json) {
                     resolve(json);
                 }).catch(function (err) {
-                    logger.error('[fetcher] btGetPeers error ' + err);
+                    logger.error('btGetPeers error ' + err);
                     reject(err);
                 });
             });
@@ -9462,13 +9462,13 @@ var Fetcher = function () {
                 if (this.errsInternalExpt > 0) {
                     body.errsInternalExpt = this.errsInternalExpt;
                 }
-                logger.info('reporting flow p2p ' + this.p2pDownloaded + ' http ' + this.httpDownloaded);
+                logger.info('reporting traffic p2p ' + this.p2pDownloaded + ' http ' + this.httpDownloaded);
                 fetch(this.statsURL + ('&peer_id=' + this.peerId), {
                     method: 'POST', // 指定是POST请求
                     body: JSON.stringify(body)
                 }).then(function (response) {
                     if (response.ok) {
-                        logger.info('sucessfully report flow');
+                        logger.info('sucessfully report traffic');
                         _this4.httpDownloaded = 0;
                         _this4.p2pDownloaded = 0;
                         _this4.conns = 0;
@@ -9478,7 +9478,7 @@ var Fetcher = function () {
                         _this4.errsInternalExpt = 0;
                     }
                 }).catch(function (err) {
-                    logger.error('[fetcher] stats upload error ' + err);
+                    logger.error('stats upload error ' + err);
                 });
             }
         }
@@ -9725,6 +9725,7 @@ var FragLoader = function (_EventEmitter) {
                 loaded = total = frag.loaded = seg.size;
                 var stats = { trequest: trequest, tfirst: tfirst, tload: tload, loaded: loaded, total: total, retry: 0 };
                 frag.loadByP2P = true;
+                logger.debug('P2P load ' + frag.relurl + ' at ' + frag.sn);
                 window.setTimeout(function () {
                     //必须是异步回调
                     _this2.fetcher.reportFlow(stats, true);
@@ -9737,7 +9738,7 @@ var FragLoader = function (_EventEmitter) {
                 this.scheduler.load(context, config, callbacks);
                 callbacks.onTimeout = function (stats, context) {
                     //如果P2P下载超时则立即切换到xhr下载
-                    logger.debug('xhrLoader load ' + frag.relurl + ' at ' + frag.sn);
+                    logger.debug('HTTP load ' + frag.relurl + ' at ' + frag.sn);
                     frag.loadByP2P = false;
                     frag.loadByHTTP = true;
                     _this2.xhrLoader.load(context, config, callbacks);
@@ -9750,10 +9751,11 @@ var FragLoader = function (_EventEmitter) {
                     }
                     _this2.fetcher.reportFlow(stats, true);
                     frag.loaded = stats.loaded;
+                    logger.debug('P2P load ' + frag.relurl + ' at ' + frag.sn);
                     onSuccess(response, stats, context);
                 };
             } else {
-                logger.debug('xhrLoader load ' + frag.relurl + ' at ' + frag.sn);
+                logger.debug('HTTP load ' + frag.relurl + ' at ' + frag.sn);
                 context.frag.loadByHTTP = true;
                 this.xhrLoader.load(context, config, callbacks);
                 var _onSuccess = callbacks.onSuccess;
