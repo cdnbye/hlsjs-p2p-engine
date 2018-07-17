@@ -261,7 +261,7 @@ class BTScheduler extends EventEmitter {
 
     _criticaltimeout() {
         const { logger } = this.engine;
-        logger.warn(`_criticaltimeout`);
+        logger.warn(`critical request timeout`);
         this.criticalSeg = null;
         this.callbacks.onTimeout(this.stats, this.context, null);
         this.criticaltimeouter = null;

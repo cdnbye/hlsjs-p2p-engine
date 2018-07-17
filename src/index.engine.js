@@ -40,9 +40,9 @@ class P2PEngine extends EventEmitter {
         hlsjs.on(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
 
         // 免费版需要打印版本信息
-        // if (this.config.key === 'free') {
-        //     console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P-CDN. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
-        // }
+        if (this.config.key === 'free') {
+            console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
+        }
     }
 
     _init(channel) {
@@ -79,7 +79,7 @@ class P2PEngine extends EventEmitter {
 
         this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADING, (id, data) => {
             // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
-            logger.debug('FRAG_LOADING: ' + data.frag.sn);
+            logger.debug('loading frag ' + data.frag.sn);
             this.signaler.currentLoadingSN = data.frag.sn;
 
         });
@@ -94,7 +94,7 @@ class P2PEngine extends EventEmitter {
             if (!this.signalTried && !this.signaler.connected && this.config.p2pEnabled) {
 
                 this.signaler.scheduler.bitrate = bitrate;
-                logger.info(`FRAG_LOADED bitrate ${bitrate}`);
+                logger.info(`bitrate ${bitrate}`);
 
                 this.signaler.resumeP2P();
                 this.signalTried = true;
@@ -109,7 +109,7 @@ class P2PEngine extends EventEmitter {
 
         this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_CHANGED, (id, data) => {
             // log('FRAG_CHANGED: '+JSON.stringify(data.frag, null, 2));
-            logger.debug('FRAG_CHANGED: '+data.frag.sn);
+            logger.debug('frag changed: '+data.frag.sn);
             const sn = data.frag.sn;
             this.hlsjs.config.currPlay = sn;
             this.signaler.currentPlaySN = sn;
@@ -143,7 +143,7 @@ class P2PEngine extends EventEmitter {
 
     disableP2P() {                                              //停止p2p
         const { logger } = this;
-        logger.warn(`disableP2P`);
+        logger.warn(`disable P2P`);
         if (this.p2pEnabled) {
             this.p2pEnabled = false;
             this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
@@ -155,7 +155,7 @@ class P2PEngine extends EventEmitter {
 
     enableP2P() {                                               //在停止的情况下重新启动P2P
         const { logger } = this;
-        logger.warn(`enableP2P`);
+        logger.warn(`enable P2P`);
         if (!this.p2pEnabled) {
             this.p2pEnabled = true;
             this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;

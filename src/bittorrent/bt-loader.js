@@ -46,6 +46,7 @@ class FragLoader extends EventEmitter {
             loaded = total = frag.loaded = seg.size;
             let stats={ trequest, tfirst, tload, loaded, total, retry: 0 };
             frag.loadByP2P = true;
+            logger.debug(`P2P load ${frag.relurl} at ${frag.sn}`)
             window.setTimeout(() => {                                                   //必须是异步回调
                 this.fetcher.reportFlow(stats, true);
                 callbacks.onSuccess(response, stats, context);
@@ -55,7 +56,7 @@ class FragLoader extends EventEmitter {
             context.frag.loadByP2P = true;
             this.scheduler.load(context, config, callbacks);
             callbacks.onTimeout = (stats, context) => {                             //如果P2P下载超时则立即切换到xhr下载
-                logger.debug(`xhrLoader load ${frag.relurl} at ${frag.sn}`);
+                logger.debug(`HTTP load ${frag.relurl} at ${frag.sn}`);
                 frag.loadByP2P = false;
                 frag.loadByHTTP = true;
                 this.xhrLoader.load(context, config, callbacks);
@@ -67,10 +68,11 @@ class FragLoader extends EventEmitter {
                 }
                 this.fetcher.reportFlow(stats, true);
                 frag.loaded = stats.loaded;
+                logger.debug(`P2P load ${frag.relurl} at ${frag.sn}`)
                 onSuccess(response,stats,context);
             };
         } else {
-            logger.debug(`xhrLoader load ${frag.relurl} at ${frag.sn}`);
+            logger.debug(`HTTP load ${frag.relurl} at ${frag.sn}`);
             context.frag.loadByHTTP = true;
             this.xhrLoader.load(context, config, callbacks);
             const onSuccess = callbacks.onSuccess;

@@ -45,7 +45,7 @@ class BTTracker extends EventEmitter {
     resumeP2P() {
         const { logger } = this.engine;
         this.fetcher.btAnnounce().then(json => {
-            logger.info(`announceURL response ${JSON.stringify(json)}`)
+            logger.info(`announce request response ${JSON.stringify(json)}`)
             this.peerId = json.peer_id;
             logger.identifier = this.peerId;
             this.fetcher.btHeartbeat(json.heartbeat_interval);
@@ -89,7 +89,7 @@ class BTTracker extends EventEmitter {
         const { logger } = this.engine;
         if (this.peers.length === 0) return;
         let remotePeerId = this.peers.pop().id;
-        logger.info(`tryConnectToPeer ${remotePeerId}`);
+        logger.info(`try connect to Peer ${remotePeerId}`);
         let datachannel = new DataChannel(this.engine, this.peerId, remotePeerId, true, this.config);
         this.DCMap.set(remotePeerId, datachannel);                                  //将对等端Id作为键
         this._setupDC(datachannel);
@@ -114,7 +114,7 @@ class BTTracker extends EventEmitter {
 
         })
             .once(Events.DC_ERROR, () => {
-                logger.warn(`datachannel error ${datachannel.channelId}`);
+                logger.warn(`datachannel connect ${datachannel.channelId} failed`);
                 this.scheduler.deletePeer(datachannel);
                 this.DCMap.delete(datachannel.remotePeerId);
                 this.failedDCSet.add(datachannel.remotePeerId);                  //记录失败的连接
@@ -134,7 +134,7 @@ class BTTracker extends EventEmitter {
             })
             .once(Events.DC_CLOSE, () => {
 
-                logger.warn(`datachannel closed ${datachannel.channelId} `);
+                logger.warn(`datachannel ${datachannel.channelId} closed`);
                 this.scheduler.deletePeer(datachannel);
                 this.DCMap.delete(datachannel.remotePeerId);
                 this.failedDCSet.add(datachannel.remotePeerId);              //记录断开的连接
@@ -237,7 +237,7 @@ class BTTracker extends EventEmitter {
         const { logger } = this.engine;
         if (this.scheduler.peerMap.size <= Math.floor(this.config.neighbours/2)) {
             this.fetcher.btGetPeers().then(json => {
-                logger.info(`_requestMorePeers ${JSON.stringify(json)}`);
+                logger.info(`request more peers ${JSON.stringify(json)}`);
                 this._handlePeers(json.peers);
                 this._tryConnectToPeer();
             })
