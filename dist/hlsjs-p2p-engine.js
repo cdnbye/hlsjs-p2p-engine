@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 20);
+/******/ 	return __webpack_require__(__webpack_require__.s = 21);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -423,9 +423,9 @@ module.exports = g;
 
 
 
-var base64 = __webpack_require__(26)
-var ieee754 = __webpack_require__(27)
-var isArray = __webpack_require__(28)
+var base64 = __webpack_require__(27)
+var ieee754 = __webpack_require__(28)
+var isArray = __webpack_require__(29)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -2689,7 +2689,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.getBrowserRTC = exports.Buffer = exports.Fetcher = exports.Events = exports.DataChannel = undefined;
 
-var _datachannel = __webpack_require__(24);
+var _datachannel = __webpack_require__(25);
 
 var _datachannel2 = _interopRequireDefault(_datachannel);
 
@@ -2697,11 +2697,11 @@ var _events = __webpack_require__(18);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _fetcher = __webpack_require__(44);
+var _fetcher = __webpack_require__(45);
 
 var _fetcher2 = _interopRequireDefault(_fetcher);
 
-var _getBrowserRtc = __webpack_require__(45);
+var _getBrowserRtc = __webpack_require__(46);
 
 var _getBrowserRtc2 = _interopRequireDefault(_getBrowserRtc);
 
@@ -2848,6 +2848,14 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.handleTSUrl = handleTSUrl;
 exports.throttle = throttle;
+exports.defaultChannelId = defaultChannelId;
+
+var _urlToolkit = __webpack_require__(19);
+
+var _urlToolkit2 = _interopRequireDefault(_urlToolkit);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 // 根据参数决定是否去掉ts的url的查询参数
 function handleTSUrl(url) {
     var matched = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -2874,6 +2882,14 @@ function throttle(method, context) {
     };
 };
 
+// channelId generator
+function defaultChannelId(url, protocol) {
+    var browserInfo = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+    var path = _urlToolkit2.default.parseURL(url).path.split('.')[0];
+    return path + '-' + protocol;
+}
+
 /***/ }),
 /* 11 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -2886,11 +2902,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.config = exports.FragLoader = exports.Tracker = undefined;
 
-var _btTracker = __webpack_require__(22);
+var _btTracker = __webpack_require__(23);
 
 var _btTracker2 = _interopRequireDefault(_btTracker);
 
-var _btLoader = __webpack_require__(47);
+var _btLoader = __webpack_require__(48);
 
 var _btLoader2 = _interopRequireDefault(_btLoader);
 
@@ -2943,7 +2959,7 @@ var pna = __webpack_require__(9);
 module.exports = Readable;
 
 /*<replacement>*/
-var isArray = __webpack_require__(35);
+var isArray = __webpack_require__(36);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -2983,7 +2999,7 @@ util.inherits = __webpack_require__(4);
 /*</replacement>*/
 
 /*<replacement>*/
-var debugUtil = __webpack_require__(36);
+var debugUtil = __webpack_require__(37);
 var debug = void 0;
 if (debugUtil && debugUtil.debuglog) {
   debug = debugUtil.debuglog('stream');
@@ -2992,7 +3008,7 @@ if (debugUtil && debugUtil.debuglog) {
 }
 /*</replacement>*/
 
-var BufferList = __webpack_require__(37);
+var BufferList = __webpack_require__(38);
 var destroyImpl = __webpack_require__(14);
 var StringDecoder;
 
@@ -4099,7 +4115,7 @@ util.inherits = __webpack_require__(4);
 
 /*<replacement>*/
 var internalUtil = {
-  deprecate: __webpack_require__(41)
+  deprecate: __webpack_require__(42)
 };
 /*</replacement>*/
 
@@ -4714,7 +4730,7 @@ Writable.prototype._destroy = function (err, cb) {
   this.end();
   cb(err);
 };
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(39).setImmediate, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(40).setImmediate, __webpack_require__(1)))
 
 /***/ }),
 /* 16 */
@@ -4746,7 +4762,7 @@ Writable.prototype._destroy = function (err, cb) {
 
 /*<replacement>*/
 
-var Buffer = __webpack_require__(42).Buffer;
+var Buffer = __webpack_require__(43).Buffer;
 /*</replacement>*/
 
 var isEncoding = Buffer.isEncoding || function (encoding) {
@@ -5283,6 +5299,175 @@ module.exports = exports['default'];
 /* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
+// see https://tools.ietf.org/html/rfc1808
+
+/* jshint ignore:start */
+(function(root) { 
+/* jshint ignore:end */
+
+  var URL_REGEX = /^((?:[a-zA-Z0-9+\-.]+:)?)(\/\/[^\/\;?#]*)?(.*?)??(;.*?)?(\?.*?)?(#.*?)?$/;
+  var FIRST_SEGMENT_REGEX = /^([^\/;?#]*)(.*)$/;
+  var SLASH_DOT_REGEX = /(?:\/|^)\.(?=\/)/g;
+  var SLASH_DOT_DOT_REGEX = /(?:\/|^)\.\.\/(?!\.\.\/).*?(?=\/)/g;
+
+  var URLToolkit = { // jshint ignore:line
+    // If opts.alwaysNormalize is true then the path will always be normalized even when it starts with / or //
+    // E.g
+    // With opts.alwaysNormalize = false (default, spec compliant)
+    // http://a.com/b/cd + /e/f/../g => http://a.com/e/f/../g
+    // With opts.alwaysNormalize = true (not spec compliant)
+    // http://a.com/b/cd + /e/f/../g => http://a.com/e/g
+    buildAbsoluteURL: function(baseURL, relativeURL, opts) {
+      opts = opts || {};
+      // remove any remaining space and CRLF
+      baseURL = baseURL.trim();
+      relativeURL = relativeURL.trim();
+      if (!relativeURL) {
+        // 2a) If the embedded URL is entirely empty, it inherits the
+        // entire base URL (i.e., is set equal to the base URL)
+        // and we are done.
+        if (!opts.alwaysNormalize) {
+          return baseURL;
+        }
+        var basePartsForNormalise = URLToolkit.parseURL(baseURL);
+        if (!basePartsForNormalise) {
+          throw new Error('Error trying to parse base URL.');
+        }
+        basePartsForNormalise.path = URLToolkit.normalizePath(basePartsForNormalise.path);
+        return URLToolkit.buildURLFromParts(basePartsForNormalise);
+      }
+      var relativeParts = URLToolkit.parseURL(relativeURL);
+      if (!relativeParts) {
+        throw new Error('Error trying to parse relative URL.');
+      }
+      if (relativeParts.scheme) {
+        // 2b) If the embedded URL starts with a scheme name, it is
+        // interpreted as an absolute URL and we are done.
+        if (!opts.alwaysNormalize) {
+          return relativeURL;
+        }
+        relativeParts.path = URLToolkit.normalizePath(relativeParts.path);
+        return URLToolkit.buildURLFromParts(relativeParts);
+      }
+      var baseParts = URLToolkit.parseURL(baseURL);
+      if (!baseParts) {
+        throw new Error('Error trying to parse base URL.');
+      }
+      if (!baseParts.netLoc && baseParts.path && baseParts.path[0] !== '/') {
+        // If netLoc missing and path doesn't start with '/', assume everthing before the first '/' is the netLoc
+        // This causes 'example.com/a' to be handled as '//example.com/a' instead of '/example.com/a'
+        var pathParts = FIRST_SEGMENT_REGEX.exec(baseParts.path);
+        baseParts.netLoc = pathParts[1];
+        baseParts.path = pathParts[2];
+      }
+      if (baseParts.netLoc && !baseParts.path) {
+        baseParts.path = '/';
+      }
+      var builtParts = {
+        // 2c) Otherwise, the embedded URL inherits the scheme of
+        // the base URL.
+        scheme: baseParts.scheme,
+        netLoc: relativeParts.netLoc,
+        path: null,
+        params: relativeParts.params,
+        query: relativeParts.query,
+        fragment: relativeParts.fragment
+      };
+      if (!relativeParts.netLoc) {
+        // 3) If the embedded URL's <net_loc> is non-empty, we skip to
+        // Step 7.  Otherwise, the embedded URL inherits the <net_loc>
+        // (if any) of the base URL.
+        builtParts.netLoc = baseParts.netLoc;
+        // 4) If the embedded URL path is preceded by a slash "/", the
+        // path is not relative and we skip to Step 7.
+        if (relativeParts.path[0] !== '/') {
+          if (!relativeParts.path) {
+            // 5) If the embedded URL path is empty (and not preceded by a
+            // slash), then the embedded URL inherits the base URL path
+            builtParts.path = baseParts.path;
+            // 5a) if the embedded URL's <params> is non-empty, we skip to
+            // step 7; otherwise, it inherits the <params> of the base
+            // URL (if any) and
+            if (!relativeParts.params) {
+              builtParts.params = baseParts.params;
+              // 5b) if the embedded URL's <query> is non-empty, we skip to
+              // step 7; otherwise, it inherits the <query> of the base
+              // URL (if any) and we skip to step 7.
+              if (!relativeParts.query) {
+                builtParts.query = baseParts.query;
+              }
+            }
+          } else {
+            // 6) The last segment of the base URL's path (anything
+            // following the rightmost slash "/", or the entire path if no
+            // slash is present) is removed and the embedded URL's path is
+            // appended in its place.
+            var baseURLPath = baseParts.path;
+            var newPath = baseURLPath.substring(0, baseURLPath.lastIndexOf('/') + 1) + relativeParts.path;
+            builtParts.path = URLToolkit.normalizePath(newPath);
+          }
+        }
+      }
+      if (builtParts.path === null) {
+        builtParts.path = opts.alwaysNormalize ? URLToolkit.normalizePath(relativeParts.path) : relativeParts.path;
+      }
+      return URLToolkit.buildURLFromParts(builtParts);
+    },
+    parseURL: function(url) {
+      var parts = URL_REGEX.exec(url);
+      if (!parts) {
+        return null;
+      }
+      return {
+        scheme: parts[1] || '',
+        netLoc: parts[2] || '',
+        path: parts[3] || '',
+        params: parts[4] || '',
+        query: parts[5] || '',
+        fragment: parts[6] || ''
+      };
+    },
+    normalizePath: function(path) {
+      // The following operations are
+      // then applied, in order, to the new path:
+      // 6a) All occurrences of "./", where "." is a complete path
+      // segment, are removed.
+      // 6b) If the path ends with "." as a complete path segment,
+      // that "." is removed.
+      path = path.split('').reverse().join('').replace(SLASH_DOT_REGEX, '');
+      // 6c) All occurrences of "<segment>/../", where <segment> is a
+      // complete path segment not equal to "..", are removed.
+      // Removal of these path segments is performed iteratively,
+      // removing the leftmost matching pattern on each iteration,
+      // until no matching pattern remains.
+      // 6d) If the path ends with "<segment>/..", where <segment> is a
+      // complete path segment not equal to "..", that
+      // "<segment>/.." is removed.
+      while (path.length !== (path = path.replace(SLASH_DOT_DOT_REGEX, '')).length) {} // jshint ignore:line
+      return path.split('').reverse().join('');
+    },
+    buildURLFromParts: function(parts) {
+      return parts.scheme + parts.netLoc + parts.path + parts.params + parts.query + parts.fragment;
+    }
+  };
+
+/* jshint ignore:start */
+  if(true)
+    module.exports = URLToolkit;
+  else if(typeof define === 'function' && define.amd)
+    define([], function() { return URLToolkit; });
+  else if(typeof exports === 'object')
+    exports["URLToolkit"] = URLToolkit;
+  else
+    root["URLToolkit"] = URLToolkit;
+})(this);
+/* jshint ignore:end */
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 ;
@@ -5502,7 +5687,7 @@ module.exports = ReconnectingWebsocket;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5518,7 +5703,7 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _config = __webpack_require__(21);
+var _config = __webpack_require__(22);
 
 var _config2 = _interopRequireDefault(_config);
 
@@ -5537,6 +5722,8 @@ var _logger2 = _interopRequireDefault(_logger);
 var _platform = __webpack_require__(51);
 
 var _platform2 = _interopRequireDefault(_platform);
+
+var _toolFuns = __webpack_require__(10);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5562,6 +5749,11 @@ var P2PEngine = function (_EventEmitter) {
         var _this = _possibleConstructorReturn(this, (P2PEngine.__proto__ || Object.getPrototypeOf(P2PEngine)).call(this));
 
         _this.config = Object.assign({}, _config2.default, p2pConfig);
+
+        if (!_this.config.channelId || typeof _this.config.channelId !== 'function') {
+            _this.config.channelId = _toolFuns.defaultChannelId;
+        }
+
         _this.hlsjs = hlsjs;
         _this.p2pEnabled = _this.config.disableP2P === false ? false : true; //默认开启P2P
 
@@ -5571,13 +5763,20 @@ var P2PEngine = function (_EventEmitter) {
 
             var isLive = data.details.live;
             _this.config.live = isLive;
-            var channel = hlsjs.url.split('?')[0];
-
+            // 浏览器信息
+            var browserInfo = {
+                device: _platform2.default.getPlatform(),
+                netType: _platform2.default.getNetType(),
+                host: window.location.host,
+                version: P2PEngine.version,
+                tag: _this.config.tag || _this.hlsjs.constructor.version
+            };
+            var channel = _this.config.channelId(hlsjs.url, "v1", browserInfo);
             //初始化logger
             var logger = new _logger2.default(_this.config, channel);
             _this.hlsjs.config.logger = _this.logger = logger;
-
-            _this._init(channel);
+            logger.info('channel ' + channel);
+            _this._init(channel, browserInfo);
 
             hlsjs.off(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
         };
@@ -5593,19 +5792,11 @@ var P2PEngine = function (_EventEmitter) {
 
     _createClass(P2PEngine, [{
         key: '_init',
-        value: function _init(channel) {
+        value: function _init(channel, browserInfo) {
             var _this2 = this;
 
             var logger = this.logger;
-            //上传浏览器信息
 
-            var browserInfo = {
-                device: _platform2.default.getPlatform(),
-                netType: _platform2.default.getNetType(),
-                host: window.location.host,
-                version: P2PEngine.version,
-                tag: this.config.tag || P2PEngine.version
-            };
 
             this.hlsjs.config.p2pEnabled = this.p2pEnabled;
             //实例化BufferManager
@@ -5728,13 +5919,13 @@ var P2PEngine = function (_EventEmitter) {
 
 P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)();
 
-P2PEngine.version = "0.1.6";
+P2PEngine.version = "0.1.7";
 
 exports.default = P2PEngine;
 module.exports = exports['default'];
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5773,24 +5964,15 @@ var defaultP2PConfig = _extends({
     logUploadLevel: 'warn', //log上传level，分为debug、info、warn、error、none，默认warn
     logLevel: 'none', //log的level，分为debug、info、warn、error、none，设为true等于debug，设为false等于none，默认none
 
-    tag: '' }, _bittorrent.config);
+    tag: '', //用户自定义标签，可用于在后台查看参数调整效果
 
-// let p2pConfig;
-//
-// if (__EXCLUDE_LIVE__) {
-//     p2pConfig = Object.assign(defaultP2PConfig, vodConfig);
-// } else if (__EXCLUDE_VOD__) {
-//     p2pConfig = Object.assign(defaultP2PConfig, liveConfig);
-// } else {
-//     p2pConfig = Object.assign(defaultP2PConfig, liveConfig, vodConfig);
-// }
-
+    channelId: null }, _bittorrent.config);
 
 exports.default = defaultP2PConfig;
 module.exports = exports['default'];
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5806,11 +5988,11 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _btScheduler = __webpack_require__(23);
+var _btScheduler = __webpack_require__(24);
 
 var _btScheduler2 = _interopRequireDefault(_btScheduler);
 
-var _signalClient = __webpack_require__(46);
+var _signalClient = __webpack_require__(47);
 
 var _signalClient2 = _interopRequireDefault(_signalClient);
 
@@ -6133,7 +6315,7 @@ exports.default = BTTracker;
 module.exports = exports['default'];
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6538,7 +6720,7 @@ exports.default = BTScheduler;
 module.exports = exports['default'];
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6550,7 +6732,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _simpleChannel = __webpack_require__(25);
+var _simpleChannel = __webpack_require__(26);
 
 var _simpleChannel2 = _interopRequireDefault(_simpleChannel);
 
@@ -7011,7 +7193,7 @@ exports.default = DataChannel;
 module.exports = exports['default'];
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7021,11 +7203,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 module.exports = Peer;
 
-var debug = __webpack_require__(29)('simple-channel');
-var getBrowserRTC = __webpack_require__(32);
+var debug = __webpack_require__(30)('simple-channel');
+var getBrowserRTC = __webpack_require__(33);
 var inherits = __webpack_require__(4);
-var randombytes = __webpack_require__(33);
-var stream = __webpack_require__(34);
+var randombytes = __webpack_require__(34);
+var stream = __webpack_require__(35);
 
 var MAX_BUFFERED_AMOUNT = 64 * 1024;
 
@@ -7820,7 +8002,7 @@ function noop() {}
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2).Buffer))
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7943,7 +8125,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -8033,7 +8215,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -8044,7 +8226,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8058,7 +8240,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
  * Expose `debug()` as the module.
  */
 
-exports = module.exports = __webpack_require__(30);
+exports = module.exports = __webpack_require__(31);
 exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
@@ -8227,7 +8409,7 @@ function localstorage() {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8245,7 +8427,7 @@ exports.coerce = coerce;
 exports.disable = disable;
 exports.enable = enable;
 exports.enabled = enabled;
-exports.humanize = __webpack_require__(31);
+exports.humanize = __webpack_require__(32);
 
 /**
  * Active `debug` instances.
@@ -8460,7 +8642,7 @@ function coerce(val) {
 }
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8613,7 +8795,7 @@ function plural(ms, n, name) {
 }
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8633,7 +8815,7 @@ module.exports = function getBrowserRTC() {
 };
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8679,7 +8861,7 @@ function randomBytes(size, cb) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3)))
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8691,10 +8873,10 @@ exports.Readable = exports;
 exports.Writable = __webpack_require__(15);
 exports.Duplex = __webpack_require__(5);
 exports.Transform = __webpack_require__(17);
-exports.PassThrough = __webpack_require__(43);
+exports.PassThrough = __webpack_require__(44);
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8707,13 +8889,13 @@ module.exports = Array.isArray || function (arr) {
 };
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8726,7 +8908,7 @@ function _classCallCheck(instance, Constructor) {
 }
 
 var Buffer = __webpack_require__(8).Buffer;
-var util = __webpack_require__(38);
+var util = __webpack_require__(39);
 
 function copyBuffer(src, target, offset) {
   src.copy(target, offset);
@@ -8802,13 +8984,13 @@ if (util && util.inspect && util.inspect.custom) {
 }
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var apply = Function.prototype.apply;
@@ -8861,7 +9043,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(40);
+__webpack_require__(41);
 // On some exotic environments, it's not clear which object `setimmeidate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -8875,7 +9057,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -9068,7 +9250,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3)))
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9143,7 +9325,7 @@ function config(name) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-disable node/no-deprecated-api */
@@ -9211,7 +9393,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9264,7 +9446,7 @@ PassThrough.prototype._transform = function (chunk, encoding, cb) {
 };
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9499,7 +9681,7 @@ exports.default = Fetcher;
 module.exports = exports['default'];
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports) {
 
 // originally pulled out of simple-peer
@@ -9520,7 +9702,7 @@ module.exports = function getBrowserRTC () {
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9536,7 +9718,7 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _reconnectingWebsocket = __webpack_require__(19);
+var _reconnectingWebsocket = __webpack_require__(20);
 
 var _reconnectingWebsocket2 = _interopRequireDefault(_reconnectingWebsocket);
 
@@ -9632,7 +9814,7 @@ exports.default = SignalClient;
 module.exports = exports['default'];
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9648,7 +9830,7 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _urlToolkit = __webpack_require__(48);
+var _urlToolkit = __webpack_require__(19);
 
 var _urlToolkit2 = _interopRequireDefault(_urlToolkit);
 
@@ -9776,175 +9958,6 @@ var FragLoader = function (_EventEmitter) {
 
 exports.default = FragLoader;
 module.exports = exports['default'];
-
-/***/ }),
-/* 48 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// see https://tools.ietf.org/html/rfc1808
-
-/* jshint ignore:start */
-(function(root) { 
-/* jshint ignore:end */
-
-  var URL_REGEX = /^((?:[a-zA-Z0-9+\-.]+:)?)(\/\/[^\/\;?#]*)?(.*?)??(;.*?)?(\?.*?)?(#.*?)?$/;
-  var FIRST_SEGMENT_REGEX = /^([^\/;?#]*)(.*)$/;
-  var SLASH_DOT_REGEX = /(?:\/|^)\.(?=\/)/g;
-  var SLASH_DOT_DOT_REGEX = /(?:\/|^)\.\.\/(?!\.\.\/).*?(?=\/)/g;
-
-  var URLToolkit = { // jshint ignore:line
-    // If opts.alwaysNormalize is true then the path will always be normalized even when it starts with / or //
-    // E.g
-    // With opts.alwaysNormalize = false (default, spec compliant)
-    // http://a.com/b/cd + /e/f/../g => http://a.com/e/f/../g
-    // With opts.alwaysNormalize = true (not spec compliant)
-    // http://a.com/b/cd + /e/f/../g => http://a.com/e/g
-    buildAbsoluteURL: function(baseURL, relativeURL, opts) {
-      opts = opts || {};
-      // remove any remaining space and CRLF
-      baseURL = baseURL.trim();
-      relativeURL = relativeURL.trim();
-      if (!relativeURL) {
-        // 2a) If the embedded URL is entirely empty, it inherits the
-        // entire base URL (i.e., is set equal to the base URL)
-        // and we are done.
-        if (!opts.alwaysNormalize) {
-          return baseURL;
-        }
-        var basePartsForNormalise = URLToolkit.parseURL(baseURL);
-        if (!basePartsForNormalise) {
-          throw new Error('Error trying to parse base URL.');
-        }
-        basePartsForNormalise.path = URLToolkit.normalizePath(basePartsForNormalise.path);
-        return URLToolkit.buildURLFromParts(basePartsForNormalise);
-      }
-      var relativeParts = URLToolkit.parseURL(relativeURL);
-      if (!relativeParts) {
-        throw new Error('Error trying to parse relative URL.');
-      }
-      if (relativeParts.scheme) {
-        // 2b) If the embedded URL starts with a scheme name, it is
-        // interpreted as an absolute URL and we are done.
-        if (!opts.alwaysNormalize) {
-          return relativeURL;
-        }
-        relativeParts.path = URLToolkit.normalizePath(relativeParts.path);
-        return URLToolkit.buildURLFromParts(relativeParts);
-      }
-      var baseParts = URLToolkit.parseURL(baseURL);
-      if (!baseParts) {
-        throw new Error('Error trying to parse base URL.');
-      }
-      if (!baseParts.netLoc && baseParts.path && baseParts.path[0] !== '/') {
-        // If netLoc missing and path doesn't start with '/', assume everthing before the first '/' is the netLoc
-        // This causes 'example.com/a' to be handled as '//example.com/a' instead of '/example.com/a'
-        var pathParts = FIRST_SEGMENT_REGEX.exec(baseParts.path);
-        baseParts.netLoc = pathParts[1];
-        baseParts.path = pathParts[2];
-      }
-      if (baseParts.netLoc && !baseParts.path) {
-        baseParts.path = '/';
-      }
-      var builtParts = {
-        // 2c) Otherwise, the embedded URL inherits the scheme of
-        // the base URL.
-        scheme: baseParts.scheme,
-        netLoc: relativeParts.netLoc,
-        path: null,
-        params: relativeParts.params,
-        query: relativeParts.query,
-        fragment: relativeParts.fragment
-      };
-      if (!relativeParts.netLoc) {
-        // 3) If the embedded URL's <net_loc> is non-empty, we skip to
-        // Step 7.  Otherwise, the embedded URL inherits the <net_loc>
-        // (if any) of the base URL.
-        builtParts.netLoc = baseParts.netLoc;
-        // 4) If the embedded URL path is preceded by a slash "/", the
-        // path is not relative and we skip to Step 7.
-        if (relativeParts.path[0] !== '/') {
-          if (!relativeParts.path) {
-            // 5) If the embedded URL path is empty (and not preceded by a
-            // slash), then the embedded URL inherits the base URL path
-            builtParts.path = baseParts.path;
-            // 5a) if the embedded URL's <params> is non-empty, we skip to
-            // step 7; otherwise, it inherits the <params> of the base
-            // URL (if any) and
-            if (!relativeParts.params) {
-              builtParts.params = baseParts.params;
-              // 5b) if the embedded URL's <query> is non-empty, we skip to
-              // step 7; otherwise, it inherits the <query> of the base
-              // URL (if any) and we skip to step 7.
-              if (!relativeParts.query) {
-                builtParts.query = baseParts.query;
-              }
-            }
-          } else {
-            // 6) The last segment of the base URL's path (anything
-            // following the rightmost slash "/", or the entire path if no
-            // slash is present) is removed and the embedded URL's path is
-            // appended in its place.
-            var baseURLPath = baseParts.path;
-            var newPath = baseURLPath.substring(0, baseURLPath.lastIndexOf('/') + 1) + relativeParts.path;
-            builtParts.path = URLToolkit.normalizePath(newPath);
-          }
-        }
-      }
-      if (builtParts.path === null) {
-        builtParts.path = opts.alwaysNormalize ? URLToolkit.normalizePath(relativeParts.path) : relativeParts.path;
-      }
-      return URLToolkit.buildURLFromParts(builtParts);
-    },
-    parseURL: function(url) {
-      var parts = URL_REGEX.exec(url);
-      if (!parts) {
-        return null;
-      }
-      return {
-        scheme: parts[1] || '',
-        netLoc: parts[2] || '',
-        path: parts[3] || '',
-        params: parts[4] || '',
-        query: parts[5] || '',
-        fragment: parts[6] || ''
-      };
-    },
-    normalizePath: function(path) {
-      // The following operations are
-      // then applied, in order, to the new path:
-      // 6a) All occurrences of "./", where "." is a complete path
-      // segment, are removed.
-      // 6b) If the path ends with "." as a complete path segment,
-      // that "." is removed.
-      path = path.split('').reverse().join('').replace(SLASH_DOT_REGEX, '');
-      // 6c) All occurrences of "<segment>/../", where <segment> is a
-      // complete path segment not equal to "..", are removed.
-      // Removal of these path segments is performed iteratively,
-      // removing the leftmost matching pattern on each iteration,
-      // until no matching pattern remains.
-      // 6d) If the path ends with "<segment>/..", where <segment> is a
-      // complete path segment not equal to "..", that
-      // "<segment>/.." is removed.
-      while (path.length !== (path = path.replace(SLASH_DOT_DOT_REGEX, '')).length) {} // jshint ignore:line
-      return path.split('').reverse().join('');
-    },
-    buildURLFromParts: function(parts) {
-      return parts.scheme + parts.netLoc + parts.path + parts.params + parts.query + parts.fragment;
-    }
-  };
-
-/* jshint ignore:start */
-  if(true)
-    module.exports = URLToolkit;
-  else if(typeof define === 'function' && define.amd)
-    define([], function() { return URLToolkit; });
-  else if(typeof exports === 'object')
-    exports["URLToolkit"] = URLToolkit;
-  else
-    root["URLToolkit"] = URLToolkit;
-})(this);
-/* jshint ignore:end */
-
 
 /***/ }),
 /* 49 */
@@ -10103,7 +10116,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _reconnectingWebsocket = __webpack_require__(19);
+var _reconnectingWebsocket = __webpack_require__(20);
 
 var _reconnectingWebsocket2 = _interopRequireDefault(_reconnectingWebsocket);
 

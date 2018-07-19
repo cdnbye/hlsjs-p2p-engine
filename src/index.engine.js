@@ -5,6 +5,7 @@ import BufferManager from './buffer-manager';
 import {Events, Fetcher, getBrowserRTC} from 'core';
 import Logger from './utils/logger';
 import platform from './utils/platform';
+import { defaultChannelId } from './utils/toolFuns';
 
 class P2PEngine extends EventEmitter {
 
@@ -17,6 +18,11 @@ class P2PEngine extends EventEmitter {
         super();
 
         this.config = Object.assign({}, defaultP2PConfig, p2pConfig);
+
+        if (!this.config.channelId || typeof this.config.channelId !== 'function') {
+            this.config.channelId = defaultChannelId;
+        }
+
         this.hlsjs = hlsjs;
         this.p2pEnabled = this.config.disableP2P === false ? false : true;                                      //默认开启P2P
 
@@ -26,13 +32,20 @@ class P2PEngine extends EventEmitter {
 
             const isLive = data.details.live;
             this.config.live = isLive;
-            let channel = hlsjs.url.split('?')[0];
-
+            // 浏览器信息
+            let browserInfo = {
+                device: platform.getPlatform(),
+                netType: platform.getNetType(),
+                host: window.location.host,
+                version: P2PEngine.version,
+                tag: this.config.tag || this.hlsjs.constructor.version,
+            };
+            let channel = this.config.channelId(hlsjs.url, __DC_PROTOCOL__, browserInfo);
             //初始化logger
             let logger = new Logger(this.config, channel);
             this.hlsjs.config.logger = this.logger = logger;
-
-            this._init(channel);
+            logger.info(`channel ${channel}`);
+            this._init(channel, browserInfo);
 
             hlsjs.off(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
         };
@@ -45,16 +58,8 @@ class P2PEngine extends EventEmitter {
         }
     }
 
-    _init(channel) {
+    _init(channel, browserInfo) {
         const { logger } = this;
-        //上传浏览器信息
-        let browserInfo = {
-            device: platform.getPlatform(),
-            netType: platform.getNetType(),
-            host: window.location.host,
-            version: P2PEngine.version,
-            tag: this.config.tag || P2PEngine.version,
-        };
 
 
         this.hlsjs.config.p2pEnabled = this.p2pEnabled;

@@ -1,5 +1,5 @@
 
-import {config as btConfig} from './bittorrent';
+import { config as btConfig } from './bittorrent';
 
 //时间单位统一为秒
 let defaultP2PConfig = {
@@ -28,19 +28,9 @@ let defaultP2PConfig = {
 
     tag: '',                                     //用户自定义标签，可用于在后台查看参数调整效果
 
+    channelId: null,                             //标识channel的字段，默认是'[path]-[protocol version]'
+
     ...btConfig
 };
-
-// let p2pConfig;
-//
-// if (__EXCLUDE_LIVE__) {
-//     p2pConfig = Object.assign(defaultP2PConfig, vodConfig);
-// } else if (__EXCLUDE_VOD__) {
-//     p2pConfig = Object.assign(defaultP2PConfig, liveConfig);
-// } else {
-//     p2pConfig = Object.assign(defaultP2PConfig, liveConfig, vodConfig);
-// }
-
-
 
 export default defaultP2PConfig;

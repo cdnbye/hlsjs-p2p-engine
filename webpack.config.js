@@ -3,6 +3,7 @@ const pkgJson = require('./package.json');
 const path = require('path');
 const webpack = require('webpack');
 const fs= require('fs');
+const DATACHANNEL_PROTOCOL_VER = 'v1';
 
 const uglifyJsOptions = {
     screwIE8: true,
@@ -74,6 +75,7 @@ function getConstantsForConfig(light = false) {                                 
     return {
         __VERSION__: JSON.stringify(pkgJson.version),
         __IS_HLSJS_LIGHT__: light,
+        __DC_PROTOCOL__: JSON.stringify(DATACHANNEL_PROTOCOL_VER)
     };
 }
 

@@ -47,25 +47,26 @@ If `opts` is specified, then the default options (shown below) will be overridde
 {
     // hlsjsConfig options provided by hls.js
     p2pConfig: {
-        logLevel: 'none',                                 // Print log level(debug, info, warn, error, none，false=none, true=debug) (default='none')
-        announce: "https://tracker.cdnbye.com",           // The address of tracker server
-        wsSignalerAddr: 'wss://signal.cdnbye.com/wss',    // The address of signal server
-        wsMaxRetries: 3,                                  // The maximum number of reconnection attempts that will be made by websocket before giving up (default=3)
-        wsReconnectInterval: 5,                           // The number of seconds to delay before attempting to reconnect by websocket (default=5)
-        loadTimeout: 3,                                   // Timeout of downloading by p2p (default=3)
-        maxBufSize: 1024*1024*50,                         // The cache size of binary data (default=50MB)
-        p2pEnabled: true,                                 // Enable P2P (default=true)
-        tsStrictMatched: false,                           // Drop the query string of ts url while sharing segment to peers (default=false)
-        key: 'free',                                      // API key to connected with tracker server (default=free)
-        tag: '',                                          // User defined tag which is useful for observing the effect of parameters turning (default=bundle version)
+        logLevel: string or boolean         // Print log level(debug, info, warn, error, none，false=none, true=debug) (default='none')
+        announce: string                    // The address of tracker server (default=https://tracker.cdnbye.com)
+        wsSignalerAddr: string              // The address of signal server (default=wss://signal.cdnbye.com/wss)
+        wsMaxRetries: number                // The maximum number of reconnection attempts that will be made by websocket before giving up (default=3)
+        wsReconnectInterval: number         // The number of seconds to delay before attempting to reconnect by websocket (default=5)
+        loadTimeout: number                 // Timeout of downloading by p2p (default=3)
+        maxBufSize: number                  // The cache size of binary data (default=1024*1024*50)
+        p2pEnabled: boolean                 // Enable P2P (default=true)
+        tsStrictMatched: boolean            // Drop the query string of ts url while sharing segment to peers (default=false)
+        key: string                         // API key to connected with tracker server (default=free)
+        tag: string                         // User defined tag which is useful for observing the effect of parameters turning (default=[hlsjs version])
         // advanced options
-        dcRequestTimeout: 3,                              // The request timeout of datachannel (default=3)
-        dcUploadTimeout: 3,                               // The upload timeout of datachannel (default=3)
-        packetSize: 64*1024,                              // The maximum package size sent by datachannel per time (default=64KB)
-        enableLogUpload: false,                           // Enable upload logs to server (default=false)
-        logUploadAddr: "wss://api.cdnbye.com/trace",      // Log upload address
-        logUploadLevel: 'warn',                           // Log upload level(debug, info, warn, error, none) (default=warn)
-        neighbours: 12,                                   // The maximum number of peers allowed to connect (default=12)                             
+        channelId: function                 // Pass a function to generate channel Id (default: see utils/toolFuns)
+        dcRequestTimeout: number            // The request timeout of datachannel (default=3)
+        dcUploadTimeout: number             // The upload timeout of datachannel (default=3)
+        packetSize: number                  // The maximum package size sent by datachannel per time (default=64*1024)
+        enableLogUpload: boolean            // Enable upload logs to server (default=false)
+        logUploadAddr: string               // Log upload address (default=wss://api.cdnbye.com/trace)
+        logUploadLevel: string              // Log upload level(debug, info, warn, error, none) (default=warn)
+        neighbours: number                  // The maximum number of peers allowed to connect (default=12)                             
     }
 }
 ```

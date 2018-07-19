@@ -1,3 +1,5 @@
+import URLToolkit from 'url-toolkit';
+
 // 根据参数决定是否去掉ts的url的查询参数
 export function handleTSUrl(url, matched = false) {
     if (!matched) {
@@ -19,3 +21,9 @@ export function throttle(method, context, colddown = 15) {
         }, colddown*1000);
     }
 };
+
+// channelId generator
+export function defaultChannelId(url, protocol, browserInfo = {}) {
+    const path = URLToolkit.parseURL(url).path.split('.')[0];
+    return `${path}-${protocol}`;
+}
