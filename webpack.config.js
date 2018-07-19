@@ -79,17 +79,6 @@ function getConstantsForConfig(light = false) {                                 
     };
 }
 
-function getAliasesForLightDist() {
-    let aliases = {};
-
-    aliases = Object.assign({}, aliases, {
-        './bittorrent': './empty.js'
-    });
-
-
-    return aliases;
-}
-
 const multiConfig = [
         {
             name: 'bundle-engine',
