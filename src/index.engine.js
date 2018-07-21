@@ -2,7 +2,7 @@ import EventEmitter from 'events';
 import defaultP2PConfig from './config';
 import {Tracker, FragLoader} from './bittorrent';
 import BufferManager from './buffer-manager';
-import {Events, Fetcher, getBrowserRTC} from 'core';
+import {Events, Fetcher, getBrowserRTC, DataChannel} from 'core';
 import Logger from './utils/logger';
 import platform from './utils/platform';
 import { defaultChannelId } from './utils/toolFuns';
@@ -40,7 +40,7 @@ class P2PEngine extends EventEmitter {
                 version: P2PEngine.version,
                 tag: this.config.tag || this.hlsjs.constructor.version,
             };
-            let channel = this.config.channelId(hlsjs.url, __DC_PROTOCOL__, browserInfo);
+            let channel = this.config.channelId(hlsjs.url, DataChannel.VERSION, browserInfo);
             //初始化logger
             let logger = new Logger(this.config, channel);
             this.hlsjs.config.logger = this.logger = logger;

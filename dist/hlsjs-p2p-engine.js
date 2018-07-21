@@ -2887,7 +2887,7 @@ function defaultChannelId(url, protocol) {
     var browserInfo = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
     var path = _urlToolkit2.default.parseURL(url).path.split('.')[0];
-    return path + '-' + protocol;
+    return path + '[' + protocol + ']';
 }
 
 /***/ }),
@@ -5771,7 +5771,7 @@ var P2PEngine = function (_EventEmitter) {
                 version: P2PEngine.version,
                 tag: _this.config.tag || _this.hlsjs.constructor.version
             };
-            var channel = _this.config.channelId(hlsjs.url, "v1", browserInfo);
+            var channel = _this.config.channelId(hlsjs.url, _core.DataChannel.VERSION, browserInfo);
             //初始化logger
             var logger = new _logger2.default(_this.config, channel);
             _this.hlsjs.config.logger = _this.logger = logger;
@@ -6761,6 +6761,13 @@ var Buffer = __webpack_require__(2).Buffer;
 
 var DataChannel = function (_EventEmitter) {
     _inherits(DataChannel, _EventEmitter);
+
+    _createClass(DataChannel, null, [{
+        key: 'VERSION',
+        get: function get() {
+            return 'v1';
+        }
+    }]);
 
     function DataChannel(engine, peerId, remotePeerId, isInitiator, config) {
         _classCallCheck(this, DataChannel);

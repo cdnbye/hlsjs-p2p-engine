@@ -26,8 +26,12 @@
                 type="application/x-mpegURL"/>
     </video>
     <!--<div style="font-size: 20px; float: right; margin: 10px auto">-->
-        <p id="info" style="float: left; font-size: 20px;  margin: 10px auto"></p>
+        <div style="float: left; font-size: 20px;  margin: 10px auto">
+            <p id="downloadInfo" ></p>
+            <p id="peerInfo"></p>
+        </div>
         <button id="button"  style="float: right; background-color: cornflowerblue; color: white; font-size: 20px;  margin: 10px auto">Simulate A Peer</button>
+
     <!--</div>-->
     <table class="table table-hover" style="border: 0; margin: 0">
         <thead>
@@ -72,13 +76,13 @@
                 debug: false,
                 // Other hlsjsConfig options provided by hls.js
                 p2pConfig: {
-                    logLevel: false,
+                    logLevel: true,
                     // Other p2pConfig options provided by CDNBye
                 }
             }
         }
     });
-
+    var peerId = '', peerNum = 0;
     player.tech_.on(Hls.Events.MANIFEST_LOADED, function (e) {
         player.tech_.sourceHandler_.hls.loadLevel = 0;
         cpm.downloadresult.classList.remove('sr-only');
@@ -97,8 +101,16 @@
     player.tech_.sourceHandler_.hls.engine.on('stats', function ({totalHTTPDownloaded=0, totalP2PDownloaded=0, totalP2PUploaded=0}) {
 //        console.warn(`totalHTTPDownloaded ${totalHTTPDownloaded} totalP2PDownloaded ${totalP2PDownloaded}`)
         var total = totalHTTPDownloaded + totalP2PDownloaded;
-        document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%,  saved traffic: ${totalP2PDownloaded}KB`;
-    })
+        document.querySelector('#downloadInfo').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%,  saved traffic: ${totalP2PDownloaded}KB, uploaded data: ${totalP2PUploaded}KB`;
+    });
+    player.tech_.sourceHandler_.hls.engine.on('peerId', function (id) {
+        peerId = id;
+        document.querySelector('#peerInfo').innerText = `peerId: ${peerId}, peers: ${peerNum}`;
+    });
+    player.tech_.sourceHandler_.hls.engine.on('peers', function (peers) {
+        peerNum = peers.length;
+        document.querySelector('#peerInfo').innerText = `peerId: ${peerId}, peers: ${peerNum}`;
+    });
     document.getElementById('button').addEventListener('click', function () {
         window.open("http://cdnbye.gitee.io/hlsjs-p2p-engine/videojs-demo.html");
     })

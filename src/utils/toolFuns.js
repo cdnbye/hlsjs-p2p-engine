@@ -25,5 +25,5 @@ export function throttle(method, context, colddown = 15) {
 // channelId generator
 export function defaultChannelId(url, protocol, browserInfo = {}) {
     const path = URLToolkit.parseURL(url).path.split('.')[0];
-    return `${path}-${protocol}`;
+    return `${path}[${protocol}]`;
 }
