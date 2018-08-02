@@ -220,8 +220,10 @@ class BTScheduler extends EventEmitter {
             })
             .on(Events.DC_TIMEOUT, () => {
                 logger.warn(`DC_TIMEOUT`);
-                window.clearTimeout(this.criticaltimeouter);                             //清除定时器
-                this.criticaltimeouter = null;
+                if (this.criticaltimeouter) {
+                    window.clearTimeout(this.criticaltimeouter);
+                    this._criticaltimeout();
+                }
             })
     }
 
