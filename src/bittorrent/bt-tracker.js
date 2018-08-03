@@ -31,10 +31,12 @@ class BTTracker extends EventEmitter {
     }
 
     set currentPlaySN(sn) {
+        // console.warn(`currentPlaySN ${sn}`);
         this.scheduler.updatePlaySN(sn);
     }
 
     set currentLoadingSN(sn) {
+        // console.warn(`currentLoadingSN ${sn}`);
         this.scheduler.updateLoadingSN(sn);
     }
 
@@ -46,10 +48,9 @@ class BTTracker extends EventEmitter {
         const { logger } = this.engine;
         this.fetcher.btAnnounce().then(json => {
             logger.info(`announce request response ${JSON.stringify(json)}`)
-            this.peerId = json.peer_id;
+            this.engine.peerId = this.peerId = json.id;
             logger.identifier = this.peerId;
             this.fetcher.btHeartbeat(json.heartbeat_interval);
-            this.fetcher.btStatsStart(json.report_limit);
             this.signalerWs = this._initSignalerWs();                         //连上tracker后开始连接信令服务器
             this._handlePeers(json.peers);
             this.engine.emit('peerId', this.peerId);
@@ -227,11 +228,11 @@ class BTTracker extends EventEmitter {
 
     }
 
-    _heartbeat() {
-        this.heartbeater = window.setInterval(() => {
-            this.fetcher.btHeartbeat();
-        }, this.heartbeatInterval * 1000)
-    }
+    // _heartbeat() {
+    //     this.heartbeater = window.setInterval(() => {
+    //         this.fetcher.btHeartbeat();
+    //     }, this.heartbeatInterval * 1000)
+    // }
 
     _requestMorePeers() {
         const { logger } = this.engine;

@@ -25,7 +25,7 @@
   "license": "MIT",
   "dependencies": {
     "cdnbye-core": "^0.0.10",
-    "hls.js": "^0.8.9",
+    "hls.js": "^0.10.1",
     "reconnecting-websocket": "^3.2.2"
   },
   "devDependencies": {

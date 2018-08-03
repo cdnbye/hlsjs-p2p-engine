@@ -14,6 +14,7 @@ class BufferManager extends EventEmitter {
         relurl: string
         data: Buffer
         size: string
+        fromPeerId: string
          */
         this._segPool = new Map();             //存放seg的Map            relurl -> segment
         this._currBufSize = 0;                 //目前的buffer总大小
@@ -29,7 +30,7 @@ class BufferManager extends EventEmitter {
         return this._segPool.has(url);
     }
 
-    copyAndAddBuffer(data, url, sn) {                                       //先复制再缓存
+    copyAndAddBuffer(data, url, sn, fromPeerId = '') {                                       //先复制再缓存
         const handledUrl = handleTSUrl(url, this.config.tsStrictMatched);
         let payloadBuf = Buffer.from(data);
         let byteLength = payloadBuf.byteLength;
@@ -37,23 +38,25 @@ class BufferManager extends EventEmitter {
         payloadBuf.copy(targetBuffer);
 
         let segment = {
-            sn: sn,
+            sn,
             relurl: handledUrl,
             data: targetBuffer,
-            size: byteLength
+            size: byteLength,
+            fromPeerId
         };
 
         this.addSeg(segment);
         this.sn2Url.set(sn, handledUrl);
     }
 
-    addBuffer(sn, url, buf) {                                             //直接缓存
+    addBuffer(sn, url, buf, fromPeerId = '') {                                             //直接缓存
         const handledUrl = handleTSUrl(url, this.config.tsStrictMatched);
         let segment = {
-            sn: sn,
+            sn,
             relurl: handledUrl,
             data: buf,
-            size: buf.byteLength
+            size: buf.byteLength,
+            fromPeerId
         };
         this.addSeg(segment);
         this.sn2Url.set(sn, handledUrl);

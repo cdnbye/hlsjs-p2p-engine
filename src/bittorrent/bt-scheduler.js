@@ -13,6 +13,8 @@ class BTScheduler extends EventEmitter {
         this.bitset = new Set();                  //本节点的bitfield
         this.bitCounts = new Map();               //记录peers的每个buffer的总和，用于BT的rearest first策略  index -> count
 
+        // 传输控制(单位ms)
+
     }
 
     updateLoadedSN(sn) {
@@ -41,7 +43,7 @@ class BTScheduler extends EventEmitter {
         for (let idx=sn+1;idx<=sn+this.config.urgentOffset+1;idx++) {
             if (!this.bitset.has(idx) && idx !== this.loadingSN && this.bitCounts.has(idx)) {                  //如果这个块没有缓存并且peers有
                 for (let peer of this.peerMap.values()) {                           //找到拥有这个块并且空闲的peer
-                    if (peer.downloading === false && peer.bitset.has(idx)) {
+                    if (peer.isAvailable && peer.bitset.has(idx)) {
                         peer.requestDataBySN(idx, true);
                         logger.debug(`request urgent ${idx} from peer ${peer.remotePeerId}`);
                         requested.push(idx);
@@ -112,7 +114,7 @@ class BTScheduler extends EventEmitter {
 
         let target;
         for (let peer of this.peerMap.values()) {
-            if (peer.bitset.has(frag.sn)) {
+            if (peer.isAvailable && peer.bitset.has(frag.sn)) {
                 target = peer;
             }
         }
@@ -121,12 +123,23 @@ class BTScheduler extends EventEmitter {
             // target.requestDataBySN(frag.sn, true);
             target.requestDataByURL(handledUrl, true);                            //critical的根据url请求
             logger.info(`request criticalSeg url ${frag.relurl} at ${frag.sn}`);
+            this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout*1000);
+        } else {
+            logger.info(`no expected sn in peers for criticalSeg url ${frag.relurl} at ${frag.sn}`);
+            this._criticaltimeout();
         }
-        this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout*1000);
+
     }
 
     get hasPeers() {
         return this.peerMap.size > 0;
+    }
+
+    get hasIdlePeers() {
+        const { logger } = this.engine;
+        const idles = this._getIdlePeer().length;
+        logger.info(`peers: ${this.peerMap.size} idle peers: ${idles}`);
+        return idles > 0;
     }
 
     set bufferManager(bm) {
@@ -139,6 +152,10 @@ class BTScheduler extends EventEmitter {
             });
             this.bitset.delete(sn);
         })
+    }
+
+    get requestTimeout() {
+
     }
 
     _setupDC(dc) {
@@ -181,7 +198,8 @@ class BTScheduler extends EventEmitter {
             .on(Events.DC_PIECE_NOT_FOUND, msg => {
                 if (this.criticalSeg && this.criticalSeg.relurl === msg.url) {                    //接收到critical未找到的响应
                     window.clearTimeout(this.criticaltimeouter);                             //清除定时器
-                    this.criticaltimeouter = null;
+                    // this.criticaltimeouter = null;
+                    logger.info(`DC_PIECE_NOT_FOUND`);
                     this._criticaltimeout();                                                   //触发超时，由xhr下载
                 }
             })
@@ -194,9 +212,10 @@ class BTScheduler extends EventEmitter {
                     stats.tload = Math.max(stats.tfirst, performance.now());
                     stats.loaded = stats.total = response.data.byteLength;
                     this.criticalSeg = null;
+                    this.context.frag.fromPeerId = dc.remotePeerId;
                     this.callbacks.onSuccess(response, stats, this.context);
                 } else {
-                    this.bufMgr.addBuffer(response.sn, response.url, response.data);
+                    this.bufMgr.addBuffer(response.sn, response.url, response.data, dc.remotePeerId);
                 }
                 this.updateLoadedSN(response.sn);
             })
@@ -220,8 +239,10 @@ class BTScheduler extends EventEmitter {
             })
             .on(Events.DC_TIMEOUT, () => {
                 logger.warn(`DC_TIMEOUT`);
-                window.clearTimeout(this.criticaltimeouter);                             //清除定时器
-                this.criticaltimeouter = null;
+                if (this.criticaltimeouter) {
+                    window.clearTimeout(this.criticaltimeouter);                             //清除定时器
+                    this._criticaltimeout();
+                }
             })
     }
 
@@ -233,7 +254,7 @@ class BTScheduler extends EventEmitter {
 
     _getIdlePeer() {
         return [...this.peerMap.values()].filter(peer => {
-            return peer.downloading === false;
+            return peer.isAvailable;
         });
     }
 
@@ -265,8 +286,8 @@ class BTScheduler extends EventEmitter {
         const { logger } = this.engine;
         logger.warn(`critical request timeout`);
         this.criticalSeg = null;
-        this.callbacks.onTimeout(this.stats, this.context, null);
         this.criticaltimeouter = null;
+        this.callbacks.onTimeout(this.stats, this.context, null);
     }
 }
 
