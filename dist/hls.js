@@ -2913,7 +2913,7 @@ var _btLoader2 = _interopRequireDefault(_btLoader);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var config = {
-    announce: "https://tracker.cdnbye.com", //tracker服务器地址
+    announce: "https://api.cdnbye.com/v1", //tracker服务器地址
     neighbours: 12, //连接的节点数量
     urgentOffset: 3 //播放点的后多少个buffer为urgent
 
@@ -6013,7 +6013,7 @@ var P2PEngine = function (_EventEmitter) {
 
 P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)();
 
-P2PEngine.version = "0.1.7";
+P2PEngine.version = "0.2.0";
 
 exports.default = P2PEngine;
 module.exports = exports['default'];
