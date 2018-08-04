@@ -2866,9 +2866,9 @@ function handleTSUrl(url) {
     return url;
 }
 
-// 函数节流
+// 函数节流，默认冷却时间30秒
 function throttle(method, context) {
-    var colddown = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 15;
+    var colddown = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 30;
 
 
     var going = false;
@@ -6050,7 +6050,6 @@ var BTTracker = function (_EventEmitter) {
                 logger.info('announce request response ' + JSON.stringify(json));
                 _this2.engine.peerId = _this2.peerId = json.id;
                 logger.identifier = _this2.peerId;
-                _this2.fetcher.btHeartbeat(json.heartbeat_interval);
                 _this2.signalerWs = _this2._initSignalerWs(); //连上tracker后开始连接信令服务器
                 _this2._handlePeers(json.peers);
                 _this2.engine.emit('peerId', _this2.peerId);
@@ -6265,21 +6264,15 @@ var BTTracker = function (_EventEmitter) {
     }, {
         key: '_setupScheduler',
         value: function _setupScheduler(s) {}
-
-        // _heartbeat() {
-        //     this.heartbeater = window.setInterval(() => {
-        //         this.fetcher.btHeartbeat();
-        //     }, this.heartbeatInterval * 1000)
-        // }
-
     }, {
         key: '_requestMorePeers',
         value: function _requestMorePeers() {
             var _this6 = this;
 
             var logger = this.engine.logger;
+            // 连接的节点<=3时请求更多节点
 
-            if (this.scheduler.peerMap.size <= Math.floor(this.config.neighbours / 2)) {
+            if (this.scheduler.peerMap.size <= 3) {
                 this.fetcher.btGetPeers().then(function (json) {
                     logger.info('request more peers ' + JSON.stringify(json));
                     _this6._handlePeers(json.peers);
@@ -6724,9 +6717,6 @@ var BTScheduler = function (_EventEmitter) {
                 _this4.bitset.delete(sn);
             });
         }
-    }, {
-        key: 'requestTimeout',
-        get: function get() {}
     }]);
 
     return BTScheduler;
@@ -9573,28 +9563,6 @@ var Fetcher = function () {
                 });
             });
         }
-
-        // deprecated
-
-    }, {
-        key: 'btHeartbeat',
-        value: function btHeartbeat() {
-            // const { logger } = this.engine;
-            // this.heartbeater = window.setInterval(() => {
-            //     fetch(this.heartbeatURL+`&peer_id=${this.peerId}`, {
-            //         headers: {
-            //             "X-Key": this.key,
-            //         }
-            //     }).then(response => {
-            //
-            //     }).catch(err => {
-            //         window.clearInterval(this.heartbeater);
-            //         logger.error(`btHeartbeat error ${err}`);
-            //     })
-            // }, interval * 1000)
-
-            var interval = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 10;
-        }
     }, {
         key: 'btStats',
         value: function btStats() {
@@ -9606,7 +9574,7 @@ var Fetcher = function () {
             this.heartbeater = window.setInterval(function () {
                 fetch(_this2.statsURL, {
                     headers: _this2._requestHeader,
-                    method: 'PUT',
+                    method: 'POST',
                     body: JSON.stringify(_this2._makeStatsBody())
                 }).then(function (response) {
                     if (response.ok) {
@@ -9620,7 +9588,7 @@ var Fetcher = function () {
                         _this2.errsInternalExpt = 0;
                     }
                 }).catch(function (err) {
-                    window.clearInterval(_this2.heartbeater);
+                    // window.clearInterval(this.heartbeater);
                     logger.error('btStats error ' + err);
                 });
             }, interval * 1000);
@@ -9709,53 +9677,6 @@ var Fetcher = function () {
                 totalP2PUploaded: this.totalP2PUploaded
             });
         }
-
-        // _checkFlowLimit() {                            //检查是否需要上报流量
-        //     const { logger } = this.engine;
-        //     if (this.p2pDownloaded >= this.limit || this.httpDownloaded >= this.limit) {         //只有流量达到阈值才上报(单位：KB)
-        //         const body = {
-        //             source:  Math.round(this.httpDownloaded),    //上报以KB为单位
-        //             p2p:  Math.round(this.p2pDownloaded)
-        //         };
-        //         if (this.conns !== 0) {
-        //             body.conns = this.conns;
-        //         }
-        //         if (this.failConns > 0) {
-        //             body.failConns = this.failConns;
-        //         }
-        //         if (this.errsFragLoad > 0) {
-        //             body.errsFragLoad = this.errsFragLoad;
-        //         }
-        //         if (this.errsBufStalled > 0) {
-        //             body.errsBufStalled = this.errsBufStalled;
-        //         }
-        //         if (this.errsInternalExpt > 0) {
-        //             body.errsInternalExpt = this.errsInternalExpt;
-        //         }
-        //         logger.info(`reporting traffic p2p ${this.p2pDownloaded} http ${this.httpDownloaded}`);
-        //         fetch(this.statsURL+`&peer_id=${this.peerId}`, {
-        //             headers: {
-        //                 "X-Key": this.key,
-        //             },
-        //             method: 'POST',
-        //             body: JSON.stringify(body)
-        //         }).then(response => {
-        //             if (response.ok) {
-        //                 logger.info(`sucessfully report traffic`);
-        //                 this.httpDownloaded = 0;
-        //                 this.p2pDownloaded = 0;
-        //                 this.conns = 0;
-        //                 this.failConns = 0;
-        //                 this.errsFragLoad = 0;
-        //                 this.errsBufStalled = 0;
-        //                 this.errsInternalExpt = 0;
-        //             }
-        //         }).catch(err  => {
-        //             logger.error(`stats upload error ${err}`);
-        //         })
-        //     }
-        // }
-
     }, {
         key: '_makeStatsBody',
         value: function _makeStatsBody() {
@@ -9773,8 +9694,8 @@ var Fetcher = function () {
         key: '_requestHeader',
         get: function get() {
             var headerInfo = {
-                "X-Key": this.key,
-                timestamp: new Date().getTime()
+                // "X-Key": this.key,
+                // timestamp: new Date().getTime()
             };
             return headerInfo;
         }

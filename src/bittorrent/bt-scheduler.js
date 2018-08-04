@@ -154,10 +154,6 @@ class BTScheduler extends EventEmitter {
         })
     }
 
-    get requestTimeout() {
-
-    }
-
     _setupDC(dc) {
         const { logger } = this.engine;
         dc.on(Events.DC_BITFIELD, msg => {

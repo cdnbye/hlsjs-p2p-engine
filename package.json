@@ -1,7 +1,7 @@
 {
   "name": "cdnbye",
-  "version": "0.2.0",
-  "description": "A Free and Infinitely Scalable Video P2P-CDN.",
+  "version": "0.2.1",
+  "description": "A Free and Infinitely Scalable Video P2P Engine.",
   "main": "./dist/hls.min.js",
   "scripts": {
     "release": "npm run bundle-engine && npm run bundle-hlsjs && npm run release-engine && npm run release-hlsjs && npm run release-hlsjs-light",
@@ -11,7 +11,7 @@
     "release-hlsjs": "webpack --progress --env.release-hlsjs",
     "release-hlsjs-light": "webpack --progress --env.release-hlsjs-light",
     "publish": "npm publish",
-    "git-push": "git add . && git commit -m 'release v0.2.0' && git push origin master",
+    "git-push": "git add . && git commit -m 'reduce frequency of get peers' && git push origin master",
     "git-pull": "git pull origin master",
     "install-core": "cnpm install cdnbye-core@latest",
     "update-core": "npm update cdnbye-core --save",

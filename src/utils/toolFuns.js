@@ -8,8 +8,8 @@ export function handleTSUrl(url, matched = false) {
     return url;
 }
 
-// 函数节流
-export function throttle(method, context, colddown = 15) {
+// 函数节流，默认冷却时间30秒
+export function throttle(method, context, colddown = 30) {
 
     var going = false;
     return function () {

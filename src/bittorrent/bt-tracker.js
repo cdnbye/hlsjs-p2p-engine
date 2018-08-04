@@ -50,7 +50,6 @@ class BTTracker extends EventEmitter {
             logger.info(`announce request response ${JSON.stringify(json)}`)
             this.engine.peerId = this.peerId = json.id;
             logger.identifier = this.peerId;
-            this.fetcher.btHeartbeat(json.heartbeat_interval);
             this.signalerWs = this._initSignalerWs();                         //连上tracker后开始连接信令服务器
             this._handlePeers(json.peers);
             this.engine.emit('peerId', this.peerId);
@@ -228,15 +227,10 @@ class BTTracker extends EventEmitter {
 
     }
 
-    // _heartbeat() {
-    //     this.heartbeater = window.setInterval(() => {
-    //         this.fetcher.btHeartbeat();
-    //     }, this.heartbeatInterval * 1000)
-    // }
-
     _requestMorePeers() {
         const { logger } = this.engine;
-        if (this.scheduler.peerMap.size <= Math.floor(this.config.neighbours/2)) {
+        // 连接的节点<=3时请求更多节点
+        if (this.scheduler.peerMap.size <= 3) {
             this.fetcher.btGetPeers().then(json => {
                 logger.info(`request more peers ${JSON.stringify(json)}`);
                 this._handlePeers(json.peers);
