@@ -5877,9 +5877,8 @@ var P2PEngine = function (_EventEmitter) {
 
         hlsjs.on(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
 
-        if (_this.config.key === 'free') {
-            console.log('CDNBye v' + P2PEngine.version + ' -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)');
-        }
+        console.log('CDNBye v' + P2PEngine.version + ' -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)');
+
         return _this;
     }
 
@@ -5897,7 +5896,7 @@ var P2PEngine = function (_EventEmitter) {
             this.hlsjs.config.bufMgr = this.bufMgr;
 
             //实例化Fetcher
-            var fetcher = new _core.Fetcher(this, this.config.key, window.encodeURIComponent(channel), this.config.announce, browserInfo);
+            var fetcher = new _core.Fetcher(this, 'free', window.encodeURIComponent(channel), this.config.announce, browserInfo);
             this.fetcher = fetcher;
             //实例化tracker服务器
             this.signaler = new _bittorrent.Tracker(this, fetcher, this.config);
@@ -6034,8 +6033,6 @@ var _bittorrent = __webpack_require__(11);
 
 //时间单位统一为秒
 var defaultP2PConfig = _extends({
-    key: 'free', //连接tracker服务器的API key
-
     wsSignalerAddr: 'wss://signal.cdnbye.com/wss', //信令服务器地址
     wsMaxRetries: 3, //发送数据重试次数
     wsReconnectInterval: 5, //websocket重连时间间隔

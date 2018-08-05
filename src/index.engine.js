@@ -52,9 +52,9 @@ class P2PEngine extends EventEmitter {
 
         hlsjs.on(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
 
-        if (this.config.key === 'free') {
-            console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
-        }
+
+        console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
+
     }
 
     _init(channel, browserInfo) {
@@ -68,7 +68,7 @@ class P2PEngine extends EventEmitter {
 
 
         //实例化Fetcher
-        let fetcher = new Fetcher(this, this.config.key, window.encodeURIComponent(channel), this.config.announce, browserInfo);
+        let fetcher = new Fetcher(this, 'free', window.encodeURIComponent(channel), this.config.announce, browserInfo);
         this.fetcher = fetcher;
         //实例化tracker服务器
         this.signaler = new Tracker(this, fetcher, this.config);

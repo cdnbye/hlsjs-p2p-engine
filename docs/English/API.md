@@ -56,7 +56,6 @@ If `opts` is specified, then the default options (shown below) will be overridde
         maxBufSize: number                  // The cache size of binary data (default=1024*1024*50)
         p2pEnabled: boolean                 // Enable P2P (default=true)
         tsStrictMatched: boolean            // Drop the query string of ts url while sharing segment to peers (default=false)
-        key: string                         // API key to connected with tracker server (default=free)
         tag: string                         // User defined tag which is useful for observing the effect of parameters turning (default=[hlsjs version])
         // advanced options
         channelId: function                 // Pass a function to generate channel Id (default: see utils/toolFuns)

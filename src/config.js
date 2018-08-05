@@ -3,8 +3,6 @@ import { config as btConfig } from './bittorrent';
 
 //时间单位统一为秒
 let defaultP2PConfig = {
-    key: 'free',                                //连接tracker服务器的API key
-
     wsSignalerAddr: 'wss://signal.cdnbye.com/wss',          //信令服务器地址
     wsMaxRetries: 3,                           //发送数据重试次数
     wsReconnectInterval: 5,                     //websocket重连时间间隔
