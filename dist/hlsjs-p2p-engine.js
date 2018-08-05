@@ -5916,7 +5916,7 @@ var P2PEngine = function (_EventEmitter) {
 
 P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)();
 
-P2PEngine.version = "0.2.1";
+P2PEngine.version = "0.2.2";
 
 exports.default = P2PEngine;
 module.exports = exports['default'];
@@ -6223,7 +6223,7 @@ var BTTracker = function (_EventEmitter) {
                 switch (action) {
                     case 'signal':
                         if (_this6.failedDCSet.has(msg.from_peer_id)) return;
-                        logger.debug('start handle signal of ' + msg.from_peer_id);
+                        logger.debug('handle signal of ' + msg.from_peer_id);
                         // window.clearTimeout(this.signalTimer);                       //接收到信令后清除定时器
                         // this.signalTimer = null;
                         if (!msg.data) {
@@ -6359,8 +6359,10 @@ var BTScheduler = function (_EventEmitter) {
         _this.config = config;
         _this.bufMgr = null;
         _this.peerMap = new Map(); // remotePeerId -> dc
-        _this.bitset = new Set(); //本节点的bitfield
-        _this.bitCounts = new Map(); //记录peers的每个buffer的总和，用于BT的rearest first策略  index -> count
+        _this.bitset = new Set(); // 本节点的bitfield
+        _this.bitCounts = new Map(); // 记录peers的每个buffer的总和，用于BT的rearest first策略  index -> count
+
+        _this.targetPeer = null; // 当前的目标peer
 
         // 传输控制(单位ms)
 
@@ -6487,18 +6489,11 @@ var BTScheduler = function (_EventEmitter) {
             return this.bitCounts.has(sn);
         }
     }, {
-        key: 'load',
-        value: function load(context, config, callbacks) {
+        key: 'hasAndSetTargetPeer',
+        value: function hasAndSetTargetPeer(sn) {
             var logger = this.engine.logger;
 
-            this.context = context;
-            var frag = context.frag;
-            var handledUrl = (0, _toolFuns.handleTSUrl)(frag.relurl, this.config.tsStrictMatched);
-            this.callbacks = callbacks;
-            this.stats = { trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0 };
-            this.criticalSeg = { sn: frag.sn, relurl: handledUrl };
-
-            var target = void 0;
+            if (!(this.hasIdlePeers && this.peersHasSN(sn))) return false;
             var _iteratorNormalCompletion2 = true;
             var _didIteratorError2 = false;
             var _iteratorError2 = undefined;
@@ -6507,8 +6502,10 @@ var BTScheduler = function (_EventEmitter) {
                 for (var _iterator2 = this.peerMap.values()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                     var peer = _step2.value;
 
-                    if (peer.isAvailable && peer.bitset.has(frag.sn)) {
-                        target = peer;
+                    if (peer.isAvailable && peer.bitset.has(sn)) {
+                        logger.info('found sn ' + sn + ' from peer ' + peer.remotePeerId);
+                        this.targetPeer = peer;
+                        return true;
                     }
                 }
             } catch (err) {
@@ -6526,15 +6523,41 @@ var BTScheduler = function (_EventEmitter) {
                 }
             }
 
-            if (target) {
-                // target.requestDataBySN(frag.sn, true);
-                target.requestDataByURL(handledUrl, true); //critical的根据url请求
-                logger.info('request criticalSeg url ' + frag.relurl + ' at ' + frag.sn);
-                this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout * 1000);
-            } else {
-                logger.info('no expected sn in peers for criticalSeg url ' + frag.relurl + ' at ' + frag.sn);
-                this._criticaltimeout();
-            }
+            logger.warn('idle peers has not sn ' + sn);
+            return false;
+        }
+    }, {
+        key: 'load',
+        value: function load(context, config, callbacks) {
+            var logger = this.engine.logger;
+
+            this.context = context;
+            var frag = context.frag;
+            var handledUrl = (0, _toolFuns.handleTSUrl)(frag.relurl, this.config.tsStrictMatched);
+            this.callbacks = callbacks;
+            this.stats = { trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0 };
+            this.criticalSeg = { sn: frag.sn, relurl: handledUrl };
+
+            // let target;
+            // for (let peer of this.peerMap.values()) {
+            //     if (peer.isAvailable && peer.bitset.has(frag.sn)) {
+            //         target = peer;
+            //     }
+            // }
+            //
+            // if (target) {
+            //     // target.requestDataBySN(frag.sn, true);
+            //     target.requestDataByURL(handledUrl, true);                            //critical的根据url请求
+            //     logger.info(`request criticalSeg url ${frag.relurl} at ${frag.sn}`);
+            //     this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout*1000);
+            // } else {
+            //     logger.info(`no expected sn in peers for criticalSeg url ${frag.relurl} at ${frag.sn}`);
+            //     this._criticaltimeout();
+            // }
+
+            this.targetPeer.requestDataByURL(handledUrl, true);
+            logger.info('request criticalSeg url ' + frag.relurl + ' at ' + frag.sn);
+            this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout * 1000);
         }
     }, {
         key: '_setupDC',
@@ -10142,9 +10165,9 @@ var FragLoader = function (_EventEmitter) {
                     _this2.fetcher.reportFlow(stats, true);
                     callbacks.onSuccess(response, stats, context);
                 }, 50);
-            } else if (this.scheduler.hasIdlePeers && this.scheduler.peersHasSN(frag.sn)) {
+                // } else if (this.scheduler.hasIdlePeers && this.scheduler.peersHasSN(frag.sn)) {                             //如果在peers的bitmap中找到
+            } else if (this.scheduler.hasAndSetTargetPeer(frag.sn)) {
                 //如果在peers的bitmap中找到
-                logger.info('found sn ' + frag.sn + ' from peers');
                 context.frag.loadByP2P = true;
                 this.scheduler.load(context, config, callbacks);
                 callbacks.onTimeout = function (stats, context) {

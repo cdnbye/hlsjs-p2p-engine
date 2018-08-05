@@ -189,7 +189,7 @@ class BTTracker extends EventEmitter {
             switch (action) {
                 case 'signal':
                     if (this.failedDCSet.has(msg.from_peer_id)) return;
-                    logger.debug(`start handle signal of ${msg.from_peer_id}`);
+                    logger.debug(`handle signal of ${msg.from_peer_id}`);
                     // window.clearTimeout(this.signalTimer);                       //接收到信令后清除定时器
                     // this.signalTimer = null;
                     if (!msg.data) {                                             //如果对等端已不在线

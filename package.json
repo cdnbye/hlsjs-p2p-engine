@@ -1,6 +1,6 @@
 {
   "name": "cdnbye",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A Free and Infinitely Scalable Video P2P Engine.",
   "main": "./dist/hls.min.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "release-hlsjs": "webpack --progress --env.release-hlsjs",
     "release-hlsjs-light": "webpack --progress --env.release-hlsjs-light",
     "publish": "npm publish",
-    "git-push": "git add . && git commit -m 'remove key' && git push origin master",
+    "git-push": "git add . && git commit -m 'fix bug in scheduler' && git push origin master",
     "git-pull": "git pull origin master",
     "install-core": "cnpm install cdnbye-core@latest",
     "update-core": "npm update cdnbye-core --save",

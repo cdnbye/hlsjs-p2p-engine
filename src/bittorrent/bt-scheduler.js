@@ -10,8 +10,10 @@ class BTScheduler extends EventEmitter {
         this.config = config;
         this.bufMgr = null;
         this.peerMap = new Map();                 // remotePeerId -> dc
-        this.bitset = new Set();                  //本节点的bitfield
-        this.bitCounts = new Map();               //记录peers的每个buffer的总和，用于BT的rearest first策略  index -> count
+        this.bitset = new Set();                  // 本节点的bitfield
+        this.bitCounts = new Map();               // 记录peers的每个buffer的总和，用于BT的rearest first策略  index -> count
+
+        this.targetPeer = null;               // 当前的目标peer
 
         // 传输控制(单位ms)
 
@@ -103,6 +105,20 @@ class BTScheduler extends EventEmitter {
         return this.bitCounts.has(sn);
     }
 
+    hasAndSetTargetPeer(sn) {
+        const { logger } = this.engine;
+        if (!(this.hasIdlePeers && this.peersHasSN(sn))) return false;
+        for (let peer of this.peerMap.values()) {
+            if (peer.isAvailable && peer.bitset.has(sn)) {
+                logger.info(`found sn ${sn} from peer ${peer.remotePeerId}`);
+                this.targetPeer = peer;
+                return true;
+            }
+        }
+        logger.warn(`idle peers has not sn ${sn}`);
+        return false;
+    }
+
     load(context, config, callbacks) {
         const { logger } = this.engine;
         this.context = context;
@@ -112,23 +128,26 @@ class BTScheduler extends EventEmitter {
         this.stats = {trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0};
         this.criticalSeg = {sn: frag.sn, relurl: handledUrl};
 
-        let target;
-        for (let peer of this.peerMap.values()) {
-            if (peer.isAvailable && peer.bitset.has(frag.sn)) {
-                target = peer;
-            }
-        }
+        // let target;
+        // for (let peer of this.peerMap.values()) {
+        //     if (peer.isAvailable && peer.bitset.has(frag.sn)) {
+        //         target = peer;
+        //     }
+        // }
+        //
+        // if (target) {
+        //     // target.requestDataBySN(frag.sn, true);
+        //     target.requestDataByURL(handledUrl, true);                            //critical的根据url请求
+        //     logger.info(`request criticalSeg url ${frag.relurl} at ${frag.sn}`);
+        //     this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout*1000);
+        // } else {
+        //     logger.info(`no expected sn in peers for criticalSeg url ${frag.relurl} at ${frag.sn}`);
+        //     this._criticaltimeout();
+        // }
 
-        if (target) {
-            // target.requestDataBySN(frag.sn, true);
-            target.requestDataByURL(handledUrl, true);                            //critical的根据url请求
-            logger.info(`request criticalSeg url ${frag.relurl} at ${frag.sn}`);
-            this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout*1000);
-        } else {
-            logger.info(`no expected sn in peers for criticalSeg url ${frag.relurl} at ${frag.sn}`);
-            this._criticaltimeout();
-        }
-
+        this.targetPeer.requestDataByURL(handledUrl, true);
+        logger.info(`request criticalSeg url ${frag.relurl} at ${frag.sn}`);
+        this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout*1000);
     }
 
     get hasPeers() {

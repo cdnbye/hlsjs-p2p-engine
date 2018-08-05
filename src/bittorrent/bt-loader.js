@@ -53,8 +53,8 @@ class FragLoader extends EventEmitter {
                 this.fetcher.reportFlow(stats, true);
                 callbacks.onSuccess(response, stats, context);
             }, 50)
-        } else if (this.scheduler.hasIdlePeers && this.scheduler.peersHasSN(frag.sn)) {                             //如果在peers的bitmap中找到
-            logger.info(`found sn ${frag.sn} from peers`);
+        // } else if (this.scheduler.hasIdlePeers && this.scheduler.peersHasSN(frag.sn)) {                             //如果在peers的bitmap中找到
+        } else if (this.scheduler.hasAndSetTargetPeer(frag.sn)) {                             //如果在peers的bitmap中找到
             context.frag.loadByP2P = true;
             this.scheduler.load(context, config, callbacks);
             callbacks.onTimeout = (stats, context) => {                             //如果P2P下载超时则立即切换到xhr下载
