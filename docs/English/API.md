@@ -48,7 +48,7 @@ If `opts` is specified, then the default options (shown below) will be overridde
     // hlsjsConfig options provided by hls.js
     p2pConfig: {
         logLevel: string or boolean         // Print log level(debug, info, warn, error, none，false=none, true=debug) (default='none')
-        announce: string                    // The address of tracker server (default=https://tracker.cdnbye.com)
+        announce: string                    // The address of tracker server
         wsSignalerAddr: string              // The address of signal server (default=wss://signal.cdnbye.com/wss)
         wsMaxRetries: number                // The maximum number of reconnection attempts that will be made by websocket before giving up (default=3)
         wsReconnectInterval: number         // The number of seconds to delay before attempting to reconnect by websocket (default=5)
