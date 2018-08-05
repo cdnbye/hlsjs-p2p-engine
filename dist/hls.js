@@ -2914,7 +2914,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var config = {
     announce: "https://api.cdnbye.com/v1", //tracker服务器地址
-    neighbours: 12, //连接的节点数量
     urgentOffset: 3 //播放点的后多少个buffer为urgent
 
 };
@@ -6013,7 +6012,7 @@ var P2PEngine = function (_EventEmitter) {
 
 P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)();
 
-P2PEngine.version = "0.2.0";
+P2PEngine.version = "0.2.1";
 
 exports.default = P2PEngine;
 module.exports = exports['default'];
@@ -6119,7 +6118,6 @@ var BTTracker = function (_EventEmitter) {
         _this.DCMap = new Map(); //{key: remotePeerId, value: DataChannnel} 目前已经建立连接或正在建立连接的dc
         _this.failedDCSet = new Set(); //{remotePeerId} 建立连接失败的dc
         _this.signalerWs = null; //信令服务器ws
-        _this.heartbeatInterval = 30;
         //tracker request API
         _this.fetcher = fetcher;
         /*
@@ -6161,10 +6159,7 @@ var BTTracker = function (_EventEmitter) {
         }
     }, {
         key: 'destroy',
-        value: function destroy() {
-            window.clearInterval(this.heartbeater);
-            this.heartbeater = null;
-        }
+        value: function destroy() {}
     }, {
         key: '_handlePeers',
         value: function _handlePeers(peers) {
@@ -6223,83 +6218,101 @@ var BTTracker = function (_EventEmitter) {
             this._setupDC(datachannel);
         }
     }, {
+        key: '_tryConnectToAllPeers',
+        value: function _tryConnectToAllPeers() {
+            var _this4 = this;
+
+            var logger = this.engine.logger;
+
+            if (this.peers.length === 0) return;
+            logger.info('try connect to ' + this.peers.length + ' peers');
+            this.peers.forEach(function (peer) {
+                var datachannel = new _core.DataChannel(_this4.engine, _this4.peerId, peer.id, true, _this4.config);
+                _this4.DCMap.set(peer.id, datachannel); // 将对等端Id作为键
+                _this4._setupDC(datachannel);
+            });
+            // 清空peers
+            this.peers = [];
+        }
+    }, {
         key: '_setupDC',
         value: function _setupDC(datachannel) {
-            var _this4 = this;
+            var _this5 = this;
 
             var logger = this.engine.logger;
 
             datachannel.on(_core.Events.DC_SIGNAL, function (data) {
                 var remotePeerId = datachannel.remotePeerId;
-                _this4.signalerWs.sendSignal(remotePeerId, data);
+                _this5.signalerWs.sendSignal(remotePeerId, data);
                 //启动定时器，如果指定时间对方没有响应则连接下一个
-                if (!_this4.signalTimer && !_this4.failedDCSet.has(remotePeerId)) {
-                    _this4.signalTimer = window.setTimeout(function () {
-                        _this4.DCMap.delete(remotePeerId);
-                        _this4.failedDCSet.add(remotePeerId); //记录失败的连接
-                        logger.warn('signaling ' + remotePeerId + ' timeout');
-                        _this4.signalTimer = null;
-                        _this4._tryConnectToPeer();
-                    }, 10000);
-                }
+                // if (!this.signalTimer && !this.failedDCSet.has(remotePeerId)) {
+                //     this.signalTimer = window.setTimeout(() => {
+                //         this.DCMap.delete(remotePeerId);
+                //         this.failedDCSet.add(remotePeerId);              //记录失败的连接
+                //         logger.warn(`signaling ${remotePeerId} timeout`);
+                //         this.signalTimer = null;
+                //         this._tryConnectToPeer();
+                //     }, 10000)
+                // }
+
             }).once(_core.Events.DC_ERROR, function () {
                 logger.warn('datachannel connect ' + datachannel.channelId + ' failed');
-                _this4.scheduler.deletePeer(datachannel);
-                _this4.DCMap.delete(datachannel.remotePeerId);
-                _this4.failedDCSet.add(datachannel.remotePeerId); //记录失败的连接
-                _this4._tryConnectToPeer();
+                _this5.scheduler.deletePeer(datachannel);
+                _this5.DCMap.delete(datachannel.remotePeerId);
+                _this5.failedDCSet.add(datachannel.remotePeerId); //记录失败的连接
+                // this._tryConnectToPeer();
                 datachannel.destroy();
 
-                _this4.requestMorePeers();
+                _this5.requestMorePeers();
 
                 //更新conns
                 if (datachannel.isInitiator) {
                     if (datachannel.connected) {
                         //连接断开
-                        _this4.fetcher.decreConns();
+                        _this5.fetcher.decreConns();
                     } else {
                         //连接失败
-                        _this4.fetcher.increFailConns();
+                        _this5.fetcher.increFailConns();
                     }
                 }
             }).once(_core.Events.DC_CLOSE, function () {
 
                 logger.warn('datachannel ' + datachannel.channelId + ' closed');
-                _this4.scheduler.deletePeer(datachannel);
-                _this4.DCMap.delete(datachannel.remotePeerId);
-                _this4.failedDCSet.add(datachannel.remotePeerId); //记录断开的连接
-                _this4._tryConnectToPeer();
+                _this5.scheduler.deletePeer(datachannel);
+                _this5.DCMap.delete(datachannel.remotePeerId);
+                _this5.failedDCSet.add(datachannel.remotePeerId); //记录断开的连接
+                // this._tryConnectToPeer();
 
                 datachannel.destroy();
 
-                _this4.requestMorePeers();
+                _this5.requestMorePeers();
 
                 //更新conns
-                _this4.fetcher.decreConns();
+                _this5.fetcher.decreConns();
             }).once(_core.Events.DC_OPEN, function () {
 
-                _this4.scheduler.handshakePeer(datachannel);
+                _this5.scheduler.handshakePeer(datachannel);
 
                 //如果dc数量不够则继续尝试连接
-                if (_this4.DCMap.size < _this4.config.neighbours) {
-                    _this4._tryConnectToPeer();
-                }
+                _this5.requestMorePeers();
 
                 //更新conns
-                _this4.fetcher.increConns();
+                _this5.fetcher.increConns();
             });
         }
     }, {
         key: '_initSignalerWs',
         value: function _initSignalerWs() {
-            var _this5 = this;
+            var _this6 = this;
 
             var logger = this.engine.logger;
 
             var websocket = new _signalClient2.default(this.engine, this.peerId, this.config);
             websocket.onopen = function () {
-                _this5.connected = true;
-                _this5._tryConnectToPeer();
+                _this6.connected = true;
+                // this._tryConnectToPeer();
+                // 尝试与所有peers同时建立连接
+                _this6._tryConnectToAllPeers();
             };
 
             websocket.onmessage = function (e) {
@@ -6307,22 +6320,22 @@ var BTTracker = function (_EventEmitter) {
                 var action = msg.action;
                 switch (action) {
                     case 'signal':
-                        if (_this5.failedDCSet.has(msg.from_peer_id)) return;
+                        if (_this6.failedDCSet.has(msg.from_peer_id)) return;
                         logger.debug('start handle signal of ' + msg.from_peer_id);
-                        window.clearTimeout(_this5.signalTimer); //接收到信令后清除定时器
-                        _this5.signalTimer = null;
+                        // window.clearTimeout(this.signalTimer);                       //接收到信令后清除定时器
+                        // this.signalTimer = null;
                         if (!msg.data) {
                             //如果对等端已不在线
-                            _this5.DCMap.delete(msg.from_peer_id);
-                            _this5.failedDCSet.add(msg.from_peer_id); //记录失败的连接
+                            _this6.DCMap.delete(msg.from_peer_id);
+                            _this6.failedDCSet.add(msg.from_peer_id); //记录失败的连接
                             logger.info('signaling ' + msg.from_peer_id + ' not found');
-                            _this5._tryConnectToPeer();
+                            // this._tryConnectToPeer();
                         } else {
-                            _this5._handleSignal(msg.from_peer_id, msg.data);
+                            _this6._handleSignal(msg.from_peer_id, msg.data);
                         }
                         break;
                     case 'reject':
-                        _this5.stopP2P();
+                        _this6.stopP2P();
                         break;
                     default:
                         logger.warn('Signaler websocket unknown action ' + action);
@@ -6331,8 +6344,8 @@ var BTTracker = function (_EventEmitter) {
             };
             websocket.onclose = function () {
                 //websocket断开时清除datachannel
-                _this5.connected = false;
-                _this5.destroy();
+                _this6.connected = false;
+                _this6.destroy();
             };
             return websocket;
         }
@@ -6362,7 +6375,7 @@ var BTTracker = function (_EventEmitter) {
     }, {
         key: '_requestMorePeers',
         value: function _requestMorePeers() {
-            var _this6 = this;
+            var _this7 = this;
 
             var logger = this.engine.logger;
             // 连接的节点<=3时请求更多节点
@@ -6370,8 +6383,9 @@ var BTTracker = function (_EventEmitter) {
             if (this.scheduler.peerMap.size <= 3) {
                 this.fetcher.btGetPeers().then(function (json) {
                     logger.info('request more peers ' + JSON.stringify(json));
-                    _this6._handlePeers(json.peers);
-                    _this6._tryConnectToPeer();
+                    _this7._handlePeers(json.peers);
+                    // this._tryConnectToPeer();
+                    _this7._tryConnectToAllPeers();
                 });
             }
         }

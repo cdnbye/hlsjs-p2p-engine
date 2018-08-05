@@ -16,7 +16,6 @@ class BTTracker extends EventEmitter {
         this.DCMap = new Map();                                  //{key: remotePeerId, value: DataChannnel} 目前已经建立连接或正在建立连接的dc
         this.failedDCSet= new Set();                            //{remotePeerId} 建立连接失败的dc
         this.signalerWs = null;                                  //信令服务器ws
-        this.heartbeatInterval = 30;
         //tracker request API
         this.fetcher = fetcher;
         /*
@@ -64,8 +63,7 @@ class BTTracker extends EventEmitter {
     }
 
     destroy() {
-        window.clearInterval(this.heartbeater);
-        this.heartbeater = null;
+
     }
 
     _handlePeers(peers) {
@@ -95,21 +93,34 @@ class BTTracker extends EventEmitter {
         this._setupDC(datachannel);
     }
 
+    _tryConnectToAllPeers() {
+        const { logger } = this.engine;
+        if (this.peers.length === 0) return;
+        logger.info(`try connect to ${this.peers.length} peers`);
+        this.peers.forEach(peer => {
+            let datachannel = new DataChannel(this.engine, this.peerId, peer.id, true, this.config);
+            this.DCMap.set(peer.id, datachannel);     // 将对等端Id作为键
+            this._setupDC(datachannel);
+        });
+        // 清空peers
+        this.peers = [];
+    }
+
     _setupDC(datachannel) {
         const { logger } = this.engine;
         datachannel.on(Events.DC_SIGNAL, data => {
             const remotePeerId = datachannel.remotePeerId;
             this.signalerWs.sendSignal(remotePeerId, data);
             //启动定时器，如果指定时间对方没有响应则连接下一个
-            if (!this.signalTimer && !this.failedDCSet.has(remotePeerId)) {
-                this.signalTimer = window.setTimeout(() => {
-                    this.DCMap.delete(remotePeerId);
-                    this.failedDCSet.add(remotePeerId);              //记录失败的连接
-                    logger.warn(`signaling ${remotePeerId} timeout`);
-                    this.signalTimer = null;
-                    this._tryConnectToPeer();
-                }, 10000)
-            }
+            // if (!this.signalTimer && !this.failedDCSet.has(remotePeerId)) {
+            //     this.signalTimer = window.setTimeout(() => {
+            //         this.DCMap.delete(remotePeerId);
+            //         this.failedDCSet.add(remotePeerId);              //记录失败的连接
+            //         logger.warn(`signaling ${remotePeerId} timeout`);
+            //         this.signalTimer = null;
+            //         this._tryConnectToPeer();
+            //     }, 10000)
+            // }
 
 
         })
@@ -118,7 +129,7 @@ class BTTracker extends EventEmitter {
                 this.scheduler.deletePeer(datachannel);
                 this.DCMap.delete(datachannel.remotePeerId);
                 this.failedDCSet.add(datachannel.remotePeerId);                  //记录失败的连接
-                this._tryConnectToPeer();
+                // this._tryConnectToPeer();
                 datachannel.destroy();
 
                 this.requestMorePeers();
@@ -138,7 +149,7 @@ class BTTracker extends EventEmitter {
                 this.scheduler.deletePeer(datachannel);
                 this.DCMap.delete(datachannel.remotePeerId);
                 this.failedDCSet.add(datachannel.remotePeerId);              //记录断开的连接
-                this._tryConnectToPeer();
+                // this._tryConnectToPeer();
 
                 datachannel.destroy();
 
@@ -154,9 +165,7 @@ class BTTracker extends EventEmitter {
                 this.scheduler.handshakePeer(datachannel);
 
                 //如果dc数量不够则继续尝试连接
-                if (this.DCMap.size < this.config.neighbours) {
-                    this._tryConnectToPeer();
-                }
+                this.requestMorePeers();
 
                 //更新conns
                 this.fetcher.increConns();
@@ -169,7 +178,9 @@ class BTTracker extends EventEmitter {
         let websocket = new SignalClient(this.engine, this.peerId, this.config);
         websocket.onopen = () => {
             this.connected = true;
-            this._tryConnectToPeer();
+            // this._tryConnectToPeer();
+            // 尝试与所有peers同时建立连接
+            this._tryConnectToAllPeers();
         };
 
         websocket.onmessage = (e) => {
@@ -179,13 +190,13 @@ class BTTracker extends EventEmitter {
                 case 'signal':
                     if (this.failedDCSet.has(msg.from_peer_id)) return;
                     logger.debug(`start handle signal of ${msg.from_peer_id}`);
-                    window.clearTimeout(this.signalTimer);                       //接收到信令后清除定时器
-                    this.signalTimer = null;
+                    // window.clearTimeout(this.signalTimer);                       //接收到信令后清除定时器
+                    // this.signalTimer = null;
                     if (!msg.data) {                                             //如果对等端已不在线
                         this.DCMap.delete(msg.from_peer_id);
                         this.failedDCSet.add(msg.from_peer_id);              //记录失败的连接
                         logger.info(`signaling ${msg.from_peer_id} not found`);
-                        this._tryConnectToPeer();
+                        // this._tryConnectToPeer();
                     } else {
                         this._handleSignal(msg.from_peer_id, msg.data);
                     }
@@ -234,7 +245,8 @@ class BTTracker extends EventEmitter {
             this.fetcher.btGetPeers().then(json => {
                 logger.info(`request more peers ${JSON.stringify(json)}`);
                 this._handlePeers(json.peers);
-                this._tryConnectToPeer();
+                // this._tryConnectToPeer();
+                this._tryConnectToAllPeers();
             })
         }
     }

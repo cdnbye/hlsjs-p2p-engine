@@ -65,8 +65,7 @@ If `opts` is specified, then the default options (shown below) will be overridde
         packetSize: number                  // The maximum package size sent by datachannel per time (default=64*1024)
         enableLogUpload: boolean            // Enable upload logs to server (default=false)
         logUploadAddr: string               // Log upload address (default=wss://api.cdnbye.com/trace)
-        logUploadLevel: string              // Log upload level(debug, info, warn, error, none) (default=warn)
-        neighbours: number                  // The maximum number of peers allowed to connect (default=12)                             
+        logUploadLevel: string              // Log upload level(debug, info, warn, error, none) (default=warn)                          
     }
 }
 ```
