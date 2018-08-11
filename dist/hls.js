@@ -6014,7 +6014,7 @@ var P2PEngine = function (_EventEmitter) {
 
 P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)();
 
-P2PEngine.version = "0.2.2";
+P2PEngine.version = "0.2.3";
 
 exports.default = P2PEngine;
 module.exports = exports['default'];
