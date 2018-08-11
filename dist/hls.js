@@ -2849,6 +2849,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.handleTSUrl = handleTSUrl;
 exports.throttle = throttle;
 exports.defaultChannelId = defaultChannelId;
+exports.noop = noop;
 
 var _urlToolkit = __webpack_require__(19);
 
@@ -2868,7 +2869,7 @@ function handleTSUrl(url) {
 
 // 函数节流，默认冷却时间30秒
 function throttle(method, context) {
-    var colddown = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 30;
+    var colddown = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 20;
 
 
     var going = false;
@@ -2889,6 +2890,8 @@ function defaultChannelId(url, protocol) {
     var path = _urlToolkit2.default.parseURL(url).path.split('.')[0];
     return path + '[' + protocol + ']';
 }
+
+function noop() {}
 
 /***/ }),
 /* 11 */
@@ -2913,8 +2916,8 @@ var _btLoader2 = _interopRequireDefault(_btLoader);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var config = {
-    announce: "https://api.cdnbye.com/v1", //tracker服务器地址
-    urgentOffset: 3 //播放点的后多少个buffer为urgent
+    announce: "https://api.cdnbye.com/v1", // tracker服务器地址
+    urgentOffset: 3 // 播放点的后多少个buffer为urgent
 
 };
 
@@ -6033,28 +6036,28 @@ var _bittorrent = __webpack_require__(11);
 
 //时间单位统一为秒
 var defaultP2PConfig = _extends({
-    wsSignalerAddr: 'wss://signal.cdnbye.com/wss', //信令服务器地址
-    wsMaxRetries: 3, //发送数据重试次数
-    wsReconnectInterval: 5, //websocket重连时间间隔
+    wsSignalerAddr: 'wss://signal.cdnbye.com/wss', // 信令服务器地址
+    wsMaxRetries: 3, // websocket连接重试次数
+    wsReconnectInterval: 5, // websocket重连时间间隔
 
-    p2pEnabled: true, //是否开启P2P，默认true
+    p2pEnabled: true, // 是否开启P2P，默认true
 
-    dcRequestTimeout: 3, //datachannel接收二进制数据的超时时间
-    dcUploadTimeout: 3, //datachannel上传二进制数据的超时时间
-    dcPings: 5, //datachannel发送ping数据包的数量
-    dcTolerance: 4, //请求超时或错误多少次淘汰该peer
+    dcRequestTimeout: 3, // datachannel接收二进制数据的超时时间
+    dcUploadTimeout: 3, // datachannel上传二进制数据的超时时间
+    dcPings: 5, // datachannel发送ping数据包的数量
+    dcTolerance: 4, // 请求超时或错误多少次淘汰该peer
 
-    packetSize: 64 * 1024, //每次通过datachannel发送的包的大小
-    maxBufSize: 1024 * 1024 * 50, //p2p缓存的最大数据量
-    loadTimeout: 3, //p2p下载的超时时间
-    tsStrictMatched: false, //p2p传输的ts是否要严格匹配（去掉查询参数），默认false
+    packetSize: 64 * 1024, // 每次通过datachannel发送的包的大小
+    maxBufSize: 1024 * 1024 * 50, // p2p缓存的最大数据量
+    loadTimeout: 3, // p2p下载的超时时间
+    tsStrictMatched: false, // p2p传输的ts是否要严格匹配（去掉查询参数），默认false
 
-    enableLogUpload: false, //上传log到服务器，默认false
-    logUploadAddr: "wss://api.cdnbye.com/trace", //log上传地址
-    logUploadLevel: 'warn', //log上传level，分为debug、info、warn、error、none，默认warn
-    logLevel: 'none', //log的level，分为debug、info、warn、error、none，设为true等于debug，设为false等于none，默认none
+    enableLogUpload: false, // 上传log到服务器，默认false
+    logUploadAddr: "wss://api.cdnbye.com/trace", // log上传地址
+    logUploadLevel: 'warn', // log上传level，分为debug、info、warn、error、none，默认warn
+    logLevel: 'none', // log的level，分为debug、info、warn、error、none，设为true等于debug，设为false等于none，默认none
 
-    tag: '', //用户自定义标签，可用于在后台查看参数调整效果
+    tag: '', // 用户自定义标签，可用于在后台查看参数调整效果
 
     channelId: null }, _bittorrent.config);
 
@@ -6203,18 +6206,6 @@ var BTTracker = function (_EventEmitter) {
             });
         }
     }, {
-        key: '_tryConnectToPeer',
-        value: function _tryConnectToPeer() {
-            var logger = this.engine.logger;
-
-            if (this.peers.length === 0) return;
-            var remotePeerId = this.peers.pop().id;
-            logger.info('try connect to Peer ' + remotePeerId);
-            var datachannel = new _core.DataChannel(this.engine, this.peerId, remotePeerId, true, this.config);
-            this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
-            this._setupDC(datachannel);
-        }
-    }, {
         key: '_tryConnectToAllPeers',
         value: function _tryConnectToAllPeers() {
             var _this4 = this;
@@ -6241,23 +6232,11 @@ var BTTracker = function (_EventEmitter) {
             datachannel.on(_core.Events.DC_SIGNAL, function (data) {
                 var remotePeerId = datachannel.remotePeerId;
                 _this5.signalerWs.sendSignal(remotePeerId, data);
-                //启动定时器，如果指定时间对方没有响应则连接下一个
-                // if (!this.signalTimer && !this.failedDCSet.has(remotePeerId)) {
-                //     this.signalTimer = window.setTimeout(() => {
-                //         this.DCMap.delete(remotePeerId);
-                //         this.failedDCSet.add(remotePeerId);              //记录失败的连接
-                //         logger.warn(`signaling ${remotePeerId} timeout`);
-                //         this.signalTimer = null;
-                //         this._tryConnectToPeer();
-                //     }, 10000)
-                // }
-
             }).once(_core.Events.DC_ERROR, function () {
                 logger.warn('datachannel connect ' + datachannel.channelId + ' failed');
                 _this5.scheduler.deletePeer(datachannel);
                 _this5.DCMap.delete(datachannel.remotePeerId);
                 _this5.failedDCSet.add(datachannel.remotePeerId); //记录失败的连接
-                // this._tryConnectToPeer();
                 datachannel.destroy();
 
                 _this5.requestMorePeers();
@@ -6278,7 +6257,6 @@ var BTTracker = function (_EventEmitter) {
                 _this5.scheduler.deletePeer(datachannel);
                 _this5.DCMap.delete(datachannel.remotePeerId);
                 _this5.failedDCSet.add(datachannel.remotePeerId); //记录断开的连接
-                // this._tryConnectToPeer();
 
                 datachannel.destroy();
 
@@ -6307,7 +6285,6 @@ var BTTracker = function (_EventEmitter) {
             var websocket = new _signalClient2.default(this.engine, this.peerId, this.config);
             websocket.onopen = function () {
                 _this6.connected = true;
-                // this._tryConnectToPeer();
                 // 尝试与所有peers同时建立连接
                 _this6._tryConnectToAllPeers();
             };
@@ -6319,14 +6296,11 @@ var BTTracker = function (_EventEmitter) {
                     case 'signal':
                         if (_this6.failedDCSet.has(msg.from_peer_id)) return;
                         logger.debug('handle signal of ' + msg.from_peer_id);
-                        // window.clearTimeout(this.signalTimer);                       //接收到信令后清除定时器
-                        // this.signalTimer = null;
                         if (!msg.data) {
                             //如果对等端已不在线
                             _this6.DCMap.delete(msg.from_peer_id);
                             _this6.failedDCSet.add(msg.from_peer_id); //记录失败的连接
                             logger.info('signaling ' + msg.from_peer_id + ' not found');
-                            // this._tryConnectToPeer();
                         } else {
                             _this6._handleSignal(msg.from_peer_id, msg.data);
                         }
@@ -6381,7 +6355,6 @@ var BTTracker = function (_EventEmitter) {
                 this.fetcher.btGetPeers().then(function (json) {
                     logger.info('request more peers ' + JSON.stringify(json));
                     _this7._handlePeers(json.peers);
-                    // this._tryConnectToPeer();
                     _this7._tryConnectToAllPeers();
                 });
             }
@@ -6632,24 +6605,6 @@ var BTScheduler = function (_EventEmitter) {
             this.callbacks = callbacks;
             this.stats = { trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0 };
             this.criticalSeg = { sn: frag.sn, relurl: handledUrl };
-
-            // let target;
-            // for (let peer of this.peerMap.values()) {
-            //     if (peer.isAvailable && peer.bitset.has(frag.sn)) {
-            //         target = peer;
-            //     }
-            // }
-            //
-            // if (target) {
-            //     // target.requestDataBySN(frag.sn, true);
-            //     target.requestDataByURL(handledUrl, true);                            //critical的根据url请求
-            //     logger.info(`request criticalSeg url ${frag.relurl} at ${frag.sn}`);
-            //     this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout*1000);
-            // } else {
-            //     logger.info(`no expected sn in peers for criticalSeg url ${frag.relurl} at ${frag.sn}`);
-            //     this._criticaltimeout();
-            // }
-
             this.targetPeer.requestDataByURL(handledUrl, true);
             logger.info('request criticalSeg url ' + frag.relurl + ' at ' + frag.sn);
             this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout * 1000);
@@ -6850,11 +6805,6 @@ var BTScheduler = function (_EventEmitter) {
 
     return BTScheduler;
 }(_events2.default);
-
-function handleUrl(url) {
-    // return url;
-    return url.split("?")[0];
-}
 
 exports.default = BTScheduler;
 module.exports = exports['default'];
@@ -9639,7 +9589,7 @@ var Fetcher = function () {
         this.key = key;
 
         //上报参数
-        this.limit = 10 * 1024; //上报流量的阈值（单位：KB）
+
 
         //连接情况上报
         this.conns = 0; //连接的peer的增量
@@ -9809,7 +9759,7 @@ var Fetcher = function () {
     }, {
         key: '_makeStatsBody',
         value: function _makeStatsBody() {
-            return {
+            var stats = {
                 conns: this.conns,
                 failConns: this.failConns,
                 errsFragLoad: this.errsFragLoad,
@@ -9818,6 +9768,14 @@ var Fetcher = function () {
                 http: Math.round(this.httpDownloaded), //上报以KB为单位
                 p2p: Math.round(this.p2pDownloaded)
             };
+
+            Object.keys(stats).forEach(function (key) {
+                if (stats[key] === 0) {
+                    delete stats[key];
+                }
+            });
+
+            return stats;
         }
     }, {
         key: '_requestHeader',
@@ -10087,6 +10045,7 @@ var SignalClient = function (_EventEmitter) {
         _this.peerId = peerId;
         _this.config = config;
         _this.connected = false;
+        _this.msgQueue = [];
         _this._ws = _this._init(peerId);
         return _this;
     }
@@ -10108,6 +10067,16 @@ var SignalClient = function (_EventEmitter) {
                 logger.info('Signaler websocket connection opened');
 
                 _this2.connected = true;
+
+                // 发送所有没有成功发送的消息
+                if (_this2.msgQueue.length > 0) {
+                    logger.warn('resend all cached msg');
+                    _this2.msgQueue.forEach(function (msg) {
+                        _this2._ws.send(msg);
+                    });
+                    _this2.msgQueue = [];
+                }
+
                 if (_this2.onopen) _this2.onopen();
             };
 
@@ -10137,12 +10106,19 @@ var SignalClient = function (_EventEmitter) {
                 to_peer_id: remotePeerId,
                 data: data
             };
-            this.send(msg);
+            this._send(msg);
         }
     }, {
-        key: 'send',
-        value: function send(msg) {
-            this._ws.send(msg);
+        key: '_send',
+        value: function _send(msg) {
+            var logger = this.engine.logger;
+
+            if (this.connected) {
+                this._ws.send(msg);
+            } else {
+                logger.warn('signaler closed, msg is cached');
+                this.msgQueue.push(msg);
+            }
         }
     }, {
         key: 'close',

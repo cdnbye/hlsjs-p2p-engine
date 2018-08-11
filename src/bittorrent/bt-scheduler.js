@@ -127,24 +127,6 @@ class BTScheduler extends EventEmitter {
         this.callbacks = callbacks;
         this.stats = {trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0};
         this.criticalSeg = {sn: frag.sn, relurl: handledUrl};
-
-        // let target;
-        // for (let peer of this.peerMap.values()) {
-        //     if (peer.isAvailable && peer.bitset.has(frag.sn)) {
-        //         target = peer;
-        //     }
-        // }
-        //
-        // if (target) {
-        //     // target.requestDataBySN(frag.sn, true);
-        //     target.requestDataByURL(handledUrl, true);                            //critical的根据url请求
-        //     logger.info(`request criticalSeg url ${frag.relurl} at ${frag.sn}`);
-        //     this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout*1000);
-        // } else {
-        //     logger.info(`no expected sn in peers for criticalSeg url ${frag.relurl} at ${frag.sn}`);
-        //     this._criticaltimeout();
-        // }
-
         this.targetPeer.requestDataByURL(handledUrl, true);
         logger.info(`request criticalSeg url ${frag.relurl} at ${frag.sn}`);
         this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout*1000);
@@ -304,11 +286,6 @@ class BTScheduler extends EventEmitter {
         this.criticaltimeouter = null;
         this.callbacks.onTimeout(this.stats, this.context, null);
     }
-}
-
-function handleUrl(url) {
-    // return url;
-    return url.split("?")[0];
 }
 
 

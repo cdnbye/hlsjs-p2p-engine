@@ -9,7 +9,7 @@ export function handleTSUrl(url, matched = false) {
 }
 
 // 函数节流，默认冷却时间30秒
-export function throttle(method, context, colddown = 30) {
+export function throttle(method, context, colddown = 20) {
 
     var going = false;
     return function () {
@@ -26,4 +26,8 @@ export function throttle(method, context, colddown = 30) {
 export function defaultChannelId(url, protocol, browserInfo = {}) {
     const path = URLToolkit.parseURL(url).path.split('.')[0];
     return `${path}[${protocol}]`;
+}
+
+export function noop() {
+
 }

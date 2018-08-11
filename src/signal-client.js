@@ -10,6 +10,7 @@ class SignalClient extends EventEmitter{
         this.peerId = peerId;
         this.config = config;
         this.connected = false;
+        this.msgQueue = [];
         this._ws = this._init(peerId);
     }
 
@@ -25,6 +26,16 @@ class SignalClient extends EventEmitter{
             logger.info('Signaler websocket connection opened');
 
             this.connected = true;
+
+            // 发送所有没有成功发送的消息
+            if (this.msgQueue.length > 0) {
+                logger.warn(`resend all cached msg`);
+                this.msgQueue.forEach(msg => {
+                    this._ws.send(msg);
+                });
+                this.msgQueue = [];
+            }
+
             if (this.onopen) this.onopen();
         };
 
@@ -52,11 +63,18 @@ class SignalClient extends EventEmitter{
             to_peer_id: remotePeerId,
             data: data
         };
-        this.send(msg);
+        this._send(msg);
     }
 
-    send(msg) {
-        this._ws.send(msg);
+    _send(msg) {
+        const { logger } = this.engine;
+        if (this.connected) {
+            this._ws.send(msg);
+        } else {
+            logger.warn(`signaler closed, msg is cached`);
+            this.msgQueue.push(msg);
+        }
+
     }
 
     close() {
