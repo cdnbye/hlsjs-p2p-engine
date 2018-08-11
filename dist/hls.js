@@ -6362,18 +6362,19 @@ var BTTracker = function (_EventEmitter) {
     }, {
         key: 'currentPlaySN',
         set: function set(sn) {
-            // console.warn(`currentPlaySN ${sn}`);
+            console.warn('currentPlaySN ' + sn + ' ' + performance.now());
             this.scheduler.updatePlaySN(sn);
         }
     }, {
         key: 'currentLoadingSN',
         set: function set(sn) {
-            // console.warn(`currentLoadingSN ${sn}`);
+            console.warn('currentLoadingSN ' + sn + ' ' + performance.now());
             this.scheduler.updateLoadingSN(sn);
         }
     }, {
         key: 'currentLoadedSN',
         set: function set(sn) {
+            console.warn('currentLoadedSN ' + sn + ' ' + performance.now());
             this.scheduler.updateLoadedSN(sn); //更新bitmap
         }
     }]);
