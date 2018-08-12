@@ -30,7 +30,8 @@ class P2PEngine extends EventEmitter {
 
         this.HLSEvents = hlsjs.constructor.Events;
 
-        this.checkTSPath = tsPathChecker();
+        // 如果tsStrictMatched=false，需要自动检查不同ts路径是否相同
+        this.checkTSPath = this.config.tsStrictMatched ? noop : tsPathChecker();
 
         const onLevelLoaded = (event, data) => {
 

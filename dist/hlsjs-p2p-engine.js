@@ -2379,9 +2379,9 @@ function tsPathChecker() {
     var lastPath = '';
     return function (sn, path) {
         path = path.split('?')[0];
-        var isOK = false;
-        if (lastSN === -1 || lastSN !== sn && lastPath !== path || lastSN === sn) {
-            isOK = true;
+        var isOK = true;
+        if (lastSN !== sn && lastPath === path) {
+            isOK = false;
         }
         // if (lastSN !== sn && lastPath === path) {
         //     console.warn(`path of ${sn} equal to path of ${lastSN}`);
@@ -2894,7 +2894,7 @@ var P2PEngine = function (_EventEmitter) {
 
         _this.HLSEvents = hlsjs.constructor.Events;
 
-        _this.checkTSPath = (0, _toolFuns.tsPathChecker)();
+        _this.checkTSPath = _this.config.tsStrictMatched ? _toolFuns.noop : (0, _toolFuns.tsPathChecker)();
 
         var onLevelLoaded = function onLevelLoaded(event, data) {
 

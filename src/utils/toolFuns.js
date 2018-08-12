@@ -33,9 +33,9 @@ export function tsPathChecker() {
     let lastPath = '';
     return function (sn, path) {
         path = path.split('?')[0];
-        let isOK = false;
-        if (lastSN === -1 || (lastSN !== sn && lastPath !== path) || lastSN === sn) {
-            isOK = true;
+        let isOK = true;
+        if (lastSN !== sn && lastPath === path) {
+            isOK = false;
         }
         // if (lastSN !== sn && lastPath === path) {
         //     console.warn(`path of ${sn} equal to path of ${lastSN}`);
