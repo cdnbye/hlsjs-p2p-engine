@@ -28,6 +28,24 @@ export function defaultChannelId(url, protocol, browserInfo = {}) {
     return `${path}[${protocol}]`;
 }
 
-export function noop() {
+export function tsPathChecker() {
+    let lastSN = -1;
+    let lastPath = '';
+    return function (sn, path) {
+        path = path.split('?')[0];
+        let isOK = false;
+        if (lastSN === -1 || (lastSN !== sn && lastPath !== path) || lastSN === sn) {
+            isOK = true;
+        }
+        // if (lastSN !== sn && lastPath === path) {
+        //     console.warn(`path of ${sn} equal to path of ${lastSN}`);
+        // }
+        lastSN = sn;
+        lastPath = path;
+        return isOK;
+    }
+}
 
+export function noop() {
+    return true;
 }

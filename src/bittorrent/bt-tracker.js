@@ -30,17 +30,17 @@ class BTTracker extends EventEmitter {
     }
 
     set currentPlaySN(sn) {
-        console.warn(`currentPlaySN ${sn} ${performance.now()}`);
+        // console.warn(`currentPlaySN ${sn} ${performance.now()}`);
         this.scheduler.updatePlaySN(sn);
     }
 
     set currentLoadingSN(sn) {
-        console.warn(`currentLoadingSN ${sn} ${performance.now()}`);
+        // console.warn(`currentLoadingSN ${sn} ${performance.now()}`);
         this.scheduler.updateLoadingSN(sn);
     }
 
     set currentLoadedSN(sn) {
-        console.warn(`currentLoadedSN ${sn} ${performance.now()}`);
+        // console.warn(`currentLoadedSN ${sn} ${performance.now()}`);
         this.scheduler.updateLoadedSN(sn);                        //更新bitmap
     }
 

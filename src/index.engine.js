@@ -5,7 +5,7 @@ import BufferManager from './buffer-manager';
 import {Events, Fetcher, getBrowserRTC, DataChannel} from 'core';
 import Logger from './utils/logger';
 import platform from './utils/platform';
-import { defaultChannelId } from './utils/toolFuns';
+import { defaultChannelId, tsPathChecker, noop } from './utils/toolFuns';
 
 class P2PEngine extends EventEmitter {
 
@@ -28,6 +28,10 @@ class P2PEngine extends EventEmitter {
 
         hlsjs.config.currLoaded = hlsjs.config.currPlay = 0;
 
+        this.HLSEvents = hlsjs.constructor.Events;
+
+        this.checkTSPath = tsPathChecker();
+
         const onLevelLoaded = (event, data) => {
 
             const isLive = data.details.live;
@@ -47,10 +51,10 @@ class P2PEngine extends EventEmitter {
             logger.info(`channel ${channel}`);
             this._init(channel, browserInfo);
 
-            hlsjs.off(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
+            hlsjs.off(this.HLSEvents.LEVEL_LOADED, onLevelLoaded);
         };
 
-        hlsjs.on(hlsjs.constructor.Events.LEVEL_LOADED, onLevelLoaded);
+        hlsjs.on(this.HLSEvents.LEVEL_LOADED, onLevelLoaded);
 
 
         console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
@@ -81,7 +85,7 @@ class P2PEngine extends EventEmitter {
         this.hlsjs.config.fetcher = fetcher;
 
 
-        this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADING, (id, data) => {
+        this.hlsjs.on(this.HLSEvents.FRAG_LOADING, (id, data) => {
             // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
             logger.debug('loading frag ' + data.frag.sn);
             this.signaler.currentLoadingSN = data.frag.sn;
@@ -89,7 +93,7 @@ class P2PEngine extends EventEmitter {
         });
 
         this.signalTried = false;                                                   //防止重复连接ws
-        this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_LOADED, (id, data) => {
+        this.hlsjs.on(this.HLSEvents.FRAG_LOADED, (id, data) => {
             let sn = data.frag.sn;
             this.hlsjs.config.currLoaded = sn;
             this.signaler.currentLoadedSN = sn;                                //用于BT算法
@@ -109,9 +113,15 @@ class P2PEngine extends EventEmitter {
                 data.frag.loadByP2P = false;
                 data.frag.loadByHTTP = true;
             }
+            // console.warn(`data.frag.url ${data.frag.url}`);
+            if (!this.checkTSPath(sn, data.frag.url)) {
+                logger.warn(`ts path of ${sn} equal to the previous, set tsStrictMatched to true`);
+                this.config.tsStrictMatched = true;
+                this.checkTSPath = noop;
+            }
         });
 
-        this.hlsjs.on(this.hlsjs.constructor.Events.FRAG_CHANGED, (id, data) => {
+        this.hlsjs.on(this.HLSEvents.FRAG_CHANGED, (id, data) => {
             // log('FRAG_CHANGED: '+JSON.stringify(data.frag, null, 2));
             logger.debug('frag changed: '+data.frag.sn);
             const sn = data.frag.sn;
@@ -119,7 +129,7 @@ class P2PEngine extends EventEmitter {
             this.signaler.currentPlaySN = sn;
         });
 
-        this.hlsjs.on(this.hlsjs.constructor.Events.ERROR, (event, data) => {
+        this.hlsjs.on(this.HLSEvents.ERROR, (event, data) => {
             logger.error(`errorType ${data.type} details ${data.details} errorFatal ${data.fatal}`);
             const errDetails = this.hlsjs.constructor.ErrorDetails;
             switch (data.details) {
@@ -137,7 +147,7 @@ class P2PEngine extends EventEmitter {
             }
         });
 
-        this.hlsjs.on(this.hlsjs.constructor.Events.DESTROYING, () => {
+        this.hlsjs.on(this.HLSEvents.DESTROYING, () => {
             // log('DESTROYING: '+JSON.stringify(frag));
             this.signaler.destroy();
             this.signaler = null;
