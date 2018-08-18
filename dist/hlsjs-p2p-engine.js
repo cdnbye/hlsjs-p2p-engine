@@ -1495,7 +1495,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     "use strict";
     function r(e) {
       return e && e.__esModule ? e : { default: e };
-    }Object.defineProperty(t, "__esModule", { value: !0 }), t.getBrowserRTC = t.Buffer = t.Fetcher = t.Events = t.DataChannel = void 0;var i = n(20),
+    }Object.defineProperty(t, "__esModule", { value: !0 }), t.getPeersThrottle = t.getBrowserRTC = t.Buffer = t.Fetcher = t.Events = t.DataChannel = void 0;var i = n(20),
         o = r(i),
         a = n(17),
         s = r(a),
@@ -1503,7 +1503,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         c = r(u),
         f = n(10),
         l = r(f),
-        h = n(4).Buffer;t.DataChannel = o.default, t.Events = s.default, t.Fetcher = c.default, t.Buffer = h, t.getBrowserRTC = l.default;
+        h = n(39),
+        d = r(h),
+        p = n(4).Buffer;t.DataChannel = o.default, t.Events = s.default, t.Fetcher = c.default, t.Buffer = p, t.getBrowserRTC = l.default, t.getPeersThrottle = d.default;
   }, function (e, t, n) {
     "use strict";
     function r(e) {
@@ -1522,11 +1524,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       } else for (var s = void 0, u = 0; u < n; u++) {
         s = e.slice(u * t, (u + 1) * t), i.push(s);
       }return i;
-    }function u(e) {
-      for (var t = 0, n = 0; n < e.length - 1; n++) {
-        t += e.charCodeAt(n);
-      }return e[e.length - 1] === (t % 16).toString(16);
-    }Object.defineProperty(t, "__esModule", { value: !0 });var c = function () {
+    }Object.defineProperty(t, "__esModule", { value: !0 });var u = function () {
       function e(e, t) {
         for (var n = 0; n < t.length; n++) {
           var r = t[n];r.enumerable = r.enumerable || !1, r.configurable = !0, "value" in r && (r.writable = !0), Object.defineProperty(e, r.key, r);
@@ -1535,61 +1533,65 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         return n && e(t.prototype, n), r && e(t, r), t;
       };
     }(),
-        f = n(21),
-        l = r(f),
-        h = n(8),
-        d = r(h),
-        p = n(17),
-        g = r(p),
-        y = n(4).Buffer,
-        v = function (e) {
+        c = n(21),
+        f = r(c),
+        l = n(8),
+        h = r(l),
+        d = n(17),
+        p = r(d),
+        g = n(4).Buffer,
+        y = function (e) {
       function t(e, n, r, a, s) {
-        i(this, t);var c = o(this, (t.__proto__ || Object.getPrototypeOf(t)).call(this));return c.engine = e, c.config = s, c.remotePeerId = r, c.channelId = a ? n + "-" + r : r + "-" + n, c.connected = !1, c.msgQueue = [], c.miss = 0, c.rcvdReqQueue = [], c.downloading = !1, c.uploading = !1, c.choked = !u(r), c.delays = [], c._datachannel = new l.default({ initiator: a, objectMode: !0 }), c.isInitiator = a, c._init(c._datachannel), c.streamingRate = 0, c.recordSended = c._adjustStreamingRate(10), c;
-      }return a(t, e), c(t, null, [{ key: "VERSION", get: function get() {
+        i(this, t);var u = o(this, (t.__proto__ || Object.getPrototypeOf(t)).call(this));return u.engine = e, u.config = s, u.remotePeerId = r, u.channelId = a ? n + "-" + r : r + "-" + n, u.connected = !1, u.msgQueue = [], u.miss = 0, u.rcvdReqQueue = [], u.downloading = !1, u.uploading = !1, u.choked = !function (e) {
+          for (var t = 0, n = 0; n < e.length - 1; n++) {
+            t += e.charCodeAt(n);
+          }return e[e.length - 1] === (t % 16).toString(16);
+        }(r), u.delays = [], u._datachannel = new f.default({ initiator: a, objectMode: !0 }), u.isInitiator = a, u._init(u._datachannel), u.streamingRate = 0, u.recordSended = u._adjustStreamingRate(10), u;
+      }return a(t, e), u(t, null, [{ key: "VERSION", get: function get() {
           return "v1";
-        } }]), c(t, [{ key: "_init", value: function value(e) {
+        } }]), u(t, [{ key: "_init", value: function value(e) {
           var t = this,
               n = this.engine.logger;e.on("error", function (e) {
-            t.emit(g.default.DC_ERROR);
+            t.emit(p.default.DC_ERROR);
           }), e.on("signal", function (e) {
-            t.emit(g.default.DC_SIGNAL, e);
+            t.emit(p.default.DC_SIGNAL, e);
           });var r = function r() {
-            for (n.info("datachannel CONNECTED to " + t.remotePeerId), t.connected = !0, t.emit(g.default.DC_OPEN), t._sendPing(); t.msgQueue.length > 0;) {
+            for (n.info("datachannel CONNECTED to " + t.remotePeerId), t.connected = !0, t.emit(p.default.DC_OPEN), t._sendPing(); t.msgQueue.length > 0;) {
               var e = t.msgQueue.shift();t.emit(e.event, e);
             }
           };e.once("connect", r), e.on("data", function (e) {
             if ("string" == typeof e) {
-              var n = JSON.parse(e);if (!t.connected) return void t.msgQueue.push(n);switch (n.event) {case g.default.DC_PONG:
-                  t._handlePongMsg();break;case g.default.DC_PING:
-                  t.sendJson({ event: g.default.DC_PONG });break;case g.default.DC_PIECE:
-                  t._prepareForBinary(n.attachments, n.url, n.sn, n.size), t.emit(n.event, n);break;case g.default.DC_PIECE_NOT_FOUND:
-                  window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.emit(n.event, n);break;case g.default.DC_REQUEST:
-                  t._handleRequestMsg(n);break;case g.default.DC_PIECE_ACK:
+              var n = JSON.parse(e);if (!t.connected) return void t.msgQueue.push(n);switch (n.event) {case p.default.DC_PONG:
+                  t._handlePongMsg();break;case p.default.DC_PING:
+                  t.sendJson({ event: p.default.DC_PONG });break;case p.default.DC_PIECE:
+                  t._prepareForBinary(n.attachments, n.url, n.sn, n.size), t.emit(n.event, n);break;case p.default.DC_PIECE_NOT_FOUND:
+                  window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.emit(n.event, n);break;case p.default.DC_REQUEST:
+                  t._handleRequestMsg(n);break;case p.default.DC_PIECE_ACK:
                   t._handlePieceAck(), t.emit(n.event, n);break;default:
                   t.emit(n.event, n);}
-            } else t.bufArr.push(e), 0 === --t.remainAttachments && (window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.sendJson({ event: g.default.DC_PIECE_ACK, sn: t.bufSN, url: t.bufUrl, size: t.expectedSize }), t._handleBinaryData());
+            } else t.bufArr.push(e), 0 === --t.remainAttachments && (window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.sendJson({ event: p.default.DC_PIECE_ACK, sn: t.bufSN, url: t.bufUrl, size: t.expectedSize }), t._handleBinaryData());
           }), e.once("close", function () {
-            t.emit(g.default.DC_CLOSE);
+            t.emit(p.default.DC_CLOSE);
           });
         } }, { key: "sendJson", value: function value(e) {
           this.send(JSON.stringify(e));
         } }, { key: "send", value: function value(e) {
           this._datachannel && this._datachannel.connected && this._datachannel.send(e);
         } }, { key: "sendBitField", value: function value(e) {
-          this.sendJson({ event: g.default.DC_BITFIELD, field: e });
+          this.sendJson({ event: p.default.DC_BITFIELD, field: e });
         } }, { key: "sendBuffer", value: function value(e, t, n) {
           this.uploading = !0, this.uploadTimeout = window.setTimeout(this._uploadtimeout.bind(this), 1e3 * this.config.dcUploadTimeout);var r = n.byteLength,
               i = this.config.packetSize,
               o = 0,
-              a = 0;r % i == 0 ? a = r / i : (a = Math.floor(r / i) + 1, o = r % i);var u = { event: g.default.DC_PIECE, attachments: a, url: t, sn: e, size: r };this.sendJson(u);for (var c = s(n, i, a, o), f = 0; f < c.length; f++) {
+              a = 0;r % i == 0 ? a = r / i : (a = Math.floor(r / i) + 1, o = r % i);var u = { event: p.default.DC_PIECE, attachments: a, url: t, sn: e, size: r };this.sendJson(u);for (var c = s(n, i, a, o), f = 0; f < c.length; f++) {
             this.send(c[f]);
           }this.recordSended(r);
         } }, { key: "requestDataByURL", value: function value(e) {
           var t = arguments.length > 1 && void 0 !== arguments[1] && arguments[1],
-              n = { event: g.default.DC_REQUEST, url: e, urgent: t };this.downloading = !0, this.sendJson(n), t && (this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), 1e3 * this.config.dcRequestTimeout));
+              n = { event: p.default.DC_REQUEST, url: e, urgent: t };this.downloading = !0, this.sendJson(n), t && (this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), 1e3 * this.config.dcRequestTimeout));
         } }, { key: "requestDataBySN", value: function value(e) {
           var t = arguments.length > 1 && void 0 !== arguments[1] && arguments[1],
-              n = { event: g.default.DC_REQUEST, sn: e, urgent: t };this.downloading = !0, this.sendJson(n), t && (this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), 1e3 * this.config.dcRequestTimeout));
+              n = { event: p.default.DC_REQUEST, sn: e, urgent: t };this.downloading = !0, this.sendJson(n), t && (this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), 1e3 * this.config.dcRequestTimeout));
         } }, { key: "close", value: function value() {
           this.destroy();
         } }, { key: "receiveSignal", value: function value(e) {
@@ -1597,15 +1599,15 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } }, { key: "destroy", value: function value() {
           window.clearInterval(this.adjustSRInterval), window.clearInterval(this.pinger), this._datachannel.removeAllListeners(), this.removeAllListeners(), this._datachannel.destroy();
         } }, { key: "_handleRequestMsg", value: function value(e) {
-          this.rcvdReqQueue.length > 0 ? e.urgent ? this.rcvdReqQueue.push(e.sn) : this.rcvdReqQueue.unshift(e.sn) : this.emit(g.default.DC_REQUEST, e);
+          this.rcvdReqQueue.length > 0 ? e.urgent ? this.rcvdReqQueue.push(e.sn) : this.rcvdReqQueue.unshift(e.sn) : this.emit(p.default.DC_REQUEST, e);
         } }, { key: "_handlePieceAck", value: function value() {
           if (this.uploading = !1, window.clearTimeout(this.uploadTimeout), this.uploadTimeout = null, this.rcvdReqQueue.length > 0) {
-            var e = this.rcvdReqQueue.pop();this.emit(g.default.DC_REQUEST, { sn: e });
+            var e = this.rcvdReqQueue.pop();this.emit(p.default.DC_REQUEST, { sn: e });
           }
         } }, { key: "_prepareForBinary", value: function value(e, t, n, r) {
           this.bufArr = [], this.remainAttachments = e, this.bufUrl = t, this.bufSN = n, this.expectedSize = r;
         } }, { key: "_handleBinaryData", value: function value() {
-          var e = y.concat(this.bufArr);e.byteLength == this.expectedSize && this.emit(g.default.DC_RESPONSE, { url: this.bufUrl, sn: this.bufSN, data: e }), this.bufUrl = "", this.bufArr = [], this.expectedSize = -1, this.downloading = !1;
+          var e = g.concat(this.bufArr);e.byteLength == this.expectedSize && this.emit(p.default.DC_RESPONSE, { url: this.bufUrl, sn: this.bufSN, data: e }), this.bufUrl = "", this.bufArr = [], this.expectedSize = -1, this.downloading = !1;
         } }, { key: "_adjustStreamingRate", value: function value(e) {
           var t = this,
               n = 0;return this.adjustSRInterval = window.setInterval(function () {
@@ -1614,14 +1616,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             n += e;
           };
         } }, { key: "_loadtimeout", value: function value() {
-          var e = this.engine.logger;if (e.warn("datachannel timeout while downloading from " + this.remotePeerId), this.emit(g.default.DC_TIMEOUT), this.requestTimeout = null, this.downloading = !1, ++this.miss >= this.config.dcTolerance) {
-            var t = { event: g.default.DC_CLOSE };this.sendJson(t), e.warn("datachannel download miss reach dcTolerance, close " + this.remotePeerId), this.emit(g.default.DC_ERROR);
+          var e = this.engine.logger;if (e.warn("datachannel timeout while downloading from " + this.remotePeerId), this.emit(p.default.DC_TIMEOUT), this.requestTimeout = null, this.downloading = !1, ++this.miss >= this.config.dcTolerance) {
+            var t = { event: p.default.DC_CLOSE };this.sendJson(t), e.warn("datachannel download miss reach dcTolerance, close " + this.remotePeerId), this.emit(p.default.DC_ERROR);
           }
         } }, { key: "_uploadtimeout", value: function value() {
           this.engine.logger.warn("datachannel timeout while uploading to " + this.remotePeerId), this.uploading = !1, this.rcvdReqQueue = [];
         } }, { key: "_sendPing", value: function value() {
           var e = this;this.ping = performance.now();for (var t = 0; t < this.config.dcPings; t++) {
-            this.sendJson({ event: g.default.DC_PING });
+            this.sendJson({ event: p.default.DC_PING });
           }window.setTimeout(function () {
             if (e.delays.length > 0) {
               var t = 0,
@@ -1654,7 +1656,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } }, { key: "isAvailable", get: function get() {
           return !1 === this.downloading && !1 === this.choked;
         } }]), t;
-    }(d.default);t.default = v, e.exports = t.default;
+    }(h.default);t.default = y, e.exports = t.default;
   }, function (e, t, n) {
     "use strict";
     (function (t) {
@@ -2314,6 +2316,17 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           return e.i;
         } }), e.webpackPolyfill = 1), e;
     };
+  }, function (e, t, n) {
+    "use strict";
+    function r(e, t) {
+      var n = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : 20,
+          r = null,
+          i = !1;return function () {
+        if (arguments.length > 0 && void 0 !== arguments[0] && arguments[0]) return void window.clearTimeout(r);i || (i = !0, r = setTimeout(function () {
+          e.call(t), i = !1, r = null;
+        }, 1e3 * n));
+      };
+    }Object.defineProperty(t, "__esModule", { value: !0 }), t.default = r, e.exports = t.default;
   }]);
 });
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)(module)))
@@ -2329,7 +2342,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.handleTSUrl = handleTSUrl;
-exports.throttle = throttle;
 exports.defaultChannelId = defaultChannelId;
 exports.tsPathChecker = tsPathChecker;
 exports.noop = noop;
@@ -2350,28 +2362,12 @@ function handleTSUrl(url) {
     return url;
 }
 
-// 函数节流，默认冷却时间30秒
-function throttle(method, context) {
-    var colddown = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 20;
-
-
-    var going = false;
-    return function () {
-        if (going) return;
-        going = true;
-        setTimeout(function () {
-            method.call(context);
-            going = false;
-        }, colddown * 1000);
-    };
-};
-
 // channelId generator
-function defaultChannelId(url, protocol) {
-    var browserInfo = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+function defaultChannelId(url) {
+    var browserInfo = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     var path = _urlToolkit2.default.parseURL(url).path.split('.')[0];
-    return path + '[' + protocol + ']';
+    return '' + path;
 }
 
 function tsPathChecker() {
@@ -2909,7 +2905,7 @@ var P2PEngine = function (_EventEmitter) {
                 version: P2PEngine.version,
                 tag: _this.config.tag || _this.hlsjs.constructor.version
             };
-            var channel = _this.config.channelId(hlsjs.url, _core.DataChannel.VERSION, browserInfo);
+            var channel = _this.config.channelId(hlsjs.url, browserInfo) + '[' + _core.DataChannel.VERSION + ']';
             //初始化logger
             var logger = new _logger2.default(_this.config, channel);
             _this.hlsjs.config.logger = _this.logger = logger;
@@ -2921,7 +2917,7 @@ var P2PEngine = function (_EventEmitter) {
 
         hlsjs.on(_this.HLSEvents.LEVEL_LOADED, onLevelLoaded);
 
-        console.log('CDNBye v' + P2PEngine.version + ' -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)');
+        // console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
 
         return _this;
     }
@@ -3061,7 +3057,7 @@ var P2PEngine = function (_EventEmitter) {
 
 P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)();
 
-P2PEngine.version = "0.2.4";
+P2PEngine.version = "0.2.5";
 
 exports.default = P2PEngine;
 module.exports = exports['default'];
@@ -3173,7 +3169,7 @@ var BTTracker = function (_EventEmitter) {
         _this.peers = [];
 
         // 防止调用频率过高
-        _this.requestMorePeers = (0, _toolFuns.throttle)(_this._requestMorePeers, _this);
+        _this.requestMorePeers = (0, _core.getPeersThrottle)(_this._requestMorePeers, _this);
 
         _this._setupScheduler(_this.scheduler);
         return _this;
@@ -3316,7 +3312,8 @@ var BTTracker = function (_EventEmitter) {
                 _this5.scheduler.handshakePeer(datachannel);
 
                 //如果dc数量不够则继续尝试连接
-                _this5.requestMorePeers();
+                var cancel = _this5.scheduler.peersNum <= 3 ? false : true;
+                _this5.requestMorePeers(cancel);
 
                 //更新conns
                 _this5.fetcher.increConns();
@@ -3398,7 +3395,7 @@ var BTTracker = function (_EventEmitter) {
             var logger = this.engine.logger;
             // 连接的节点<=3时请求更多节点
 
-            if (this.scheduler.peerMap.size <= 3) {
+            if (this.scheduler.peersNum <= 3) {
                 this.fetcher.btGetPeers().then(function (json) {
                     logger.info('request more peers ' + JSON.stringify(json));
                     _this7._handlePeers(json.peers);
@@ -3639,7 +3636,7 @@ var BTScheduler = function (_EventEmitter) {
                 }
             }
 
-            logger.warn('idle peers has not sn ' + sn);
+            logger.warn('idle peers hasn\'t sn ' + sn);
             return false;
         }
     }, {
@@ -3824,6 +3821,11 @@ var BTScheduler = function (_EventEmitter) {
         key: 'hasPeers',
         get: function get() {
             return this.peerMap.size > 0;
+        }
+    }, {
+        key: 'peersNum',
+        get: function get() {
+            return this.peerMap.size;
         }
     }, {
         key: 'hasIdlePeers',

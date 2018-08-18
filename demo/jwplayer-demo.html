@@ -37,6 +37,12 @@
             }
         },
     });
+
+    jwplayer().on('play', function () {
+        jwplayer().hls.engine.on('stats', function ({totalHTTPDownloaded, totalP2PDownloaded}) {
+            // get totalHTTPDownloaded and totalP2PDownloaded here
+        })
+    })
 </script>
 </body>
 

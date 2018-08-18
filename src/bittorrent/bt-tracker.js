@@ -2,7 +2,7 @@
 import EventEmitter from 'events';
 import BTScheduler from './bt-scheduler';
 import SignalClient from '../signal-client';
-import {DataChannel, Events} from 'core';
+import {DataChannel, Events, getPeersThrottle} from 'core';
 import {throttle} from '../utils/toolFuns';
 
 class BTTracker extends EventEmitter {
@@ -24,7 +24,7 @@ class BTTracker extends EventEmitter {
         this.peers = [];
 
         // 防止调用频率过高
-        this.requestMorePeers = throttle(this._requestMorePeers, this);
+        this.requestMorePeers = getPeersThrottle(this._requestMorePeers, this);
 
         this._setupScheduler(this.scheduler);
     }
@@ -142,7 +142,8 @@ class BTTracker extends EventEmitter {
                 this.scheduler.handshakePeer(datachannel);
 
                 //如果dc数量不够则继续尝试连接
-                this.requestMorePeers();
+                const cancel = this.scheduler.peersNum <= 3 ? false : true;
+                this.requestMorePeers(cancel);
 
                 //更新conns
                 this.fetcher.increConns();
@@ -214,7 +215,7 @@ class BTTracker extends EventEmitter {
     _requestMorePeers() {
         const { logger } = this.engine;
         // 连接的节点<=3时请求更多节点
-        if (this.scheduler.peerMap.size <= 3) {
+        if (this.scheduler.peersNum <= 3) {
             this.fetcher.btGetPeers().then(json => {
                 logger.info(`request more peers ${JSON.stringify(json)}`);
                 this._handlePeers(json.peers);
