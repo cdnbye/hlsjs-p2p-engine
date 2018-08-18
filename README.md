@@ -113,7 +113,7 @@ See [API.md](docs/English/API.md)
 ## Signaling Server
 To communicate with another peer you simply need to exchange contact information and the rest will be done by WebRTC. The process of connecting to the other peers is also known as signaling. It's recommended to build and deploy your own signaling server.
 - [gosignaler](https://github.com/cdnbye/gosignaler) (written by Golang)
-- [php-signaler](https://github.com/RayP2P/php-signaler) (written by PHP)
+- [php-signaler](https://github.com/cdnbye/php-signaler) (written by PHP)
 
 ## They are using CDNBye
 [<img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531253035445&di=7af6cc9ad4abe3d06ba376af22d85131&imgtype=0&src=http%3A%2F%2Fimg.kuai8.com%2Fattaches%2Fintro%2F1213%2F201612131436417407.png" width="120">](http://egame.qq.com/)
@@ -139,6 +139,8 @@ We have collected some [frequently asked questions](docs/English/FAQ.md). Before
     - See [clappr-demo.html](demo/clappr-demo.html)
 - [MediaElement.js](http://www.mediaelementjs.com/)
     - See [mediaelement-demo.html](demo/mediaelement-demo.html)
+- [TCPlayer](https://cloud.tencent.com/document/product/267/7479)(Tencent Cloud Player)
+    - See [tcplayer-demo.html](demo/tcplayer-demo.html)
 - `Add your customized player here`
     - CDNBye can be integrated into any HTML5 video player that with hls.js built in.
 

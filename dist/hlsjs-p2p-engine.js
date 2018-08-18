@@ -2894,6 +2894,7 @@ var P2PEngine = function (_EventEmitter) {
 
         _this.HLSEvents = hlsjs.constructor.Events;
 
+        // 如果tsStrictMatched=false，需要自动检查不同ts路径是否相同
         _this.checkTSPath = _this.config.tsStrictMatched ? _toolFuns.noop : (0, _toolFuns.tsPathChecker)();
 
         var onLevelLoaded = function onLevelLoaded(event, data) {

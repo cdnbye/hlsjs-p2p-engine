@@ -45,7 +45,7 @@ class P2PEngine extends EventEmitter {
                 version: P2PEngine.version,
                 tag: this.config.tag || this.hlsjs.constructor.version,
             };
-            let channel = this.config.channelId(hlsjs.url, DataChannel.VERSION, browserInfo);
+            let channel = `${this.config.channelId(hlsjs.url, browserInfo)}[${DataChannel.VERSION}]`;
             //初始化logger
             let logger = new Logger(this.config, channel);
             this.hlsjs.config.logger = this.logger = logger;

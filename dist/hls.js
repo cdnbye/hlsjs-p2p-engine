@@ -2367,11 +2367,11 @@ function throttle(method, context) {
 };
 
 // channelId generator
-function defaultChannelId(url, protocol) {
-    var browserInfo = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+function defaultChannelId(url) {
+    var browserInfo = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     var path = _urlToolkit2.default.parseURL(url).path.split('.')[0];
-    return path + '[' + protocol + ']';
+    return '' + path;
 }
 
 function tsPathChecker() {
@@ -2989,6 +2989,7 @@ var P2PEngine = function (_EventEmitter) {
 
         _this.HLSEvents = hlsjs.constructor.Events;
 
+        // 如果tsStrictMatched=false，需要自动检查不同ts路径是否相同
         _this.checkTSPath = _this.config.tsStrictMatched ? _toolFuns.noop : (0, _toolFuns.tsPathChecker)();
 
         var onLevelLoaded = function onLevelLoaded(event, data) {
@@ -3003,7 +3004,7 @@ var P2PEngine = function (_EventEmitter) {
                 version: P2PEngine.version,
                 tag: _this.config.tag || _this.hlsjs.constructor.version
             };
-            var channel = _this.config.channelId(hlsjs.url, _core.DataChannel.VERSION, browserInfo);
+            var channel = _this.config.channelId(hlsjs.url, browserInfo) + '[' + _core.DataChannel.VERSION + ']';
             //初始化logger
             var logger = new _logger2.default(_this.config, channel);
             _this.hlsjs.config.logger = _this.logger = logger;

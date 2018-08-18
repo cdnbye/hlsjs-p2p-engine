@@ -23,9 +23,9 @@ export function throttle(method, context, colddown = 20) {
 };
 
 // channelId generator
-export function defaultChannelId(url, protocol, browserInfo = {}) {
+export function defaultChannelId(url, browserInfo = {}) {
     const path = URLToolkit.parseURL(url).path.split('.')[0];
-    return `${path}[${protocol}]`;
+    return `${path}`;
 }
 
 export function tsPathChecker() {
