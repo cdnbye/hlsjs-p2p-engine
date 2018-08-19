@@ -410,7 +410,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       };return t.d(n, "a", n), n;
     }, t.o = function (e, t) {
       return Object.prototype.hasOwnProperty.call(e, t);
-    }, t.p = "", t(t.s = 19);
+    }, t.p = "", t(t.s = 18);
   }([function (e, t) {
     var n;n = function () {
       return this;
@@ -572,22 +572,22 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         var r = !1;if ((void 0 === t || t < 0) && (t = 0), t > this.length) return "";if ((void 0 === n || n > this.length) && (n = this.length), n <= 0) return "";if (n >>>= 0, t >>>= 0, n <= t) return "";for (e || (e = "utf8");;) {
           switch (e) {case "hex":
               return I(this, t, n);case "utf8":case "utf-8":
-              return k(this, t, n);case "ascii":
+              return A(this, t, n);case "ascii":
               return x(this, t, n);case "latin1":case "binary":
               return O(this, t, n);case "base64":
-              return A(this, t, n);case "ucs2":case "ucs-2":case "utf16le":case "utf-16le":
+              return k(this, t, n);case "ucs2":case "ucs-2":case "utf16le":case "utf-16le":
               return D(this, t, n);default:
               if (r) throw new TypeError("Unknown encoding: " + e);e = (e + "").toLowerCase(), r = !0;}
         }
       }function m(e, t, n) {
         var r = e[t];e[t] = e[n], e[n] = r;
-      }function b(e, t, n, r, i) {
+      }function _(e, t, n, r, i) {
         if (0 === e.length) return -1;if ("string" == typeof n ? (r = n, n = 0) : n > 2147483647 ? n = 2147483647 : n < -2147483648 && (n = -2147483648), n = +n, isNaN(n) && (n = i ? 0 : e.length - 1), n < 0 && (n = e.length + n), n >= e.length) {
           if (i) return -1;n = e.length - 1;
         } else if (n < 0) {
           if (!i) return -1;n = 0;
-        }if ("string" == typeof t && (t = o.from(t, r)), o.isBuffer(t)) return 0 === t.length ? -1 : _(e, t, n, r, i);if ("number" == typeof t) return t &= 255, o.TYPED_ARRAY_SUPPORT && "function" == typeof Uint8Array.prototype.indexOf ? i ? Uint8Array.prototype.indexOf.call(e, t, n) : Uint8Array.prototype.lastIndexOf.call(e, t, n) : _(e, [t], n, r, i);throw new TypeError("val must be string, number or Buffer");
-      }function _(e, t, n, r, i) {
+        }if ("string" == typeof t && (t = o.from(t, r)), o.isBuffer(t)) return 0 === t.length ? -1 : b(e, t, n, r, i);if ("number" == typeof t) return t &= 255, o.TYPED_ARRAY_SUPPORT && "function" == typeof Uint8Array.prototype.indexOf ? i ? Uint8Array.prototype.indexOf.call(e, t, n) : Uint8Array.prototype.lastIndexOf.call(e, t, n) : b(e, [t], n, r, i);throw new TypeError("val must be string, number or Buffer");
+      }function b(e, t, n, r, i) {
         function o(e, t) {
           return 1 === a ? e[t] : e.readUInt16BE(t * a);
         }var a = 1,
@@ -621,9 +621,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         return G(Q(t), e, n, r);
       }function R(e, t, n, r) {
         return G(J(t, e.length - n), e, n, r);
-      }function A(e, t, n) {
-        return 0 === t && n === e.length ? K.fromByteArray(e) : K.fromByteArray(e.slice(t, n));
       }function k(e, t, n) {
+        return 0 === t && n === e.length ? K.fromByteArray(e) : K.fromByteArray(e.slice(t, n));
+      }function A(e, t, n) {
         n = Math.min(e.length, n);for (var r = [], i = t; i < n;) {
           var o = e[i],
               a = null,
@@ -719,8 +719,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         }return i;
       }function V(e) {
         return e !== e;
-      }var K = n(22),
-          $ = n(23),
+      }var K = n(21),
+          $ = n(22),
           Z = n(9);t.Buffer = o, t.SlowBuffer = g, t.INSPECT_MAX_BYTES = 50, o.TYPED_ARRAY_SUPPORT = void 0 !== e.TYPED_ARRAY_SUPPORT ? e.TYPED_ARRAY_SUPPORT : function () {
         try {
           var e = new Uint8Array(1);return e.__proto__ = { __proto__: Uint8Array.prototype, foo: function foo() {
@@ -771,7 +771,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           m(this, t, t + 7), m(this, t + 1, t + 6), m(this, t + 2, t + 5), m(this, t + 3, t + 4);
         }return this;
       }, o.prototype.toString = function () {
-        var e = 0 | this.length;return 0 === e ? "" : 0 === arguments.length ? k(this, 0, e) : v.apply(this, arguments);
+        var e = 0 | this.length;return 0 === e ? "" : 0 === arguments.length ? A(this, 0, e) : v.apply(this, arguments);
       }, o.prototype.equals = function (e) {
         if (!o.isBuffer(e)) throw new TypeError("Argument must be a Buffer");return this === e || 0 === o.compare(this, e);
       }, o.prototype.inspect = function () {
@@ -786,9 +786,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       }, o.prototype.includes = function (e, t, n) {
         return -1 !== this.indexOf(e, t, n);
       }, o.prototype.indexOf = function (e, t, n) {
-        return b(this, e, t, n, !0);
+        return _(this, e, t, n, !0);
       }, o.prototype.lastIndexOf = function (e, t, n) {
-        return b(this, e, t, n, !1);
+        return _(this, e, t, n, !1);
       }, o.prototype.write = function (e, t, n, r) {
         if (void 0 === t) r = "utf8", n = this.length, t = 0;else if (void 0 === n && "string" == typeof t) r = t, n = this.length, t = 0;else {
           if (!isFinite(t)) throw new Error("Buffer.write(string, encoding, offset[, length]) is no longer supported");t |= 0, isFinite(n) ? (n |= 0, void 0 === r && (r = "utf8")) : (r = n, n = void 0);
@@ -1111,12 +1111,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       }function v(e) {
         q("emit readable"), e.emit("readable"), E(e);
       }function m(e, t) {
-        t.readingMore || (t.readingMore = !0, I.nextTick(b, e, t));
-      }function b(e, t) {
+        t.readingMore || (t.readingMore = !0, I.nextTick(_, e, t));
+      }function _(e, t) {
         for (var n = t.length; !t.reading && !t.flowing && !t.ended && t.length < t.highWaterMark && (q("maybeReadMore read 0"), e.read(0), n !== t.length);) {
           n = t.length;
         }t.readingMore = !1;
-      }function _(e) {
+      }function b(e) {
         return function () {
           var t = e._readableState;q("pipeOnDrain", t.awaitDrain), t.awaitDrain && t.awaitDrain--, 0 === t.awaitDrain && L(e, "data") && (t.flowing = !0, E(e));
         };
@@ -1131,8 +1131,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       }function T(e, t) {
         if (0 === t.length) return null;var n;return t.objectMode ? n = t.buffer.shift() : !e || e >= t.length ? (n = t.decoder ? t.buffer.join("") : 1 === t.buffer.length ? t.buffer.head.data : t.buffer.concat(t.length), t.buffer.clear()) : n = R(e, t.buffer, t.decoder), n;
       }function R(e, t, n) {
-        var r;return e < t.head.data.length ? (r = t.head.data.slice(0, e), t.head.data = t.head.data.slice(e)) : r = e === t.head.data.length ? t.shift() : n ? A(e, t) : k(e, t), r;
-      }function A(e, t) {
+        var r;return e < t.head.data.length ? (r = t.head.data.slice(0, e), t.head.data = t.head.data.slice(e)) : r = e === t.head.data.length ? t.shift() : n ? k(e, t) : A(e, t), r;
+      }function k(e, t) {
         var n = t.head,
             r = 1,
             i = n.data;for (e -= i.length; n = n.next;) {
@@ -1141,7 +1141,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             a === o.length ? (++r, n.next ? t.head = n.next : t.head = t.tail = null) : (t.head = n, n.data = o.slice(a));break;
           }++r;
         }return t.length -= r, i;
-      }function k(e, t) {
+      }function A(e, t) {
         var n = F.allocUnsafe(e),
             r = t.head,
             i = 1;for (r.data.copy(n), e -= r.data.length; r = r.next;) {
@@ -1165,9 +1165,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           B = n(12),
           F = n(5).Buffer,
           N = t.Uint8Array || function () {},
-          U = n(6);U.inherits = n(2);var j = n(29),
+          U = n(6);U.inherits = n(2);var j = n(28),
           q = void 0;q = j && j.debuglog ? j.debuglog("stream") : function () {};var Y,
-          W = n(30),
+          W = n(29),
           z = n(13);U.inherits(u, B);var H = ["error", "close", "destroy", "pause", "resume"];Object.defineProperty(u.prototype, "destroyed", { get: function get() {
           return void 0 !== this._readableState && this._readableState.destroyed;
         }, set: function set(e) {
@@ -1210,7 +1210,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             d.pipes = e;break;case 1:
             d.pipes = [d.pipes, e];break;default:
             d.pipes.push(e);}d.pipesCount += 1, q("pipe count=%d opts=%j", d.pipesCount, t);var p = (!t || !1 !== t.end) && e !== r.stdout && e !== r.stderr,
-            g = p ? i : l;d.endEmitted ? I.nextTick(g) : h.once("end", g), e.on("unpipe", n);var y = _(h);e.on("drain", y);var v = !1,
+            g = p ? i : l;d.endEmitted ? I.nextTick(g) : h.once("end", g), e.on("unpipe", n);var y = b(h);e.on("drain", y);var v = !1,
             m = !1;return h.on("data", s), a(e, "error", u), e.once("close", c), e.once("finish", f), e.emit("pipe", h), d.flowing || (q("pipe resume"), h.resume()), e;
       }, u.prototype.unpipe = function (e) {
         var t = this._readableState,
@@ -1274,7 +1274,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     (function (t, r, i) {
       function o(e) {
         var t = this;this.next = null, this.entry = null, this.finish = function () {
-          A(t, e);
+          k(t, e);
         };
       }function a(e) {
         return M.from(e);
@@ -1289,10 +1289,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       }function f(e) {
         if (P = P || n(3), !(F.call(f, this) || this instanceof P)) return new f(e);this._writableState = new c(e, this), this.writable = !0, e && ("function" == typeof e.write && (this._write = e.write), "function" == typeof e.writev && (this._writev = e.writev), "function" == typeof e.destroy && (this._destroy = e.destroy), "function" == typeof e.final && (this._final = e.final)), D.call(this);
       }function l(e, t) {
-        var n = new Error("write after end");e.emit("error", n), k.nextTick(t, n);
+        var n = new Error("write after end");e.emit("error", n), A.nextTick(t, n);
       }function h(e, t, n, r) {
         var i = !0,
-            o = !1;return null === n ? o = new TypeError("May not write null values to stream") : "string" == typeof n || void 0 === n || t.objectMode || (o = new TypeError("Invalid non-string/buffer chunk")), o && (e.emit("error", o), k.nextTick(r, o), i = !1), i;
+            o = !1;return null === n ? o = new TypeError("May not write null values to stream") : "string" == typeof n || void 0 === n || t.objectMode || (o = new TypeError("Invalid non-string/buffer chunk")), o && (e.emit("error", o), A.nextTick(r, o), i = !1), i;
       }function d(e, t, n) {
         return e.objectMode || !1 === e.decodeStrings || "string" != typeof t || (t = M.from(t, n)), t;
       }function p(e, t, n, r, i, o) {
@@ -1304,18 +1304,18 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       }function g(e, t, n, r, i, o, a) {
         t.writelen = r, t.writecb = a, t.writing = !0, t.sync = !0, n ? e._writev(i, t.onwrite) : e._write(i, o, t.onwrite), t.sync = !1;
       }function y(e, t, n, r, i) {
-        --t.pendingcb, n ? (k.nextTick(i, r), k.nextTick(T, e, t), e._writableState.errorEmitted = !0, e.emit("error", r)) : (i(r), e._writableState.errorEmitted = !0, e.emit("error", r), T(e, t));
+        --t.pendingcb, n ? (A.nextTick(i, r), A.nextTick(T, e, t), e._writableState.errorEmitted = !0, e.emit("error", r)) : (i(r), e._writableState.errorEmitted = !0, e.emit("error", r), T(e, t));
       }function v(e) {
         e.writing = !1, e.writecb = null, e.length -= e.writelen, e.writelen = 0;
       }function m(e, t) {
         var n = e._writableState,
             r = n.sync,
             i = n.writecb;if (v(n), t) y(e, n, r, t, i);else {
-          var o = C(n);o || n.corked || n.bufferProcessing || !n.bufferedRequest || w(e, n), r ? x(b, e, n, o, i) : b(e, n, o, i);
+          var o = C(n);o || n.corked || n.bufferProcessing || !n.bufferedRequest || w(e, n), r ? x(_, e, n, o, i) : _(e, n, o, i);
         }
-      }function b(e, t, n, r) {
-        n || _(e, t), t.pendingcb--, r(), T(e, t);
-      }function _(e, t) {
+      }function _(e, t, n, r) {
+        n || b(e, t), t.pendingcb--, r(), T(e, t);
+      }function b(e, t) {
         0 === t.length && t.needDrain && (t.needDrain = !1, e.emit("drain"));
       }function w(e, t) {
         t.bufferProcessing = !0;var n = t.bufferedRequest;if (e._writev && n && n.next) {
@@ -1338,17 +1338,17 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           t.pendingcb--, n && e.emit("error", n), t.prefinished = !0, e.emit("prefinish"), T(e, t);
         });
       }function E(e, t) {
-        t.prefinished || t.finalCalled || ("function" == typeof e._final ? (t.pendingcb++, t.finalCalled = !0, k.nextTick(S, e, t)) : (t.prefinished = !0, e.emit("prefinish")));
+        t.prefinished || t.finalCalled || ("function" == typeof e._final ? (t.pendingcb++, t.finalCalled = !0, A.nextTick(S, e, t)) : (t.prefinished = !0, e.emit("prefinish")));
       }function T(e, t) {
         var n = C(t);return n && (E(e, t), 0 === t.pendingcb && (t.finished = !0, e.emit("finish"))), n;
       }function R(e, t, n) {
-        t.ending = !0, T(e, t), n && (t.finished ? k.nextTick(n) : e.once("finish", n)), t.ended = !0, e.writable = !1;
-      }function A(e, t, n) {
+        t.ending = !0, T(e, t), n && (t.finished ? A.nextTick(n) : e.once("finish", n)), t.ended = !0, e.writable = !1;
+      }function k(e, t, n) {
         var r = e.entry;for (e.entry = null; r;) {
           var i = r.callback;t.pendingcb--, i(n), r = r.next;
         }t.corkedRequestsFree ? t.corkedRequestsFree.next = e : t.corkedRequestsFree = e;
-      }var k = n(7);e.exports = f;var P,
-          x = !t.browser && ["v0.10", "v0.9."].indexOf(t.version.slice(0, 5)) > -1 ? r : k.nextTick;f.WritableState = c;var O = n(6);O.inherits = n(2);var I = { deprecate: n(34) },
+      }var A = n(7);e.exports = f;var P,
+          x = !t.browser && ["v0.10", "v0.9."].indexOf(t.version.slice(0, 5)) > -1 ? r : A.nextTick;f.WritableState = c;var O = n(6);O.inherits = n(2);var I = { deprecate: n(33) },
           D = n(12),
           M = n(5).Buffer,
           L = i.Uint8Array || function () {},
@@ -1391,7 +1391,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } }), f.prototype.destroy = B.destroy, f.prototype._undestroy = B.undestroy, f.prototype._destroy = function (e, t) {
         this.end(), t(e);
       };
-    }).call(t, n(1), n(32).setImmediate, n(0));
+    }).call(t, n(1), n(31).setImmediate, n(0));
   }, function (e, t, n) {
     "use strict";
     function r(e) {
@@ -1404,7 +1404,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             if (t) return;e = ("" + e).toLowerCase(), t = !0;}
       }
     }function i(e) {
-      var t = r(e);if ("string" != typeof t && (m.isEncoding === b || !b(e))) throw new Error("Unknown encoding: " + e);return t || e;
+      var t = r(e);if ("string" != typeof t && (m.isEncoding === _ || !_(e))) throw new Error("Unknown encoding: " + e);return t || e;
     }function o(e) {
       this.encoding = i(e);var t;switch (this.encoding) {case "utf16le":
           this.text = h, this.end = d, t = 4;break;case "utf8":
@@ -1445,7 +1445,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     }function v(e) {
       return e && e.length ? this.write(e) : "";
     }var m = n(5).Buffer,
-        b = m.isEncoding || function (e) {
+        _ = m.isEncoding || function (e) {
       switch ((e = "" + e) && e.toLowerCase()) {case "hex":case "utf8":case "utf-8":case "ascii":case "binary":case "base64":case "ucs2":case "ucs-2":case "utf16le":case "utf-16le":case "raw":
           return !0;default:
           return !1;}
@@ -1487,23 +1487,19 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   }, function (e, t, n) {
     "use strict";
     Object.defineProperty(t, "__esModule", { value: !0 }), t.default = { DC_PING: "PING", DC_PONG: "PONG", DC_SIGNAL: "SIGNAL", DC_OPEN: "OPEN", DC_REQUEST: "REQUEST", DC_PIECE_NOT_FOUND: "PIECE_NOT_FOUND", DC_CLOSE: "CLOSE", DC_RESPONSE: "RESPONSE", DC_ERROR: "ERROR", DC_PIECE: "PIECE", DC_TIMEOUT: "TIMEOUT", DC_PIECE_ACK: "PIECE_ACK", DC_BITFIELD: "BITFIELD", DC_CHOKE: "CHOKE", DC_UNCHOKE: "UNCHOKE", DC_INTERESTED: "INTERESTED", DC_NOTINTERESTED: "NOT_INTERESTED", DC_HAVE: "HAVE", DC_LOST: "LOST", BM_LOST: "lost" }, e.exports = t.default;
-  }, function (e, t) {
-    (function (t) {
-      e.exports = t;
-    }).call(t, {});
   }, function (e, t, n) {
     "use strict";
     function r(e) {
       return e && e.__esModule ? e : { default: e };
-    }Object.defineProperty(t, "__esModule", { value: !0 }), t.getPeersThrottle = t.getBrowserRTC = t.Buffer = t.Fetcher = t.Events = t.DataChannel = void 0;var i = n(20),
+    }Object.defineProperty(t, "__esModule", { value: !0 }), t.getPeersThrottle = t.getBrowserRTC = t.Buffer = t.Fetcher = t.Events = t.DataChannel = void 0;var i = n(19),
         o = r(i),
         a = n(17),
         s = r(a),
-        u = n(36),
+        u = n(35),
         c = r(u),
         f = n(10),
         l = r(f),
-        h = n(39),
+        h = n(36),
         d = r(h),
         p = n(4).Buffer;t.DataChannel = o.default, t.Events = s.default, t.Fetcher = c.default, t.Buffer = p, t.getBrowserRTC = l.default, t.getPeersThrottle = d.default;
   }, function (e, t, n) {
@@ -1533,7 +1529,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         return n && e(t.prototype, n), r && e(t, r), t;
       };
     }(),
-        c = n(21),
+        c = n(20),
         f = r(c),
         l = n(8),
         h = r(l),
@@ -1690,11 +1686,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         return typeof e === "undefined" ? "undefined" : _typeof(e);
       } : function (e) {
         return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e === "undefined" ? "undefined" : _typeof(e);
-      };e.exports = r;var a = n(24)("simple-channel"),
+      };e.exports = r;var a = n(23)("simple-channel"),
           s = n(10),
           u = n(2),
-          c = n(27),
-          f = n(28);u(r, f.Duplex), r.WEBRTC_SUPPORT = !!s(), r.config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:global.stun.twilio.com:3478?transport=udp" }] }, r.constraints = {}, r.channelConfig = {}, Object.defineProperty(r.prototype, "bufferSize", { get: function get() {
+          c = n(26),
+          f = n(27);u(r, f.Duplex), r.WEBRTC_SUPPORT = !!s(), r.config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:global.stun.twilio.com:3478?transport=udp" }] }, r.constraints = {}, r.channelConfig = {}, Object.defineProperty(r.prototype, "bufferSize", { get: function get() {
           var e = this;return e._channel && e._channel.bufferedAmount || 0;
         } }), r.prototype.address = function () {
         var e = this;return { port: e.localPort, family: "IPv4", address: e.localAddress };
@@ -1946,7 +1942,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         var e;try {
           e = t.storage.debug;
         } catch (e) {}return !e && void 0 !== r && "env" in r && (e = r.env.DEBUG), e;
-      }t = e.exports = n(25), t.log = a, t.formatArgs = o, t.save = s, t.load = u, t.useColors = i, t.storage = "undefined" != typeof chrome && void 0 !== chrome.storage ? chrome.storage.local : function () {
+      }t = e.exports = n(24), t.log = a, t.formatArgs = o, t.save = s, t.load = u, t.useColors = i, t.storage = "undefined" != typeof chrome && void 0 !== chrome.storage ? chrome.storage.local : function () {
         try {
           return window.localStorage;
         } catch (e) {}
@@ -1998,7 +1994,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       }return !1;
     }function c(e) {
       return e instanceof Error ? e.stack || e.message : e;
-    }t = e.exports = i.debug = i.default = i, t.coerce = c, t.disable = s, t.enable = a, t.enabled = u, t.humanize = n(26), t.instances = [], t.names = [], t.skips = [], t.formatters = {};
+    }t = e.exports = i.debug = i.default = i, t.coerce = c, t.disable = s, t.enable = a, t.enabled = u, t.humanize = n(25), t.instances = [], t.names = [], t.skips = [], t.formatters = {};
   }, function (e, t) {
     function n(e) {
       if (e = String(e), !(e.length > 100)) {
@@ -2039,7 +2035,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           s = t.crypto || t.msCrypto;s && s.getRandomValues ? e.exports = o : e.exports = i;
     }).call(t, n(0), n(1));
   }, function (e, t, n) {
-    t = e.exports = n(11), t.Stream = t, t.Readable = t, t.Writable = n(14), t.Duplex = n(3), t.Transform = n(16), t.PassThrough = n(35);
+    t = e.exports = n(11), t.Stream = t, t.Readable = t, t.Writable = n(14), t.Duplex = n(3), t.Transform = n(16), t.PassThrough = n(34);
   }, function (e, t) {}, function (e, t, n) {
     "use strict";
     function r(e, t) {
@@ -2047,7 +2043,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     }function i(e, t, n) {
       e.copy(t, n);
     }var o = n(5).Buffer,
-        a = n(31);e.exports = function () {
+        a = n(30);e.exports = function () {
       function e() {
         r(this, e), this.head = null, this.tail = null, this.length = 0;
       }return e.prototype.push = function (e) {
@@ -2093,7 +2089,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         clearTimeout(e._idleTimeoutId);var t = e._idleTimeout;t >= 0 && (e._idleTimeoutId = setTimeout(function () {
           e._onTimeout && e._onTimeout();
         }, t));
-      }, n(33), t.setImmediate = "undefined" != typeof self && self.setImmediate || void 0 !== e && e.setImmediate || this && this.setImmediate, t.clearImmediate = "undefined" != typeof self && self.clearImmediate || void 0 !== e && e.clearImmediate || this && this.clearImmediate;
+      }, n(32), t.setImmediate = "undefined" != typeof self && self.setImmediate || void 0 !== e && e.setImmediate || this && this.setImmediate, t.clearImmediate = "undefined" != typeof self && self.clearImmediate || void 0 !== e && e.clearImmediate || this && this.clearImmediate;
     }).call(t, n(0));
   }, function (e, t, n) {
     (function (e, t) {
@@ -2213,13 +2209,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         return n && e(t.prototype, n), r && e(t, r), t;
       };
     }(),
-        a = n(37),
-        s = function (e) {
-      return e && e.__esModule ? e : { default: e };
-    }(a),
-        u = function () {
-      function e(t, n, o, a, u) {
-        r(this, e), this.engine = t, this.key = n, this.baseUrl = a, this.channelId = s.default.encode(o), this.announceInfo = i({}, u, { channel: this.channelId }), this.announceURL = a + "/channel", this.key = n, this.conns = 0, this.failConns = 0, this.totalHTTPDownloaded = 0, this.totalP2PDownloaded = 0, this.totalP2PUploaded = 0, this.httpDownloaded = 0, this.p2pDownloaded = 0, this.errsFragLoad = 0, this.errsBufStalled = 0, this.errsInternalExpt = 0;
+        a = function () {
+      function e(t, n, o, a, s) {
+        r(this, e), this.engine = t, this.key = n, this.baseUrl = a, this.channelId = window.btoa(o), this.announceInfo = i({}, s, { channel: this.channelId }), this.announceURL = a + "/channel", this.key = n, this.conns = 0, this.failConns = 0, this.totalHTTPDownloaded = 0, this.totalP2PDownloaded = 0, this.totalP2PUploaded = 0, this.httpDownloaded = 0, this.p2pDownloaded = 0, this.errsFragLoad = 0, this.errsBufStalled = 0, this.errsInternalExpt = 0;
       }return o(e, [{ key: "btAnnounce", value: function value() {
           var e = this,
               t = this.engine.logger;return new Promise(function (n, r) {
@@ -2276,46 +2268,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } }, { key: "_requestHeader", get: function get() {
           return {};
         } }]), e;
-    }();t.default = u, e.exports = t.default;
-  }, function (e, t, n) {
-    "use strict";
-    (function (e, r) {
-      var i,
-          o = "function" == typeof Symbol && "symbol" == _typeof(Symbol.iterator) ? function (e) {
-        return typeof e === "undefined" ? "undefined" : _typeof(e);
-      } : function (e) {
-        return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e === "undefined" ? "undefined" : _typeof(e);
-      };!function (a) {
-        var s = "object" == o(t) && t,
-            u = "object" == o(e) && e && e.exports == s && e,
-            c = "object" == (void 0 === r ? "undefined" : o(r)) && r;c.global !== c && c.window !== c || (a = c);var f = function f(e) {
-          this.message = e;
-        };f.prototype = new Error(), f.prototype.name = "InvalidCharacterError";var l = function l(e) {
-          throw new f(e);
-        },
-            h = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
-            d = function d(e) {
-          e = String(e), /[^\0-\xFF]/.test(e) && l("The string to be encoded contains characters outside of the Latin1 range.");for (var t, n, r, i, o = e.length % 3, a = "", s = -1, u = e.length - o; ++s < u;) {
-            t = e.charCodeAt(s) << 16, n = e.charCodeAt(++s) << 8, r = e.charCodeAt(++s), i = t + n + r, a += h.charAt(i >> 18 & 63) + h.charAt(i >> 12 & 63) + h.charAt(i >> 6 & 63) + h.charAt(63 & i);
-          }return 2 == o ? (t = e.charCodeAt(s) << 8, n = e.charCodeAt(++s), i = t + n, a += h.charAt(i >> 10) + h.charAt(i >> 4 & 63) + h.charAt(i << 2 & 63) + "=") : 1 == o && (i = e.charCodeAt(s), a += h.charAt(i >> 2) + h.charAt(i << 4 & 63) + "=="), a;
-        },
-            p = { encode: d, version: "<%= version %>" };if ("object" == o(n(18)) && n(18)) void 0 !== (i = function () {
-          return p;
-        }.call(t, n, t, e)) && (e.exports = i);else if (s && !s.nodeType) {
-          if (u) u.exports = p;else for (var g in p) {
-            p.hasOwnProperty(g) && (s[g] = p[g]);
-          }
-        } else a.base64 = p;
-      }(void 0);
-    }).call(t, n(38)(e), n(0));
-  }, function (e, t) {
-    e.exports = function (e) {
-      return e.webpackPolyfill || (e.deprecate = function () {}, e.paths = [], e.children || (e.children = []), Object.defineProperty(e, "loaded", { enumerable: !0, get: function get() {
-          return e.l;
-        } }), Object.defineProperty(e, "id", { enumerable: !0, get: function get() {
-          return e.i;
-        } }), e.webpackPolyfill = 1), e;
-    };
+    }();t.default = a, e.exports = t.default;
   }, function (e, t, n) {
     "use strict";
     function r(e, t) {
