@@ -41,7 +41,6 @@ class P2PEngine extends EventEmitter {
             let browserInfo = {
                 device: platform.getPlatform(),
                 netType: platform.getNetType(),
-                host: window.location.host,
                 version: P2PEngine.version,
                 tag: this.config.tag || this.hlsjs.constructor.version,
             };
