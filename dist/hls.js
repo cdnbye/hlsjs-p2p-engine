@@ -2465,7 +2465,7 @@ exports.config = config;
 // see https://tools.ietf.org/html/rfc1808
 
 /* jshint ignore:start */
-(function(root) { 
+(function(root) {
 /* jshint ignore:end */
 
   var URL_REGEX = /^((?:[a-zA-Z0-9+\-.]+:)?)(\/\/[^\/\;?#]*)?(.*?)??(;.*?)?(\?.*?)?(#.*?)?$/;
@@ -3045,7 +3045,11 @@ var P2PEngine = function (_EventEmitter) {
 
         hlsjs.on(_this.HLSEvents.LEVEL_LOADED, onLevelLoaded);
 
+<<<<<<< HEAD
+        console.log('Hybrid Engine started');
+=======
         // console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
+>>>>>>> 8d66fa469d7a417a90c34b70db445548fef0f194
 
         return _this;
     }
@@ -5055,7 +5059,7 @@ function getSelfScope() {
 // see https://tools.ietf.org/html/rfc1808
 
 /* jshint ignore:start */
-(function(root) { 
+(function(root) {
 /* jshint ignore:end */
 
   var URL_REGEX = /^((?:[a-zA-Z0-9+\-.]+:)?)(\/\/[^\/\;?#]*)?(.*?)??(;.*?)?(\?.*?)?(#.*?)?$/;

@@ -57,7 +57,11 @@ class P2PEngine extends EventEmitter {
         hlsjs.on(this.HLSEvents.LEVEL_LOADED, onLevelLoaded);
 
 
+<<<<<<< HEAD
+        console.log(`Hybrid Engine started`);
+=======
         // console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
+>>>>>>> 8d66fa469d7a417a90c34b70db445548fef0f194
 
     }
 
