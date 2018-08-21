@@ -120,7 +120,7 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 ## 信令服务器
 信令服务器用于在WebRTC建立P2P连接过程中交换信令，推荐自行部署信令服务器
 - [gosignaler](https://github.com/cdnbye/gosignaler) (Go语言版)
-- [php-signaler](https://github.com/RayP2P/php-signaler) (PHP版)
+- [php-signaler](https://github.com/cdnbye/php-signaler) (PHP版)
 
 ## 用户案例
 [<img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531253035445&di=7af6cc9ad4abe3d06ba376af22d85131&imgtype=0&src=http%3A%2F%2Fimg.kuai8.com%2Fattaches%2Fintro%2F1213%2F201612131436417407.png" width="120">](http://egame.qq.com/)
@@ -146,6 +146,8 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
     - 参见 [clappr-demo.html](demo/clappr-demo.html)
 - [MediaElement.js](http://www.mediaelementjs.com/)
     - 参见 [mediaelement-demo.html](demo/mediaelement-demo.html)
+- [TCPlayer](https://cloud.tencent.com/document/product/267/7479)(腾讯云播放器)
+    - 参见 [tcplayer-demo.html](demo/tcplayer-demo.html)
 - `欢迎贡献您的播放器demo`
     - CDNBye可以集成到内置hls.js的任何H5视频播放器中！
 

@@ -8,24 +8,10 @@ export function handleTSUrl(url, matched = false) {
     return url;
 }
 
-// 函数节流，默认冷却时间30秒
-export function throttle(method, context, colddown = 20) {
-
-    var going = false;
-    return function () {
-        if (going) return;
-        going = true;
-        setTimeout(function(){
-            method.call(context);
-            going = false;
-        }, colddown*1000);
-    }
-};
-
 // channelId generator
-export function defaultChannelId(url, protocol, browserInfo = {}) {
+export function defaultChannelId(url, browserInfo = {}) {
     const path = URLToolkit.parseURL(url).path.split('.')[0];
-    return `${path}[${protocol}]`;
+    return `${path}`;
 }
 
 export function tsPathChecker() {

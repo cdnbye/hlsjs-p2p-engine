@@ -410,7 +410,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       };return t.d(n, "a", n), n;
     }, t.o = function (e, t) {
       return Object.prototype.hasOwnProperty.call(e, t);
-    }, t.p = "", t(t.s = 19);
+    }, t.p = "", t(t.s = 18);
   }([function (e, t) {
     var n;n = function () {
       return this;
@@ -571,23 +571,23 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       }function v(e, t, n) {
         var r = !1;if ((void 0 === t || t < 0) && (t = 0), t > this.length) return "";if ((void 0 === n || n > this.length) && (n = this.length), n <= 0) return "";if (n >>>= 0, t >>>= 0, n <= t) return "";for (e || (e = "utf8");;) {
           switch (e) {case "hex":
-              return I(this, t, n);case "utf8":case "utf-8":
-              return k(this, t, n);case "ascii":
+              return O(this, t, n);case "utf8":case "utf-8":
+              return A(this, t, n);case "ascii":
               return x(this, t, n);case "latin1":case "binary":
-              return O(this, t, n);case "base64":
-              return A(this, t, n);case "ucs2":case "ucs-2":case "utf16le":case "utf-16le":
+              return I(this, t, n);case "base64":
+              return k(this, t, n);case "ucs2":case "ucs-2":case "utf16le":case "utf-16le":
               return D(this, t, n);default:
               if (r) throw new TypeError("Unknown encoding: " + e);e = (e + "").toLowerCase(), r = !0;}
         }
       }function m(e, t, n) {
         var r = e[t];e[t] = e[n], e[n] = r;
-      }function b(e, t, n, r, i) {
+      }function _(e, t, n, r, i) {
         if (0 === e.length) return -1;if ("string" == typeof n ? (r = n, n = 0) : n > 2147483647 ? n = 2147483647 : n < -2147483648 && (n = -2147483648), n = +n, isNaN(n) && (n = i ? 0 : e.length - 1), n < 0 && (n = e.length + n), n >= e.length) {
           if (i) return -1;n = e.length - 1;
         } else if (n < 0) {
           if (!i) return -1;n = 0;
-        }if ("string" == typeof t && (t = o.from(t, r)), o.isBuffer(t)) return 0 === t.length ? -1 : _(e, t, n, r, i);if ("number" == typeof t) return t &= 255, o.TYPED_ARRAY_SUPPORT && "function" == typeof Uint8Array.prototype.indexOf ? i ? Uint8Array.prototype.indexOf.call(e, t, n) : Uint8Array.prototype.lastIndexOf.call(e, t, n) : _(e, [t], n, r, i);throw new TypeError("val must be string, number or Buffer");
-      }function _(e, t, n, r, i) {
+        }if ("string" == typeof t && (t = o.from(t, r)), o.isBuffer(t)) return 0 === t.length ? -1 : b(e, t, n, r, i);if ("number" == typeof t) return t &= 255, o.TYPED_ARRAY_SUPPORT && "function" == typeof Uint8Array.prototype.indexOf ? i ? Uint8Array.prototype.indexOf.call(e, t, n) : Uint8Array.prototype.lastIndexOf.call(e, t, n) : b(e, [t], n, r, i);throw new TypeError("val must be string, number or Buffer");
+      }function b(e, t, n, r, i) {
         function o(e, t) {
           return 1 === a ? e[t] : e.readUInt16BE(t * a);
         }var a = 1,
@@ -621,9 +621,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         return G(Q(t), e, n, r);
       }function R(e, t, n, r) {
         return G(J(t, e.length - n), e, n, r);
-      }function A(e, t, n) {
-        return 0 === t && n === e.length ? K.fromByteArray(e) : K.fromByteArray(e.slice(t, n));
       }function k(e, t, n) {
+        return 0 === t && n === e.length ? K.fromByteArray(e) : K.fromByteArray(e.slice(t, n));
+      }function A(e, t, n) {
         n = Math.min(e.length, n);for (var r = [], i = t; i < n;) {
           var o = e[i],
               a = null,
@@ -643,11 +643,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         var r = "";n = Math.min(e.length, n);for (var i = t; i < n; ++i) {
           r += String.fromCharCode(127 & e[i]);
         }return r;
-      }function O(e, t, n) {
+      }function I(e, t, n) {
         var r = "";n = Math.min(e.length, n);for (var i = t; i < n; ++i) {
           r += String.fromCharCode(e[i]);
         }return r;
-      }function I(e, t, n) {
+      }function O(e, t, n) {
         var r = e.length;(!t || t < 0) && (t = 0), (!n || n < 0 || n > r) && (n = r);for (var i = "", o = t; o < n; ++o) {
           i += W(e[o]);
         }return i;
@@ -719,8 +719,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         }return i;
       }function V(e) {
         return e !== e;
-      }var K = n(22),
-          $ = n(23),
+      }var K = n(21),
+          $ = n(22),
           Z = n(9);t.Buffer = o, t.SlowBuffer = g, t.INSPECT_MAX_BYTES = 50, o.TYPED_ARRAY_SUPPORT = void 0 !== e.TYPED_ARRAY_SUPPORT ? e.TYPED_ARRAY_SUPPORT : function () {
         try {
           var e = new Uint8Array(1);return e.__proto__ = { __proto__: Uint8Array.prototype, foo: function foo() {
@@ -771,7 +771,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           m(this, t, t + 7), m(this, t + 1, t + 6), m(this, t + 2, t + 5), m(this, t + 3, t + 4);
         }return this;
       }, o.prototype.toString = function () {
-        var e = 0 | this.length;return 0 === e ? "" : 0 === arguments.length ? k(this, 0, e) : v.apply(this, arguments);
+        var e = 0 | this.length;return 0 === e ? "" : 0 === arguments.length ? A(this, 0, e) : v.apply(this, arguments);
       }, o.prototype.equals = function (e) {
         if (!o.isBuffer(e)) throw new TypeError("Argument must be a Buffer");return this === e || 0 === o.compare(this, e);
       }, o.prototype.inspect = function () {
@@ -786,9 +786,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       }, o.prototype.includes = function (e, t, n) {
         return -1 !== this.indexOf(e, t, n);
       }, o.prototype.indexOf = function (e, t, n) {
-        return b(this, e, t, n, !0);
+        return _(this, e, t, n, !0);
       }, o.prototype.lastIndexOf = function (e, t, n) {
-        return b(this, e, t, n, !1);
+        return _(this, e, t, n, !1);
       }, o.prototype.write = function (e, t, n, r) {
         if (void 0 === t) r = "utf8", n = this.length, t = 0;else if (void 0 === n && "string" == typeof t) r = t, n = this.length, t = 0;else {
           if (!isFinite(t)) throw new Error("Buffer.write(string, encoding, offset[, length]) is no longer supported");t |= 0, isFinite(n) ? (n |= 0, void 0 === r && (r = "utf8")) : (r = n, n = void 0);
@@ -1107,23 +1107,23 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           }t.ended = !0, y(e);
         }
       }function y(e) {
-        var t = e._readableState;t.needReadable = !1, t.emittedReadable || (q("emitReadable", t.flowing), t.emittedReadable = !0, t.sync ? I.nextTick(v, e) : v(e));
+        var t = e._readableState;t.needReadable = !1, t.emittedReadable || (q("emitReadable", t.flowing), t.emittedReadable = !0, t.sync ? O.nextTick(v, e) : v(e));
       }function v(e) {
         q("emit readable"), e.emit("readable"), E(e);
       }function m(e, t) {
-        t.readingMore || (t.readingMore = !0, I.nextTick(b, e, t));
-      }function b(e, t) {
+        t.readingMore || (t.readingMore = !0, O.nextTick(_, e, t));
+      }function _(e, t) {
         for (var n = t.length; !t.reading && !t.flowing && !t.ended && t.length < t.highWaterMark && (q("maybeReadMore read 0"), e.read(0), n !== t.length);) {
           n = t.length;
         }t.readingMore = !1;
-      }function _(e) {
+      }function b(e) {
         return function () {
           var t = e._readableState;q("pipeOnDrain", t.awaitDrain), t.awaitDrain && t.awaitDrain--, 0 === t.awaitDrain && L(e, "data") && (t.flowing = !0, E(e));
         };
       }function w(e) {
         q("readable nexttick read 0"), e.read(0);
       }function C(e, t) {
-        t.resumeScheduled || (t.resumeScheduled = !0, I.nextTick(S, e, t));
+        t.resumeScheduled || (t.resumeScheduled = !0, O.nextTick(S, e, t));
       }function S(e, t) {
         t.reading || (q("resume read 0"), e.read(0)), t.resumeScheduled = !1, t.awaitDrain = 0, e.emit("resume"), E(e), t.flowing && !t.reading && e.read(0);
       }function E(e) {
@@ -1131,8 +1131,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       }function T(e, t) {
         if (0 === t.length) return null;var n;return t.objectMode ? n = t.buffer.shift() : !e || e >= t.length ? (n = t.decoder ? t.buffer.join("") : 1 === t.buffer.length ? t.buffer.head.data : t.buffer.concat(t.length), t.buffer.clear()) : n = R(e, t.buffer, t.decoder), n;
       }function R(e, t, n) {
-        var r;return e < t.head.data.length ? (r = t.head.data.slice(0, e), t.head.data = t.head.data.slice(e)) : r = e === t.head.data.length ? t.shift() : n ? A(e, t) : k(e, t), r;
-      }function A(e, t) {
+        var r;return e < t.head.data.length ? (r = t.head.data.slice(0, e), t.head.data = t.head.data.slice(e)) : r = e === t.head.data.length ? t.shift() : n ? k(e, t) : A(e, t), r;
+      }function k(e, t) {
         var n = t.head,
             r = 1,
             i = n.data;for (e -= i.length; n = n.next;) {
@@ -1141,7 +1141,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             a === o.length ? (++r, n.next ? t.head = n.next : t.head = t.tail = null) : (t.head = n, n.data = o.slice(a));break;
           }++r;
         }return t.length -= r, i;
-      }function k(e, t) {
+      }function A(e, t) {
         var n = F.allocUnsafe(e),
             r = t.head,
             i = 1;for (r.data.copy(n), e -= r.data.length; r = r.next;) {
@@ -1151,23 +1151,23 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           }++i;
         }return t.length -= i, n;
       }function P(e) {
-        var t = e._readableState;if (t.length > 0) throw new Error('"endReadable()" called on non-empty stream');t.endEmitted || (t.ended = !0, I.nextTick(x, t, e));
+        var t = e._readableState;if (t.length > 0) throw new Error('"endReadable()" called on non-empty stream');t.endEmitted || (t.ended = !0, O.nextTick(x, t, e));
       }function x(e, t) {
         e.endEmitted || 0 !== e.length || (e.endEmitted = !0, t.readable = !1, t.emit("end"));
-      }function O(e, t) {
+      }function I(e, t) {
         for (var n = 0, r = e.length; n < r; n++) {
           if (e[n] === t) return n;
         }return -1;
-      }var I = n(7);e.exports = u;var D,
+      }var O = n(7);e.exports = u;var D,
           M = n(9);u.ReadableState = s;var L = (n(8).EventEmitter, function (e, t) {
         return e.listeners(t).length;
       }),
           B = n(12),
           F = n(5).Buffer,
           N = t.Uint8Array || function () {},
-          U = n(6);U.inherits = n(2);var j = n(29),
+          U = n(6);U.inherits = n(2);var j = n(28),
           q = void 0;q = j && j.debuglog ? j.debuglog("stream") : function () {};var Y,
-          W = n(30),
+          W = n(29),
           z = n(13);U.inherits(u, B);var H = ["error", "close", "destroy", "pause", "resume"];Object.defineProperty(u.prototype, "destroyed", { get: function get() {
           return void 0 !== this._readableState && this._readableState.destroyed;
         }, set: function set(e) {
@@ -1196,7 +1196,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         }function o() {
           q("cleanup"), e.removeListener("close", c), e.removeListener("finish", f), e.removeListener("drain", y), e.removeListener("error", u), e.removeListener("unpipe", n), h.removeListener("end", i), h.removeListener("end", l), h.removeListener("data", s), v = !0, !d.awaitDrain || e._writableState && !e._writableState.needDrain || y();
         }function s(t) {
-          q("ondata"), m = !1, !1 !== e.write(t) || m || ((1 === d.pipesCount && d.pipes === e || d.pipesCount > 1 && -1 !== O(d.pipes, e)) && !v && (q("false write response, pause", h._readableState.awaitDrain), h._readableState.awaitDrain++, m = !0), h.pause());
+          q("ondata"), m = !1, !1 !== e.write(t) || m || ((1 === d.pipesCount && d.pipes === e || d.pipesCount > 1 && -1 !== I(d.pipes, e)) && !v && (q("false write response, pause", h._readableState.awaitDrain), h._readableState.awaitDrain++, m = !0), h.pause());
         }function u(t) {
           q("onerror", t), l(), e.removeListener("error", u), 0 === L(e, "error") && e.emit("error", t);
         }function c() {
@@ -1210,7 +1210,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             d.pipes = e;break;case 1:
             d.pipes = [d.pipes, e];break;default:
             d.pipes.push(e);}d.pipesCount += 1, q("pipe count=%d opts=%j", d.pipesCount, t);var p = (!t || !1 !== t.end) && e !== r.stdout && e !== r.stderr,
-            g = p ? i : l;d.endEmitted ? I.nextTick(g) : h.once("end", g), e.on("unpipe", n);var y = _(h);e.on("drain", y);var v = !1,
+            g = p ? i : l;d.endEmitted ? O.nextTick(g) : h.once("end", g), e.on("unpipe", n);var y = b(h);e.on("drain", y);var v = !1,
             m = !1;return h.on("data", s), a(e, "error", u), e.once("close", c), e.once("finish", f), e.emit("pipe", h), d.flowing || (q("pipe resume"), h.resume()), e;
       }, u.prototype.unpipe = function (e) {
         var t = this._readableState,
@@ -1219,10 +1219,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
               i = t.pipesCount;t.pipes = null, t.pipesCount = 0, t.flowing = !1;for (var o = 0; o < i; o++) {
             r[o].emit("unpipe", this, n);
           }return this;
-        }var a = O(t.pipes, e);return -1 === a ? this : (t.pipes.splice(a, 1), t.pipesCount -= 1, 1 === t.pipesCount && (t.pipes = t.pipes[0]), e.emit("unpipe", this, n), this);
+        }var a = I(t.pipes, e);return -1 === a ? this : (t.pipes.splice(a, 1), t.pipesCount -= 1, 1 === t.pipesCount && (t.pipes = t.pipes[0]), e.emit("unpipe", this, n), this);
       }, u.prototype.on = function (e, t) {
         var n = B.prototype.on.call(this, e, t);if ("data" === e) !1 !== this._readableState.flowing && this.resume();else if ("readable" === e) {
-          var r = this._readableState;r.endEmitted || r.readableListening || (r.readableListening = r.needReadable = !0, r.emittedReadable = !1, r.reading ? r.length && y(this) : I.nextTick(w, this));
+          var r = this._readableState;r.endEmitted || r.readableListening || (r.readableListening = r.needReadable = !0, r.emittedReadable = !1, r.reading ? r.length && y(this) : O.nextTick(w, this));
         }return n;
       }, u.prototype.addListener = u.prototype.on, u.prototype.resume = function () {
         var e = this._readableState;return e.flowing || (q("resume"), e.flowing = !0, C(this, e)), this;
@@ -1274,7 +1274,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     (function (t, r, i) {
       function o(e) {
         var t = this;this.next = null, this.entry = null, this.finish = function () {
-          A(t, e);
+          k(t, e);
         };
       }function a(e) {
         return M.from(e);
@@ -1289,10 +1289,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       }function f(e) {
         if (P = P || n(3), !(F.call(f, this) || this instanceof P)) return new f(e);this._writableState = new c(e, this), this.writable = !0, e && ("function" == typeof e.write && (this._write = e.write), "function" == typeof e.writev && (this._writev = e.writev), "function" == typeof e.destroy && (this._destroy = e.destroy), "function" == typeof e.final && (this._final = e.final)), D.call(this);
       }function l(e, t) {
-        var n = new Error("write after end");e.emit("error", n), k.nextTick(t, n);
+        var n = new Error("write after end");e.emit("error", n), A.nextTick(t, n);
       }function h(e, t, n, r) {
         var i = !0,
-            o = !1;return null === n ? o = new TypeError("May not write null values to stream") : "string" == typeof n || void 0 === n || t.objectMode || (o = new TypeError("Invalid non-string/buffer chunk")), o && (e.emit("error", o), k.nextTick(r, o), i = !1), i;
+            o = !1;return null === n ? o = new TypeError("May not write null values to stream") : "string" == typeof n || void 0 === n || t.objectMode || (o = new TypeError("Invalid non-string/buffer chunk")), o && (e.emit("error", o), A.nextTick(r, o), i = !1), i;
       }function d(e, t, n) {
         return e.objectMode || !1 === e.decodeStrings || "string" != typeof t || (t = M.from(t, n)), t;
       }function p(e, t, n, r, i, o) {
@@ -1304,18 +1304,18 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       }function g(e, t, n, r, i, o, a) {
         t.writelen = r, t.writecb = a, t.writing = !0, t.sync = !0, n ? e._writev(i, t.onwrite) : e._write(i, o, t.onwrite), t.sync = !1;
       }function y(e, t, n, r, i) {
-        --t.pendingcb, n ? (k.nextTick(i, r), k.nextTick(T, e, t), e._writableState.errorEmitted = !0, e.emit("error", r)) : (i(r), e._writableState.errorEmitted = !0, e.emit("error", r), T(e, t));
+        --t.pendingcb, n ? (A.nextTick(i, r), A.nextTick(T, e, t), e._writableState.errorEmitted = !0, e.emit("error", r)) : (i(r), e._writableState.errorEmitted = !0, e.emit("error", r), T(e, t));
       }function v(e) {
         e.writing = !1, e.writecb = null, e.length -= e.writelen, e.writelen = 0;
       }function m(e, t) {
         var n = e._writableState,
             r = n.sync,
             i = n.writecb;if (v(n), t) y(e, n, r, t, i);else {
-          var o = C(n);o || n.corked || n.bufferProcessing || !n.bufferedRequest || w(e, n), r ? x(b, e, n, o, i) : b(e, n, o, i);
+          var o = C(n);o || n.corked || n.bufferProcessing || !n.bufferedRequest || w(e, n), r ? x(_, e, n, o, i) : _(e, n, o, i);
         }
-      }function b(e, t, n, r) {
-        n || _(e, t), t.pendingcb--, r(), T(e, t);
-      }function _(e, t) {
+      }function _(e, t, n, r) {
+        n || b(e, t), t.pendingcb--, r(), T(e, t);
+      }function b(e, t) {
         0 === t.length && t.needDrain && (t.needDrain = !1, e.emit("drain"));
       }function w(e, t) {
         t.bufferProcessing = !0;var n = t.bufferedRequest;if (e._writev && n && n.next) {
@@ -1338,27 +1338,27 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           t.pendingcb--, n && e.emit("error", n), t.prefinished = !0, e.emit("prefinish"), T(e, t);
         });
       }function E(e, t) {
-        t.prefinished || t.finalCalled || ("function" == typeof e._final ? (t.pendingcb++, t.finalCalled = !0, k.nextTick(S, e, t)) : (t.prefinished = !0, e.emit("prefinish")));
+        t.prefinished || t.finalCalled || ("function" == typeof e._final ? (t.pendingcb++, t.finalCalled = !0, A.nextTick(S, e, t)) : (t.prefinished = !0, e.emit("prefinish")));
       }function T(e, t) {
         var n = C(t);return n && (E(e, t), 0 === t.pendingcb && (t.finished = !0, e.emit("finish"))), n;
       }function R(e, t, n) {
-        t.ending = !0, T(e, t), n && (t.finished ? k.nextTick(n) : e.once("finish", n)), t.ended = !0, e.writable = !1;
-      }function A(e, t, n) {
+        t.ending = !0, T(e, t), n && (t.finished ? A.nextTick(n) : e.once("finish", n)), t.ended = !0, e.writable = !1;
+      }function k(e, t, n) {
         var r = e.entry;for (e.entry = null; r;) {
           var i = r.callback;t.pendingcb--, i(n), r = r.next;
         }t.corkedRequestsFree ? t.corkedRequestsFree.next = e : t.corkedRequestsFree = e;
-      }var k = n(7);e.exports = f;var P,
-          x = !t.browser && ["v0.10", "v0.9."].indexOf(t.version.slice(0, 5)) > -1 ? r : k.nextTick;f.WritableState = c;var O = n(6);O.inherits = n(2);var I = { deprecate: n(34) },
+      }var A = n(7);e.exports = f;var P,
+          x = !t.browser && ["v0.10", "v0.9."].indexOf(t.version.slice(0, 5)) > -1 ? r : A.nextTick;f.WritableState = c;var I = n(6);I.inherits = n(2);var O = { deprecate: n(33) },
           D = n(12),
           M = n(5).Buffer,
           L = i.Uint8Array || function () {},
-          B = n(13);O.inherits(f, D), c.prototype.getBuffer = function () {
+          B = n(13);I.inherits(f, D), c.prototype.getBuffer = function () {
         for (var e = this.bufferedRequest, t = []; e;) {
           t.push(e), e = e.next;
         }return t;
       }, function () {
         try {
-          Object.defineProperty(c.prototype, "buffer", { get: I.deprecate(function () {
+          Object.defineProperty(c.prototype, "buffer", { get: O.deprecate(function () {
               return this.getBuffer();
             }, "_writableState.buffer is deprecated. Use _writableState.getBuffer instead.", "DEP0003") });
         } catch (e) {}
@@ -1391,7 +1391,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } }), f.prototype.destroy = B.destroy, f.prototype._undestroy = B.undestroy, f.prototype._destroy = function (e, t) {
         this.end(), t(e);
       };
-    }).call(t, n(1), n(32).setImmediate, n(0));
+    }).call(t, n(1), n(31).setImmediate, n(0));
   }, function (e, t, n) {
     "use strict";
     function r(e) {
@@ -1404,7 +1404,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             if (t) return;e = ("" + e).toLowerCase(), t = !0;}
       }
     }function i(e) {
-      var t = r(e);if ("string" != typeof t && (m.isEncoding === b || !b(e))) throw new Error("Unknown encoding: " + e);return t || e;
+      var t = r(e);if ("string" != typeof t && (m.isEncoding === _ || !_(e))) throw new Error("Unknown encoding: " + e);return t || e;
     }function o(e) {
       this.encoding = i(e);var t;switch (this.encoding) {case "utf16le":
           this.text = h, this.end = d, t = 4;break;case "utf8":
@@ -1445,7 +1445,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     }function v(e) {
       return e && e.length ? this.write(e) : "";
     }var m = n(5).Buffer,
-        b = m.isEncoding || function (e) {
+        _ = m.isEncoding || function (e) {
       switch ((e = "" + e) && e.toLowerCase()) {case "hex":case "utf8":case "utf-8":case "ascii":case "binary":case "base64":case "ucs2":case "ucs-2":case "utf16le":case "utf-16le":case "raw":
           return !0;default:
           return !1;}
@@ -1487,23 +1487,21 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   }, function (e, t, n) {
     "use strict";
     Object.defineProperty(t, "__esModule", { value: !0 }), t.default = { DC_PING: "PING", DC_PONG: "PONG", DC_SIGNAL: "SIGNAL", DC_OPEN: "OPEN", DC_REQUEST: "REQUEST", DC_PIECE_NOT_FOUND: "PIECE_NOT_FOUND", DC_CLOSE: "CLOSE", DC_RESPONSE: "RESPONSE", DC_ERROR: "ERROR", DC_PIECE: "PIECE", DC_TIMEOUT: "TIMEOUT", DC_PIECE_ACK: "PIECE_ACK", DC_BITFIELD: "BITFIELD", DC_CHOKE: "CHOKE", DC_UNCHOKE: "UNCHOKE", DC_INTERESTED: "INTERESTED", DC_NOTINTERESTED: "NOT_INTERESTED", DC_HAVE: "HAVE", DC_LOST: "LOST", BM_LOST: "lost" }, e.exports = t.default;
-  }, function (e, t) {
-    (function (t) {
-      e.exports = t;
-    }).call(t, {});
   }, function (e, t, n) {
     "use strict";
     function r(e) {
       return e && e.__esModule ? e : { default: e };
-    }Object.defineProperty(t, "__esModule", { value: !0 }), t.getBrowserRTC = t.Buffer = t.Fetcher = t.Events = t.DataChannel = void 0;var i = n(20),
+    }Object.defineProperty(t, "__esModule", { value: !0 }), t.getPeersThrottle = t.getBrowserRTC = t.Buffer = t.Fetcher = t.Events = t.DataChannel = void 0;var i = n(19),
         o = r(i),
         a = n(17),
         s = r(a),
-        u = n(36),
+        u = n(35),
         c = r(u),
         f = n(10),
         l = r(f),
-        h = n(4).Buffer;t.DataChannel = o.default, t.Events = s.default, t.Fetcher = c.default, t.Buffer = h, t.getBrowserRTC = l.default;
+        h = n(37),
+        d = r(h),
+        p = n(4).Buffer;t.DataChannel = o.default, t.Events = s.default, t.Fetcher = c.default, t.Buffer = p, t.getBrowserRTC = l.default, t.getPeersThrottle = d.default;
   }, function (e, t, n) {
     "use strict";
     function r(e) {
@@ -1522,11 +1520,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       } else for (var s = void 0, u = 0; u < n; u++) {
         s = e.slice(u * t, (u + 1) * t), i.push(s);
       }return i;
-    }function u(e) {
-      for (var t = 0, n = 0; n < e.length - 1; n++) {
-        t += e.charCodeAt(n);
-      }return e[e.length - 1] === (t % 16).toString(16);
-    }Object.defineProperty(t, "__esModule", { value: !0 });var c = function () {
+    }Object.defineProperty(t, "__esModule", { value: !0 });var u = function () {
       function e(e, t) {
         for (var n = 0; n < t.length; n++) {
           var r = t[n];r.enumerable = r.enumerable || !1, r.configurable = !0, "value" in r && (r.writable = !0), Object.defineProperty(e, r.key, r);
@@ -1535,61 +1529,65 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         return n && e(t.prototype, n), r && e(t, r), t;
       };
     }(),
-        f = n(21),
-        l = r(f),
-        h = n(8),
-        d = r(h),
-        p = n(17),
-        g = r(p),
-        y = n(4).Buffer,
-        v = function (e) {
+        c = n(20),
+        f = r(c),
+        l = n(8),
+        h = r(l),
+        d = n(17),
+        p = r(d),
+        g = n(4).Buffer,
+        y = function (e) {
       function t(e, n, r, a, s) {
-        i(this, t);var c = o(this, (t.__proto__ || Object.getPrototypeOf(t)).call(this));return c.engine = e, c.config = s, c.remotePeerId = r, c.channelId = a ? n + "-" + r : r + "-" + n, c.connected = !1, c.msgQueue = [], c.miss = 0, c.rcvdReqQueue = [], c.downloading = !1, c.uploading = !1, c.choked = !u(r), c.delays = [], c._datachannel = new l.default({ initiator: a, objectMode: !0 }), c.isInitiator = a, c._init(c._datachannel), c.streamingRate = 0, c.recordSended = c._adjustStreamingRate(10), c;
-      }return a(t, e), c(t, null, [{ key: "VERSION", get: function get() {
+        i(this, t);var u = o(this, (t.__proto__ || Object.getPrototypeOf(t)).call(this));return u.engine = e, u.config = s, u.remotePeerId = r, u.channelId = a ? n + "-" + r : r + "-" + n, u.connected = !1, u.msgQueue = [], u.miss = 0, u.rcvdReqQueue = [], u.downloading = !1, u.uploading = !1, u.choked = !function (e) {
+          for (var t = 0, n = 0; n < e.length - 1; n++) {
+            t += e.charCodeAt(n);
+          }return e[e.length - 1] === (t % 16).toString(16);
+        }(r), u.delays = [], u._datachannel = new f.default({ initiator: a, objectMode: !0 }), u.isInitiator = a, u._init(u._datachannel), u.streamingRate = 0, u.recordSended = u._adjustStreamingRate(10), u;
+      }return a(t, e), u(t, null, [{ key: "VERSION", get: function get() {
           return "v1";
-        } }]), c(t, [{ key: "_init", value: function value(e) {
+        } }]), u(t, [{ key: "_init", value: function value(e) {
           var t = this,
               n = this.engine.logger;e.on("error", function (e) {
-            t.emit(g.default.DC_ERROR);
+            t.emit(p.default.DC_ERROR);
           }), e.on("signal", function (e) {
-            t.emit(g.default.DC_SIGNAL, e);
+            t.emit(p.default.DC_SIGNAL, e);
           });var r = function r() {
-            for (n.info("datachannel CONNECTED to " + t.remotePeerId), t.connected = !0, t.emit(g.default.DC_OPEN), t._sendPing(); t.msgQueue.length > 0;) {
+            for (n.info("datachannel CONNECTED to " + t.remotePeerId), t.connected = !0, t.emit(p.default.DC_OPEN), t._sendPing(); t.msgQueue.length > 0;) {
               var e = t.msgQueue.shift();t.emit(e.event, e);
             }
           };e.once("connect", r), e.on("data", function (e) {
             if ("string" == typeof e) {
-              var n = JSON.parse(e);if (!t.connected) return void t.msgQueue.push(n);switch (n.event) {case g.default.DC_PONG:
-                  t._handlePongMsg();break;case g.default.DC_PING:
-                  t.sendJson({ event: g.default.DC_PONG });break;case g.default.DC_PIECE:
-                  t._prepareForBinary(n.attachments, n.url, n.sn, n.size), t.emit(n.event, n);break;case g.default.DC_PIECE_NOT_FOUND:
-                  window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.emit(n.event, n);break;case g.default.DC_REQUEST:
-                  t._handleRequestMsg(n);break;case g.default.DC_PIECE_ACK:
+              var n = JSON.parse(e);if (!t.connected) return void t.msgQueue.push(n);switch (n.event) {case p.default.DC_PONG:
+                  t._handlePongMsg();break;case p.default.DC_PING:
+                  t.sendJson({ event: p.default.DC_PONG });break;case p.default.DC_PIECE:
+                  t._prepareForBinary(n.attachments, n.url, n.sn, n.size), t.emit(n.event, n);break;case p.default.DC_PIECE_NOT_FOUND:
+                  window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.emit(n.event, n);break;case p.default.DC_REQUEST:
+                  t._handleRequestMsg(n);break;case p.default.DC_PIECE_ACK:
                   t._handlePieceAck(), t.emit(n.event, n);break;default:
                   t.emit(n.event, n);}
-            } else t.bufArr.push(e), 0 === --t.remainAttachments && (window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.sendJson({ event: g.default.DC_PIECE_ACK, sn: t.bufSN, url: t.bufUrl, size: t.expectedSize }), t._handleBinaryData());
+            } else t.bufArr.push(e), 0 === --t.remainAttachments && (window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.sendJson({ event: p.default.DC_PIECE_ACK, sn: t.bufSN, url: t.bufUrl, size: t.expectedSize }), t._handleBinaryData());
           }), e.once("close", function () {
-            t.emit(g.default.DC_CLOSE);
+            t.emit(p.default.DC_CLOSE);
           });
         } }, { key: "sendJson", value: function value(e) {
           this.send(JSON.stringify(e));
         } }, { key: "send", value: function value(e) {
           this._datachannel && this._datachannel.connected && this._datachannel.send(e);
         } }, { key: "sendBitField", value: function value(e) {
-          this.sendJson({ event: g.default.DC_BITFIELD, field: e });
+          this.sendJson({ event: p.default.DC_BITFIELD, field: e });
         } }, { key: "sendBuffer", value: function value(e, t, n) {
           this.uploading = !0, this.uploadTimeout = window.setTimeout(this._uploadtimeout.bind(this), 1e3 * this.config.dcUploadTimeout);var r = n.byteLength,
               i = this.config.packetSize,
               o = 0,
-              a = 0;r % i == 0 ? a = r / i : (a = Math.floor(r / i) + 1, o = r % i);var u = { event: g.default.DC_PIECE, attachments: a, url: t, sn: e, size: r };this.sendJson(u);for (var c = s(n, i, a, o), f = 0; f < c.length; f++) {
+              a = 0;r % i == 0 ? a = r / i : (a = Math.floor(r / i) + 1, o = r % i);var u = { event: p.default.DC_PIECE, attachments: a, url: t, sn: e, size: r };this.sendJson(u);for (var c = s(n, i, a, o), f = 0; f < c.length; f++) {
             this.send(c[f]);
           }this.recordSended(r);
         } }, { key: "requestDataByURL", value: function value(e) {
           var t = arguments.length > 1 && void 0 !== arguments[1] && arguments[1],
-              n = { event: g.default.DC_REQUEST, url: e, urgent: t };this.downloading = !0, this.sendJson(n), t && (this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), 1e3 * this.config.dcRequestTimeout));
+              n = { event: p.default.DC_REQUEST, url: e, urgent: t };this.downloading = !0, this.sendJson(n), t && (this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), 1e3 * this.config.dcRequestTimeout));
         } }, { key: "requestDataBySN", value: function value(e) {
           var t = arguments.length > 1 && void 0 !== arguments[1] && arguments[1],
-              n = { event: g.default.DC_REQUEST, sn: e, urgent: t };this.downloading = !0, this.sendJson(n), t && (this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), 1e3 * this.config.dcRequestTimeout));
+              n = { event: p.default.DC_REQUEST, sn: e, urgent: t };this.downloading = !0, this.sendJson(n), t && (this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), 1e3 * this.config.dcRequestTimeout));
         } }, { key: "close", value: function value() {
           this.destroy();
         } }, { key: "receiveSignal", value: function value(e) {
@@ -1597,15 +1595,15 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } }, { key: "destroy", value: function value() {
           window.clearInterval(this.adjustSRInterval), window.clearInterval(this.pinger), this._datachannel.removeAllListeners(), this.removeAllListeners(), this._datachannel.destroy();
         } }, { key: "_handleRequestMsg", value: function value(e) {
-          this.rcvdReqQueue.length > 0 ? e.urgent ? this.rcvdReqQueue.push(e.sn) : this.rcvdReqQueue.unshift(e.sn) : this.emit(g.default.DC_REQUEST, e);
+          this.rcvdReqQueue.length > 0 ? e.urgent ? this.rcvdReqQueue.push(e.sn) : this.rcvdReqQueue.unshift(e.sn) : this.emit(p.default.DC_REQUEST, e);
         } }, { key: "_handlePieceAck", value: function value() {
           if (this.uploading = !1, window.clearTimeout(this.uploadTimeout), this.uploadTimeout = null, this.rcvdReqQueue.length > 0) {
-            var e = this.rcvdReqQueue.pop();this.emit(g.default.DC_REQUEST, { sn: e });
+            var e = this.rcvdReqQueue.pop();this.emit(p.default.DC_REQUEST, { sn: e });
           }
         } }, { key: "_prepareForBinary", value: function value(e, t, n, r) {
           this.bufArr = [], this.remainAttachments = e, this.bufUrl = t, this.bufSN = n, this.expectedSize = r;
         } }, { key: "_handleBinaryData", value: function value() {
-          var e = y.concat(this.bufArr);e.byteLength == this.expectedSize && this.emit(g.default.DC_RESPONSE, { url: this.bufUrl, sn: this.bufSN, data: e }), this.bufUrl = "", this.bufArr = [], this.expectedSize = -1, this.downloading = !1;
+          var e = g.concat(this.bufArr);e.byteLength == this.expectedSize && this.emit(p.default.DC_RESPONSE, { url: this.bufUrl, sn: this.bufSN, data: e }), this.bufUrl = "", this.bufArr = [], this.expectedSize = -1, this.downloading = !1;
         } }, { key: "_adjustStreamingRate", value: function value(e) {
           var t = this,
               n = 0;return this.adjustSRInterval = window.setInterval(function () {
@@ -1614,14 +1612,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             n += e;
           };
         } }, { key: "_loadtimeout", value: function value() {
-          var e = this.engine.logger;if (e.warn("datachannel timeout while downloading from " + this.remotePeerId), this.emit(g.default.DC_TIMEOUT), this.requestTimeout = null, this.downloading = !1, ++this.miss >= this.config.dcTolerance) {
-            var t = { event: g.default.DC_CLOSE };this.sendJson(t), e.warn("datachannel download miss reach dcTolerance, close " + this.remotePeerId), this.emit(g.default.DC_ERROR);
+          var e = this.engine.logger;if (e.warn("datachannel timeout while downloading from " + this.remotePeerId), this.emit(p.default.DC_TIMEOUT), this.requestTimeout = null, this.downloading = !1, ++this.miss >= this.config.dcTolerance) {
+            var t = { event: p.default.DC_CLOSE };this.sendJson(t), e.warn("datachannel download miss reach dcTolerance, close " + this.remotePeerId), this.emit(p.default.DC_ERROR);
           }
         } }, { key: "_uploadtimeout", value: function value() {
           this.engine.logger.warn("datachannel timeout while uploading to " + this.remotePeerId), this.uploading = !1, this.rcvdReqQueue = [];
         } }, { key: "_sendPing", value: function value() {
           var e = this;this.ping = performance.now();for (var t = 0; t < this.config.dcPings; t++) {
-            this.sendJson({ event: g.default.DC_PING });
+            this.sendJson({ event: p.default.DC_PING });
           }window.setTimeout(function () {
             if (e.delays.length > 0) {
               var t = 0,
@@ -1654,7 +1652,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } }, { key: "isAvailable", get: function get() {
           return !1 === this.downloading && !1 === this.choked;
         } }]), t;
-    }(d.default);t.default = v, e.exports = t.default;
+    }(h.default);t.default = y, e.exports = t.default;
   }, function (e, t, n) {
     "use strict";
     (function (t) {
@@ -1688,11 +1686,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         return typeof e === "undefined" ? "undefined" : _typeof(e);
       } : function (e) {
         return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e === "undefined" ? "undefined" : _typeof(e);
-      };e.exports = r;var a = n(24)("simple-channel"),
+      };e.exports = r;var a = n(23)("simple-channel"),
           s = n(10),
           u = n(2),
-          c = n(27),
-          f = n(28);u(r, f.Duplex), r.WEBRTC_SUPPORT = !!s(), r.config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:global.stun.twilio.com:3478?transport=udp" }] }, r.constraints = {}, r.channelConfig = {}, Object.defineProperty(r.prototype, "bufferSize", { get: function get() {
+          c = n(26),
+          f = n(27);u(r, f.Duplex), r.WEBRTC_SUPPORT = !!s(), r.config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:global.stun.twilio.com:3478?transport=udp" }] }, r.constraints = {}, r.channelConfig = {}, Object.defineProperty(r.prototype, "bufferSize", { get: function get() {
           var e = this;return e._channel && e._channel.bufferedAmount || 0;
         } }), r.prototype.address = function () {
         var e = this;return { port: e.localPort, family: "IPv4", address: e.localAddress };
@@ -1944,7 +1942,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         var e;try {
           e = t.storage.debug;
         } catch (e) {}return !e && void 0 !== r && "env" in r && (e = r.env.DEBUG), e;
-      }t = e.exports = n(25), t.log = a, t.formatArgs = o, t.save = s, t.load = u, t.useColors = i, t.storage = "undefined" != typeof chrome && void 0 !== chrome.storage ? chrome.storage.local : function () {
+      }t = e.exports = n(24), t.log = a, t.formatArgs = o, t.save = s, t.load = u, t.useColors = i, t.storage = "undefined" != typeof chrome && void 0 !== chrome.storage ? chrome.storage.local : function () {
         try {
           return window.localStorage;
         } catch (e) {}
@@ -1996,7 +1994,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       }return !1;
     }function c(e) {
       return e instanceof Error ? e.stack || e.message : e;
-    }t = e.exports = i.debug = i.default = i, t.coerce = c, t.disable = s, t.enable = a, t.enabled = u, t.humanize = n(26), t.instances = [], t.names = [], t.skips = [], t.formatters = {};
+    }t = e.exports = i.debug = i.default = i, t.coerce = c, t.disable = s, t.enable = a, t.enabled = u, t.humanize = n(25), t.instances = [], t.names = [], t.skips = [], t.formatters = {};
   }, function (e, t) {
     function n(e) {
       if (e = String(e), !(e.length > 100)) {
@@ -2037,7 +2035,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           s = t.crypto || t.msCrypto;s && s.getRandomValues ? e.exports = o : e.exports = i;
     }).call(t, n(0), n(1));
   }, function (e, t, n) {
-    t = e.exports = n(11), t.Stream = t, t.Readable = t, t.Writable = n(14), t.Duplex = n(3), t.Transform = n(16), t.PassThrough = n(35);
+    t = e.exports = n(11), t.Stream = t, t.Readable = t, t.Writable = n(14), t.Duplex = n(3), t.Transform = n(16), t.PassThrough = n(34);
   }, function (e, t) {}, function (e, t, n) {
     "use strict";
     function r(e, t) {
@@ -2045,7 +2043,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     }function i(e, t, n) {
       e.copy(t, n);
     }var o = n(5).Buffer,
-        a = n(31);e.exports = function () {
+        a = n(30);e.exports = function () {
       function e() {
         r(this, e), this.head = null, this.tail = null, this.length = 0;
       }return e.prototype.push = function (e) {
@@ -2091,7 +2089,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         clearTimeout(e._idleTimeoutId);var t = e._idleTimeout;t >= 0 && (e._idleTimeoutId = setTimeout(function () {
           e._onTimeout && e._onTimeout();
         }, t));
-      }, n(33), t.setImmediate = "undefined" != typeof self && self.setImmediate || void 0 !== e && e.setImmediate || this && this.setImmediate, t.clearImmediate = "undefined" != typeof self && self.clearImmediate || void 0 !== e && e.clearImmediate || this && this.clearImmediate;
+      }, n(32), t.setImmediate = "undefined" != typeof self && self.setImmediate || void 0 !== e && e.setImmediate || this && this.setImmediate, t.clearImmediate = "undefined" != typeof self && self.clearImmediate || void 0 !== e && e.clearImmediate || this && this.clearImmediate;
     }).call(t, n(0));
   }, function (e, t, n) {
     (function (e, t) {
@@ -2195,14 +2193,16 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     "use strict";
     function r(e, t) {
       if (!(e instanceof t)) throw new TypeError("Cannot call a class as a function");
-    }Object.defineProperty(t, "__esModule", { value: !0 });var i = Object.assign || function (e) {
+    }function i(e, t, n, r, i) {
+      return (0, u.default)(e + t + n + "heke", r).substr(0, 8) === i || Math.random() > .5;
+    }Object.defineProperty(t, "__esModule", { value: !0 });var o = Object.assign || function (e) {
       for (var t = 1; t < arguments.length; t++) {
         var n = arguments[t];for (var r in n) {
           Object.prototype.hasOwnProperty.call(n, r) && (e[r] = n[r]);
         }
       }return e;
     },
-        o = function () {
+        a = function () {
       function e(e, t) {
         for (var n = 0; n < t.length; n++) {
           var r = t[n];r.enumerable = r.enumerable || !1, r.configurable = !0, "value" in r && (r.writable = !0), Object.defineProperty(e, r.key, r);
@@ -2211,21 +2211,21 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         return n && e(t.prototype, n), r && e(t, r), t;
       };
     }(),
-        a = n(37),
-        s = function (e) {
+        s = n(36),
+        u = function (e) {
       return e && e.__esModule ? e : { default: e };
-    }(a),
-        u = function () {
-      function e(t, n, o, a, u) {
-        r(this, e), this.engine = t, this.key = n, this.baseUrl = a, this.channelId = s.default.encode(o), this.announceInfo = i({}, u, { channel: this.channelId }), this.announceURL = a + "/channel", this.key = n, this.conns = 0, this.failConns = 0, this.totalHTTPDownloaded = 0, this.totalP2PDownloaded = 0, this.totalP2PUploaded = 0, this.httpDownloaded = 0, this.p2pDownloaded = 0, this.errsFragLoad = 0, this.errsBufStalled = 0, this.errsInternalExpt = 0;
-      }return o(e, [{ key: "btAnnounce", value: function value() {
+    }(s),
+        c = function () {
+      function e(t, n, i, a, s) {
+        r(this, e), this.engine = t, this.key = n, this.baseUrl = a, this.channelId = window.btoa(i), this.timestamp = Date.parse(new Date()) / 1e3, this.announceInfo = o({}, s, { channel: this.channelId, ts: this.timestamp }), this.announceURL = a + "/channel", this.key = n, this.conns = 0, this.failConns = 0, this.totalHTTPDownloaded = 0, this.totalP2PDownloaded = 0, this.totalP2PUploaded = 0, this.httpDownloaded = 0, this.p2pDownloaded = 0, this.errsFragLoad = 0, this.errsBufStalled = 0, this.errsInternalExpt = 0;
+      }return a(e, [{ key: "btAnnounce", value: function value() {
           var e = this,
               t = this.engine.logger;return new Promise(function (n, r) {
             fetch(e.announceURL, { headers: e._requestHeader, method: "POST", body: JSON.stringify(e.announceInfo) }).then(function (e) {
               return e.json();
             }).then(function (t) {
               if (-1 === t.ret) r(t.data.msg);else {
-                var i = t.data;e.peerId = i.id, e.btStats(i.report_interval), e.getPeersURL = e.baseUrl + "/channel/" + e.channelId + "/node/" + e.peerId + "/peers", e.statsURL = e.baseUrl + "/channel/" + e.channelId + "/node/" + e.peerId + "/stats", n(t.data);
+                var o = t.data;e.peerId = o.id, i(e.channelId, o.id, e.timestamp, e.engine.version, o.v || "") ? (e.btStats(o.report_interval), e.getPeersURL = e.baseUrl + "/channel/" + e.channelId + "/node/" + e.peerId + "/peers", e.statsURL = e.baseUrl + "/channel/" + e.channelId + "/node/" + e.peerId + "/stats", n(t.data)) : r("something wrong");
               }
             }).catch(function (e) {
               t.error("btAnnounce error " + e), r(e);
@@ -2274,46 +2274,93 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } }, { key: "_requestHeader", get: function get() {
           return {};
         } }]), e;
-    }();t.default = u, e.exports = t.default;
+    }();t.default = c, e.exports = t.default;
   }, function (e, t, n) {
     "use strict";
-    (function (e, r) {
-      var i,
-          o = "function" == typeof Symbol && "symbol" == _typeof(Symbol.iterator) ? function (e) {
-        return typeof e === "undefined" ? "undefined" : _typeof(e);
-      } : function (e) {
-        return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e === "undefined" ? "undefined" : _typeof(e);
-      };!function (a) {
-        var s = "object" == o(t) && t,
-            u = "object" == o(e) && e && e.exports == s && e,
-            c = "object" == (void 0 === r ? "undefined" : o(r)) && r;c.global !== c && c.window !== c || (a = c);var f = function f(e) {
-          this.message = e;
-        };f.prototype = new Error(), f.prototype.name = "InvalidCharacterError";var l = function l(e) {
-          throw new f(e);
-        },
-            h = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
-            d = function d(e) {
-          e = String(e), /[^\0-\xFF]/.test(e) && l("The string to be encoded contains characters outside of the Latin1 range.");for (var t, n, r, i, o = e.length % 3, a = "", s = -1, u = e.length - o; ++s < u;) {
-            t = e.charCodeAt(s) << 16, n = e.charCodeAt(++s) << 8, r = e.charCodeAt(++s), i = t + n + r, a += h.charAt(i >> 18 & 63) + h.charAt(i >> 12 & 63) + h.charAt(i >> 6 & 63) + h.charAt(63 & i);
-          }return 2 == o ? (t = e.charCodeAt(s) << 8, n = e.charCodeAt(++s), i = t + n, a += h.charAt(i >> 10) + h.charAt(i >> 4 & 63) + h.charAt(i << 2 & 63) + "=") : 1 == o && (i = e.charCodeAt(s), a += h.charAt(i >> 2) + h.charAt(i << 4 & 63) + "=="), a;
-        },
-            p = { encode: d, version: "<%= version %>" };if ("object" == o(n(18)) && n(18)) void 0 !== (i = function () {
-          return p;
-        }.call(t, n, t, e)) && (e.exports = i);else if (s && !s.nodeType) {
-          if (u) u.exports = p;else for (var g in p) {
-            p.hasOwnProperty(g) && (s[g] = p[g]);
-          }
-        } else a.base64 = p;
-      }(void 0);
-    }).call(t, n(38)(e), n(0));
-  }, function (e, t) {
-    e.exports = function (e) {
-      return e.webpackPolyfill || (e.deprecate = function () {}, e.paths = [], e.children || (e.children = []), Object.defineProperty(e, "loaded", { enumerable: !0, get: function get() {
-          return e.l;
-        } }), Object.defineProperty(e, "id", { enumerable: !0, get: function get() {
-          return e.i;
-        } }), e.webpackPolyfill = 1), e;
-    };
+    var r;"function" == typeof Symbol && Symbol.iterator;!function (i) {
+      function o(e, t) {
+        var n = (65535 & e) + (65535 & t);return (e >> 16) + (t >> 16) + (n >> 16) << 16 | 65535 & n;
+      }function a(e, t) {
+        return e << t | e >>> 32 - t;
+      }function s(e, t, n, r, i, s) {
+        return o(a(o(o(t, e), o(r, s)), i), n);
+      }function u(e, t, n, r, i, o, a) {
+        return s(t & n | ~t & r, e, t, i, o, a);
+      }function c(e, t, n, r, i, o, a) {
+        return s(t & r | n & ~r, e, t, i, o, a);
+      }function f(e, t, n, r, i, o, a) {
+        return s(t ^ n ^ r, e, t, i, o, a);
+      }function l(e, t, n, r, i, o, a) {
+        return s(n ^ (t | ~r), e, t, i, o, a);
+      }function h(e, t) {
+        e[t >> 5] |= 128 << t % 32, e[14 + (t + 64 >>> 9 << 4)] = t;var n,
+            r,
+            i,
+            a,
+            s,
+            h = 1732584193,
+            d = -271733879,
+            p = -1732584194,
+            g = 271733878;for (n = 0; n < e.length; n += 16) {
+          r = h, i = d, a = p, s = g, h = u(h, d, p, g, e[n], 7, -680876936), g = u(g, h, d, p, e[n + 1], 12, -389564586), p = u(p, g, h, d, e[n + 2], 17, 606105819), d = u(d, p, g, h, e[n + 3], 22, -1044525330), h = u(h, d, p, g, e[n + 4], 7, -176418897), g = u(g, h, d, p, e[n + 5], 12, 1200080426), p = u(p, g, h, d, e[n + 6], 17, -1473231341), d = u(d, p, g, h, e[n + 7], 22, -45705983), h = u(h, d, p, g, e[n + 8], 7, 1770035416), g = u(g, h, d, p, e[n + 9], 12, -1958414417), p = u(p, g, h, d, e[n + 10], 17, -42063), d = u(d, p, g, h, e[n + 11], 22, -1990404162), h = u(h, d, p, g, e[n + 12], 7, 1804603682), g = u(g, h, d, p, e[n + 13], 12, -40341101), p = u(p, g, h, d, e[n + 14], 17, -1502002290), d = u(d, p, g, h, e[n + 15], 22, 1236535329), h = c(h, d, p, g, e[n + 1], 5, -165796510), g = c(g, h, d, p, e[n + 6], 9, -1069501632), p = c(p, g, h, d, e[n + 11], 14, 643717713), d = c(d, p, g, h, e[n], 20, -373897302), h = c(h, d, p, g, e[n + 5], 5, -701558691), g = c(g, h, d, p, e[n + 10], 9, 38016083), p = c(p, g, h, d, e[n + 15], 14, -660478335), d = c(d, p, g, h, e[n + 4], 20, -405537848), h = c(h, d, p, g, e[n + 9], 5, 568446438), g = c(g, h, d, p, e[n + 14], 9, -1019803690), p = c(p, g, h, d, e[n + 3], 14, -187363961), d = c(d, p, g, h, e[n + 8], 20, 1163531501), h = c(h, d, p, g, e[n + 13], 5, -1444681467), g = c(g, h, d, p, e[n + 2], 9, -51403784), p = c(p, g, h, d, e[n + 7], 14, 1735328473), d = c(d, p, g, h, e[n + 12], 20, -1926607734), h = f(h, d, p, g, e[n + 5], 4, -378558), g = f(g, h, d, p, e[n + 8], 11, -2022574463), p = f(p, g, h, d, e[n + 11], 16, 1839030562), d = f(d, p, g, h, e[n + 14], 23, -35309556), h = f(h, d, p, g, e[n + 1], 4, -1530992060), g = f(g, h, d, p, e[n + 4], 11, 1272893353), p = f(p, g, h, d, e[n + 7], 16, -155497632), d = f(d, p, g, h, e[n + 10], 23, -1094730640), h = f(h, d, p, g, e[n + 13], 4, 681279174), g = f(g, h, d, p, e[n], 11, -358537222), p = f(p, g, h, d, e[n + 3], 16, -722521979), d = f(d, p, g, h, e[n + 6], 23, 76029189), h = f(h, d, p, g, e[n + 9], 4, -640364487), g = f(g, h, d, p, e[n + 12], 11, -421815835), p = f(p, g, h, d, e[n + 15], 16, 530742520), d = f(d, p, g, h, e[n + 2], 23, -995338651), h = l(h, d, p, g, e[n], 6, -198630844), g = l(g, h, d, p, e[n + 7], 10, 1126891415), p = l(p, g, h, d, e[n + 14], 15, -1416354905), d = l(d, p, g, h, e[n + 5], 21, -57434055), h = l(h, d, p, g, e[n + 12], 6, 1700485571), g = l(g, h, d, p, e[n + 3], 10, -1894986606), p = l(p, g, h, d, e[n + 10], 15, -1051523), d = l(d, p, g, h, e[n + 1], 21, -2054922799), h = l(h, d, p, g, e[n + 8], 6, 1873313359), g = l(g, h, d, p, e[n + 15], 10, -30611744), p = l(p, g, h, d, e[n + 6], 15, -1560198380), d = l(d, p, g, h, e[n + 13], 21, 1309151649), h = l(h, d, p, g, e[n + 4], 6, -145523070), g = l(g, h, d, p, e[n + 11], 10, -1120210379), p = l(p, g, h, d, e[n + 2], 15, 718787259), d = l(d, p, g, h, e[n + 9], 21, -343485551), h = o(h, r), d = o(d, i), p = o(p, a), g = o(g, s);
+        }return [h, d, p, g];
+      }function d(e) {
+        var t,
+            n = "",
+            r = 32 * e.length;for (t = 0; t < r; t += 8) {
+          n += String.fromCharCode(e[t >> 5] >>> t % 32 & 255);
+        }return n;
+      }function p(e) {
+        var t,
+            n = [];for (n[(e.length >> 2) - 1] = void 0, t = 0; t < n.length; t += 1) {
+          n[t] = 0;
+        }var r = 8 * e.length;for (t = 0; t < r; t += 8) {
+          n[t >> 5] |= (255 & e.charCodeAt(t / 8)) << t % 32;
+        }return n;
+      }function g(e) {
+        return d(h(p(e), 8 * e.length));
+      }function y(e, t) {
+        var n,
+            r,
+            i = p(e),
+            o = [],
+            a = [];for (o[15] = a[15] = void 0, i.length > 16 && (i = h(i, 8 * e.length)), n = 0; n < 16; n += 1) {
+          o[n] = 909522486 ^ i[n], a[n] = 1549556828 ^ i[n];
+        }return r = h(o.concat(p(t)), 512 + 8 * t.length), d(h(a.concat(r), 640));
+      }function v(e) {
+        var t,
+            n,
+            r = "0123456789abcdef",
+            i = "";for (n = 0; n < e.length; n += 1) {
+          t = e.charCodeAt(n), i += r.charAt(t >>> 4 & 15) + r.charAt(15 & t);
+        }return i;
+      }function m(e) {
+        return unescape(encodeURIComponent(e));
+      }function _(e) {
+        return g(m(e));
+      }function b(e) {
+        return v(_(e));
+      }function w(e, t) {
+        return y(m(e), m(t));
+      }function C(e, t) {
+        return v(w(e, t));
+      }function S(e, t, n) {
+        return t ? n ? w(t, e) : C(t, e) : n ? _(e) : b(e);
+      }void 0 !== (r = function () {
+        return S;
+      }.call(t, n, t, e)) && (e.exports = r);
+    }();
+  }, function (e, t, n) {
+    "use strict";
+    function r(e, t) {
+      var n = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : 20,
+          r = null,
+          i = !1;return function () {
+        if (arguments.length > 0 && void 0 !== arguments[0] && arguments[0]) return void window.clearTimeout(r);i || (i = !0, r = setTimeout(function () {
+          e.call(t), i = !1, r = null;
+        }, 1e3 * n));
+      };
+    }Object.defineProperty(t, "__esModule", { value: !0 }), t.default = r, e.exports = t.default;
   }]);
 });
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)(module)))
@@ -2329,7 +2376,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.handleTSUrl = handleTSUrl;
-exports.throttle = throttle;
 exports.defaultChannelId = defaultChannelId;
 exports.tsPathChecker = tsPathChecker;
 exports.noop = noop;
@@ -2350,28 +2396,12 @@ function handleTSUrl(url) {
     return url;
 }
 
-// 函数节流，默认冷却时间30秒
-function throttle(method, context) {
-    var colddown = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 20;
-
-
-    var going = false;
-    return function () {
-        if (going) return;
-        going = true;
-        setTimeout(function () {
-            method.call(context);
-            going = false;
-        }, colddown * 1000);
-    };
-};
-
 // channelId generator
-function defaultChannelId(url, protocol) {
-    var browserInfo = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+function defaultChannelId(url) {
+    var browserInfo = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     var path = _urlToolkit2.default.parseURL(url).path.split('.')[0];
-    return path + '[' + protocol + ']';
+    return '' + path;
 }
 
 function tsPathChecker() {
@@ -2989,6 +3019,7 @@ var P2PEngine = function (_EventEmitter) {
 
         _this.HLSEvents = hlsjs.constructor.Events;
 
+        // 如果tsStrictMatched=false，需要自动检查不同ts路径是否相同
         _this.checkTSPath = _this.config.tsStrictMatched ? _toolFuns.noop : (0, _toolFuns.tsPathChecker)();
 
         var onLevelLoaded = function onLevelLoaded(event, data) {
@@ -2999,11 +3030,10 @@ var P2PEngine = function (_EventEmitter) {
             var browserInfo = {
                 device: _platform2.default.getPlatform(),
                 netType: _platform2.default.getNetType(),
-                host: window.location.host,
                 version: P2PEngine.version,
                 tag: _this.config.tag || _this.hlsjs.constructor.version
             };
-            var channel = _this.config.channelId(hlsjs.url, _core.DataChannel.VERSION, browserInfo);
+            var channel = _this.config.channelId(hlsjs.url, browserInfo) + '[' + _core.DataChannel.VERSION + ']';
             //初始化logger
             var logger = new _logger2.default(_this.config, channel);
             _this.hlsjs.config.logger = _this.logger = logger;
@@ -3015,7 +3045,11 @@ var P2PEngine = function (_EventEmitter) {
 
         hlsjs.on(_this.HLSEvents.LEVEL_LOADED, onLevelLoaded);
 
+<<<<<<< HEAD
         console.log('Hybrid Engine started');
+=======
+        // console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
+>>>>>>> 8d66fa469d7a417a90c34b70db445548fef0f194
 
         return _this;
     }
@@ -3155,7 +3189,7 @@ var P2PEngine = function (_EventEmitter) {
 
 P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)();
 
-P2PEngine.version = "0.2.4";
+P2PEngine.version = "0.2.5";
 
 exports.default = P2PEngine;
 module.exports = exports['default'];
@@ -3267,7 +3301,7 @@ var BTTracker = function (_EventEmitter) {
         _this.peers = [];
 
         // 防止调用频率过高
-        _this.requestMorePeers = (0, _toolFuns.throttle)(_this._requestMorePeers, _this);
+        _this.requestMorePeers = (0, _core.getPeersThrottle)(_this._requestMorePeers, _this);
 
         _this._setupScheduler(_this.scheduler);
         return _this;
@@ -3410,7 +3444,8 @@ var BTTracker = function (_EventEmitter) {
                 _this5.scheduler.handshakePeer(datachannel);
 
                 //如果dc数量不够则继续尝试连接
-                _this5.requestMorePeers();
+                var cancel = _this5.scheduler.peersNum <= 3 ? false : true;
+                _this5.requestMorePeers(cancel);
 
                 //更新conns
                 _this5.fetcher.increConns();
@@ -3492,7 +3527,7 @@ var BTTracker = function (_EventEmitter) {
             var logger = this.engine.logger;
             // 连接的节点<=3时请求更多节点
 
-            if (this.scheduler.peerMap.size <= 3) {
+            if (this.scheduler.peersNum <= 3) {
                 this.fetcher.btGetPeers().then(function (json) {
                     logger.info('request more peers ' + JSON.stringify(json));
                     _this7._handlePeers(json.peers);
@@ -3733,7 +3768,7 @@ var BTScheduler = function (_EventEmitter) {
                 }
             }
 
-            logger.warn('idle peers has not sn ' + sn);
+            logger.warn('idle peers hasn\'t sn ' + sn);
             return false;
         }
     }, {
@@ -3918,6 +3953,11 @@ var BTScheduler = function (_EventEmitter) {
         key: 'hasPeers',
         get: function get() {
             return this.peerMap.size > 0;
+        }
+    }, {
+        key: 'peersNum',
+        get: function get() {
+            return this.peerMap.size;
         }
     }, {
         key: 'hasIdlePeers',

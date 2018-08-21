@@ -115,7 +115,7 @@ class BTScheduler extends EventEmitter {
                 return true;
             }
         }
-        logger.warn(`idle peers has not sn ${sn}`);
+        logger.warn(`idle peers hasn't sn ${sn}`);
         return false;
     }
 
@@ -134,6 +134,10 @@ class BTScheduler extends EventEmitter {
 
     get hasPeers() {
         return this.peerMap.size > 0;
+    }
+
+    get peersNum() {
+        return this.peerMap.size;
     }
 
     get hasIdlePeers() {

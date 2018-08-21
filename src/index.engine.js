@@ -41,11 +41,10 @@ class P2PEngine extends EventEmitter {
             let browserInfo = {
                 device: platform.getPlatform(),
                 netType: platform.getNetType(),
-                host: window.location.host,
                 version: P2PEngine.version,
                 tag: this.config.tag || this.hlsjs.constructor.version,
             };
-            let channel = this.config.channelId(hlsjs.url, DataChannel.VERSION, browserInfo);
+            let channel = `${this.config.channelId(hlsjs.url, browserInfo)}[${DataChannel.VERSION}]`;
             //初始化logger
             let logger = new Logger(this.config, channel);
             this.hlsjs.config.logger = this.logger = logger;
@@ -58,7 +57,11 @@ class P2PEngine extends EventEmitter {
         hlsjs.on(this.HLSEvents.LEVEL_LOADED, onLevelLoaded);
 
 
+<<<<<<< HEAD
         console.log(`Hybrid Engine started`);
+=======
+        // console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
+>>>>>>> 8d66fa469d7a417a90c34b70db445548fef0f194
 
     }
 
