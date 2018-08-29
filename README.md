@@ -111,9 +111,13 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 See [API.md](docs/English/API.md)
 
 ## Signaling Server
-To communicate with another peer you simply need to exchange contact information and the rest will be done by WebRTC. The process of connecting to the other peers is also known as signaling. It's recommended to build and deploy your own signaling server.
-- [gosignaler](https://github.com/cdnbye/gosignaler) (written by Golang)
-- [php-signaler](https://github.com/cdnbye/php-signaler) (written by PHP)
+To communicate with another peer you simply need to exchange contact information and the rest will be done by WebRTC. The process of connecting to the other peers is also known as signaling.
+- Deploy your own Signaling Server (recommended)
+    - [gosignaler](https://github.com/cdnbye/gosignaler) (written by Golang)
+    - [php-signaler](https://github.com/cdnbye/php-signaler) (written by PHP)
+- Use free Signaling Server
+    - 'wss://signal.cdnbye.com/wss' (provided by cdnbye, sometimes overloaded, not recommended)
+    - 'wss://free.freesignal.net' (contributed by freesignal.com, recommended)
 
 ## They are using CDNBye
 [<img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531253035445&di=7af6cc9ad4abe3d06ba376af22d85131&imgtype=0&src=http%3A%2F%2Fimg.kuai8.com%2Fattaches%2Fintro%2F1213%2F201612131436417407.png" width="120">](http://egame.qq.com/)
