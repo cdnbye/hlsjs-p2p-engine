@@ -124,7 +124,7 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
     - [php-signaler](https://github.com/cdnbye/php-signaler) (PHP版)
 - 第三方免费信令服务
     - 'wss://signal.cdnbye.com/wss'（本插件默认信令地址，负载较大，不推荐）
-    - 'wss://free.freesignal.net'（由freesignal.com提供的免费版本，推荐）
+    - 'wss://free.freesignal.net'（由freesignal.net提供的免费版本，推荐）
 
 ## 用户案例
 [<img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531253035445&di=7af6cc9ad4abe3d06ba376af22d85131&imgtype=0&src=http%3A%2F%2Fimg.kuai8.com%2Fattaches%2Fintro%2F1213%2F201612131436417407.png" width="120">](http://egame.qq.com/)
@@ -154,4 +154,9 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
     - 参见 [tcplayer-demo.html](demo/tcplayer-demo.html)
 - `欢迎贡献您的播放器demo`
     - CDNBye可以集成到内置hls.js的任何H5视频播放器中！
+    
+## 捐赠
+您的捐赠将用于购买服务器以及维持该开源项目的其它开销：）
+
+<img width="250" src="figs/pay.jpeg" alt="cdnbye logo" align="center">
 
