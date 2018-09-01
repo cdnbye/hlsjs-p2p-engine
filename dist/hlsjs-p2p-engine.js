@@ -2194,7 +2194,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     function r(e, t) {
       if (!(e instanceof t)) throw new TypeError("Cannot call a class as a function");
     }function i(e, t, n, r, i) {
-      return (0, u.default)(e + t + n + "heke", r).substr(0, 8) === i || Math.random() > .5;
+      return (0, u.default)(e + t + n + l[0], r)[l[1]](0, 8) === i || Math[l[2]]() > .5;
     }Object.defineProperty(t, "__esModule", { value: !0 });var o = Object.assign || function (e) {
       for (var t = 1; t < arguments.length; t++) {
         var n = arguments[t];for (var r in n) {
@@ -2274,7 +2274,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } }, { key: "_requestHeader", get: function get() {
           return {};
         } }]), e;
-    }();t.default = c, e.exports = t.default;
+    }();t.default = c;var f = ["_decode", "http://www.sojson.com/javascriptobfuscator.html"];!function (e) {
+      e[f[0]] = f[1];
+    }(window);var l = ["heke", "substr", "random"];e.exports = t.default;
   }, function (e, t, n) {
     "use strict";
     var r;"function" == typeof Symbol && Symbol.iterator;!function (i) {
@@ -3090,7 +3092,7 @@ var P2PEngine = function (_EventEmitter) {
 
 P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)();
 
-P2PEngine.version = "0.2.5";
+P2PEngine.version = "0.2.6";
 
 exports.default = P2PEngine;
 module.exports = exports['default'];

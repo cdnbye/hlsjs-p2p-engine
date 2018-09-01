@@ -28,6 +28,8 @@ let defaultP2PConfig = {
 
     channelId: null,                             // 标识channel的字段，默认是'[path]-[protocol version]'
 
+    webRTCConfig: {},                            // 传入channelConfig用于createDataChannel，config用于RTCPeerConnection
+
     ...btConfig
 };
 

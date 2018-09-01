@@ -43,8 +43,10 @@ class P2PEngine extends EventEmitter {
                 netType: platform.getNetType(),
                 version: P2PEngine.version,
                 tag: this.config.tag || this.hlsjs.constructor.version,
+                live: isLive,
             };
-            let channel = `${this.config.channelId(hlsjs.url, browserInfo)}[${DataChannel.VERSION}]`;
+
+            let channel = `${this.config.channelId(hlsjs.url, this.config.wsSignalerAddr, browserInfo)}[${DataChannel.VERSION}]`;
             //初始化logger
             let logger = new Logger(this.config, channel);
             this.hlsjs.config.logger = this.logger = logger;
@@ -148,10 +150,8 @@ class P2PEngine extends EventEmitter {
         });
 
         this.hlsjs.on(this.HLSEvents.DESTROYING, () => {
-            // log('DESTROYING: '+JSON.stringify(frag));
-            this.signaler.destroy();
-            this.signaler = null;
-
+            logger.warn('destroying hlsjs');
+            this.destroy();
         });
     }
 
@@ -177,6 +177,10 @@ class P2PEngine extends EventEmitter {
                 this.signaler.resumeP2P();
             }
         }
+    }
+
+    destroy() {
+        this.disableP2P();
     }
 
     get version() {

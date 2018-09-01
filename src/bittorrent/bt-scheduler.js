@@ -24,13 +24,11 @@ class BTScheduler extends EventEmitter {
         if (this.bitCounts.has(sn)) {
             this.bitCounts.delete(sn)             //在bitCounts清除，防止重复下载
         }
-        if (this.peerMap.size > 0) {
-            const msg = {
-                event: Events.DC_HAVE,
-                sn: sn
-            };
-            this._broadcastToPeers(msg);
-        }
+        const msg = {
+            event: Events.DC_HAVE,
+            sn: sn
+        };
+        this._broadcastToPeers(msg);
     }
 
     updateLoadingSN(sn) {                                                           //防止下载hls.js正在下载的sn
@@ -76,6 +74,44 @@ class BTScheduler extends EventEmitter {
         //     }
         // }
 
+    }
+
+    // 阻止其它peer的请求
+    chokePeerRequest(dc) {
+        const msg = {
+            event: Events.DC_CHOKE
+        };
+        if (dc) {
+            dc.sendJson(msg)
+        } else {
+            this._broadcastToPeers(msg);
+        }
+    }
+
+    // 允许其它peer的请求
+    unchokePeerRequest(dc) {
+        const msg = {
+            event: Events.DC_UNCHOKE
+        };
+        if (dc) {
+            dc.sendJson(msg)
+        } else {
+            this._broadcastToPeers(msg);
+        }
+    }
+
+    // 暂停从其它peer请求数据
+    stopRequestFromPeers() {
+        for (let peer of this.peerMap.values()) {
+            peer.choked = true;
+        }
+    }
+
+    // 恢复从其它peer请求数据
+    resumeRequestFromPeers() {
+        for (let peer of this.peerMap.values()) {
+            peer.choked = false;
+        }
     }
 
     deletePeer(dc) {
@@ -133,7 +169,7 @@ class BTScheduler extends EventEmitter {
     }
 
     get hasPeers() {
-        return this.peerMap.size > 0;
+        return this.peersNum > 0;
     }
 
     get peersNum() {
@@ -143,7 +179,7 @@ class BTScheduler extends EventEmitter {
     get hasIdlePeers() {
         const { logger } = this.engine;
         const idles = this._getIdlePeer().length;
-        logger.info(`peers: ${this.peerMap.size} idle peers: ${idles}`);
+        logger.info(`peers: ${this.peersNum} idle peers: ${idles}`);
         return idles > 0;
     }
 
@@ -157,6 +193,18 @@ class BTScheduler extends EventEmitter {
             });
             this.bitset.delete(sn);
         })
+    }
+
+    destroy() {
+        const { logger } = this.engine;
+        if (this.peersNum > 0) {
+            for (let peer of this.peerMap.values()) {
+                peer.destroy();
+                peer = null;
+            }
+            this.peerMap.clear();
+        }
+        logger.warn(`destroy scheduler`);
     }
 
     _setupDC(dc) {
@@ -248,8 +296,10 @@ class BTScheduler extends EventEmitter {
     }
 
     _broadcastToPeers(msg) {
-        for (let peer of this.peerMap.values()) {
-            peer.sendJson(msg);
+        if (this.peersNum > 0) {
+            for (let peer of this.peerMap.values()) {
+                peer.sendJson(msg);
+            }
         }
     }
 

@@ -21,10 +21,6 @@ class CDNByeHlsjs extends Hlsjs{
         return P2PEngine.Events;
     }
 
-    static get uaParserResult() {
-        return P2PEngine.uaParserResult;
-    }
-
     constructor(config = {}) {
 
         let p2pConfig = config.p2pConfig || {};

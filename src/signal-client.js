@@ -78,6 +78,8 @@ class SignalClient extends EventEmitter{
     }
 
     close() {
+        const { logger } = this.engine;
+        logger.warn(`close signal client`);
         this._ws.close();
         this._ws = null;
     }

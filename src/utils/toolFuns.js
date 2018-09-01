@@ -8,10 +8,16 @@ export function handleTSUrl(url, matched = false) {
     return url;
 }
 
-// channelId generator
-export function defaultChannelId(url, browserInfo = {}) {
-    const path = URLToolkit.parseURL(url).path.split('.')[0];
-    return `${path}`;
+/*
+    fun: channelId generator
+    streamId: 用于标识流地址的ID
+    signalId: 用于标识信令地址的ID，在channelID加上这个可以防止不同信令服务器下的节点混在一起
+ */
+export function defaultChannelId(url, signalAddr, browserInfo = {}) {
+    const streamParsed = URLToolkit.parseURL(url);
+    const streamId = streamParsed.netLoc.substr(2) + streamParsed.path.split('.')[0];
+    const signalId = URLToolkit.parseURL(signalAddr).netLoc.substr(2);
+    return `${streamId}|${signalId}`;
 }
 
 export function tsPathChecker() {

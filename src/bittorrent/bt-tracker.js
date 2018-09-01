@@ -11,7 +11,7 @@ class BTTracker extends EventEmitter {
 
         this.engine = engine;
         this.config = config;
-        this.connected = false;
+        this.connected = false;                                // 与信令的连接状态
         this.scheduler = new BTScheduler(engine, config);
         this.DCMap = new Map();                                  //{key: remotePeerId, value: DataChannnel} 目前已经建立连接或正在建立连接的dc
         this.failedDCSet= new Set();                            //{remotePeerId} 建立连接失败的dc
@@ -26,21 +26,24 @@ class BTTracker extends EventEmitter {
         // 防止调用频率过高
         this.requestMorePeers = getPeersThrottle(this._requestMorePeers, this);
 
-        this._setupScheduler(this.scheduler);
+        // this._setupScheduler(this.scheduler);
     }
 
     set currentPlaySN(sn) {
         // console.warn(`currentPlaySN ${sn} ${performance.now()}`);
+        if (!this.config.p2pEnabled) return;
         this.scheduler.updatePlaySN(sn);
     }
 
     set currentLoadingSN(sn) {
         // console.warn(`currentLoadingSN ${sn} ${performance.now()}`);
+        if (!this.config.p2pEnabled) return;
         this.scheduler.updateLoadingSN(sn);
     }
 
     set currentLoadedSN(sn) {
         // console.warn(`currentLoadedSN ${sn} ${performance.now()}`);
+        if (!this.config.p2pEnabled) return;
         this.scheduler.updateLoadedSN(sn);                        //更新bitmap
     }
 
@@ -60,11 +63,19 @@ class BTTracker extends EventEmitter {
 
     stopP2P() {
         const { logger } = this.engine;
-        logger.warn(`未实现`);
+        this.scheduler.destroy();
+        this.scheduler = null;
+        this.signalerWs.close();
+        this.peers = [];
+        this.DCMap.clear();
+        this.failedDCSet.clear();
+        logger.warn(`tracker stop p2p`);
     }
 
     destroy() {
-
+        const { logger } = this.engine;
+        this.stopP2P();
+        logger.warn(`destroy tracker`);
     }
 
     _handlePeers(peers) {
@@ -186,7 +197,6 @@ class BTTracker extends EventEmitter {
         };
         websocket.onclose = () => {                                            //websocket断开时清除datachannel
             this.connected = false;
-            this.destroy();
         };
         return websocket;
     }
@@ -208,9 +218,9 @@ class BTTracker extends EventEmitter {
         datachannel.receiveSignal(data);
     }
 
-    _setupScheduler(s) {
-
-    }
+    // _setupScheduler(s) {
+    //
+    // }
 
     _requestMorePeers() {
         const { logger } = this.engine;

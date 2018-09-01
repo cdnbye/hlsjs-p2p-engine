@@ -38,7 +38,7 @@ class FragLoader extends EventEmitter {
         frag.relurl = urlObj.path + urlObj.query;
         frag.loadByP2P = false;                //初始化flag
         frag.loadByHTTP = false;
-        if (this.bufMgr.hasSegOfURL(frag.relurl)) {                                     //如果命中缓存
+        if (this.p2pEnabled && this.bufMgr.hasSegOfURL(frag.relurl)) {                                     //如果命中缓存
             logger.debug(`bufMgr found seg sn ${frag.sn} url ${frag.relurl}`);
             let seg = this.bufMgr.getSegByURL(frag.relurl);
             let response = { url : context.url, data : seg.data }, trequest, tfirst, tload, loaded, total;
@@ -54,7 +54,7 @@ class FragLoader extends EventEmitter {
                 callbacks.onSuccess(response, stats, context);
             }, 50)
         // } else if (this.scheduler.hasIdlePeers && this.scheduler.peersHasSN(frag.sn)) {                             //如果在peers的bitmap中找到
-        } else if (this.scheduler.hasAndSetTargetPeer(frag.sn)) {                             //如果在peers的bitmap中找到
+        } else if (this.p2pEnabled && this.scheduler.hasAndSetTargetPeer(frag.sn)) {                             //如果在peers的bitmap中找到
             context.frag.loadByP2P = true;
             this.scheduler.load(context, config, callbacks);
             callbacks.onTimeout = (stats, context) => {                             //如果P2P下载超时则立即切换到xhr下载
