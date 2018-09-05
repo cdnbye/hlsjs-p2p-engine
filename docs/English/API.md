@@ -38,36 +38,27 @@ if (Hls.WEBRTC_SUPPORT) {
 }
 ```
 
-### `var hls = new Hls([opts]);`
+### `var hls = new Hls({p2pConfig: [opts]});` 
 Create a new `Hls` instance.
 
 If `opts` is specified, then the default options (shown below) will be overridden.
 
-```javascript
-{
-    // hlsjsConfig options provided by hls.js
-    p2pConfig: {
-        logLevel: string or boolean         // Print log level(debug, info, warn, error, none，false=none, true=debug) (default='none')
-        announce: string                    // The address of tracker server
-        wsSignalerAddr: string              // The address of signal server (default=wss://signal.cdnbye.com/wss)
-        wsMaxRetries: number                // The maximum number of reconnection attempts that will be made by websocket before giving up (default=3)
-        wsReconnectInterval: number         // The number of seconds to delay before attempting to reconnect by websocket (default=5)
-        loadTimeout: number                 // Timeout of downloading by p2p (default=3)
-        maxBufSize: number                  // The cache size of binary data (default=1024*1024*50)
-        p2pEnabled: boolean                 // Enable P2P (default=true)
-        tsStrictMatched: boolean            // Drop the query string of ts url while sharing segment to peers (default=false)
-        tag: string                         // User defined tag which is useful for observing the effect of parameters turning (default=[hlsjs version])
-        // advanced options
-        channelId: function                 // Pass a function to generate channel Id (default: see utils/toolFuns)
-        dcRequestTimeout: number            // The request timeout of datachannel (default=3)
-        dcUploadTimeout: number             // The upload timeout of datachannel (default=3)
-        packetSize: number                  // The maximum package size sent by datachannel per time (default=64*1024)
-        enableLogUpload: boolean            // Enable upload logs to server (default=false)
-        logUploadAddr: string               // Log upload address (default=wss://api.cdnbye.com/trace)
-        logUploadLevel: string              // Log upload level(debug, info, warn, error, none) (default=warn)                          
-    }
-}
-```
+| Field | Type | Default | Description |
+| :-: | :-: | :-: | :-: |
+| `logLevel` | string or boolean | 'none' | Print log level(debug, info, warn, error, none，false=none, true=debug).
+| `announce` | string | 'https://api.cdnbye.com/v1' | The address of tracker server.
+| `wsSignalerAddr` | string | 'wss://signal.cdnbye.com/wss' | The address of signal server.
+| `wsMaxRetries` | number | 3 | The maximum number of reconnection attempts that will be made by websocket before giving up.
+| `wsReconnectInterval` | number | 5 | The number of seconds to delay before attempting to reconnect by websocket.
+| `loadTimeout` | number | 3 | Timeout to download a segment from a peer, if exceeded the segment is dropped.
+| `maxBufSize` | number | 1024 * 1024 * 50 | The max size of binary data that can be stored in the cache.
+| `p2pEnabled` | boolean | true | Enable or disable p2p engine.
+| `tsStrictMatched` | boolean | false | Drop the query string of ts url while sharing segment to peers.
+| `tag` | string | [hlsjs version] | User defined tag which is useful for observing the effect of parameters turning.
+| `channelId` | function | - | Pass a function to generate channel Id.
+| `packetSize` | number | 64 * 1024 | The maximum package size sent by datachannel, 64KB should work with most of recent browsers. Set it to 16KB for older browsers support.
+
+| Name | Type | Default Value | Description |
 
 ## P2PEngine Events
 
@@ -89,5 +80,8 @@ totalP2PUploaded: total data uploaded by P2P(KB).
 Resume P2P if it has been stopped.
 
 ### `hls.engine.disableP2P()`
-Disable P2P if it is not stopped.
+Disable P2P to stop p2p and free used resources.
+
+### `hls.engine.destroy()`
+Stop p2p and free used resources, it will be called automatically before hls.js is destroyed.  
 
