@@ -204,6 +204,7 @@ class BTScheduler extends EventEmitter {
             }
             this.peerMap.clear();
         }
+        this.removeAllListeners();
         logger.warn(`destroy scheduler`);
     }
 

@@ -92,6 +92,11 @@ class BufferManager extends EventEmitter {
         this.sn2Url.clear();
         this._currBufSize = 0;
     }
+
+    destroy() {
+        this.clear();
+        this.removeAllListeners();
+    }
 }
 
 export default BufferManager;

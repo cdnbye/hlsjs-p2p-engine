@@ -21,8 +21,8 @@ class SignalClient extends EventEmitter{
             minReconnectionDelay: this.config.wsReconnectInterval*1000
         };
         let queryStr = `?id=${id}`;
-        let websocket = new ReconnectingWebSocket(this.config.wsSignalerAddr+queryStr, undefined, wsOptions);
-        websocket.onopen = () => {
+        let ws = new ReconnectingWebSocket(this.config.wsSignalerAddr+queryStr, undefined, wsOptions);
+        ws.onopen = () => {
             logger.info('Signaler websocket connection opened');
 
             this.connected = true;
@@ -39,21 +39,21 @@ class SignalClient extends EventEmitter{
             if (this.onopen) this.onopen();
         };
 
-        websocket.push = websocket.send;
-        websocket.send = msg => {
+        ws.push = ws.send;
+        ws.send = msg => {
             let msgStr = JSON.stringify(Object.assign({peer_id: id}, msg));
-            websocket.push(msgStr);
+            ws.push(msgStr);
         };
-        websocket.onmessage = (e) => {
+        ws.onmessage = (e) => {
 
             if (this.onmessage) this.onmessage(e)
         };
-        websocket.onclose = () => {                                            //websocket断开时清除datachannel
+        ws.onclose = () => {                                            //websocket断开时清除datachannel
             logger.warn(`Signaler websocket closed`);
             if (this.onclose) this.onclose();
             this.connected = false;
         };
-        return websocket;
+        return ws;
     }
 
     sendSignal(remotePeerId, data) {
@@ -80,6 +80,7 @@ class SignalClient extends EventEmitter{
     close() {
         const { logger } = this.engine;
         logger.warn(`close signal client`);
+        this.connected = false;
         this._ws.close();
         this._ws = null;
     }

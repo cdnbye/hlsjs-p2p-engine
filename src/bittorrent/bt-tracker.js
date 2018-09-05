@@ -63,6 +63,9 @@ class BTTracker extends EventEmitter {
 
     stopP2P() {
         const { logger } = this.engine;
+        this.fetcher.destroy();
+        this.fetcher = null;
+        this.requestMorePeers(true);          // 清空里面的定时器
         this.scheduler.destroy();
         this.scheduler = null;
         this.signalerWs.close();
@@ -75,6 +78,7 @@ class BTTracker extends EventEmitter {
     destroy() {
         const { logger } = this.engine;
         this.stopP2P();
+        this.removeAllListeners();
         logger.warn(`destroy tracker`);
     }
 

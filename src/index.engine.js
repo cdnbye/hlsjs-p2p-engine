@@ -1,4 +1,5 @@
 import EventEmitter from 'events';
+import URLToolkit from 'url-toolkit';
 import defaultP2PConfig from './config';
 import {Tracker, FragLoader} from './bittorrent';
 import BufferManager from './buffer-manager';
@@ -24,7 +25,8 @@ class P2PEngine extends EventEmitter {
         }
 
         this.hlsjs = hlsjs;
-        this.p2pEnabled = this.config.disableP2P === false ? false : true;                                      //默认开启P2P
+
+        this.p2pEnabled = this.config.p2pEnabled === false ? false : true;                                      //默认开启P2P
 
         hlsjs.config.currLoaded = hlsjs.config.currPlay = 0;
 
@@ -38,20 +40,20 @@ class P2PEngine extends EventEmitter {
             const isLive = data.details.live;
             this.config.live = isLive;
             // 浏览器信息
-            let browserInfo = {
+            this.browserInfo = {
                 device: platform.getPlatform(),
                 netType: platform.getNetType(),
                 version: P2PEngine.version,
                 tag: this.config.tag || this.hlsjs.constructor.version,
                 live: isLive,
             };
-
-            let channel = `${this.config.channelId(hlsjs.url, this.config.wsSignalerAddr, browserInfo)}[${DataChannel.VERSION}]`;
+            const signalId = URLToolkit.parseURL(this.config.wsSignalerAddr).netLoc.substr(2);
+            this.channel = `${this.config.channelId(hlsjs.url, this.browserInfo)}|${signalId}[${DataChannel.VERSION}]`;
             //初始化logger
-            let logger = new Logger(this.config, channel);
+            let logger = new Logger(this.config, this.channel);
             this.hlsjs.config.logger = this.logger = logger;
-            logger.info(`channel ${channel}`);
-            this._init(channel, browserInfo);
+            logger.info(`channel ${this.channel}`);
+            this._init(this.channel, this.browserInfo);
 
             hlsjs.off(this.HLSEvents.LEVEL_LOADED, onLevelLoaded);
         };
@@ -65,7 +67,7 @@ class P2PEngine extends EventEmitter {
 
     _init(channel, browserInfo) {
         const { logger } = this;
-
+        if (!this.p2pEnabled) return;
 
         this.hlsjs.config.p2pEnabled = this.p2pEnabled;
         //实例化BufferManager
@@ -77,12 +79,12 @@ class P2PEngine extends EventEmitter {
         let fetcher = new Fetcher(this, 'free', window.encodeURIComponent(channel), this.config.announce, browserInfo);
         this.fetcher = fetcher;
         //实例化tracker服务器
-        this.signaler = new Tracker(this, fetcher, this.config);
-        this.signaler.scheduler.bufferManager = this.bufMgr;
+        this.tracker = new Tracker(this, fetcher, this.config);
+        this.tracker.scheduler.bufferManager = this.bufMgr;
         //替换fLoader
         this.hlsjs.config.fLoader = FragLoader;
         //向fLoader导入scheduler
-        this.hlsjs.config.scheduler = this.signaler.scheduler;
+        this.hlsjs.config.scheduler = this.tracker.scheduler;
         //在fLoader中使用fetcher
         this.hlsjs.config.fetcher = fetcher;
 
@@ -90,27 +92,27 @@ class P2PEngine extends EventEmitter {
         this.hlsjs.on(this.HLSEvents.FRAG_LOADING, (id, data) => {
             // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
             logger.debug('loading frag ' + data.frag.sn);
-            this.signaler.currentLoadingSN = data.frag.sn;
+            this.tracker.currentLoadingSN = data.frag.sn;
 
         });
 
-        this.signalTried = false;                                                   //防止重复连接ws
+        this.trackerTried = false;                                                   //防止重复连接ws
         this.hlsjs.on(this.HLSEvents.FRAG_LOADED, (id, data) => {
             let sn = data.frag.sn;
             this.hlsjs.config.currLoaded = sn;
-            this.signaler.currentLoadedSN = sn;                                //用于BT算法
+            this.tracker.currentLoadedSN = sn;                                //用于BT算法
             this.hlsjs.config.currLoadedDuration = data.frag.duration;
             let bitrate = Math.round(data.frag.loaded*8/data.frag.duration);
-            if (!this.signalTried && !this.signaler.connected && this.config.p2pEnabled) {
+            if (!this.trackerTried && !this.tracker.connected && this.config.p2pEnabled) {
 
-                this.signaler.scheduler.bitrate = bitrate;
+                this.tracker.scheduler.bitrate = bitrate;
                 logger.info(`bitrate ${bitrate}`);
 
-                this.signaler.resumeP2P();
-                this.signalTried = true;
+                this.tracker.resumeP2P();
+                this.trackerTried = true;
             }
             // this.streamingRate = (this.streamingRate*this.fragLoadedCounter + bitrate)/(++this.fragLoadedCounter);
-            // this.signaler.scheduler.streamingRate = Math.floor(this.streamingRate);
+            // this.tracker.scheduler.streamingRate = Math.floor(this.streamingRate);
             if (!data.frag.loadByHTTP) {
                 data.frag.loadByP2P = false;
                 data.frag.loadByHTTP = true;
@@ -128,7 +130,7 @@ class P2PEngine extends EventEmitter {
             logger.debug('frag changed: '+data.frag.sn);
             const sn = data.frag.sn;
             this.hlsjs.config.currPlay = sn;
-            this.signaler.currentPlaySN = sn;
+            this.tracker.currentPlaySN = sn;
         });
 
         this.hlsjs.on(this.HLSEvents.ERROR, (event, data) => {
@@ -161,26 +163,29 @@ class P2PEngine extends EventEmitter {
         if (this.p2pEnabled) {
             this.p2pEnabled = false;
             this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
-            if (this.signaler) {
-                this.signaler.stopP2P();
+            if (this.tracker) {
+                this.tracker.stopP2P();
             }
+            this.bufMgr.destroy();
+            this.bufMgr = null;
+            this.hlsjs.config.fLoader = this.hlsjs.constructor.DefaultConfig.loader;
         }
     }
 
     enableP2P() {                                               //在停止的情况下重新启动P2P
         const { logger } = this;
-        logger.warn(`enable P2P`);
+        logger.warn(this.p2pEnabled);
         if (!this.p2pEnabled) {
+            logger.warn(`enable P2P`);
             this.p2pEnabled = true;
             this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
-            if (this.signaler) {
-                this.signaler.resumeP2P();
-            }
+            this._init(this.channel, this.browserInfo);
         }
     }
 
     destroy() {
         this.disableP2P();
+        this.removeAllListeners();
     }
 
     get version() {
