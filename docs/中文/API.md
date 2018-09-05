@@ -57,6 +57,7 @@ if (Hls.WEBRTC_SUPPORT) {
 | `tag` | string | [hlsjs version] | 用户自定义标签，可用于在后台查看参数调整效果。
 | `channelId` | function | - | 标识channel的字段，同一个channel的用户可以共享数据。
 | `packetSize` | number | 64 * 1024 | 每次通过datachannel发送的包的大小，64KB适用于较新版本的浏览器，如果要兼容低版本浏览器可以设置成16KB。
+| `webRTCConfig` | Object | {} | 用于配置stun和datachannel的[字典](https://github.com/feross/simple-peer)。
 
 ## P2PEngine事件
 

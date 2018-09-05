@@ -57,8 +57,7 @@ If `opts` is specified, then the default options (shown below) will be overridde
 | `tag` | string | [hlsjs version] | User defined tag which is useful for observing the effect of parameters turning.
 | `channelId` | function | - | Pass a function to generate channel Id.
 | `packetSize` | number | 64 * 1024 | The maximum package size sent by datachannel, 64KB should work with most of recent browsers. Set it to 16KB for older browsers support.
-
-| Name | Type | Default Value | Description |
+| `webRTCConfig` | Object | {} | A [Configuration dictionary](https://github.com/feross/simple-peer) providing options to configure WebRTC connections.
 
 ## P2PEngine Events
 
