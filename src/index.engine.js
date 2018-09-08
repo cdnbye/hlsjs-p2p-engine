@@ -151,32 +151,31 @@ class P2PEngine extends EventEmitter {
             }
         });
 
-        this.hlsjs.on(this.HLSEvents.DESTROYING, () => {
-            logger.warn('destroying hlsjs');
-            this.destroy();
-        });
+        // this.hlsjs.on(this.HLSEvents.DESTROYING, () => {
+        //     logger.warn('destroying hlsjs');
+        //     this.destroy();
+        // });
     }
 
     disableP2P() {                                              //停止p2p
-        const { logger } = this;
-        logger.warn(`disable P2P`);
+        this.logger.warn(`disable P2P`);
         if (this.p2pEnabled) {
             this.p2pEnabled = false;
             this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
             if (this.tracker) {
                 this.tracker.stopP2P();
+                this.tracker = {};
+                this.fetcher = null;
+                this.bufMgr.destroy();
+                this.bufMgr = null;
+                this.hlsjs.config.fLoader = this.hlsjs.constructor.DefaultConfig.loader;
             }
-            this.bufMgr.destroy();
-            this.bufMgr = null;
-            this.hlsjs.config.fLoader = this.hlsjs.constructor.DefaultConfig.loader;
         }
     }
 
     enableP2P() {                                               //在停止的情况下重新启动P2P
-        const { logger } = this;
-        logger.warn(this.p2pEnabled);
         if (!this.p2pEnabled) {
-            logger.warn(`enable P2P`);
+            this.logger.warn(`enable P2P`);
             this.p2pEnabled = true;
             this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
             this._init(this.channel, this.browserInfo);
@@ -186,6 +185,7 @@ class P2PEngine extends EventEmitter {
     destroy() {
         this.disableP2P();
         this.removeAllListeners();
+        this.logger.warn(`destroy p2p engine`);
     }
 
     get version() {

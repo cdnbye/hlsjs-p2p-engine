@@ -10,6 +10,7 @@ class BTTracker extends EventEmitter {
         super();
 
         this.engine = engine;
+        this.logger = engine.logger;
         this.config = config;
         this.connected = false;                                // 与信令的连接状态
         this.scheduler = new BTScheduler(engine, config);
@@ -48,11 +49,10 @@ class BTTracker extends EventEmitter {
     }
 
     resumeP2P() {
-        const { logger } = this.engine;
         this.fetcher.btAnnounce().then(json => {
-            logger.info(`announce request response ${JSON.stringify(json)}`)
+            this.logger.info(`announce request response ${JSON.stringify(json)}`)
             this.engine.peerId = this.peerId = json.id;
-            logger.identifier = this.peerId;
+            this.logger.identifier = this.peerId;
             this.signalerWs = this._initSignalerWs();                         //连上tracker后开始连接信令服务器
             this._handlePeers(json.peers);
             this.engine.emit('peerId', this.peerId);
@@ -62,24 +62,23 @@ class BTTracker extends EventEmitter {
     }
 
     stopP2P() {
-        const { logger } = this.engine;
         this.fetcher.destroy();
         this.fetcher = null;
         this.requestMorePeers(true);          // 清空里面的定时器
         this.scheduler.destroy();
         this.scheduler = null;
-        this.signalerWs.close();
+        this.signalerWs.destroy();
+        this.signalerWs = null;
         this.peers = [];
         this.DCMap.clear();
         this.failedDCSet.clear();
-        logger.warn(`tracker stop p2p`);
+        this.logger.warn(`tracker stop p2p`);
     }
 
     destroy() {
-        const { logger } = this.engine;
         this.stopP2P();
         this.removeAllListeners();
-        logger.warn(`destroy tracker`);
+        this.logger.warn(`destroy tracker`);
     }
 
     _handlePeers(peers) {
@@ -100,9 +99,8 @@ class BTTracker extends EventEmitter {
     }
 
     _tryConnectToAllPeers() {
-        const { logger } = this.engine;
         if (this.peers.length === 0) return;
-        logger.info(`try connect to ${this.peers.length} peers`);
+        this.logger.info(`try connect to ${this.peers.length} peers`);
         this.peers.forEach(peer => {
             let datachannel = new DataChannel(this.engine, this.peerId, peer.id, true, this.config);
             this.DCMap.set(peer.id, datachannel);     // 将对等端Id作为键
@@ -113,13 +111,12 @@ class BTTracker extends EventEmitter {
     }
 
     _setupDC(datachannel) {
-        const { logger } = this.engine;
         datachannel.on(Events.DC_SIGNAL, data => {
             const remotePeerId = datachannel.remotePeerId;
             this.signalerWs.sendSignal(remotePeerId, data);
         })
             .once(Events.DC_ERROR, () => {
-                logger.warn(`datachannel connect ${datachannel.channelId} failed`);
+                this.logger.warn(`datachannel connect ${datachannel.channelId} failed`);
                 this.scheduler.deletePeer(datachannel);
                 this.DCMap.delete(datachannel.remotePeerId);
                 this.failedDCSet.add(datachannel.remotePeerId);                  //记录失败的连接
@@ -138,7 +135,7 @@ class BTTracker extends EventEmitter {
             })
             .once(Events.DC_CLOSE, () => {
 
-                logger.warn(`datachannel ${datachannel.channelId} closed`);
+                this.logger.warn(`datachannel ${datachannel.channelId} closed`);
                 this.scheduler.deletePeer(datachannel);
                 this.DCMap.delete(datachannel.remotePeerId);
                 this.failedDCSet.add(datachannel.remotePeerId);              //记录断开的连接
@@ -167,7 +164,6 @@ class BTTracker extends EventEmitter {
     }
 
     _initSignalerWs() {
-        const { logger } = this.engine;
         let websocket = new SignalClient(this.engine, this.peerId, this.config);
         websocket.onopen = () => {
             this.connected = true;
@@ -181,11 +177,11 @@ class BTTracker extends EventEmitter {
             switch (action) {
                 case 'signal':
                     if (this.failedDCSet.has(msg.from_peer_id)) return;
-                    logger.debug(`handle signal of ${msg.from_peer_id}`);
+                    this.logger.debug(`handle signal of ${msg.from_peer_id}`);
                     if (!msg.data) {                                             //如果对等端已不在线
                         this.DCMap.delete(msg.from_peer_id);
                         this.failedDCSet.add(msg.from_peer_id);              //记录失败的连接
-                        logger.info(`signaling ${msg.from_peer_id} not found`);
+                        this.logger.info(`signaling ${msg.from_peer_id} not found`);
                     } else {
                         this._handleSignal(msg.from_peer_id, msg.data);
                     }
@@ -194,7 +190,7 @@ class BTTracker extends EventEmitter {
                     this.stopP2P();
                     break;
                 default:
-                    logger.warn('Signaler websocket unknown action ' + action);
+                    this.logger.warn('Signaler websocket unknown action ' + action);
 
             }
 
@@ -206,14 +202,13 @@ class BTTracker extends EventEmitter {
     }
 
     _handleSignal(remotePeerId, data) {
-        const { logger } = this.engine;
         let datachannel = this.DCMap.get(remotePeerId);
         if (datachannel && datachannel.connected) {
-            logger.info(`datachannel had connected, signal ignored`);
+            this.logger.info(`datachannel had connected, signal ignored`);
             return
         }
         if (!datachannel) {                                               //收到子节点连接请求
-            logger.debug(`receive node ${remotePeerId} connection request`);
+            this.logger.debug(`receive node ${remotePeerId} connection request`);
             if (this.failedDCSet.has(remotePeerId)) return;
             datachannel = new DataChannel(this.engine, this.peerId, remotePeerId, false, this.config);
             this.DCMap.set(remotePeerId, datachannel);                                  //将对等端Id作为键
@@ -227,11 +222,10 @@ class BTTracker extends EventEmitter {
     // }
 
     _requestMorePeers() {
-        const { logger } = this.engine;
         // 连接的节点<=3时请求更多节点
         if (this.scheduler.peersNum <= 3) {
             this.fetcher.btGetPeers().then(json => {
-                logger.info(`request more peers ${JSON.stringify(json)}`);
+                this.logger.info(`request more peers ${JSON.stringify(json)}`);
                 this._handlePeers(json.peers);
                 this._tryConnectToAllPeers();
             })

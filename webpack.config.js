@@ -83,27 +83,23 @@ const multiConfig = [
             entry: './src/index.engine.js',
             output: {
                 filename: './hlsjs-p2p-engine.js',
-                sourceMapFilename: './hlsjs-p2p-engine.js.map',
                 path: path.resolve(__dirname, 'dist'),
                 // publicPath: '/src/',
                 library: ['P2PEngine'],
                 libraryTarget: 'umd'
             },
             plugins: getPluginsForConfig(),
-            devtool: 'source-map',
         },
         {
             name: 'bundle-hlsjs',
             entry: './src/index.hls.js',
             output: {
                 filename: 'hls.js',
-                sourceMapFilename: './hls.js.map',
                 path: path.resolve(__dirname, 'dist'),
                 library: ['Hls'],
                 libraryTarget: 'umd'
             },
             plugins: getPluginsForConfig(),
-            devtool: 'source-map',
         },
         {
             name: 'release-engine',

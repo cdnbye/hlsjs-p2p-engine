@@ -1899,38 +1899,35 @@ var P2PEngine = function (_EventEmitter) {
                 }
             });
 
-            this.hlsjs.on(this.HLSEvents.DESTROYING, function () {
-                logger.warn('destroying hlsjs');
-                _this2.destroy();
-            });
+            // this.hlsjs.on(this.HLSEvents.DESTROYING, () => {
+            //     logger.warn('destroying hlsjs');
+            //     this.destroy();
+            // });
         }
     }, {
         key: 'disableP2P',
         value: function disableP2P() {
             //停止p2p
-            var logger = this.logger;
-
-            logger.warn('disable P2P');
+            this.logger.warn('disable P2P');
             if (this.p2pEnabled) {
                 this.p2pEnabled = false;
                 this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
                 if (this.tracker) {
                     this.tracker.stopP2P();
+                    this.tracker = {};
+                    this.fetcher = null;
+                    this.bufMgr.destroy();
+                    this.bufMgr = null;
+                    this.hlsjs.config.fLoader = this.hlsjs.constructor.DefaultConfig.loader;
                 }
-                this.bufMgr.destroy();
-                this.bufMgr = null;
-                this.hlsjs.config.fLoader = this.hlsjs.constructor.DefaultConfig.loader;
             }
         }
     }, {
         key: 'enableP2P',
         value: function enableP2P() {
             //在停止的情况下重新启动P2P
-            var logger = this.logger;
-
-            logger.warn(this.p2pEnabled);
             if (!this.p2pEnabled) {
-                logger.warn('enable P2P');
+                this.logger.warn('enable P2P');
                 this.p2pEnabled = true;
                 this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
                 this._init(this.channel, this.browserInfo);
@@ -1941,6 +1938,7 @@ var P2PEngine = function (_EventEmitter) {
         value: function destroy() {
             this.disableP2P();
             this.removeAllListeners();
+            this.logger.warn('destroy p2p engine');
         }
     }, {
         key: 'version',
@@ -2054,6 +2052,7 @@ var BTTracker = function (_EventEmitter) {
         var _this = _possibleConstructorReturn(this, (BTTracker.__proto__ || Object.getPrototypeOf(BTTracker)).call(this));
 
         _this.engine = engine;
+        _this.logger = engine.logger;
         _this.config = config;
         _this.connected = false; // 与信令的连接状态
         _this.scheduler = new _btScheduler2.default(engine, config);
@@ -2079,12 +2078,10 @@ var BTTracker = function (_EventEmitter) {
         value: function resumeP2P() {
             var _this2 = this;
 
-            var logger = this.engine.logger;
-
             this.fetcher.btAnnounce().then(function (json) {
-                logger.info('announce request response ' + JSON.stringify(json));
+                _this2.logger.info('announce request response ' + JSON.stringify(json));
                 _this2.engine.peerId = _this2.peerId = json.id;
-                logger.identifier = _this2.peerId;
+                _this2.logger.identifier = _this2.peerId;
                 _this2.signalerWs = _this2._initSignalerWs(); //连上tracker后开始连接信令服务器
                 _this2._handlePeers(json.peers);
                 _this2.engine.emit('peerId', _this2.peerId);
@@ -2095,27 +2092,24 @@ var BTTracker = function (_EventEmitter) {
     }, {
         key: 'stopP2P',
         value: function stopP2P() {
-            var logger = this.engine.logger;
-
             this.fetcher.destroy();
             this.fetcher = null;
             this.requestMorePeers(true); // 清空里面的定时器
             this.scheduler.destroy();
             this.scheduler = null;
-            this.signalerWs.close();
+            this.signalerWs.destroy();
+            this.signalerWs = null;
             this.peers = [];
             this.DCMap.clear();
             this.failedDCSet.clear();
-            logger.warn('tracker stop p2p');
+            this.logger.warn('tracker stop p2p');
         }
     }, {
         key: 'destroy',
         value: function destroy() {
-            var logger = this.engine.logger;
-
             this.stopP2P();
             this.removeAllListeners();
-            logger.warn('destroy tracker');
+            this.logger.warn('destroy tracker');
         }
     }, {
         key: '_handlePeers',
@@ -2167,10 +2161,8 @@ var BTTracker = function (_EventEmitter) {
         value: function _tryConnectToAllPeers() {
             var _this4 = this;
 
-            var logger = this.engine.logger;
-
             if (this.peers.length === 0) return;
-            logger.info('try connect to ' + this.peers.length + ' peers');
+            this.logger.info('try connect to ' + this.peers.length + ' peers');
             this.peers.forEach(function (peer) {
                 var datachannel = new _core.DataChannel(_this4.engine, _this4.peerId, peer.id, true, _this4.config);
                 _this4.DCMap.set(peer.id, datachannel); // 将对等端Id作为键
@@ -2184,13 +2176,11 @@ var BTTracker = function (_EventEmitter) {
         value: function _setupDC(datachannel) {
             var _this5 = this;
 
-            var logger = this.engine.logger;
-
             datachannel.on(_core.Events.DC_SIGNAL, function (data) {
                 var remotePeerId = datachannel.remotePeerId;
                 _this5.signalerWs.sendSignal(remotePeerId, data);
             }).once(_core.Events.DC_ERROR, function () {
-                logger.warn('datachannel connect ' + datachannel.channelId + ' failed');
+                _this5.logger.warn('datachannel connect ' + datachannel.channelId + ' failed');
                 _this5.scheduler.deletePeer(datachannel);
                 _this5.DCMap.delete(datachannel.remotePeerId);
                 _this5.failedDCSet.add(datachannel.remotePeerId); //记录失败的连接
@@ -2210,7 +2200,7 @@ var BTTracker = function (_EventEmitter) {
                 }
             }).once(_core.Events.DC_CLOSE, function () {
 
-                logger.warn('datachannel ' + datachannel.channelId + ' closed');
+                _this5.logger.warn('datachannel ' + datachannel.channelId + ' closed');
                 _this5.scheduler.deletePeer(datachannel);
                 _this5.DCMap.delete(datachannel.remotePeerId);
                 _this5.failedDCSet.add(datachannel.remotePeerId); //记录断开的连接
@@ -2238,8 +2228,6 @@ var BTTracker = function (_EventEmitter) {
         value: function _initSignalerWs() {
             var _this6 = this;
 
-            var logger = this.engine.logger;
-
             var websocket = new _signalClient2.default(this.engine, this.peerId, this.config);
             websocket.onopen = function () {
                 _this6.connected = true;
@@ -2253,12 +2241,12 @@ var BTTracker = function (_EventEmitter) {
                 switch (action) {
                     case 'signal':
                         if (_this6.failedDCSet.has(msg.from_peer_id)) return;
-                        logger.debug('handle signal of ' + msg.from_peer_id);
+                        _this6.logger.debug('handle signal of ' + msg.from_peer_id);
                         if (!msg.data) {
                             //如果对等端已不在线
                             _this6.DCMap.delete(msg.from_peer_id);
                             _this6.failedDCSet.add(msg.from_peer_id); //记录失败的连接
-                            logger.info('signaling ' + msg.from_peer_id + ' not found');
+                            _this6.logger.info('signaling ' + msg.from_peer_id + ' not found');
                         } else {
                             _this6._handleSignal(msg.from_peer_id, msg.data);
                         }
@@ -2267,7 +2255,7 @@ var BTTracker = function (_EventEmitter) {
                         _this6.stopP2P();
                         break;
                     default:
-                        logger.warn('Signaler websocket unknown action ' + action);
+                        _this6.logger.warn('Signaler websocket unknown action ' + action);
 
                 }
             };
@@ -2280,16 +2268,14 @@ var BTTracker = function (_EventEmitter) {
     }, {
         key: '_handleSignal',
         value: function _handleSignal(remotePeerId, data) {
-            var logger = this.engine.logger;
-
             var datachannel = this.DCMap.get(remotePeerId);
             if (datachannel && datachannel.connected) {
-                logger.info('datachannel had connected, signal ignored');
+                this.logger.info('datachannel had connected, signal ignored');
                 return;
             }
             if (!datachannel) {
                 //收到子节点连接请求
-                logger.debug('receive node ' + remotePeerId + ' connection request');
+                this.logger.debug('receive node ' + remotePeerId + ' connection request');
                 if (this.failedDCSet.has(remotePeerId)) return;
                 datachannel = new _core.DataChannel(this.engine, this.peerId, remotePeerId, false, this.config);
                 this.DCMap.set(remotePeerId, datachannel); //将对等端Id作为键
@@ -2307,12 +2293,10 @@ var BTTracker = function (_EventEmitter) {
         value: function _requestMorePeers() {
             var _this7 = this;
 
-            var logger = this.engine.logger;
             // 连接的节点<=3时请求更多节点
-
             if (this.scheduler.peersNum <= 3) {
                 this.fetcher.btGetPeers().then(function (json) {
-                    logger.info('request more peers ' + JSON.stringify(json));
+                    _this7.logger.info('request more peers ' + JSON.stringify(json));
                     _this7._handlePeers(json.peers);
                     _this7._tryConnectToAllPeers();
                 });
@@ -2972,6 +2956,7 @@ var SignalClient = function (_EventEmitter) {
         var _this = _possibleConstructorReturn(this, (SignalClient.__proto__ || Object.getPrototypeOf(SignalClient)).call(this));
 
         _this.engine = engine;
+        _this.logger = engine.logger;
         _this.peerId = peerId;
         _this.config = config;
         _this.connected = false;
@@ -2985,22 +2970,21 @@ var SignalClient = function (_EventEmitter) {
         value: function _init(id) {
             var _this2 = this;
 
-            var logger = this.engine.logger;
-
             var wsOptions = {
+                // debug: true,
                 maxRetries: this.config.wsMaxRetries,
                 minReconnectionDelay: this.config.wsReconnectInterval * 1000
             };
             var queryStr = '?id=' + id;
             var ws = new _reconnectingWebsocket2.default(this.config.wsSignalerAddr + queryStr, undefined, wsOptions);
             ws.onopen = function () {
-                logger.info('Signaler websocket connection opened');
+                _this2.logger.info('Signaler websocket connection opened');
 
                 _this2.connected = true;
 
                 // 发送所有没有成功发送的消息
                 if (_this2.msgQueue.length > 0) {
-                    logger.warn('resend all cached msg');
+                    _this2.logger.warn('resend all cached msg');
                     _this2.msgQueue.forEach(function (msg) {
                         _this2._ws.send(msg);
                     });
@@ -3021,7 +3005,7 @@ var SignalClient = function (_EventEmitter) {
             };
             ws.onclose = function () {
                 //websocket断开时清除datachannel
-                logger.warn('Signaler websocket closed');
+                _this2.logger.warn('Signaler websocket closed');
                 if (_this2.onclose) _this2.onclose();
                 _this2.connected = false;
             };
@@ -3041,24 +3025,27 @@ var SignalClient = function (_EventEmitter) {
     }, {
         key: '_send',
         value: function _send(msg) {
-            var logger = this.engine.logger;
-
             if (this.connected) {
                 this._ws.send(msg);
             } else {
-                logger.warn('signaler closed, msg is cached');
+                this.logger.warn('signaler closed, msg is cached');
                 this.msgQueue.push(msg);
             }
         }
     }, {
         key: 'close',
         value: function close() {
-            var logger = this.engine.logger;
-
-            logger.warn('close signal client');
+            this.logger.warn('close signal client');
             this.connected = false;
-            this._ws.close();
+            this._ws.close(1000, 'stop signaling', { keepClosed: true });
+        }
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            this.close();
             this._ws = null;
+            this.removeAllListeners();
+            this.logger.warn('destroyt signaler');
         }
     }]);
 
@@ -3324,6 +3311,7 @@ var BufferManager = function (_EventEmitter) {
 
             this._segPool.set(seg.relurl, seg);
             // this.urlSet.add(seg.relurl);
+            // logger.debug(`_segPool add seg ${seg.relurl}`);
             this._currBufSize += parseInt(seg.size);
             // logger.debug(`seg.size ${seg.size} _currBufSize ${this._currBufSize} maxBufSize ${this.config.maxBufSize}`);
             while (this._currBufSize > this.config.maxBufSize) {
@@ -3600,4 +3588,3 @@ module.exports = os;
 /***/ })
 /******/ ]);
 });
-//# sourceMappingURL=hlsjs-p2p-engine.js.map

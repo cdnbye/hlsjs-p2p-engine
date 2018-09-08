@@ -66,6 +66,7 @@ class BufferManager extends EventEmitter {
         const { logger } = this.engine;
         this._segPool.set(seg.relurl, seg);
         // this.urlSet.add(seg.relurl);
+        // logger.debug(`_segPool add seg ${seg.relurl}`);
         this._currBufSize += parseInt(seg.size);
         // logger.debug(`seg.size ${seg.size} _currBufSize ${this._currBufSize} maxBufSize ${this.config.maxBufSize}`);
         while (this._currBufSize > this.config.maxBufSize) {                       //去掉多余的数据

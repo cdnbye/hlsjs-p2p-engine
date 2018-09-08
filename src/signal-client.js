@@ -7,6 +7,7 @@ class SignalClient extends EventEmitter{
     constructor(engine, peerId, config) {
         super();
         this.engine = engine;
+        this.logger = engine.logger;
         this.peerId = peerId;
         this.config = config;
         this.connected = false;
@@ -15,21 +16,21 @@ class SignalClient extends EventEmitter{
     }
 
     _init(id) {
-        const { logger } = this.engine;
         const wsOptions = {
+            // debug: true,
             maxRetries: this.config.wsMaxRetries,
-            minReconnectionDelay: this.config.wsReconnectInterval*1000
+            minReconnectionDelay: this.config.wsReconnectInterval * 1000
         };
         let queryStr = `?id=${id}`;
-        let ws = new ReconnectingWebSocket(this.config.wsSignalerAddr+queryStr, undefined, wsOptions);
+        let ws = new ReconnectingWebSocket(this.config.wsSignalerAddr + queryStr, undefined, wsOptions);
         ws.onopen = () => {
-            logger.info('Signaler websocket connection opened');
+            this.logger.info('Signaler websocket connection opened');
 
             this.connected = true;
 
             // 发送所有没有成功发送的消息
             if (this.msgQueue.length > 0) {
-                logger.warn(`resend all cached msg`);
+                this.logger.warn(`resend all cached msg`);
                 this.msgQueue.forEach(msg => {
                     this._ws.send(msg);
                 });
@@ -49,7 +50,7 @@ class SignalClient extends EventEmitter{
             if (this.onmessage) this.onmessage(e)
         };
         ws.onclose = () => {                                            //websocket断开时清除datachannel
-            logger.warn(`Signaler websocket closed`);
+            this.logger.warn(`Signaler websocket closed`);
             if (this.onclose) this.onclose();
             this.connected = false;
         };
@@ -67,22 +68,27 @@ class SignalClient extends EventEmitter{
     }
 
     _send(msg) {
-        const { logger } = this.engine;
         if (this.connected) {
             this._ws.send(msg);
         } else {
-            logger.warn(`signaler closed, msg is cached`);
+            this.logger.warn(`signaler closed, msg is cached`);
             this.msgQueue.push(msg);
         }
 
     }
 
     close() {
-        const { logger } = this.engine;
-        logger.warn(`close signal client`);
+        this.logger.warn(`close signal client`);
         this.connected = false;
-        this._ws.close();
+        this._ws.close(1000, 'stop signaling', {keepClosed: true});
+
+    }
+
+    destroy() {
+        this.close();
         this._ws = null;
+        this.removeAllListeners();
+        this.logger.warn(`destroyt signaler`);
     }
 }
 

@@ -1,6 +1,5 @@
-
-
 import P2PEngine from './index.engine';
+
 var Hlsjs;
 if (__IS_HLSJS_LIGHT__) {
     Hlsjs = require('hls.js/dist/hls.light');
@@ -34,7 +33,11 @@ class CDNByeHlsjs extends Hlsjs{
             this.engine = new P2PEngine(this, p2pConfig);
         }
 
-
+        this.on(Hlsjs.Events.DESTROYING, () => {
+            console.warn('destroying hlsjs');
+            this.engine.destroy();
+            this.engine = null;
+        });
     }
 
     enableP2P() {
