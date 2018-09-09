@@ -65,7 +65,7 @@ If `opts` is specified, then the default options (shown below) will be overridde
 Create a new `P2PEngine` instance. 
 
 ### `engine.version`
-Get the version of P2PEngine.
+Get the version of `P2PEngine`.
 
 ### `engine.isSupported()`
 Returns true if WebRTC data channel is supported by the browser.

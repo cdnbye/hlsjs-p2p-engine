@@ -156,9 +156,10 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
     - 参见 [tcplayer-demo.html](demo/tcplayer-demo.html)
 - `欢迎贡献您的播放器demo`
     - CDNBye可以集成到内置hls.js的任何H5视频播放器中！
-    
+
+<!--
 ## 捐赠
 您的捐赠将用于购买服务器以及维持该开源项目的其它开销：）
 
 <img width="250" src="figs/pay.jpeg" alt="cdnbye logo" align="center">
-
+-->
