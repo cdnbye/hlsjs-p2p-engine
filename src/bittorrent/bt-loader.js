@@ -74,7 +74,7 @@ class FragLoader extends EventEmitter {
                 onSuccess(response,stats,context);
             };
         } else {
-            logger.debug(`HTTP load ${frag.relurl} at ${frag.sn}`);
+            logger.debug(`HTTP load ${frag.relurl} at ${frag.sn} level ${frag.level}`);
             context.frag.loadByHTTP = true;
             this.xhrLoader.load(context, config, callbacks);
             const onSuccess = callbacks.onSuccess;

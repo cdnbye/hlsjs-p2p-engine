@@ -1901,6 +1901,16 @@ var P2PEngine = function (_EventEmitter) {
 
         hlsjs.on(_this.HLSEvents.LEVEL_LOADED, onLevelLoaded);
 
+        // const onManifestParsed = (event, data) => {
+        //
+        //     console.warn(`manifest loaded ${JSON.stringify(data, null, 2)}`);
+        //
+        //     hlsjs.off(this.HLSEvents.MANIFEST_PARSED, onManifestParsed);
+        // };
+        //
+        // hlsjs.on(this.HLSEvents.MANIFEST_PARSED, onManifestParsed);
+
+
         // console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
 
         return _this;
@@ -1941,6 +1951,7 @@ var P2PEngine = function (_EventEmitter) {
 
             this.trackerTried = false; //防止重复连接ws
             this.hlsjs.on(this.HLSEvents.FRAG_LOADED, function (id, data) {
+                logger.warn('nextLoadLevel ' + _this2.hlsjs.nextLoadLevel);
                 var sn = data.frag.sn;
                 _this2.hlsjs.config.currLoaded = sn;
                 _this2.tracker.currentLoadedSN = sn; //用于BT算法
@@ -2053,7 +2064,7 @@ var P2PEngine = function (_EventEmitter) {
 
 P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)(); // deprecated
 
-P2PEngine.version = "0.3.0";
+P2PEngine.version = "0.3.1";
 
 exports.default = P2PEngine;
 module.exports = exports['default'];
@@ -3282,7 +3293,7 @@ var FragLoader = function (_EventEmitter) {
                     onSuccess(response, stats, context);
                 };
             } else {
-                logger.debug('HTTP load ' + frag.relurl + ' at ' + frag.sn);
+                logger.debug('HTTP load ' + frag.relurl + ' at ' + frag.sn + ' level ' + frag.level);
                 context.frag.loadByHTTP = true;
                 this.xhrLoader.load(context, config, callbacks);
                 var _onSuccess = callbacks.onSuccess;

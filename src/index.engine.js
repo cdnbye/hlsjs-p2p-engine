@@ -60,6 +60,16 @@ class P2PEngine extends EventEmitter {
 
         hlsjs.on(this.HLSEvents.LEVEL_LOADED, onLevelLoaded);
 
+        // const onManifestParsed = (event, data) => {
+        //
+        //     console.warn(`manifest loaded ${JSON.stringify(data, null, 2)}`);
+        //
+        //     hlsjs.off(this.HLSEvents.MANIFEST_PARSED, onManifestParsed);
+        // };
+        //
+        // hlsjs.on(this.HLSEvents.MANIFEST_PARSED, onManifestParsed);
+
+
 
         // console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
 
