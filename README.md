@@ -14,7 +14,7 @@ This JS library implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC) datach
 This library is a part of CDNBye project which attempts to deliver high quality video streams, decreasing the number of requests to CDN servers, reducing the cost of transmission and enhancing system’s scalability. As the name suggests, CDNBye will help you offload bandwidth from expensive traditional CDNs，while also maximizing a user’s viewing experience.
 
 ## Playground
-[Click me!](http://cdnbye.gitee.io/hlsjs-p2p-engine/videojs-demo.html)
+[Click me!](https://cdnbye.github.io/hlsjs-p2p-demo/)
 
 ## Getting Started
 #### Quick Start Demo
@@ -97,7 +97,9 @@ var p2pConfig = {
 };
 
 var hls = new Hls(hlsjsConfig);
-var p2pEngine = new P2PEngine(hls, p2pConfig);        // Key step
+if (P2PEngine.isSupported()) {
+    new P2PEngine(hls, p2pConfig);        // Key step
+}
 
 // Use `hls` just like your usual hls.js…
 hls.loadSource(contentUrl);

@@ -21,7 +21,7 @@
 - Tracker服务器根据访问IP的ISP、地域等进行智能调度
 
 ## 演示Demo
-打开2个相同的网页：[demo](http://cdnbye.gitee.io/hlsjs-p2p-engine/videojs-demo.html)
+打开2个相同的网页：[demo](https://cdnbye.github.io/hlsjs-p2p-demo/)
 
 ## 快速入门
 #### 快速入门Demo
@@ -104,7 +104,9 @@ var p2pConfig = {
 };
 
 var hls = new Hls(hlsjsConfig);
-var p2pEngine = new P2PEngine(hls, p2pConfig);        // Key step
+if (P2PEngine.isSupported()) {
+    new P2PEngine(hls, p2pConfig);        // Key step
+}
 
 // Use `hls` just like your usual hls.js…
 hls.loadSource(contentUrl);

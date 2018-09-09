@@ -1945,12 +1945,18 @@ var P2PEngine = function (_EventEmitter) {
         get: function get() {
             return P2PEngine.version;
         }
+    }], [{
+        key: 'isSupported',
+        value: function isSupported() {
+            var browserRTC = (0, _core.getBrowserRTC)();
+            return browserRTC && browserRTC.RTCPeerConnection.prototype.createDataChannel !== undefined;
+        }
     }]);
 
     return P2PEngine;
 }(_events2.default);
 
-P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)();
+P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)(); // deprecated
 
 P2PEngine.version = "0.3.0";
 

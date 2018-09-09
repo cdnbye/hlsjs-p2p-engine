@@ -1,4 +1,5 @@
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/cdnbye@0.3.0/dist/hlsjs-p2p-engine.min.js"></script>-->
 <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
 <video id="video" controls></video>
 <p id="version"></p>
@@ -13,10 +14,17 @@
         var hls = new Hls({
             maxBufferSize: 0
         });
-        var engine = new P2PEngine(hls, {
-            logLevel: true,
-            wsSignalerAddr: 'wss://free.freesignal.net',
-        });
+        if (P2PEngine.isSupported()) {
+            var engine = new P2PEngine(hls, {
+                logLevel: true,
+                wsSignalerAddr: 'wss://free.freesignal.net',
+            });
+            engine.on('stats', function ({totalHTTPDownloaded=0, totalP2PDownloaded=0, totalP2PUploaded=0}) {
+                var total = totalHTTPDownloaded + totalP2PDownloaded;
+                document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB`;
+            })
+        }
+
         hls.loadSource('https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8');
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
@@ -32,10 +40,6 @@
             }
             addToTable(frag.relurl, frag.loaded, source);
         });
-        engine.on('stats', function ({totalHTTPDownloaded=0, totalP2PDownloaded=0, totalP2PUploaded=0}) {
-            var total = totalHTTPDownloaded + totalP2PDownloaded;
-            document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB`;
-        })
         document.querySelector('#version').innerText = `hls.js version: ${Hls.version}  cdnbye version: ${P2PEngine.version}`;
         function addToTable(url, downloaded, source) {
             var infoStr = `download ${url}(size:${downloaded}B) by ${source}`;

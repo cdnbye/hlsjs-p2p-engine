@@ -1759,7 +1759,7 @@ var CDNByeHlsjs = function (_Hlsjs) {
 
         var _this = _possibleConstructorReturn(this, (CDNByeHlsjs.__proto__ || Object.getPrototypeOf(CDNByeHlsjs)).call(this, mergedHlsjsConfig));
 
-        if (_index2.default.WEBRTC_SUPPORT) {
+        if (_index2.default.isSupported()) {
             _this.engine = new _index2.default(_this, p2pConfig);
         }
 
@@ -1788,7 +1788,7 @@ var CDNByeHlsjs = function (_Hlsjs) {
 
 CDNByeHlsjs.engineVersion = _index2.default.version; //the current version of p2p engine
 
-CDNByeHlsjs.WEBRTC_SUPPORT = _index2.default.WEBRTC_SUPPORT; //check if webrtc is supported in this browser
+CDNByeHlsjs.WEBRTC_SUPPORT = _index2.default.isSupported(); //check if webrtc is supported in this browser
 
 exports.default = CDNByeHlsjs;
 module.exports = exports['default'];
@@ -2040,12 +2040,18 @@ var P2PEngine = function (_EventEmitter) {
         get: function get() {
             return P2PEngine.version;
         }
+    }], [{
+        key: 'isSupported',
+        value: function isSupported() {
+            var browserRTC = (0, _core.getBrowserRTC)();
+            return browserRTC && browserRTC.RTCPeerConnection.prototype.createDataChannel !== undefined;
+        }
     }]);
 
     return P2PEngine;
 }(_events2.default);
 
-P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)();
+P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)(); // deprecated
 
 P2PEngine.version = "0.3.0";
 

@@ -192,9 +192,14 @@ class P2PEngine extends EventEmitter {
         return P2PEngine.version;
     }
 
+    static isSupported() {
+        const browserRTC = getBrowserRTC();
+        return (browserRTC && (browserRTC.RTCPeerConnection.prototype.createDataChannel !== undefined));
+    }
+
 }
 
-P2PEngine.WEBRTC_SUPPORT = !!getBrowserRTC();
+P2PEngine.WEBRTC_SUPPORT = !!getBrowserRTC();   // deprecated
 
 P2PEngine.version = __VERSION__;
 

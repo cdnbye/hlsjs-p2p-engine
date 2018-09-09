@@ -29,7 +29,7 @@ class CDNByeHlsjs extends Hlsjs{
 
         super(mergedHlsjsConfig);
 
-        if (P2PEngine.WEBRTC_SUPPORT) {
+        if (P2PEngine.isSupported()) {
             this.engine = new P2PEngine(this, p2pConfig);
         }
 
@@ -53,6 +53,6 @@ class CDNByeHlsjs extends Hlsjs{
 
 CDNByeHlsjs.engineVersion = P2PEngine.version;           //the current version of p2p engine
 
-CDNByeHlsjs.WEBRTC_SUPPORT = P2PEngine.WEBRTC_SUPPORT;   //check if webrtc is supported in this browser
+CDNByeHlsjs.WEBRTC_SUPPORT = P2PEngine.isSupported();   //check if webrtc is supported in this browser
 
 export default CDNByeHlsjs
