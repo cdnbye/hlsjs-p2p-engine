@@ -23,7 +23,7 @@ npm install cdnbye --save
   }
 ```
 
-## New API to Hls.js
+## Use Hls.js wrapped with P2PEngine
 
 ### `Hls.engineVersion` (static method)
 Show the current version of CDNBye plugin.
@@ -59,28 +59,40 @@ If `opts` is specified, then the default options (shown below) will be overridde
 | `packetSize` | number | 64 * 1024 | The maximum package size sent by datachannel, 64KB should work with most of recent browsers. Set it to 16KB for older browsers support.
 | `webRTCConfig` | Object | {} | A [Configuration dictionary](https://github.com/feross/simple-peer) providing options to configure WebRTC connections.
 
+## P2PEngine API
+
+### `var engine = new P2PEngine(hlsjs, p2pConfig);`
+Create a new `P2PEngine` instance. 
+
+### `engine.version`
+Get the version of P2PEngine.
+
+### `engine.isSupported()`
+Returns true if WebRTC data channel is supported by the browser.
+
+### `engine.enableP2P()`
+Resume P2P if it has been stopped.
+
+### `engine.disableP2P()`
+Disable P2P to stop p2p and free used resources.
+
+### `engine.destroy()`
+Stop p2p and free used resources, it will be called automatically before hls.js is destroyed.  
+
 ## P2PEngine Events
 
-### `hls.engine.on('peerId', function (peerId) {})`
+### `engine.on('peerId', function (peerId) {})`
 Emitted when the peer Id of this client is obtained from server.
 
-### `hls.engine.on('peers', function (peers) {})`
+### `engine.on('peers', function (peers) {})`
 Emitted when successfully connected with new peer.
 
-### `hls.engine.on('stats', function ({totalHTTPDownloaded, totalP2PDownloaded, totalP2PUploaded}) {})`
+### `engine.on('stats', function ({totalHTTPDownloaded, totalP2PDownloaded, totalP2PUploaded}) {})`
 Emitted when data is downloaded/uploaded.
 totalHTTPDownloaded: total data downloaded by HTTP(KB).
 totalP2PDownloaded: total data downloaded by P2P(KB).
 totalP2PUploaded: total data uploaded by P2P(KB).
 
-## P2PEngine Runtime API
 
-### `hls.engine.enableP2P()`
-Resume P2P if it has been stopped.
 
-### `hls.engine.disableP2P()`
-Disable P2P to stop p2p and free used resources.
-
-### `hls.engine.destroy()`
-Stop p2p and free used resources, it will be called automatically before hls.js is destroyed.  
 

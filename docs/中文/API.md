@@ -59,30 +59,40 @@ if (Hls.WEBRTC_SUPPORT) {
 | `packetSize` | number | 64 * 1024 | 每次通过datachannel发送的包的大小，64KB适用于较新版本的浏览器，如果要兼容低版本浏览器可以设置成16KB。
 | `webRTCConfig` | Object | {} | 用于配置stun和datachannel的[字典](https://github.com/feross/simple-peer)。
 
+## P2PEngine API
+
+### `var engine = new P2PEngine(hlsjs, p2pConfig);`
+Create a new `P2PEngine` instance. 
+
+### `engine.version`
+Get the version of P2PEngine.
+
+### `engine.isSupported()`
+Returns true if WebRTC data channel is supported by the browser.
+
+### `engine.enableP2P()`
+在p2p暂停或未启动情况下启动p2p。
+
+### `engine.disableP2P()`
+停止p2p并释放内存。
+
+### `engine.destroy()`
+停止p2p、销毁engine并释放内存。在Hls.js销毁时会自动调用。
+
 ## P2PEngine事件
 
-### `hls.engine.on('peerId', function (peerId) {})`
+### `engine.on('peerId', function (peerId) {})`
 当从服务端获取到peerId时回调该事件。
 
-### `hls.engine.on('peers', function (peers) {})`
+### `engine.on('peers', function (peers) {})`
 当与新的节点成功建立p2p连接时回调该事件。
 
-### `hls.engine.on('stats', function ({totalHTTPDownloaded, totalP2PDownloaded, totalP2PUploaded}) {})`
+### `engine.on('stats', function ({totalHTTPDownloaded, totalP2PDownloaded, totalP2PUploaded}) {})`
 该回调函数可以获取p2p信息，包括：
 totalHTTPDownloaded: 从HTTP(CDN)下载的数据量（单位KB）
 totalP2PDownloaded: 从P2P下载的数据量（单位KB）
 totalP2PUploaded: P2P上传的数据量（单位KB）
 
-## P2PEngine运行时API
-
-### `hls.engine.enableP2P()`
-在p2p暂停或未启动情况下启动p2p。
-
-### `hls.engine.disableP2P()` 
-停止p2p并释放内存。
-
-### `hls.engine.destroy()`
-停止p2p、销毁engine并释放内存。
 
 
 
