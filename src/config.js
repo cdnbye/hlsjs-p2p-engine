@@ -30,6 +30,7 @@ let defaultP2PConfig = {
 
     webRTCConfig: {},                            // 传入channelConfig用于createDataChannel，config用于RTCPeerConnection
 
+    pathModified: {},
     ...btConfig
 };
 

@@ -159,7 +159,8 @@ class BTScheduler extends EventEmitter {
         const { logger } = this.engine;
         this.context = context;
         const frag = context.frag;
-        const handledUrl = handleTSUrl(frag.relurl, this.config.tsStrictMatched);
+        //const handledUrl = handleTSUrl(frag.relurl, this.config.tsStrictMatched);
+        const handledUrl = handleTSUrl(frag.relurl, this.config);
         this.callbacks = callbacks;
         this.stats = {trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0};
         this.criticalSeg = {sn: frag.sn, relurl: handledUrl};

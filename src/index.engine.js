@@ -48,7 +48,7 @@ class P2PEngine extends EventEmitter {
                 live: isLive,
             };
             const signalId = URLToolkit.parseURL(this.config.wsSignalerAddr).netLoc.substr(2);
-            this.channel = `${this.config.channelId(hlsjs.url, this.browserInfo)}|${signalId}[${DataChannel.VERSION}]`;
+            this.channel = `${this.config.channelId(hlsjs.url, this.browserInfo, this.config)}|${signalId}[${DataChannel.VERSION}]`;
             //初始化logger
             let logger = new Logger(this.config, this.channel);
             this.hlsjs.config.logger = this.logger = logger;

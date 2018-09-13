@@ -31,7 +31,8 @@ class BufferManager extends EventEmitter {
     }
 
     copyAndAddBuffer(data, url, sn, fromPeerId = '') {                                       //先复制再缓存
-        const handledUrl = handleTSUrl(url, this.config.tsStrictMatched);
+        //const handledUrl = handleTSUrl(url, this.config.tsStrictMatched);
+        const handledUrl = handleTSUrl(url, this.config);
         let payloadBuf = Buffer.from(data);
         let byteLength = payloadBuf.byteLength;
         let targetBuffer = new Buffer(byteLength);
@@ -50,7 +51,8 @@ class BufferManager extends EventEmitter {
     }
 
     addBuffer(sn, url, buf, fromPeerId = '') {                                             //直接缓存
-        const handledUrl = handleTSUrl(url, this.config.tsStrictMatched);
+        //const handledUrl = handleTSUrl(url, this.config.tsStrictMatched);
+        const handledUrl = handleTSUrl(url, this.config);
         let segment = {
             sn,
             relurl: handledUrl,
