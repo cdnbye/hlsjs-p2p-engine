@@ -57,7 +57,8 @@ If `opts` is specified, then the default options (shown below) will be overridde
 | `maxBufSize` | number | 1024 * 1024 * 50 | The max size of binary data that can be stored in the cache.
 | `p2pEnabled` | boolean | true | Enable or disable p2p engine.
 | `tag` | string | [hlsjs version] | User defined tag which is useful for observing the effect of parameters turning.
-| `channelId` | function | - | Pass a function to generate channel Id.
+| `channelId` | function | - | Pass a function to generate channel Id.(See advanced usage)
+| `segmentId` | function | - | Pass a function to generate segment Id.(See advanced usage)
 | `packetSize` | number | 64 * 1024 | The maximum package size sent by datachannel, 64KB should work with most of recent browsers. Set it to 16KB for older browsers support.
 | `webRTCConfig` | Object | {} | A [Configuration dictionary](https://github.com/feross/simple-peer) providing options to configure WebRTC connections.
 
@@ -95,6 +96,28 @@ totalHTTPDownloaded: total data downloaded by HTTP(KB).
 totalP2PDownloaded: total data downloaded by P2P(KB).
 totalP2PUploaded: total data uploaded by P2P(KB).
 
+## Advanced Usage
+### Dynamic m3u8 path issue
+Some m3u8 urls play the same live/vod but have different paths on them. For example, 
+example.com/clientId1/file.m3u8 and example.com/clientId2/file.m3u8. In this case, you can format a common channelId for them.
+```javascript
+p2pConfig: {
+    channelId: function (m3u8Url) {
+        const formatedUrl = format(m3u8Url);   // format a channelId by removing the different part
+        return formatedUrl;
+    }
+}
+```
 
+### Dynamic ts path issue
+Like dynamic m3u8 path issue, you should format a common segmentId for the same ts file.
+```javascript
+p2pConfig: {
+    segmentId: function (level, sn, tsUrl) {
+        const formatedUrl = format(tsUrl);  // format a segmentId by removing the different part
+        return formatedUrl;
+    }
+}
+```
 
 

@@ -6,7 +6,7 @@ import SegmentManager from './segment-manager';
 import {Events, Fetcher, getBrowserRTC, DataChannel} from 'core';
 import Logger from './utils/logger';
 import platform from './utils/platform';
-import { defaultChannelId, tsPathChecker, noop } from './utils/toolFuns';
+import { defaultChannelId, defaultSegmentId} from './utils/toolFuns';
 
 class P2PEngine extends EventEmitter {
 
@@ -23,6 +23,10 @@ class P2PEngine extends EventEmitter {
         if (!this.config.channelId || typeof this.config.channelId !== 'function') {
             this.config.channelId = defaultChannelId;
         }
+        if (!this.config.segmentId || typeof this.config.segmentId !== 'function') {
+            this.config.segmentId = defaultSegmentId;
+        }
+        hlsjs.config.segmentId = this.config.segmentId
 
         this.hlsjs = hlsjs;
 

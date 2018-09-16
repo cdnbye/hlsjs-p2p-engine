@@ -57,7 +57,8 @@ if (Hls.WEBRTC_SUPPORT) {
 | `maxBufSize` | number | 1024 * 1024 * 50 | p2p缓存的最大数据量。
 | `p2pEnabled` | boolean | true | 是否开启P2P。
 | `tag` | string | [hlsjs version] | 用户自定义标签，可用于在后台查看参数调整效果。
-| `channelId` | function | - | 标识channel的字段，同一个channel的用户可以共享数据。
+| `channelId` | function | - | 标识channel的字段，同一个channel的用户可以共享数据。（参考高级用法）
+| `segmentId` | function | - | 标识ts文件的字段，防止相同ts文件具有不同的路径。（参考高级用法）
 | `packetSize` | number | 64 * 1024 | 每次通过datachannel发送的包的大小，64KB适用于较新版本的浏览器，如果要兼容低版本浏览器可以设置成16KB。
 | `webRTCConfig` | Object | {} | 用于配置stun和datachannel的[字典](https://github.com/feross/simple-peer)。
 
@@ -95,6 +96,29 @@ totalHTTPDownloaded: 从HTTP(CDN)下载的数据量（单位KB）
 totalP2PDownloaded: 从P2P下载的数据量（单位KB）
 totalP2PUploaded: P2P上传的数据量（单位KB）
 
+## 高级用法
+### 解决动态m3u8路径问题
+某些流媒体提供商的m3u8是动态生成的，不同节点的m3u8地址不一样，例如example.com/clientId1/file.m3u8和example.com/clientId2/file.m3u8,
+而本插件默认使用m3u8作为channelId。这时候就要构造一个共同的chanelId，使实际观看同一直播/视频的节点处在相同频道中。
+```javascript
+p2pConfig: {
+    channelId: function (m3u8Url) {
+        const formatedUrl = format(m3u8Url);   // 忽略差异部分，构造一个一致的channelId
+        return formatedUrl;
+    }
+}
+```
+
+### 解决动态ts路径问题
+类似动态m3u8路径问题，相同ts文件的路径也可能有差异，这时候需要忽略ts路径差异的部分。
+```javascript
+p2pConfig: {
+    segmentId: function (level, sn, tsUrl) {
+        const formatedUrl = format(tsUrl);  // 忽略路径差异的部分，使相同的ts文件具有相同的segmentId
+        return formatedUrl;
+    }
+}
+```
 
 
 

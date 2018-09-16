@@ -1,7 +1,7 @@
 import URLToolkit from 'url-toolkit';
 
 // 获取segment Id的函数
-export function segmentId(streamLevel, segmentSn, segmentUrl) {
+export function defaultSegmentId(streamLevel, segmentSn, segmentUrl) {
     return `${streamLevel}-${segmentSn}`
 }
 

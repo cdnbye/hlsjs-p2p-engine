@@ -1220,7 +1220,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.segmentId = segmentId;
+exports.defaultSegmentId = defaultSegmentId;
 exports.defaultChannelId = defaultChannelId;
 exports.noop = noop;
 
@@ -1231,7 +1231,7 @@ var _urlToolkit2 = _interopRequireDefault(_urlToolkit);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // 获取segment Id的函数
-function segmentId(streamLevel, segmentSn, segmentUrl) {
+function defaultSegmentId(streamLevel, segmentSn, segmentUrl) {
     return streamLevel + '-' + segmentSn;
 }
 
@@ -1871,6 +1871,10 @@ var P2PEngine = function (_EventEmitter) {
         if (!_this.config.channelId || typeof _this.config.channelId !== 'function') {
             _this.config.channelId = _toolFuns.defaultChannelId;
         }
+        if (!_this.config.segmentId || typeof _this.config.segmentId !== 'function') {
+            _this.config.segmentId = _toolFuns.defaultSegmentId;
+        }
+        hlsjs.config.segmentId = _this.config.segmentId;
 
         _this.hlsjs = hlsjs;
 
@@ -2125,6 +2129,7 @@ var defaultP2PConfig = _extends({
     tag: '', // 用户自定义标签，可用于在后台查看参数调整效果
 
     channelId: null, // 标识channel的字段，默认是'[path]-[protocol version]'
+    segmentId: null, // 标识ts文件的字段，默认是'[level]-[sn]'
 
     webRTCConfig: {} }, _bittorrent.config);
 
@@ -2477,8 +2482,6 @@ var _events2 = _interopRequireDefault(_events);
 
 var _core = __webpack_require__(1);
 
-var _toolFuns = __webpack_require__(2);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -2488,6 +2491,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+// import {segmentId} from '../utils/toolFuns';
 
 var BTScheduler = function (_EventEmitter) {
     _inherits(BTScheduler, _EventEmitter);
@@ -2765,7 +2770,7 @@ var BTScheduler = function (_EventEmitter) {
 
             this.context = context;
             var frag = context.frag;
-            var segId = (0, _toolFuns.segmentId)(frag.level, frag.sn, frag.url);
+            var segId = this.config.segmentId(frag.level, frag.sn, frag.url);
             this.callbacks = callbacks;
             this.stats = { trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0 };
             this.criticalSeg = { sn: frag.sn, segId: segId };
@@ -3262,6 +3267,7 @@ var FragLoader = function (_EventEmitter) {
         _this.p2pEnabled = config.p2pEnabled;
         _this.scheduler = config.scheduler;
         _this.fetcher = config.fetcher;
+        _this.segmentId = config.segmentId;
         return _this;
     }
 
@@ -3295,7 +3301,7 @@ var FragLoader = function (_EventEmitter) {
             frag.loadByP2P = false; //初始化flag
             frag.loadByHTTP = false;
             // console.warn(`load frag level ${frag.level} sn ${frag.sn}`);
-            var segId = (0, _toolFuns.segmentId)(frag.level, frag.sn, frag.url);
+            var segId = this.segmentId(frag.level, frag.sn, frag.url);
             if (this.p2pEnabled && this.bufMgr.hasSegOfId(segId)) {
                 //如果命中缓存
                 logger.debug('bufMgr found seg sn ' + frag.sn + ' url ' + frag.relurl);

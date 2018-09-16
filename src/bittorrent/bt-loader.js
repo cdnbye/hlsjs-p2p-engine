@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 // import URLToolkit from 'url-toolkit';
-import {segmentId} from '../utils/toolFuns';
+import {defaultSegmentId} from '../utils/toolFuns';
 
 class FragLoader extends EventEmitter {
     constructor(config) {
@@ -17,6 +17,7 @@ class FragLoader extends EventEmitter {
         this.p2pEnabled = config.p2pEnabled;
         this.scheduler = config.scheduler;
         this.fetcher = config.fetcher;
+        this.segmentId = config.segmentId;
     }
 
     destroy() {
@@ -40,7 +41,7 @@ class FragLoader extends EventEmitter {
         frag.loadByP2P = false;                //初始化flag
         frag.loadByHTTP = false;
         // console.warn(`load frag level ${frag.level} sn ${frag.sn}`);
-        const segId = segmentId(frag.level, frag.sn, frag.url);
+        const segId = this.segmentId(frag.level, frag.sn, frag.url);
         if (this.p2pEnabled && this.bufMgr.hasSegOfId(segId)) {                                     //如果命中缓存
             logger.debug(`bufMgr found seg sn ${frag.sn} url ${frag.relurl}`);
             let seg = this.bufMgr.getSegById(segId);

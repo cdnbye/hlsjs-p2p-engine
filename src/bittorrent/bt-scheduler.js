@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 import {Events} from 'core';
-import {segmentId} from '../utils/toolFuns';
+// import {segmentId} from '../utils/toolFuns';
 
 class BTScheduler extends EventEmitter {
     constructor(engine, config) {
@@ -159,7 +159,7 @@ class BTScheduler extends EventEmitter {
         const { logger } = this.engine;
         this.context = context;
         const frag = context.frag;
-        const segId = segmentId(frag.level, frag.sn, frag.url);
+        const segId = this.config.segmentId(frag.level, frag.sn, frag.url);
         this.callbacks = callbacks;
         this.stats = {trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0};
         this.criticalSeg = {sn: frag.sn, segId};

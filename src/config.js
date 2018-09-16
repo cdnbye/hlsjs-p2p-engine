@@ -26,6 +26,7 @@ let defaultP2PConfig = {
     tag: '',                                     // 用户自定义标签，可用于在后台查看参数调整效果
 
     channelId: null,                             // 标识channel的字段，默认是'[path]-[protocol version]'
+    segmentId: null,                             // 标识ts文件的字段，默认是'[level]-[sn]'
 
     webRTCConfig: {},                            // 传入channelConfig用于createDataChannel，config用于RTCPeerConnection
 
