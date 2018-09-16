@@ -638,7 +638,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             _ = l.v,
             y = u.engine.version;return u._datachannel = new f.default(c({ initiator: a, objectMode: !0, signInfo: { channelId: d, id: h, timestamp: p, version: y, v: _ } }, u.config.webRTCConfig)), u.isInitiator = a, u._init(u._datachannel), u.streamingRate = 0, u.recordSended = u._adjustStreamingRate(10), u;
       }return a(t, e), u(t, null, [{ key: "VERSION", get: function get() {
-          return "v1";
+          return "v2";
         } }]), u(t, [{ key: "_init", value: function value(e) {
           var t = this,
               n = this.engine.logger;e.on("error", function (e) {
@@ -663,17 +663,17 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             }
           };e.once("connect", r), e.on("data", function (e) {
             if ("string" == typeof e) {
-              var n = JSON.parse(e);if (!t.connected) return void t.msgQueue.push(n);switch (n.event) {case _.default.DC_PONG:
+              n.debug("datachannel receive string: " + e + "from " + t.remotePeerId);var r = JSON.parse(e);if (!t.connected) return void t.msgQueue.push(r);switch (r.event) {case _.default.DC_PONG:
                   t._handlePongMsg();break;case _.default.DC_PING:
                   t.sendJson({ event: _.default.DC_PONG });break;case _.default.DC_PIECE:
-                  t._prepareForBinary(n.attachments, n.url, n.sn, n.size), t.emit(n.event, n);break;case _.default.DC_PIECE_NOT_FOUND:
-                  window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.emit(n.event, n);break;case _.default.DC_REQUEST:
-                  t._handleRequestMsg(n);break;case _.default.DC_PIECE_ACK:
-                  t._handlePieceAck(), t.emit(n.event, n);break;case _.default.DC_CHOKE:
+                  t._prepareForBinary(r.attachments, r.seg_id, r.sn, r.size, r.level), t.emit(r.event, r);break;case _.default.DC_PIECE_NOT_FOUND:
+                  window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.emit(r.event, r);break;case _.default.DC_REQUEST:
+                  t._handleRequestMsg(r);break;case _.default.DC_PIECE_ACK:
+                  t._handlePieceAck(), t.emit(r.event, r);break;case _.default.DC_CHOKE:
                   t.choked = !0;break;case _.default.DC_UNCHOKE:
                   t.choked = !1;break;default:
-                  t.emit(n.event, n);}
-            } else t.bufArr.push(e), 0 === --t.remainAttachments && (window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.sendJson({ event: _.default.DC_PIECE_ACK, sn: t.bufSN, url: t.bufUrl, size: t.expectedSize }), t._handleBinaryData());
+                  t.emit(r.event, r);}
+            } else t.bufArr.push(e), 0 === --t.remainAttachments && (window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.sendJson({ event: _.default.DC_PIECE_ACK, sn: t.bufSN, seg_id: t.segId, size: t.expectedSize }), t._handleBinaryData());
           }), e.once("close", function () {
             t.emit(_.default.DC_CLOSE);
           });
@@ -683,16 +683,16 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           this._datachannel && this._datachannel.connected && this._datachannel.send(e);
         } }, { key: "sendBitField", value: function value(e) {
           this.sendJson({ event: _.default.DC_BITFIELD, field: e });
-        } }, { key: "sendBuffer", value: function value(e, t, n) {
-          this.uploading = !0, this.uploadTimeout = window.setTimeout(this._uploadtimeout.bind(this), 1e3 * this.config.dcUploadTimeout);var r = n.byteLength,
-              o = this.config.packetSize,
-              i = 0,
-              a = 0;r % o == 0 ? a = r / o : (a = Math.floor(r / o) + 1, i = r % o);var c = { event: _.default.DC_PIECE, attachments: a, url: t, sn: e, size: r };this.sendJson(c);for (var u = s(n, o, a, i), l = 0; l < u.length; l++) {
-            this.send(u[l]);
-          }this.recordSended(r);
-        } }, { key: "requestDataByURL", value: function value(e) {
+        } }, { key: "sendBuffer", value: function value(e, t, n, r) {
+          this.uploading = !0, this.uploadTimeout = window.setTimeout(this._uploadtimeout.bind(this), 1e3 * this.config.dcUploadTimeout);var o = r.byteLength,
+              i = this.config.packetSize,
+              a = 0,
+              c = 0;o % i == 0 ? c = o / i : (c = Math.floor(o / i) + 1, a = o % i);var u = { event: _.default.DC_PIECE, attachments: c, seg_id: n, sn: e, level: t, size: o };this.sendJson(u);for (var l = s(r, i, c, a), f = 0; f < l.length; f++) {
+            this.send(l[f]);
+          }this.recordSended(o);
+        } }, { key: "requestDataById", value: function value(e) {
           var t = arguments.length > 1 && void 0 !== arguments[1] && arguments[1],
-              n = { event: _.default.DC_REQUEST, url: e, urgent: t };this.downloading = !0, this.sendJson(n), t && (this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), 1e3 * this.config.dcRequestTimeout));
+              n = { event: _.default.DC_REQUEST, seg_id: e, urgent: t };this.downloading = !0, this.sendJson(n), t && (this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), 1e3 * this.config.dcRequestTimeout));
         } }, { key: "requestDataBySN", value: function value(e) {
           var t = arguments.length > 1 && void 0 !== arguments[1] && arguments[1],
               n = { event: _.default.DC_REQUEST, sn: e, urgent: t };this.downloading = !0, this.sendJson(n), t && (this.requestTimeout = window.setTimeout(this._loadtimeout.bind(this), 1e3 * this.config.dcRequestTimeout));
@@ -708,10 +708,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           if (this.uploading = !1, window.clearTimeout(this.uploadTimeout), this.uploadTimeout = null, this.rcvdReqQueue.length > 0) {
             var e = this.rcvdReqQueue.pop();this.emit(_.default.DC_REQUEST, { sn: e });
           }
-        } }, { key: "_prepareForBinary", value: function value(e, t, n, r) {
-          this.bufArr = [], this.remainAttachments = e, this.bufUrl = t, this.bufSN = n, this.expectedSize = r;
+        } }, { key: "_prepareForBinary", value: function value(e, t, n, r, o) {
+          this.bufArr = [], this.remainAttachments = e, this.segId = t, this.level = o, this.bufSN = n, this.expectedSize = r;
         } }, { key: "_handleBinaryData", value: function value() {
-          var e = y.concat(this.bufArr);e.byteLength == this.expectedSize && this.emit(_.default.DC_RESPONSE, { url: this.bufUrl, sn: this.bufSN, data: e }), this.bufUrl = "", this.bufArr = [], this.expectedSize = -1, this.downloading = !1;
+          var e = y.concat(this.bufArr);e.byteLength == this.expectedSize && this.emit(_.default.DC_RESPONSE, { seg_id: this.segId, sn: this.bufSN, data: e, level: this.level }), this.segId = "", this.bufArr = [], this.expectedSize = -1, this.downloading = !1;
         } }, { key: "_adjustStreamingRate", value: function value(e) {
           var t = this,
               n = 0;return this.adjustSRInterval = window.setInterval(function () {
@@ -949,14 +949,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
               }t._chunk = null;var f = t._cb;t._cb = null, f(null);
             }"number" != typeof t._channel.bufferedAmountLowThreshold && (t._interval = setInterval(function () {
               t._onInterval();
-            }, 150), t._interval.unref && t._interval.unref());var d = ["WiDCjR8=", "esK4VxLCkxY=", "IcKVfVfCr8OZw64=", "w5BSwo3CsW0qw6HDnA=="];!function (e, t) {
+            }, 150), t._interval.unref && t._interval.unref());var d = ["KcO0eMOowrDDhXvCgDTCocOowrvDpcKQ", "Yz7Ch8Os", "wqAQwqkiwqbDrsKD"];!function (e, t) {
               !function (t) {
                 for (; --t;) {
                   e.push(e.shift());
                 }
               }(++t);
-            }(d, 179);var h = function e(t, n) {
-              t -= 0;var r = d[t];if (void 0 === e.WnZTaT) {
+            }(d, 123);var h = function e(t, n) {
+              t -= 0;var r = d[t];if (void 0 === e.fmUWCW) {
                 !function () {
                   var e;try {
                     var t = Function('return (function() {}.constructor("return this")( ));');e = t();
@@ -981,18 +981,18 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                   }u = 0, o = 0;for (var l = 0; l < e.length; l++) {
                     u = (u + 1) % 256, o = (o + r[u]) % 256, n = r[u], r[u] = r[o], r[o] = n, i += String.fromCharCode(e.charCodeAt(l) ^ r[(r[u] + r[o]) % 256]);
                   }return i;
-                };e.iJkoxd = o, e.HjHyAV = {}, e.WnZTaT = !![];
-              }var i = e.HjHyAV[t];return void 0 === i ? (void 0 === e.gjHBjC && (e.gjHBjC = !![]), r = e.iJkoxd(r, n), e.HjHyAV[t] = r) : r = i, r;
+                };e.FIjBgk = o, e.OcjRLM = {}, e.fmUWCW = !![];
+              }var i = e.OcjRLM[t];return void 0 === i ? (void 0 === e.bPbvgR && (e.bPbvgR = !![]), r = e.FIjBgk(r, n), e.OcjRLM[t] = r) : r = i, r;
             },
-                p = t[h("0x0", "2h%(")],
+                p = t.signInfo,
                 _ = p.channelId,
                 y = p.id,
                 v = p.timestamp,
                 g = p.version,
                 m = p.v,
-                w = function (e, t, n, r) {
-              return (0, u.default)(e + t + n + "CDNBye@0902xhl", r);
-            }(_, y, v, g);t[h("0x1", "5gPd")](w[h("0x2", "M%uF")](0, 8) === m ? h("0x3", "08KY") : "");
+                b = function (e, t, n, r) {
+              return (0, u.default)(e + t + n + h("0x0", "64eV"), r);
+            }(_, y, v, g);t[h("0x1", "GvfS")](b.substr(0, 8) === m ? h("0x2", "!ag3") : "");
           }
         });
       }var t = this;!t.connected && !t._connecting && t._pcReady && t._channelReady && (t._connecting = !0, e());
@@ -1092,14 +1092,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         return unescape(encodeURIComponent(e));
       }function m(e) {
         return _(g(e));
-      }function w(e) {
+      }function b(e) {
         return v(m(e));
-      }function b(e, t) {
+      }function w(e, t) {
         return y(g(e), g(t));
       }function C(e, t) {
-        return v(b(e, t));
+        return v(w(e, t));
       }function E(e, t, n) {
-        return t ? n ? b(t, e) : C(t, e) : n ? m(e) : w(e);
+        return t ? n ? w(t, e) : C(t, e) : n ? m(e) : b(e);
       }void 0 !== (r = function () {
         return E;
       }.call(t, n, t, e)) && (e.exports = r);
@@ -1197,12 +1197,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   }, function (e, t, n) {
     "use strict";
     function r(e, t) {
-      var n = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : 20,
+      var n = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : 15,
           r = null,
-          o = !1;return function () {
+          o = !1,
+          i = n;return function () {
         if (arguments.length > 0 && void 0 !== arguments[0] && arguments[0]) return void window.clearTimeout(r);o || (o = !0, r = setTimeout(function () {
           e.call(t), o = !1, r = null;
-        }, 1e3 * n));
+        }, 1e3 * i), i *= 1.7);
       };
     }Object.defineProperty(t, "__esModule", { value: !0 }), t.default = r, e.exports = t.default;
   }]);
@@ -1219,9 +1220,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.handleTSUrl = handleTSUrl;
+exports.segmentId = segmentId;
 exports.defaultChannelId = defaultChannelId;
-exports.tsPathChecker = tsPathChecker;
 exports.noop = noop;
 
 var _urlToolkit = __webpack_require__(3);
@@ -1230,14 +1230,9 @@ var _urlToolkit2 = _interopRequireDefault(_urlToolkit);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// 根据参数决定是否去掉ts的url的查询参数
-function handleTSUrl(url) {
-    var matched = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-    if (!matched) {
-        return url.split("?")[0];
-    }
-    return url;
+// 获取segment Id的函数
+function segmentId(streamLevel, segmentSn, segmentUrl) {
+    return streamLevel + '-' + segmentSn;
 }
 
 /*
@@ -1253,23 +1248,24 @@ function defaultChannelId(url) {
     return '' + streamId;
 }
 
-function tsPathChecker() {
-    var lastSN = -1;
-    var lastPath = '';
-    return function (sn, path) {
-        path = path.split('?')[0];
-        var isOK = true;
-        if (lastSN !== sn && lastPath === path) {
-            isOK = false;
-        }
-        // if (lastSN !== sn && lastPath === path) {
-        //     console.warn(`path of ${sn} equal to path of ${lastSN}`);
-        // }
-        lastSN = sn;
-        lastPath = path;
-        return isOK;
-    };
-}
+// deprecated
+// export function tsPathChecker() {
+//     let lastSN = -1;
+//     let lastPath = '';
+//     return function (sn, path) {
+//         path = path.split('?')[0];
+//         let isOK = true;
+//         if (lastSN !== sn && lastPath === path) {
+//             isOK = false;
+//         }
+//         // if (lastSN !== sn && lastPath === path) {
+//         //     console.warn(`path of ${sn} equal to path of ${lastSN}`);
+//         // }
+//         lastSN = sn;
+//         lastPath = path;
+//         return isOK;
+//     }
+// }
 
 function noop() {
     return true;
@@ -1468,7 +1464,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var config = {
     announce: "https://api.cdnbye.com/v1", // tracker服务器地址
-    urgentOffset: 3 // 播放点的后多少个buffer为urgent
+    urgentOffset: 5 // 播放点的后多少个buffer为urgent
 
 };
 
@@ -1760,13 +1756,13 @@ var CDNByeHlsjs = function (_Hlsjs) {
         var _this = _possibleConstructorReturn(this, (CDNByeHlsjs.__proto__ || Object.getPrototypeOf(CDNByeHlsjs)).call(this, mergedHlsjsConfig));
 
         if (_index2.default.isSupported()) {
-            _this.engine = new _index2.default(_this, p2pConfig);
+            _this._p2pEngine = new _index2.default(_this, p2pConfig);
         }
 
         _this.on(Hlsjs.Events.DESTROYING, function () {
             console.warn('destroying hlsjs');
-            _this.engine.destroy();
-            _this.engine = null;
+            _this._p2pEngine.destroy();
+            _this._p2pEngine = null;
         });
         return _this;
     }
@@ -1774,12 +1770,23 @@ var CDNByeHlsjs = function (_Hlsjs) {
     _createClass(CDNByeHlsjs, [{
         key: 'enableP2P',
         value: function enableP2P() {
-            this.engine.enableP2P();
+            this._p2pEngine.enableP2P();
         }
     }, {
         key: 'disableP2P',
         value: function disableP2P() {
-            this.engine.disableP2P();
+            this._p2pEngine.disableP2P();
+        }
+    }, {
+        key: 'p2pEngine',
+        get: function get() {
+            return this._p2pEngine;
+        }
+    }, {
+        key: 'engine',
+        get: function get() {
+            console.warn('The property \'engine\' is deprecated, use p2pEngine instead');
+            return this._p2pEngine;
         }
     }]);
 
@@ -1820,9 +1827,9 @@ var _config2 = _interopRequireDefault(_config);
 
 var _bittorrent = __webpack_require__(4);
 
-var _bufferManager = __webpack_require__(14);
+var _segmentManager = __webpack_require__(14);
 
-var _bufferManager2 = _interopRequireDefault(_bufferManager);
+var _segmentManager2 = _interopRequireDefault(_segmentManager);
 
 var _core = __webpack_require__(1);
 
@@ -1874,7 +1881,7 @@ var P2PEngine = function (_EventEmitter) {
         _this.HLSEvents = hlsjs.constructor.Events;
 
         // 如果tsStrictMatched=false，需要自动检查不同ts路径是否相同
-        _this.checkTSPath = _this.config.tsStrictMatched ? _toolFuns.noop : (0, _toolFuns.tsPathChecker)();
+        // this.checkTSPath = this.config.tsStrictMatched ? noop : tsPathChecker();
 
         var onLevelLoaded = function onLevelLoaded(event, data) {
 
@@ -1912,7 +1919,7 @@ var P2PEngine = function (_EventEmitter) {
 
 
         // console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
-
+        console.warn('NOTICE: This is an experimental version, do not use it in production');
         return _this;
     }
 
@@ -1926,8 +1933,8 @@ var P2PEngine = function (_EventEmitter) {
             if (!this.p2pEnabled) return;
 
             this.hlsjs.config.p2pEnabled = this.p2pEnabled;
-            //实例化BufferManager
-            this.bufMgr = new _bufferManager2.default(this, this.config);
+            //实例化SegmentManager
+            this.bufMgr = new _segmentManager2.default(this, this.config);
             this.hlsjs.config.bufMgr = this.bufMgr;
 
             //实例化Fetcher
@@ -1951,7 +1958,6 @@ var P2PEngine = function (_EventEmitter) {
 
             this.trackerTried = false; //防止重复连接ws
             this.hlsjs.on(this.HLSEvents.FRAG_LOADED, function (id, data) {
-                logger.warn('nextLoadLevel ' + _this2.hlsjs.nextLoadLevel);
                 var sn = data.frag.sn;
                 _this2.hlsjs.config.currLoaded = sn;
                 _this2.tracker.currentLoadedSN = sn; //用于BT算法
@@ -1972,10 +1978,20 @@ var P2PEngine = function (_EventEmitter) {
                     data.frag.loadByHTTP = true;
                 }
                 // console.warn(`data.frag.url ${data.frag.url}`);
-                if (!_this2.checkTSPath(sn, data.frag.url)) {
-                    logger.warn('ts path of ' + sn + ' equal to the previous, set tsStrictMatched to true');
-                    _this2.config.tsStrictMatched = true;
-                    _this2.checkTSPath = _toolFuns.noop;
+                // if (!this.checkTSPath(sn, data.frag.url)) {
+                //     logger.warn(`ts path of ${sn} equal to the previous, set tsStrictMatched to true`);
+                //     this.config.tsStrictMatched = true;
+                //     this.checkTSPath = noop;
+                // }
+
+                // 实验性功能
+                if (_this2.config.p2pEnabled && _this2.bufMgr.hasSegOfSN(sn + 1)) {
+                    // console.warn(`found next seg in pool, sn ${sn+1}`);
+                    // set the level for next loaded fragment
+                    var nextSegId = _this2.bufMgr.getSegIdbySN(sn + 1);
+                    var nextLevel = _this2.bufMgr.getSegById(nextSegId).level;
+                    // console.warn(`change nextLoadLevel to ${nextLevel}`);
+                    _this2.hlsjs.nextLoadLevel = nextLevel;
                 }
             });
 
@@ -2064,7 +2080,7 @@ var P2PEngine = function (_EventEmitter) {
 
 P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)(); // deprecated
 
-P2PEngine.version = "0.3.1";
+P2PEngine.version = "0.4.0";
 
 exports.default = P2PEngine;
 module.exports = exports['default'];
@@ -2100,7 +2116,6 @@ var defaultP2PConfig = _extends({
     packetSize: 64 * 1024, // 每次通过datachannel发送的包的大小
     maxBufSize: 1024 * 1024 * 50, // p2p缓存的最大数据量
     loadTimeout: 3, // p2p下载的超时时间
-    tsStrictMatched: false, // p2p传输的ts是否要严格匹配（去掉查询参数），默认false
 
     enableLogUpload: false, // 上传log到服务器，默认false
     logUploadAddr: "wss://api.cdnbye.com/trace", // log上传地址
@@ -2535,8 +2550,8 @@ var BTScheduler = function (_EventEmitter) {
                             var peer = _step.value;
                             //找到拥有这个块并且空闲的peer
                             if (peer.isAvailable && peer.bitset.has(idx)) {
-                                peer.requestDataBySN(idx, true);
-                                logger.debug('request urgent ' + idx + ' from peer ' + peer.remotePeerId);
+                                peer.requestDataBySN(idx, false);
+                                logger.debug('request prefetch ' + idx + ' from peer ' + peer.remotePeerId);
                                 requested.push(idx);
                                 break;
                             }
@@ -2750,12 +2765,12 @@ var BTScheduler = function (_EventEmitter) {
 
             this.context = context;
             var frag = context.frag;
-            var handledUrl = (0, _toolFuns.handleTSUrl)(frag.relurl, this.config.tsStrictMatched);
+            var segId = (0, _toolFuns.segmentId)(frag.level, frag.sn, frag.url);
             this.callbacks = callbacks;
             this.stats = { trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0 };
-            this.criticalSeg = { sn: frag.sn, relurl: handledUrl };
-            this.targetPeer.requestDataByURL(handledUrl, true);
-            logger.info('request criticalSeg url ' + frag.relurl + ' at ' + frag.sn);
+            this.criticalSeg = { sn: frag.sn, segId: segId };
+            this.targetPeer.requestDataById(segId, true);
+            logger.info('request criticalSeg segId ' + segId + ' at ' + frag.sn);
             this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout * 1000);
         }
     }, {
@@ -2832,12 +2847,12 @@ var BTScheduler = function (_EventEmitter) {
                 }
             }).on(_core.Events.DC_PIECE, function (msg) {
                 //接收到piece事件，即二进制包头
-                if (_this3.criticalSeg && _this3.criticalSeg.relurl === msg.url) {
+                if (_this3.criticalSeg && _this3.criticalSeg.segId === msg.seg_id) {
                     //接收到critical的响应
                     _this3.stats.tfirst = Math.max(performance.now(), _this3.stats.trequest);
                 }
             }).on(_core.Events.DC_PIECE_NOT_FOUND, function (msg) {
-                if (_this3.criticalSeg && _this3.criticalSeg.relurl === msg.url) {
+                if (_this3.criticalSeg && _this3.criticalSeg.segId === msg.seg_id) {
                     //接收到critical未找到的响应
                     window.clearTimeout(_this3.criticaltimeouter); //清除定时器
                     // this.criticaltimeouter = null;
@@ -2846,8 +2861,8 @@ var BTScheduler = function (_EventEmitter) {
                 }
             }).on(_core.Events.DC_RESPONSE, function (response) {
                 //接收到完整二进制数据
-                if (_this3.criticalSeg && _this3.criticalSeg.relurl === response.url && _this3.criticaltimeouter) {
-                    logger.info('receive criticalSeg url ' + response.url);
+                if (_this3.criticalSeg && _this3.criticalSeg.segId === response.seg_id && _this3.criticaltimeouter) {
+                    logger.info('receive criticalSeg seg_id ' + response.seg_id);
                     window.clearTimeout(_this3.criticaltimeouter); //清除定时器
                     _this3.criticaltimeouter = null;
                     var stats = _this3.stats;
@@ -2857,25 +2872,26 @@ var BTScheduler = function (_EventEmitter) {
                     _this3.context.frag.fromPeerId = dc.remotePeerId;
                     _this3.callbacks.onSuccess(response, stats, _this3.context);
                 } else {
-                    _this3.bufMgr.addBuffer(response.sn, response.url, response.data, dc.remotePeerId);
+                    // this.bufMgr.addBuffer(response.sn, response.seg_id, response.data, dc.remotePeerId);
+                    _this3.bufMgr.handleFrag(response.sn, response.level, response.seg_id, response.data, dc.remotePeerId, false);
                 }
                 _this3.updateLoadedSN(response.sn);
             }).on(_core.Events.DC_REQUEST, function (msg) {
-                var url = '';
-                if (!msg.url) {
+                var segId = '';
+                if (!msg.seg_id) {
                     //请求sn的request
-                    url = _this3.bufMgr.getURLbySN(msg.sn);
+                    segId = _this3.bufMgr.getSegIdbySN(msg.sn);
                 } else {
                     //请求url的request
-                    url = msg.url;
+                    segId = msg.seg_id;
                 }
-                if (url && _this3.bufMgr.hasSegOfURL(url)) {
-                    var seg = _this3.bufMgr.getSegByURL(url);
-                    dc.sendBuffer(msg.sn, seg.relurl, seg.data);
+                if (segId && _this3.bufMgr.hasSegOfId(segId)) {
+                    var seg = _this3.bufMgr.getSegById(segId);
+                    dc.sendBuffer(seg.sn, seg.level, seg.segId, seg.data);
                 } else {
                     dc.sendJson({
                         event: _core.Events.DC_PIECE_NOT_FOUND,
-                        url: url,
+                        seg_id: segId,
                         sn: msg.sn
                     });
                 }
@@ -3059,6 +3075,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var PING_MSG = 9;
+var PING_INTERVAL = 60;
+
 var SignalClient = function (_EventEmitter) {
     _inherits(SignalClient, _EventEmitter);
 
@@ -3071,6 +3090,7 @@ var SignalClient = function (_EventEmitter) {
         _this.logger = engine.logger;
         _this.peerId = peerId;
         _this.config = config;
+        _this.wsAddr = config.wsSignalerAddr;
         _this.connected = false;
         _this.msgQueue = [];
         _this._ws = _this._init(peerId);
@@ -3088,7 +3108,7 @@ var SignalClient = function (_EventEmitter) {
                 minReconnectionDelay: this.config.wsReconnectInterval * 1000
             };
             var queryStr = '?id=' + id;
-            var ws = new _reconnectingWebsocket2.default(this.config.wsSignalerAddr + queryStr, undefined, wsOptions);
+            var ws = new _reconnectingWebsocket2.default(this.wsAddr + queryStr, undefined, wsOptions);
             ws.onopen = function () {
                 _this2.logger.info('Signaler websocket connection opened');
 
@@ -3104,12 +3124,16 @@ var SignalClient = function (_EventEmitter) {
                 }
 
                 if (_this2.onopen) _this2.onopen();
+
+                _this2._startPing(); // 开始发送心跳包
             };
 
             ws.push = ws.send;
             ws.send = function (msg) {
                 var msgStr = JSON.stringify(Object.assign({ peer_id: id }, msg));
                 ws.push(msgStr);
+
+                _this2._resetPing(); // 重置心跳
             };
             ws.onmessage = function (e) {
 
@@ -3120,6 +3144,8 @@ var SignalClient = function (_EventEmitter) {
                 _this2.logger.warn('Signaler websocket closed');
                 if (_this2.onclose) _this2.onclose();
                 _this2.connected = false;
+
+                _this2._stopPing(); // 停止心跳
             };
             return ws;
         }
@@ -3143,6 +3169,27 @@ var SignalClient = function (_EventEmitter) {
                 this.logger.warn('signaler closed, msg is cached');
                 this.msgQueue.push(msg);
             }
+        }
+    }, {
+        key: '_startPing',
+        value: function _startPing() {
+            var _this3 = this;
+
+            this.pingTimer = window.setInterval(function () {
+                _this3._ws.send(PING_MSG);
+            }, PING_INTERVAL * 1000);
+        }
+    }, {
+        key: '_resetPing',
+        value: function _resetPing() {
+            this._stopPing();
+            this._startPing();
+        }
+    }, {
+        key: '_stopPing',
+        value: function _stopPing() {
+            window.clearInterval(this.pingTimer);
+            this.pingTimer = null;
         }
     }, {
         key: 'close',
@@ -3184,9 +3231,7 @@ var _events = __webpack_require__(0);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _urlToolkit = __webpack_require__(3);
-
-var _urlToolkit2 = _interopRequireDefault(_urlToolkit);
+var _toolFuns = __webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3195,6 +3240,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+// import URLToolkit from 'url-toolkit';
+
 
 var FragLoader = function (_EventEmitter) {
     _inherits(FragLoader, _EventEmitter);
@@ -3243,14 +3290,16 @@ var FragLoader = function (_EventEmitter) {
             var frag = context.frag;
             // console.warn(`frag.duration: ${frag.duration}`);
             // 获取ts的正确相对路径 obtain the correct path. Issue: https://github.com/cdnbye/hlsjs-p2p-engine/issues/9
-            var urlObj = _urlToolkit2.default.parseURL(frag.url);
-            frag.relurl = urlObj.path + urlObj.query;
+            // const urlObj = URLToolkit.parseURL(frag.url);
+            // frag.relurl = urlObj.path + urlObj.query;
             frag.loadByP2P = false; //初始化flag
             frag.loadByHTTP = false;
-            if (this.p2pEnabled && this.bufMgr.hasSegOfURL(frag.relurl)) {
+            // console.warn(`load frag level ${frag.level} sn ${frag.sn}`);
+            var segId = (0, _toolFuns.segmentId)(frag.level, frag.sn, frag.url);
+            if (this.p2pEnabled && this.bufMgr.hasSegOfId(segId)) {
                 //如果命中缓存
                 logger.debug('bufMgr found seg sn ' + frag.sn + ' url ' + frag.relurl);
-                var seg = this.bufMgr.getSegByURL(frag.relurl);
+                var seg = this.bufMgr.getSegById(segId);
                 var response = { url: context.url, data: seg.data },
                     trequest = void 0,
                     tfirst = void 0,
@@ -3284,12 +3333,13 @@ var FragLoader = function (_EventEmitter) {
                 var onSuccess = callbacks.onSuccess;
                 callbacks.onSuccess = function (response, stats, context) {
                     //在onsucess回调中复制并缓存二进制数据
-                    if (!_this2.bufMgr.hasSegOfURL(frag.relurl)) {
-                        _this2.bufMgr.copyAndAddBuffer(response.data, frag.relurl, frag.sn, frag.fromPeerId || _this2.fetcher.peerId);
+                    if (!_this2.bufMgr.hasSegOfId(segId)) {
+                        // this.bufMgr.copyAndAddBuffer(response.data, frag.sn, segId, frag.fromPeerId || this.fetcher.peerId);
+                        _this2.bufMgr.handleFrag(frag.sn, frag.level, segId, response.data, frag.fromPeerId || _this2.fetcher.peerId, true);
                     }
                     _this2.fetcher.reportFlow(stats, frag.loadByP2P);
                     frag.loaded = stats.loaded;
-                    logger.debug((frag.loadByP2P ? 'P2P' : 'HTTP') + ' loaded ' + frag.relurl + ' at ' + frag.sn);
+                    logger.debug((frag.loadByP2P ? 'P2P' : 'HTTP') + ' loaded segment id ' + segId);
                     onSuccess(response, stats, context);
                 };
             } else {
@@ -3299,8 +3349,9 @@ var FragLoader = function (_EventEmitter) {
                 var _onSuccess = callbacks.onSuccess;
                 callbacks.onSuccess = function (response, stats, context) {
                     //在onsucess回调中复制并缓存二进制数据
-                    if (!_this2.bufMgr.hasSegOfURL(frag.relurl)) {
-                        _this2.bufMgr.copyAndAddBuffer(response.data, frag.relurl, frag.sn, _this2.fetcher.peerId);
+                    if (!_this2.bufMgr.hasSegOfId(segId)) {
+                        // this.bufMgr.copyAndAddBuffer(response.data, frag.sn, segId, this.fetcher.peerId);
+                        _this2.bufMgr.handleFrag(frag.sn, frag.level, segId, response.data, _this2.fetcher.peerId, true);
                     }
                     _this2.fetcher.reportFlow(stats, false);
                     logger.info('HTTP load time ' + (stats.tload - stats.trequest) + 'ms');
@@ -3336,8 +3387,6 @@ var _events2 = _interopRequireDefault(_events);
 
 var _core = __webpack_require__(1);
 
-var _toolFuns = __webpack_require__(2);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -3347,6 +3396,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+// import {segmentId} from './utils/toolFuns';
 
 var BufferManager = function (_EventEmitter) {
     _inherits(BufferManager, _EventEmitter);
@@ -3360,98 +3411,122 @@ var BufferManager = function (_EventEmitter) {
         _this.config = config;
         /* segment
         sn: number
-        relurl: string
+        segId: string
         data: Buffer
         size: string
         fromPeerId: string
          */
-        _this._segPool = new Map(); //存放seg的Map            relurl -> segment
+        _this._segPool = new Map(); //存放seg的Map            segId -> segment
         _this._currBufSize = 0; //目前的buffer总大小
-        _this.sn2Url = new Map(); //以sn查找relurl      sn -> relurl
+        _this.sn2Id = new Map(); //以sn查找segId      sn -> segId
         _this.overflowed = false; //缓存是否溢出
         return _this;
     }
 
     _createClass(BufferManager, [{
-        key: 'hasSegOfURL',
-        value: function hasSegOfURL(url) {
+        key: 'hasSegOfId',
+        value: function hasSegOfId(segId) {
             //防止重复加入seg
-            return this._segPool.has(url);
+            return this._segPool.has(segId);
         }
     }, {
-        key: 'copyAndAddBuffer',
-        value: function copyAndAddBuffer(data, url, sn) {
-            var fromPeerId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
-            //先复制再缓存
-            var handledUrl = (0, _toolFuns.handleTSUrl)(url, this.config.tsStrictMatched);
-            var payloadBuf = _core.Buffer.from(data);
-            var byteLength = payloadBuf.byteLength;
-            var targetBuffer = new _core.Buffer(byteLength);
-            payloadBuf.copy(targetBuffer);
+        key: 'hasSegOfSN',
+        value: function hasSegOfSN(sn) {
+            return this.sn2Id.has(sn);
+        }
+    }, {
+        key: 'handleFrag',
+        value: function handleFrag(sn, level, segId, data) {
+            var fromPeerId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : '';
+            var copy = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
 
+            var targetBuffer = void 0;
+            var byteLength = data.byteLength;
+            if (copy) {
+                var payloadBuf = _core.Buffer.from(data);
+                targetBuffer = new _core.Buffer(byteLength);
+                payloadBuf.copy(targetBuffer);
+            } else {
+                targetBuffer = data;
+            }
             var segment = {
                 sn: sn,
-                relurl: handledUrl,
+                level: level,
+                segId: segId,
                 data: targetBuffer,
                 size: byteLength,
                 fromPeerId: fromPeerId
             };
+            this._addSeg(segment);
+            this.sn2Id.set(sn, segment.segId);
+        }
 
-            this.addSeg(segment);
-            this.sn2Url.set(sn, handledUrl);
-        }
+        // copyAndAddBuffer(data, sn, segId, fromPeerId = '') {                                       //先复制再缓存
+        //     let payloadBuf = Buffer.from(data);
+        //     let byteLength = payloadBuf.byteLength;
+        //     let targetBuffer = new Buffer(byteLength);
+        //     payloadBuf.copy(targetBuffer);
+        //
+        //     let segment = {
+        //         sn,
+        //         segId,
+        //         data: targetBuffer,
+        //         size: byteLength,
+        //         fromPeerId
+        //     };
+        //
+        //     this._addSeg(segment);
+        //     this.sn2Id.set(sn, segment.segId);
+        // }
+        //
+        // addBuffer(sn, segId, buf, fromPeerId = '', copy = false) {                                             //直接缓存
+        //     let segment = {
+        //         sn,
+        //         segId,
+        //         data: buf,
+        //         size: buf.byteLength,
+        //         fromPeerId
+        //     };
+        //     this._addSeg(segment);
+        //     this.sn2Id.set(sn, segment.segId);
+        // }
+
     }, {
-        key: 'addBuffer',
-        value: function addBuffer(sn, url, buf) {
-            var fromPeerId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
-            //直接缓存
-            var handledUrl = (0, _toolFuns.handleTSUrl)(url, this.config.tsStrictMatched);
-            var segment = {
-                sn: sn,
-                relurl: handledUrl,
-                data: buf,
-                size: buf.byteLength,
-                fromPeerId: fromPeerId
-            };
-            this.addSeg(segment);
-            this.sn2Url.set(sn, handledUrl);
-        }
-    }, {
-        key: 'addSeg',
-        value: function addSeg(seg) {
+        key: '_addSeg',
+        value: function _addSeg(seg) {
             var logger = this.engine.logger;
 
-            this._segPool.set(seg.relurl, seg);
+            this._segPool.set(seg.segId, seg);
             // this.urlSet.add(seg.relurl);
-            // logger.debug(`_segPool add seg ${seg.relurl}`);
+            logger.debug('_segPool add seg ' + seg.segId + ' level ' + seg.level);
             this._currBufSize += parseInt(seg.size);
             // logger.debug(`seg.size ${seg.size} _currBufSize ${this._currBufSize} maxBufSize ${this.config.maxBufSize}`);
             while (this._currBufSize > this.config.maxBufSize) {
                 //去掉多余的数据
                 var lastSeg = [].concat(_toConsumableArray(this._segPool.values())).shift();
-                logger.info('pop seg ' + lastSeg.relurl + ' at ' + lastSeg.sn);
-                this._segPool.delete(lastSeg.relurl);
-                this.sn2Url.delete(lastSeg.sn);
+                logger.info('pop seg ' + lastSeg.segId + ' at ' + lastSeg.sn);
+                this._segPool.delete(lastSeg.segId);
+                this.sn2Id.delete(lastSeg.sn);
                 this._currBufSize -= parseInt(lastSeg.size);
                 if (!this.overflowed) this.overflowed = true;
                 this.emit(_core.Events.BM_LOST, lastSeg.sn);
             }
         }
     }, {
-        key: 'getSegByURL',
-        value: function getSegByURL(relurl) {
-            return this._segPool.get(relurl);
+        key: 'getSegById',
+        value: function getSegById(segId) {
+            return this._segPool.get(segId);
         }
     }, {
-        key: 'getURLbySN',
-        value: function getURLbySN(sn) {
-            return this.sn2Url.get(sn);
+        key: 'getSegIdbySN',
+        value: function getSegIdbySN(sn) {
+            return this.sn2Id.get(sn);
         }
     }, {
         key: 'clear',
         value: function clear() {
             this._segPool.clear();
-            this.sn2Url.clear();
+            this.sn2Id.clear();
             this._currBufSize = 0;
         }
     }, {

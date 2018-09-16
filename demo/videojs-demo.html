@@ -98,16 +98,16 @@
         }
         addToTable(frag.sn, frag.relurl, frag.loaded, source);
     });
-    player.tech_.sourceHandler_.hls.engine.on('stats', function ({totalHTTPDownloaded=0, totalP2PDownloaded=0, totalP2PUploaded=0}) {
+    player.tech_.sourceHandler_.hls.p2pEngine.on('stats', function ({totalHTTPDownloaded=0, totalP2PDownloaded=0, totalP2PUploaded=0}) {
 //        console.warn(`totalHTTPDownloaded ${totalHTTPDownloaded} totalP2PDownloaded ${totalP2PDownloaded}`)
         var total = totalHTTPDownloaded + totalP2PDownloaded;
         document.querySelector('#downloadInfo').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%,  saved traffic: ${totalP2PDownloaded}KB, uploaded data: ${totalP2PUploaded}KB`;
     });
-    player.tech_.sourceHandler_.hls.engine.on('peerId', function (id) {
+    player.tech_.sourceHandler_.hls.p2pEngine.on('peerId', function (id) {
         peerId = id;
         document.querySelector('#peerInfo').innerText = `peerId: ${peerId}, peers: ${peerNum}`;
     });
-    player.tech_.sourceHandler_.hls.engine.on('peers', function (peers) {
+    player.tech_.sourceHandler_.hls.p2pEngine.on('peers', function (peers) {
         peerNum = peers.length;
         document.querySelector('#peerInfo').innerText = `peerId: ${peerId}, peers: ${peerNum}`;
     });

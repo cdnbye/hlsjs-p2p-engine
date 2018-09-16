@@ -1,5 +1,6 @@
 import EventEmitter from 'events';
-import URLToolkit from 'url-toolkit';
+// import URLToolkit from 'url-toolkit';
+import {segmentId} from '../utils/toolFuns';
 
 class FragLoader extends EventEmitter {
     constructor(config) {
@@ -34,13 +35,15 @@ class FragLoader extends EventEmitter {
         const frag = context.frag;
         // console.warn(`frag.duration: ${frag.duration}`);
         // 获取ts的正确相对路径 obtain the correct path. Issue: https://github.com/cdnbye/hlsjs-p2p-engine/issues/9
-        const urlObj = URLToolkit.parseURL(frag.url);
-        frag.relurl = urlObj.path + urlObj.query;
+        // const urlObj = URLToolkit.parseURL(frag.url);
+        // frag.relurl = urlObj.path + urlObj.query;
         frag.loadByP2P = false;                //初始化flag
         frag.loadByHTTP = false;
-        if (this.p2pEnabled && this.bufMgr.hasSegOfURL(frag.relurl)) {                                     //如果命中缓存
+        // console.warn(`load frag level ${frag.level} sn ${frag.sn}`);
+        const segId = segmentId(frag.level, frag.sn, frag.url);
+        if (this.p2pEnabled && this.bufMgr.hasSegOfId(segId)) {                                     //如果命中缓存
             logger.debug(`bufMgr found seg sn ${frag.sn} url ${frag.relurl}`);
-            let seg = this.bufMgr.getSegByURL(frag.relurl);
+            let seg = this.bufMgr.getSegById(segId);
             let response = { url : context.url, data : seg.data }, trequest, tfirst, tload, loaded, total;
             trequest = performance.now();
             tfirst = tload = trequest + 50;
@@ -65,12 +68,13 @@ class FragLoader extends EventEmitter {
             };
             const onSuccess = callbacks.onSuccess;
             callbacks.onSuccess = (response, stats, context) => {                       //在onsucess回调中复制并缓存二进制数据
-                if (!this.bufMgr.hasSegOfURL(frag.relurl)) {
-                    this.bufMgr.copyAndAddBuffer(response.data, frag.relurl, frag.sn, frag.fromPeerId || this.fetcher.peerId);
+                if (!this.bufMgr.hasSegOfId(segId)) {
+                    // this.bufMgr.copyAndAddBuffer(response.data, frag.sn, segId, frag.fromPeerId || this.fetcher.peerId);
+                    this.bufMgr.handleFrag(frag.sn, frag.level, segId, response.data, frag.fromPeerId || this.fetcher.peerId, true);
                 }
                 this.fetcher.reportFlow(stats, frag.loadByP2P);
                 frag.loaded = stats.loaded;
-                logger.debug(`${frag.loadByP2P ? 'P2P' : 'HTTP'} loaded ${frag.relurl} at ${frag.sn}`);
+                logger.debug(`${frag.loadByP2P ? 'P2P' : 'HTTP'} loaded segment id ${segId}`);
                 onSuccess(response,stats,context);
             };
         } else {
@@ -79,8 +83,9 @@ class FragLoader extends EventEmitter {
             this.xhrLoader.load(context, config, callbacks);
             const onSuccess = callbacks.onSuccess;
             callbacks.onSuccess = (response, stats, context) => {                       //在onsucess回调中复制并缓存二进制数据
-                if (!this.bufMgr.hasSegOfURL(frag.relurl)) {
-                    this.bufMgr.copyAndAddBuffer(response.data, frag.relurl, frag.sn, this.fetcher.peerId);
+                if (!this.bufMgr.hasSegOfId(segId)) {
+                    // this.bufMgr.copyAndAddBuffer(response.data, frag.sn, segId, this.fetcher.peerId);
+                    this.bufMgr.handleFrag(frag.sn, frag.level, segId, response.data, this.fetcher.peerId, true);
                 }
                 this.fetcher.reportFlow(stats, false);
                 logger.info(`HTTP load time ${stats.tload - stats.trequest}ms`)

@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 import {Events} from 'core';
-import {handleTSUrl} from '../utils/toolFuns';
+import {segmentId} from '../utils/toolFuns';
 
 class BTScheduler extends EventEmitter {
     constructor(engine, config) {
@@ -44,8 +44,8 @@ class BTScheduler extends EventEmitter {
             if (!this.bitset.has(idx) && idx !== this.loadingSN && this.bitCounts.has(idx)) {                  //如果这个块没有缓存并且peers有
                 for (let peer of this.peerMap.values()) {                           //找到拥有这个块并且空闲的peer
                     if (peer.isAvailable && peer.bitset.has(idx)) {
-                        peer.requestDataBySN(idx, true);
-                        logger.debug(`request urgent ${idx} from peer ${peer.remotePeerId}`);
+                        peer.requestDataBySN(idx, false);
+                        logger.debug(`request prefetch ${idx} from peer ${peer.remotePeerId}`);
                         requested.push(idx);
                         break;
                     }
@@ -159,12 +159,12 @@ class BTScheduler extends EventEmitter {
         const { logger } = this.engine;
         this.context = context;
         const frag = context.frag;
-        const handledUrl = handleTSUrl(frag.relurl, this.config.tsStrictMatched);
+        const segId = segmentId(frag.level, frag.sn, frag.url);
         this.callbacks = callbacks;
         this.stats = {trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0};
-        this.criticalSeg = {sn: frag.sn, relurl: handledUrl};
-        this.targetPeer.requestDataByURL(handledUrl, true);
-        logger.info(`request criticalSeg url ${frag.relurl} at ${frag.sn}`);
+        this.criticalSeg = {sn: frag.sn, segId};
+        this.targetPeer.requestDataById(segId, true);
+        logger.info(`request criticalSeg segId ${segId} at ${frag.sn}`);
         this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout*1000);
     }
 
@@ -241,12 +241,12 @@ class BTScheduler extends EventEmitter {
                 }
             })
             .on(Events.DC_PIECE, msg => {                                                  //接收到piece事件，即二进制包头
-                if (this.criticalSeg && this.criticalSeg.relurl === msg.url) {                    //接收到critical的响应
+                if (this.criticalSeg && this.criticalSeg.segId === msg.seg_id) {                    //接收到critical的响应
                     this.stats.tfirst = Math.max(performance.now(), this.stats.trequest);
                 }
             })
             .on(Events.DC_PIECE_NOT_FOUND, msg => {
-                if (this.criticalSeg && this.criticalSeg.relurl === msg.url) {                    //接收到critical未找到的响应
+                if (this.criticalSeg && this.criticalSeg.segId === msg.seg_id) {             //接收到critical未找到的响应
                     window.clearTimeout(this.criticaltimeouter);                             //清除定时器
                     // this.criticaltimeouter = null;
                     logger.info(`DC_PIECE_NOT_FOUND`);
@@ -254,8 +254,8 @@ class BTScheduler extends EventEmitter {
                 }
             })
             .on(Events.DC_RESPONSE, response => {                                            //接收到完整二进制数据
-                if (this.criticalSeg && this.criticalSeg.relurl === response.url && this.criticaltimeouter) {
-                    logger.info(`receive criticalSeg url ${response.url}`);
+                if (this.criticalSeg && this.criticalSeg.segId === response.seg_id && this.criticaltimeouter) {
+                    logger.info(`receive criticalSeg seg_id ${response.seg_id}`);
                     window.clearTimeout(this.criticaltimeouter);                             //清除定时器
                     this.criticaltimeouter = null;
                     let stats = this.stats;
@@ -265,24 +265,25 @@ class BTScheduler extends EventEmitter {
                     this.context.frag.fromPeerId = dc.remotePeerId;
                     this.callbacks.onSuccess(response, stats, this.context);
                 } else {
-                    this.bufMgr.addBuffer(response.sn, response.url, response.data, dc.remotePeerId);
+                    // this.bufMgr.addBuffer(response.sn, response.seg_id, response.data, dc.remotePeerId);
+                    this.bufMgr.handleFrag(response.sn, response.level, response.seg_id, response.data, dc.remotePeerId, false);
                 }
                 this.updateLoadedSN(response.sn);
             })
             .on(Events.DC_REQUEST, msg => {
-                let url = '';
-                if (!msg.url) {                                    //请求sn的request
-                    url = this.bufMgr.getURLbySN(msg.sn);
+                let segId = '';
+                if (!msg.seg_id) {                                    //请求sn的request
+                    segId = this.bufMgr.getSegIdbySN(msg.sn);
                 } else {                                           //请求url的request
-                    url = msg.url;
+                    segId = msg.seg_id;
                 }
-                if (url && this.bufMgr.hasSegOfURL(url)) {
-                    let seg = this.bufMgr.getSegByURL(url);
-                    dc.sendBuffer(msg.sn, seg.relurl, seg.data);
+                if (segId && this.bufMgr.hasSegOfId(segId)) {
+                    let seg = this.bufMgr.getSegById(segId);
+                    dc.sendBuffer(seg.sn, seg.level, seg.segId, seg.data);
                 } else {
                     dc.sendJson({
                         event: Events.DC_PIECE_NOT_FOUND,
-                        url: url,
+                        seg_id: segId,
                         sn: msg.sn
                     })
                 }

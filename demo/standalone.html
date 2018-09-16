@@ -16,7 +16,6 @@
         if (P2PEngine.isSupported()) {
             var engine = new P2PEngine(hls, {
                 logLevel: true,
-                wsSignalerAddr: 'wss://free.freesignal.net',
             });
             engine.on('stats', function ({totalHTTPDownloaded=0, totalP2PDownloaded=0, totalP2PUploaded=0}) {
                 var total = totalHTTPDownloaded + totalP2PDownloaded;

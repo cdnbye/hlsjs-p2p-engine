@@ -17,7 +17,6 @@ let defaultP2PConfig = {
     packetSize: 64*1024,                        // 每次通过datachannel发送的包的大小
     maxBufSize: 1024*1024*50,                   // p2p缓存的最大数据量
     loadTimeout: 3,                             // p2p下载的超时时间
-    tsStrictMatched: false,                     // p2p传输的ts是否要严格匹配（去掉查询参数），默认false
 
     enableLogUpload: false,                      // 上传log到服务器，默认false
     logUploadAddr: "wss://api.cdnbye.com/trace", // log上传地址

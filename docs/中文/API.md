@@ -41,6 +41,9 @@ if (Hls.WEBRTC_SUPPORT) {
 ### `var hls = new Hls({p2pConfig: [opts]});`  
 创建一个新的`Hls`实例。
 
+### `var engine = hls.p2pEngine;`
+从`Hls`实例中获取`P2PEngine`实例。
+
 如果指定了`opts`，那么对应的默认值将会被覆盖。
 
 | 字段 | 类型 | 默认值 | 描述 |
@@ -53,7 +56,6 @@ if (Hls.WEBRTC_SUPPORT) {
 | `loadTimeout` | number | 3 | p2p下载的超时时间。
 | `maxBufSize` | number | 1024 * 1024 * 50 | p2p缓存的最大数据量。
 | `p2pEnabled` | boolean | true | 是否开启P2P。
-| `tsStrictMatched` | boolean | false | p2p传输的ts是否要严格匹配（去掉查询参数）。
 | `tag` | string | [hlsjs version] | 用户自定义标签，可用于在后台查看参数调整效果。
 | `channelId` | function | - | 标识channel的字段，同一个channel的用户可以共享数据。
 | `packetSize` | number | 64 * 1024 | 每次通过datachannel发送的包的大小，64KB适用于较新版本的浏览器，如果要兼容低版本浏览器可以设置成16KB。

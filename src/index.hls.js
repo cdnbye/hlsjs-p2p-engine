@@ -30,22 +30,31 @@ class CDNByeHlsjs extends Hlsjs{
         super(mergedHlsjsConfig);
 
         if (P2PEngine.isSupported()) {
-            this.engine = new P2PEngine(this, p2pConfig);
+            this._p2pEngine = new P2PEngine(this, p2pConfig);
         }
 
         this.on(Hlsjs.Events.DESTROYING, () => {
             console.warn('destroying hlsjs');
-            this.engine.destroy();
-            this.engine = null;
+            this._p2pEngine.destroy();
+            this._p2pEngine = null;
         });
     }
 
+    get p2pEngine() {
+        return this._p2pEngine;
+    }
+
+    get engine() {
+        console.warn(`The property 'engine' is deprecated, use p2pEngine instead`);
+        return this._p2pEngine;
+    }
+
     enableP2P() {
-        this.engine.enableP2P();
+        this._p2pEngine.enableP2P();
     }
 
     disableP2P() {
-        this.engine.disableP2P();
+        this._p2pEngine.disableP2P();
     }
 
 

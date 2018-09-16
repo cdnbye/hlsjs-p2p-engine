@@ -41,6 +41,9 @@ if (Hls.WEBRTC_SUPPORT) {
 ### `var hls = new Hls({p2pConfig: [opts]});` 
 Create a new `Hls` instance.
 
+### `var engine = hls.p2pEngine;`
+Get the `P2PEngine` instance from `Hls` instance.
+
 If `opts` is specified, then the default options (shown below) will be overridden.
 
 | Field | Type | Default | Description |
@@ -53,7 +56,6 @@ If `opts` is specified, then the default options (shown below) will be overridde
 | `loadTimeout` | number | 3 | Timeout to download a segment from a peer, if exceeded the segment is dropped.
 | `maxBufSize` | number | 1024 * 1024 * 50 | The max size of binary data that can be stored in the cache.
 | `p2pEnabled` | boolean | true | Enable or disable p2p engine.
-| `tsStrictMatched` | boolean | false | Drop the query string of ts url while sharing segment to peers.
 | `tag` | string | [hlsjs version] | User defined tag which is useful for observing the effect of parameters turning.
 | `channelId` | function | - | Pass a function to generate channel Id.
 | `packetSize` | number | 64 * 1024 | The maximum package size sent by datachannel, 64KB should work with most of recent browsers. Set it to 16KB for older browsers support.

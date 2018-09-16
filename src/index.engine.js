@@ -2,7 +2,7 @@ import EventEmitter from 'events';
 import URLToolkit from 'url-toolkit';
 import defaultP2PConfig from './config';
 import {Tracker, FragLoader} from './bittorrent';
-import BufferManager from './buffer-manager';
+import SegmentManager from './segment-manager';
 import {Events, Fetcher, getBrowserRTC, DataChannel} from 'core';
 import Logger from './utils/logger';
 import platform from './utils/platform';
@@ -33,7 +33,7 @@ class P2PEngine extends EventEmitter {
         this.HLSEvents = hlsjs.constructor.Events;
 
         // 如果tsStrictMatched=false，需要自动检查不同ts路径是否相同
-        this.checkTSPath = this.config.tsStrictMatched ? noop : tsPathChecker();
+        // this.checkTSPath = this.config.tsStrictMatched ? noop : tsPathChecker();
 
         const onLevelLoaded = (event, data) => {
 
@@ -72,7 +72,7 @@ class P2PEngine extends EventEmitter {
 
 
         // console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
-
+        console.warn(`NOTICE: This is an experimental version, do not use it in production`);
     }
 
     _init(channel, browserInfo) {
@@ -80,8 +80,8 @@ class P2PEngine extends EventEmitter {
         if (!this.p2pEnabled) return;
 
         this.hlsjs.config.p2pEnabled = this.p2pEnabled;
-        //实例化BufferManager
-        this.bufMgr = new BufferManager(this, this.config);
+        //实例化SegmentManager
+        this.bufMgr = new SegmentManager(this, this.config);
         this.hlsjs.config.bufMgr = this.bufMgr;
 
 
@@ -128,11 +128,22 @@ class P2PEngine extends EventEmitter {
                 data.frag.loadByHTTP = true;
             }
             // console.warn(`data.frag.url ${data.frag.url}`);
-            if (!this.checkTSPath(sn, data.frag.url)) {
-                logger.warn(`ts path of ${sn} equal to the previous, set tsStrictMatched to true`);
-                this.config.tsStrictMatched = true;
-                this.checkTSPath = noop;
+            // if (!this.checkTSPath(sn, data.frag.url)) {
+            //     logger.warn(`ts path of ${sn} equal to the previous, set tsStrictMatched to true`);
+            //     this.config.tsStrictMatched = true;
+            //     this.checkTSPath = noop;
+            // }
+
+            // 实验性功能
+            if (this.config.p2pEnabled && this.bufMgr.hasSegOfSN(sn+1)) {
+                // console.warn(`found next seg in pool, sn ${sn+1}`);
+                // set the level for next loaded fragment
+                const nextSegId = this.bufMgr.getSegIdbySN(sn+1);
+                const nextLevel = this.bufMgr.getSegById(nextSegId).level
+                // console.warn(`change nextLoadLevel to ${nextLevel}`);
+                this.hlsjs.nextLoadLevel = nextLevel;
             }
+
         });
 
         this.hlsjs.on(this.HLSEvents.FRAG_CHANGED, (id, data) => {

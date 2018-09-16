@@ -1,11 +1,8 @@
 import URLToolkit from 'url-toolkit';
 
-// 根据参数决定是否去掉ts的url的查询参数
-export function handleTSUrl(url, matched = false) {
-    if (!matched) {
-        return url.split("?")[0];
-    }
-    return url;
+// 获取segment Id的函数
+export function segmentId(streamLevel, segmentSn, segmentUrl) {
+    return `${streamLevel}-${segmentSn}`
 }
 
 /*
@@ -19,23 +16,24 @@ export function defaultChannelId(url, browserInfo = {}) {
     return `${streamId}`;
 }
 
-export function tsPathChecker() {
-    let lastSN = -1;
-    let lastPath = '';
-    return function (sn, path) {
-        path = path.split('?')[0];
-        let isOK = true;
-        if (lastSN !== sn && lastPath === path) {
-            isOK = false;
-        }
-        // if (lastSN !== sn && lastPath === path) {
-        //     console.warn(`path of ${sn} equal to path of ${lastSN}`);
-        // }
-        lastSN = sn;
-        lastPath = path;
-        return isOK;
-    }
-}
+// deprecated
+// export function tsPathChecker() {
+//     let lastSN = -1;
+//     let lastPath = '';
+//     return function (sn, path) {
+//         path = path.split('?')[0];
+//         let isOK = true;
+//         if (lastSN !== sn && lastPath === path) {
+//             isOK = false;
+//         }
+//         // if (lastSN !== sn && lastPath === path) {
+//         //     console.warn(`path of ${sn} equal to path of ${lastSN}`);
+//         // }
+//         lastSN = sn;
+//         lastPath = path;
+//         return isOK;
+//     }
+// }
 
 export function noop() {
     return true;
