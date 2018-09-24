@@ -663,16 +663,16 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             }
           };e.once("connect", r), e.on("data", function (e) {
             if ("string" == typeof e) {
-              n.debug("datachannel receive string: " + e + "from " + t.remotePeerId);var r = JSON.parse(e);if (!t.connected) return void t.msgQueue.push(r);switch (r.event) {case _.default.DC_PONG:
+              var n = JSON.parse(e);if (!t.connected) return void t.msgQueue.push(n);switch (n.event) {case _.default.DC_PONG:
                   t._handlePongMsg();break;case _.default.DC_PING:
                   t.sendJson({ event: _.default.DC_PONG });break;case _.default.DC_PIECE:
-                  t._prepareForBinary(r.attachments, r.seg_id, r.sn, r.size, r.level), t.emit(r.event, r);break;case _.default.DC_PIECE_NOT_FOUND:
-                  window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.emit(r.event, r);break;case _.default.DC_REQUEST:
-                  t._handleRequestMsg(r);break;case _.default.DC_PIECE_ACK:
-                  t._handlePieceAck(), t.emit(r.event, r);break;case _.default.DC_CHOKE:
+                  t._prepareForBinary(n.attachments, n.seg_id, n.sn, n.size, n.level), t.emit(n.event, n);break;case _.default.DC_PIECE_NOT_FOUND:
+                  window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.emit(n.event, n);break;case _.default.DC_REQUEST:
+                  t._handleRequestMsg(n);break;case _.default.DC_PIECE_ACK:
+                  t._handlePieceAck(), t.emit(n.event, n);break;case _.default.DC_CHOKE:
                   t.choked = !0;break;case _.default.DC_UNCHOKE:
                   t.choked = !1;break;default:
-                  t.emit(r.event, r);}
+                  t.emit(n.event, n);}
             } else t.bufArr.push(e), 0 === --t.remainAttachments && (window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.sendJson({ event: _.default.DC_PIECE_ACK, sn: t.bufSN, seg_id: t.segId, size: t.expectedSize }), t._handleBinaryData());
           }), e.once("close", function () {
             t.emit(_.default.DC_CLOSE);
@@ -990,9 +990,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 v = p.timestamp,
                 g = p.version,
                 m = p.v,
-                b = function (e, t, n, r) {
+                w = function (e, t, n, r) {
               return (0, u.default)(e + t + n + h("0x0", "64eV"), r);
-            }(_, y, v, g);t[h("0x1", "GvfS")](b.substr(0, 8) === m ? h("0x2", "!ag3") : "");
+            }(_, y, v, g);t[h("0x1", "GvfS")](w.substr(0, 8) === m ? h("0x2", "!ag3") : "");
           }
         });
       }var t = this;!t.connected && !t._connecting && t._pcReady && t._channelReady && (t._connecting = !0, e());
@@ -1092,14 +1092,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         return unescape(encodeURIComponent(e));
       }function m(e) {
         return _(g(e));
-      }function b(e) {
+      }function w(e) {
         return v(m(e));
-      }function w(e, t) {
+      }function b(e, t) {
         return y(g(e), g(t));
       }function C(e, t) {
-        return v(w(e, t));
+        return v(b(e, t));
       }function E(e, t, n) {
-        return t ? n ? w(t, e) : C(t, e) : n ? m(e) : b(e);
+        return t ? n ? b(t, e) : C(t, e) : n ? m(e) : w(e);
       }void 0 !== (r = function () {
         return E;
       }.call(t, n, t, e)) && (e.exports = r);
@@ -1140,7 +1140,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
               return e.json();
             }).then(function (t) {
               if (-1 === t.ret) r(t.data.msg);else {
-                var o = t.data;e.peerId = e.id = o.id, e.v = o.v, e.btStats(o.report_interval), e.getPeersURL = e.baseUrl + "/channel/" + e.channelId + "/node/" + e.peerId + "/peers", e.statsURL = e.baseUrl + "/channel/" + e.channelId + "/node/" + e.peerId + "/stats", n(t.data);
+                var o = t.data;o.info && console.info("" + o.info), o.warn && console.warn("" + o.warn), e.peerId = e.id = o.id, e.v = o.v, e.btStats(o.report_interval), e.getPeersURL = e.baseUrl + "/channel/" + e.channelId + "/node/" + e.peerId + "/peers", e.statsURL = e.baseUrl + "/channel/" + e.channelId + "/node/" + e.peerId + "/stats", n(t.data);
               }
             }).catch(function (e) {
               t.error("btAnnounce error " + e), r(e);
@@ -1817,7 +1817,7 @@ var P2PEngine = function (_EventEmitter) {
 
 
         // console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
-        console.warn('NOTICE: This is an experimental version, do not use it in production');
+
         return _this;
     }
 
@@ -2006,14 +2006,14 @@ var defaultP2PConfig = _extends({
 
     p2pEnabled: true, // 是否开启P2P，默认true
 
-    dcRequestTimeout: 3, // datachannel接收二进制数据的超时时间
-    dcUploadTimeout: 3, // datachannel上传二进制数据的超时时间
+    dcRequestTimeout: 5, // datachannel接收二进制数据的超时时间
+    dcUploadTimeout: 5, // datachannel上传二进制数据的超时时间
     dcPings: 5, // datachannel发送ping数据包的数量
-    dcTolerance: 4, // 请求超时或错误多少次淘汰该peer
+    dcTolerance: 5, // 请求超时或错误多少次淘汰该peer
 
     packetSize: 64 * 1024, // 每次通过datachannel发送的包的大小
     maxBufSize: 1024 * 1024 * 50, // p2p缓存的最大数据量
-    loadTimeout: 3, // p2p下载的超时时间
+    loadTimeout: 4, // p2p下载的超时时间
 
     enableLogUpload: false, // 上传log到服务器，默认false
     logUploadAddr: "wss://api.cdnbye.com/trace", // log上传地址
@@ -3398,7 +3398,7 @@ var BufferManager = function (_EventEmitter) {
 
             this._segPool.set(seg.segId, seg);
             // this.urlSet.add(seg.relurl);
-            logger.debug('_segPool add seg ' + seg.segId + ' level ' + seg.level);
+            logger.debug('segment pool add seg ' + seg.segId + ' level ' + seg.level);
             this._currBufSize += parseInt(seg.size);
             // logger.debug(`seg.size ${seg.size} _currBufSize ${this._currBufSize} maxBufSize ${this.config.maxBufSize}`);
             while (this._currBufSize > this.config.maxBufSize) {

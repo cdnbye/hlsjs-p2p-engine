@@ -26,7 +26,7 @@ class P2PEngine extends EventEmitter {
         if (!this.config.segmentId || typeof this.config.segmentId !== 'function') {
             this.config.segmentId = defaultSegmentId;
         }
-        hlsjs.config.segmentId = this.config.segmentId
+        hlsjs.config.segmentId = this.config.segmentId;
 
         this.hlsjs = hlsjs;
 
@@ -76,7 +76,7 @@ class P2PEngine extends EventEmitter {
 
 
         // console.log(`CDNBye v${P2PEngine.version} -- A Free and Infinitely Scalable Video P2P Engine. (https://github.com/cdnbye/hlsjs-p2p-engine)`);
-        console.warn(`NOTICE: This is an experimental version, do not use it in production`);
+
     }
 
     _init(channel, browserInfo) {
