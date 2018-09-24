@@ -120,5 +120,20 @@ p2pConfig: {
 }
 ```
 
+### 配置STUN服务器
+```javascript
+p2pConfig: {
+    webRTCConfig: { 
+        config: {         // custom webrtc configuration (used by RTCPeerConnection constructor)
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' }, 
+                { urls: 'stun:global.stun.twilio.com:3478?transport=udp' }
+            ] 
+        }
+        
+    }
+}
+```
+
 
 
