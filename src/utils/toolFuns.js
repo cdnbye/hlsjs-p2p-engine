@@ -38,3 +38,10 @@ export function defaultChannelId(url, browserInfo = {}) {
 export function noop() {
     return true;
 }
+
+export function getQueryParam(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null && r[2] !== '') return r[2].toString();
+    return '';
+}

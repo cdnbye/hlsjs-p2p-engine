@@ -9,14 +9,14 @@ let defaultP2PConfig = {
 
     p2pEnabled: true,                           // 是否开启P2P，默认true
 
-    dcRequestTimeout: 5,                        // datachannel接收二进制数据的超时时间
-    dcUploadTimeout: 5,                         // datachannel上传二进制数据的超时时间
+    dcRequestTimeout: 4,                        // datachannel接收二进制数据的超时时间
+    dcUploadTimeout: 4,                         // datachannel上传二进制数据的超时时间
     dcPings: 5,                                 // datachannel发送ping数据包的数量
     dcTolerance: 5,                             // 请求超时或错误多少次淘汰该peer
 
     packetSize: 64*1024,                        // 每次通过datachannel发送的包的大小
     maxBufSize: 1024*1024*50,                   // p2p缓存的最大数据量
-    loadTimeout: 4,                             // p2p下载的超时时间
+    loadTimeout: 3.5,                             // p2p下载的超时时间
 
     enableLogUpload: false,                      // 上传log到服务器，默认false
     logUploadAddr: "wss://api.cdnbye.com/trace", // log上传地址

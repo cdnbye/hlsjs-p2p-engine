@@ -1,4 +1,5 @@
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import { getQueryParam } from './toolFuns';
 
 const logTypes = {
     debug: 0,
@@ -23,7 +24,8 @@ class Logger {
                 this._ws = null;
             }
         }
-        if (config.logLevel === true) {
+
+        if (config.logLevel === true || getQueryParam('_debug') === '1') {
             config.logLevel = 'debug';
         } else if (!(config.logLevel in logTypes) || config.logLevel === false) {
             config.logLevel = 'none';

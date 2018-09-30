@@ -130,7 +130,6 @@ p2pConfig: {
                 { urls: 'stun:global.stun.twilio.com:3478?transport=udp' }
             ] 
         }
-        
     }
 }
 ```
