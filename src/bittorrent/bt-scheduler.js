@@ -198,10 +198,10 @@ class BTScheduler extends EventEmitter {
     destroy() {
         const { logger } = this.engine;
         if (this.peersNum > 0) {
-            for (let peer of this.peerMap.values()) {
-                peer.destroy();
-                peer = null;
-            }
+            // for (let peer of this.peerMap.values()) {
+            //     peer.destroy();
+            //     peer = null;
+            // }
             this.peerMap.clear();
         }
         this.removeAllListeners();

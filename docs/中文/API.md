@@ -65,7 +65,11 @@ if (Hls.WEBRTC_SUPPORT) {
 ## P2PEngine API
 
 ### `var engine = new P2PEngine(hlsjs, p2pConfig);`
-实例化`P2PEngine`。
+实例化`P2PEngine`。也可以从`Hls`实例获取`P2PEngine`实例：
+```javascript
+var hls = new Hls();
+var engine = hls.p2pEngine;
+```
 
 ### `engine.version`
 获取`P2PEngine`的版本号。
@@ -90,11 +94,11 @@ if (Hls.WEBRTC_SUPPORT) {
 ### `engine.on('peers', function (peers) {})`
 当与新的节点成功建立p2p连接时回调该事件。
 
-### `engine.on('stats', function ({totalHTTPDownloaded, totalP2PDownloaded, totalP2PUploaded}) {})`
+### `engine.on('stats', function (stats) {})`
 该回调函数可以获取p2p信息，包括：
-totalHTTPDownloaded: 从HTTP(CDN)下载的数据量（单位KB）
-totalP2PDownloaded: 从P2P下载的数据量（单位KB）
-totalP2PUploaded: P2P上传的数据量（单位KB）
+stats.totalHTTPDownloaded: 从HTTP(CDN)下载的数据量（单位KB）
+stats.totalP2PDownloaded: 从P2P下载的数据量（单位KB）
+stats.totalP2PUploaded: P2P上传的数据量（单位KB）
 
 ## 高级用法
 ### 解决动态m3u8路径问题

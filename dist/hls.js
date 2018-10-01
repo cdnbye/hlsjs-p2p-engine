@@ -631,7 +631,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         y = n(2).Buffer,
         v = function (e) {
       function t(e, n, r, a, s) {
-        o(this, t);var u = i(this, (t.__proto__ || Object.getPrototypeOf(t)).call(this));u.engine = e, u.config = s, u.remotePeerId = r, u.channelId = a ? n + "-" + r : r + "-" + n, u.connected = !1, u.msgQueue = [], u.miss = 0, u.rcvdReqQueue = [], u.downloading = !1, u.uploading = !1, u.choked = !1, u.delays = [];var l = u.engine.fetcher,
+        o(this, t);var u = i(this, (t.__proto__ || Object.getPrototypeOf(t)).call(this));u.engine = e, u.logger = e.logger, u.config = s, u.remotePeerId = r, u.channelId = a ? n + "-" + r : r + "-" + n, u.connected = !1, u.msgQueue = [], u.miss = 0, u.rcvdReqQueue = [], u.downloading = !1, u.uploading = !1, u.choked = !1, u.delays = [];var l = u.engine.fetcher,
             d = l.channelId,
             h = l.id,
             p = l.timestamp,
@@ -640,30 +640,29 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       }return a(t, e), u(t, null, [{ key: "VERSION", get: function get() {
           return "v2";
         } }]), u(t, [{ key: "_init", value: function value(e) {
-          var t = this,
-              n = this.engine.logger;e.on("error", function (e) {
+          var t = this;e.on("error", function (e) {
             t.emit(_.default.DC_ERROR);
           }), e.on("signal", function (e) {
             t.emit(_.default.DC_SIGNAL, e);
-          });var r = function r() {
-            n.info("datachannel CONNECTED to " + t.remotePeerId);var e = ["toString", "remotePeerId", "connected", "length", "charCodeAt"];!function (e, t) {
+          });var n = function n() {
+            t.logger.info("datachannel CONNECTED to " + t.remotePeerId);var e = ["toString", "remotePeerId", "connected", "length", "charCodeAt"];!function (e, t) {
               !function (t) {
                 for (; --t;) {
                   e.push(e.shift());
                 }
               }(++t);
-            }(e, 377);var r = function r(t, n) {
+            }(e, 377);var n = function n(t, _n) {
               return t -= 0, e[t];
-            };for (t[r("0x0")] = function (e) {
-              for (var t = 0, n = 0; n < e[r("0x1")] - 1; n++) {
-                t += e[r("0x2")](n);
-              }return e[e[r("0x1")] - 1] === (t % 16)[r("0x3")](16);
-            }(t[r("0x4")]), t.emit(_.default.DC_OPEN), t._sendPing(); t.msgQueue.length > 0;) {
-              var o = t.msgQueue.shift();t.emit(o.event, o);
+            };for (t[n("0x0")] = function (e) {
+              for (var t = 0, r = 0; r < e[n("0x1")] - 1; r++) {
+                t += e[n("0x2")](r);
+              }return e[e[n("0x1")] - 1] === (t % 16)[n("0x3")](16);
+            }(t[n("0x4")]), t.emit(_.default.DC_OPEN), t._sendPing(); t.msgQueue.length > 0;) {
+              var r = t.msgQueue.shift();t.emit(r.event, r);
             }
-          };e.once("connect", r), e.on("data", function (e) {
+          };e.once("connect", n), e.on("data", function (e) {
             if ("string" == typeof e) {
-              var n = JSON.parse(e);if (!t.connected) return void t.msgQueue.push(n);switch (n.event) {case _.default.DC_PONG:
+              t.logger.debug("datachannel receive string: " + e + "from " + t.remotePeerId);var n = JSON.parse(e);if (!t.connected) return void t.msgQueue.push(n);switch (n.event) {case _.default.DC_PONG:
                   t._handlePongMsg();break;case _.default.DC_PING:
                   t.sendJson({ event: _.default.DC_PONG });break;case _.default.DC_PIECE:
                   t._prepareForBinary(n.attachments, n.seg_id, n.sn, n.size, n.level), t.emit(n.event, n);break;case _.default.DC_PIECE_NOT_FOUND:
@@ -671,7 +670,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                   t._handleRequestMsg(n);break;case _.default.DC_PIECE_ACK:
                   t._handlePieceAck(), t.emit(n.event, n);break;case _.default.DC_CHOKE:
                   t.choked = !0;break;case _.default.DC_UNCHOKE:
-                  t.choked = !1;break;default:
+                  t.choked = !1;break;case _.default.DC_CLOSE:
+                  t.emit(_.default.DC_CLOSE);break;default:
                   t.emit(n.event, n);}
             } else t.bufArr.push(e), 0 === --t.remainAttachments && (window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.sendJson({ event: _.default.DC_PIECE_ACK, sn: t.bufSN, seg_id: t.segId, size: t.expectedSize }), t._handleBinaryData());
           }), e.once("close", function () {
@@ -680,7 +680,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } }, { key: "sendJson", value: function value(e) {
           this.send(JSON.stringify(e));
         } }, { key: "send", value: function value(e) {
-          this._datachannel && this._datachannel.connected && this._datachannel.send(e);
+          if (this._datachannel && this._datachannel.connected) try {
+            this._datachannel.send(e);
+          } catch (e) {
+            this.logger.warn("datachannel " + this.channelId + " send data failed, close it"), this.emit(_.default.DC_ERROR);
+          }
         } }, { key: "sendBitField", value: function value(e) {
           this.sendJson({ event: _.default.DC_BITFIELD, field: e });
         } }, { key: "sendBuffer", value: function value(e, t, n, r) {
@@ -701,7 +705,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } }, { key: "receiveSignal", value: function value(e) {
           this._datachannel.signal(e);
         } }, { key: "destroy", value: function value() {
-          this.engine.logger.warn("destroy datachannel " + this.channelId), window.clearInterval(this.adjustSRInterval), window.clearInterval(this.pinger), this._datachannel.removeAllListeners(), this.removeAllListeners(), this._datachannel.destroy();
+          this.logger.warn("destroy datachannel " + this.channelId), window.clearInterval(this.adjustSRInterval), window.clearInterval(this.statser);var e = { event: _.default.DC_CLOSE };this.sendJson(e), this._datachannel.removeAllListeners(), this.removeAllListeners(), this._datachannel.destroy();
         } }, { key: "_handleRequestMsg", value: function value(e) {
           this.rcvdReqQueue.length > 0 ? e.urgent ? this.rcvdReqQueue.push(e.sn) : this.rcvdReqQueue.unshift(e.sn) : this.emit(_.default.DC_REQUEST, e);
         } }, { key: "_handlePieceAck", value: function value() {
@@ -720,11 +724,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             n += e;
           };
         } }, { key: "_loadtimeout", value: function value() {
-          var e = this.engine.logger;if (e.warn("datachannel timeout while downloading from " + this.remotePeerId), this.emit(_.default.DC_TIMEOUT), this.requestTimeout = null, this.downloading = !1, ++this.miss >= this.config.dcTolerance) {
-            var t = { event: _.default.DC_CLOSE };this.sendJson(t), e.warn("datachannel download miss reach dcTolerance, close " + this.remotePeerId), this.emit(_.default.DC_ERROR);
+          if (this.logger.warn("datachannel timeout while downloading from " + this.remotePeerId), this.emit(_.default.DC_TIMEOUT), this.requestTimeout = null, this.downloading = !1, ++this.miss >= this.config.dcTolerance) {
+            var e = { event: _.default.DC_CLOSE };this.sendJson(e), this.logger.warn("datachannel download miss reach dcTolerance, close " + this.remotePeerId), this.emit(_.default.DC_ERROR);
           }
         } }, { key: "_uploadtimeout", value: function value() {
-          this.engine.logger.warn("datachannel timeout while uploading to " + this.remotePeerId), this.uploading = !1, this.rcvdReqQueue = [];
+          this.logger.warn("datachannel timeout while uploading to " + this.remotePeerId), this.uploading = !1, this.rcvdReqQueue = [];
         } }, { key: "_sendPing", value: function value() {
           var e = this;this.ping = performance.now();for (var t = 0; t < this.config.dcPings; t++) {
             this.sendJson({ event: _.default.DC_PING });
@@ -751,10 +755,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } }, { key: "_handlePongMsg", value: function value() {
           var e = performance.now() - this.ping;this.delays.push(e);
         } }, { key: "setupStats", value: function value() {
-          var e = this,
-              t = this.engine.logger;setInterval(function () {
-            e._datachannel.getStats(function (e, n) {
-              t.warn("reports: " + JSON.stringify(n, null, 1));
+          var e = this;this.statser = setInterval(function () {
+            e._datachannel.getStats(function (t, n) {
+              e.logger.warn("reports: " + JSON.stringify(n, null, 1));
             });
           }, 1e4);
         } }, { key: "isAvailable", get: function get() {
@@ -2240,7 +2243,35 @@ var BTTracker = function (_EventEmitter) {
             this.signalerWs.destroy();
             this.signalerWs = null;
             this.peers = [];
+
+            // 销毁所有datachannel
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = this.DCMap.values()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var dc = _step.value;
+
+                    dc.destroy();
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
             this.DCMap.clear();
+
             this.failedDCSet.clear();
             this.logger.warn('tracker stop p2p');
         }
@@ -2256,13 +2287,13 @@ var BTTracker = function (_EventEmitter) {
         value: function _handlePeers(peers) {
             var _this3 = this;
 
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
 
             try {
-                for (var _iterator = peers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var peer = _step.value;
+                for (var _iterator2 = peers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var peer = _step2.value;
 
                     this.peers.push({
                         id: peer.id
@@ -2270,16 +2301,16 @@ var BTTracker = function (_EventEmitter) {
                 }
                 //过滤掉已经连接的节点和连接失败的节点
             } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
                     }
                 } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
                     }
                 }
             }
@@ -2321,7 +2352,7 @@ var BTTracker = function (_EventEmitter) {
                 _this5.signalerWs.sendSignal(remotePeerId, data);
             }).once(_core.Events.DC_ERROR, function () {
                 _this5.logger.warn('datachannel connect ' + datachannel.channelId + ' failed');
-                _this5.scheduler.deletePeer(datachannel);
+                if (_this5.scheduler) _this5.scheduler.deletePeer(datachannel);
                 _this5.DCMap.delete(datachannel.remotePeerId);
                 _this5.failedDCSet.add(datachannel.remotePeerId); //记录失败的连接
                 datachannel.destroy();
@@ -2341,7 +2372,7 @@ var BTTracker = function (_EventEmitter) {
             }).once(_core.Events.DC_CLOSE, function () {
 
                 _this5.logger.warn('datachannel ' + datachannel.channelId + ' closed');
-                _this5.scheduler.deletePeer(datachannel);
+                if (_this5.scheduler) _this5.scheduler.deletePeer(datachannel);
                 _this5.DCMap.delete(datachannel.remotePeerId);
                 _this5.failedDCSet.add(datachannel.remotePeerId); //记录断开的连接
 
@@ -2792,32 +2823,10 @@ var BTScheduler = function (_EventEmitter) {
             var logger = this.engine.logger;
 
             if (this.peersNum > 0) {
-                var _iteratorNormalCompletion5 = true;
-                var _didIteratorError5 = false;
-                var _iteratorError5 = undefined;
-
-                try {
-                    for (var _iterator5 = this.peerMap.values()[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                        var peer = _step5.value;
-
-                        peer.destroy();
-                        peer = null;
-                    }
-                } catch (err) {
-                    _didIteratorError5 = true;
-                    _iteratorError5 = err;
-                } finally {
-                    try {
-                        if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                            _iterator5.return();
-                        }
-                    } finally {
-                        if (_didIteratorError5) {
-                            throw _iteratorError5;
-                        }
-                    }
-                }
-
+                // for (let peer of this.peerMap.values()) {
+                //     peer.destroy();
+                //     peer = null;
+                // }
                 this.peerMap.clear();
             }
             this.removeAllListeners();
@@ -2920,27 +2929,27 @@ var BTScheduler = function (_EventEmitter) {
         key: '_broadcastToPeers',
         value: function _broadcastToPeers(msg) {
             if (this.peersNum > 0) {
-                var _iteratorNormalCompletion6 = true;
-                var _didIteratorError6 = false;
-                var _iteratorError6 = undefined;
+                var _iteratorNormalCompletion5 = true;
+                var _didIteratorError5 = false;
+                var _iteratorError5 = undefined;
 
                 try {
-                    for (var _iterator6 = this.peerMap.values()[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                        var peer = _step6.value;
+                    for (var _iterator5 = this.peerMap.values()[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                        var peer = _step5.value;
 
                         peer.sendJson(msg);
                     }
                 } catch (err) {
-                    _didIteratorError6 = true;
-                    _iteratorError6 = err;
+                    _didIteratorError5 = true;
+                    _iteratorError5 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                            _iterator6.return();
+                        if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                            _iterator5.return();
                         }
                     } finally {
-                        if (_didIteratorError6) {
-                            throw _iteratorError6;
+                        if (_didIteratorError5) {
+                            throw _iteratorError5;
                         }
                     }
                 }

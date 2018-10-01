@@ -65,7 +65,11 @@ If `opts` is specified, then the default options (shown below) will be overridde
 ## P2PEngine API
 
 ### `var engine = new P2PEngine(hlsjs, p2pConfig);`
-Create a new `P2PEngine` instance. 
+Create a new `P2PEngine` instance. Or you can get `P2PEngine` instance from hlsjs:
+```javascript
+var hls = new Hls();
+var engine = hls.p2pEngine;
+```
 
 ### `engine.version`
 Get the version of `P2PEngine`.
@@ -90,11 +94,11 @@ Emitted when the peer Id of this client is obtained from server.
 ### `engine.on('peers', function (peers) {})`
 Emitted when successfully connected with new peer.
 
-### `engine.on('stats', function ({totalHTTPDownloaded, totalP2PDownloaded, totalP2PUploaded}) {})`
+### `engine.on('stats', function (stats) {})`
 Emitted when data is downloaded/uploaded.
-totalHTTPDownloaded: total data downloaded by HTTP(KB).
-totalP2PDownloaded: total data downloaded by P2P(KB).
-totalP2PUploaded: total data uploaded by P2P(KB).
+stats.totalHTTPDownloaded: total data downloaded by HTTP(KB).
+stats.totalP2PDownloaded: total data downloaded by P2P(KB).
+stats.totalP2PUploaded: total data uploaded by P2P(KB).
 
 ## Advanced Usage
 ### Dynamic m3u8 path issue

@@ -70,7 +70,13 @@ class BTTracker extends EventEmitter {
         this.signalerWs.destroy();
         this.signalerWs = null;
         this.peers = [];
+
+        // 销毁所有datachannel
+        for (let dc of this.DCMap.values()) {
+            dc.destroy();
+        }
         this.DCMap.clear();
+
         this.failedDCSet.clear();
         this.logger.warn(`tracker stop p2p`);
     }
@@ -117,7 +123,7 @@ class BTTracker extends EventEmitter {
         })
             .once(Events.DC_ERROR, () => {
                 this.logger.warn(`datachannel connect ${datachannel.channelId} failed`);
-                this.scheduler.deletePeer(datachannel);
+                if (this.scheduler) this.scheduler.deletePeer(datachannel);
                 this.DCMap.delete(datachannel.remotePeerId);
                 this.failedDCSet.add(datachannel.remotePeerId);                  //记录失败的连接
                 datachannel.destroy();
@@ -136,7 +142,7 @@ class BTTracker extends EventEmitter {
             .once(Events.DC_CLOSE, () => {
 
                 this.logger.warn(`datachannel ${datachannel.channelId} closed`);
-                this.scheduler.deletePeer(datachannel);
+                if (this.scheduler) this.scheduler.deletePeer(datachannel);
                 this.DCMap.delete(datachannel.remotePeerId);
                 this.failedDCSet.add(datachannel.remotePeerId);              //记录断开的连接
 
