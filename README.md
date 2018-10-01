@@ -13,6 +13,9 @@ This JS library implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC) datach
 
 This library is a part of CDNBye project which attempts to deliver high quality video streams, decreasing the number of requests to CDN servers, reducing the cost of transmission and enhancing system’s scalability. As the name suggests, CDNBye will help you offload bandwidth from expensive traditional CDNs，while also maximizing a user’s viewing experience.
 
+## Notice
+v0.2.x is deprecated, please update to the latest version.
+
 ## Playground
 [Click me!](https://cdnbye.github.io/hlsjs-p2p-demo/)
 
