@@ -662,11 +662,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             }
           };e.once("connect", n), e.on("data", function (e) {
             if ("string" == typeof e) {
-              t.logger.debug("datachannel receive string: " + e + "from " + t.remotePeerId);var n = JSON.parse(e);if (!t.connected) return void t.msgQueue.push(n);switch (n.event) {case _.default.DC_PONG:
+              var n = JSON.parse(e);if (!t.connected) return void t.msgQueue.push(n);switch (n.event) {case _.default.DC_PONG:
                   t._handlePongMsg();break;case _.default.DC_PING:
                   t.sendJson({ event: _.default.DC_PONG });break;case _.default.DC_PIECE:
                   t._prepareForBinary(n.attachments, n.seg_id, n.sn, n.size, n.level), t.emit(n.event, n);break;case _.default.DC_PIECE_NOT_FOUND:
-                  window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.emit(n.event, n);break;case _.default.DC_REQUEST:
+                  window.clearTimeout(t.requestTimeout), t.requestTimeout = null, t.downloading = !1, t.emit(n.event, n);break;case _.default.DC_REQUEST:
                   t._handleRequestMsg(n);break;case _.default.DC_PIECE_ACK:
                   t._handlePieceAck(), t.emit(n.event, n);break;case _.default.DC_CHOKE:
                   t.choked = !0;break;case _.default.DC_UNCHOKE:
@@ -3346,12 +3346,14 @@ var FragLoader = function (_EventEmitter) {
                 //如果在peers的bitmap中找到
                 context.frag.loadByP2P = true;
                 this.scheduler.load(context, config, callbacks);
+                var onTimeout = callbacks.onTimeout;
                 callbacks.onTimeout = function (stats, context) {
                     //如果P2P下载超时则立即切换到xhr下载
                     logger.debug('P2P timeout switched to HTTP load ' + frag.relurl + ' at ' + frag.sn);
                     frag.loadByP2P = false;
                     frag.loadByHTTP = true;
                     _this2.xhrLoader.load(context, config, callbacks);
+                    callbacks.onTimeout = onTimeout;
                 };
                 var onSuccess = callbacks.onSuccess;
                 callbacks.onSuccess = function (response, stats, context) {

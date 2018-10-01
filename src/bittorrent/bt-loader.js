@@ -61,11 +61,13 @@ class FragLoader extends EventEmitter {
         } else if (this.p2pEnabled && this.scheduler.hasAndSetTargetPeer(frag.sn)) {                             //如果在peers的bitmap中找到
             context.frag.loadByP2P = true;
             this.scheduler.load(context, config, callbacks);
+            const onTimeout = callbacks.onTimeout;
             callbacks.onTimeout = (stats, context) => {                             //如果P2P下载超时则立即切换到xhr下载
                 logger.debug(`P2P timeout switched to HTTP load ${frag.relurl} at ${frag.sn}`);
                 frag.loadByP2P = false;
                 frag.loadByHTTP = true;
                 this.xhrLoader.load(context, config, callbacks);
+                callbacks.onTimeout = onTimeout;
             };
             const onSuccess = callbacks.onSuccess;
             callbacks.onSuccess = (response, stats, context) => {                       //在onsucess回调中复制并缓存二进制数据
