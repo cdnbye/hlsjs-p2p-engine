@@ -95,9 +95,9 @@ var engine = hls.p2pEngine;
 当与新的节点成功建立p2p连接时回调该事件。
 
 ### `engine.on('stats', function (stats) {})`
-该回调函数可以获取p2p信息，包括：
-stats.totalHTTPDownloaded: 从HTTP(CDN)下载的数据量（单位KB）
-stats.totalP2PDownloaded: 从P2P下载的数据量（单位KB）
+该回调函数可以获取p2p信息，包括：</br>
+stats.totalHTTPDownloaded: 从HTTP(CDN)下载的数据量（单位KB）</br>
+stats.totalP2PDownloaded: 从P2P下载的数据量（单位KB）</br>
 stats.totalP2PUploaded: P2P上传的数据量（单位KB）
 
 ## 高级用法

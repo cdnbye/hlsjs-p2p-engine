@@ -95,9 +95,9 @@ Emitted when the peer Id of this client is obtained from server.
 Emitted when successfully connected with new peer.
 
 ### `engine.on('stats', function (stats) {})`
-Emitted when data is downloaded/uploaded.
-stats.totalHTTPDownloaded: total data downloaded by HTTP(KB).
-stats.totalP2PDownloaded: total data downloaded by P2P(KB).
+Emitted when data is downloaded/uploaded.</br>
+stats.totalHTTPDownloaded: total data downloaded by HTTP(KB).</br>
+stats.totalP2PDownloaded: total data downloaded by P2P(KB).</br>
 stats.totalP2PUploaded: total data uploaded by P2P(KB).
 
 ## Advanced Usage
