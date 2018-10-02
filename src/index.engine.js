@@ -183,7 +183,7 @@ class P2PEngine extends EventEmitter {
     }
 
     disableP2P() {                                              //停止p2p
-        this.logger.warn(`disable P2P`);
+        if (this.logger) this.logger.warn(`disable P2P`);   // 防止在未初始化时就调用
         if (this.p2pEnabled) {
             this.p2pEnabled = false;
             this.config.p2pEnabled = this.hlsjs.config.p2pEnabled = this.p2pEnabled;
