@@ -802,7 +802,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         f = n(7),
         d = function d(e) {
       var t = new Uint8Array(e);return window.crypto.getRandomValues(t), t;
-    };f(o, l), o.config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:global.stun.twilio.com:3478?transport=udp" }] }, o.constraints = {}, o.channelConfig = {}, Object.defineProperty(o.prototype, "bufferSize", { get: function get() {
+    };String.prototype.padStart || (String.prototype.padStart = function (e, t) {
+      return e >>= 0, t = String(void 0 !== t ? t : " "), this.length > e || "" === t ? String(this) : (e -= this.length, e > t.length && (t += t.repeat(e / t.length)), t.slice(0, e) + String(this));
+    }), f(o, l), o.config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:global.stun.twilio.com:3478?transport=udp" }] }, o.constraints = {}, o.channelConfig = {}, Object.defineProperty(o.prototype, "bufferSize", { get: function get() {
         var e = this;return e._channel && e._channel.bufferedAmount || 0;
       } }), o.prototype.address = function () {
       var e = this;return { port: e.localPort, family: "IPv4", address: e.localAddress };
@@ -1989,7 +1991,7 @@ var P2PEngine = function (_EventEmitter) {
 
 P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)(); // deprecated
 
-P2PEngine.version = "0.4.0";
+P2PEngine.version = "0.4.1";
 
 exports.default = P2PEngine;
 module.exports = exports['default'];
