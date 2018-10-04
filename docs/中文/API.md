@@ -56,7 +56,6 @@ if (Hls.WEBRTC_SUPPORT) {
 | `loadTimeout` | number | 3 | p2p下载的超时时间。
 | `maxBufSize` | number | 1024 * 1024 * 50 | p2p缓存的最大数据量。
 | `p2pEnabled` | boolean | true | 是否开启P2P。
-| `tag` | string | [hlsjs version] | 用户自定义标签，可用于在后台查看参数调整效果。
 | `channelId` | function | - | 标识channel的字段，同一个channel的用户可以共享数据。（参考高级用法）
 | `segmentId` | function | - | 标识ts文件的字段，防止相同ts文件具有不同的路径。（参考高级用法）
 | `packetSize` | number | 64 * 1024 | 每次通过datachannel发送的包的大小，64KB适用于较新版本的浏览器，如果要兼容低版本浏览器可以设置成16KB。

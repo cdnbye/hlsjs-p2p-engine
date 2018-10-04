@@ -3,9 +3,6 @@
 <p id="version"></p>
 <h3>download info:</h3>
 <p id="info"></p>
-<table id="table-body">
-    <tbody ></tbody>
-</table>
 <script>
     document.querySelector('#version').innerText = `hls.js version: ${Hls.version}  cdnbye version: ${Hls.engineVersion}`;
     if(Hls.isSupported()) {
@@ -20,31 +17,9 @@
         hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
             video.play();
         });
-        hls.on(Hls.Events.FRAG_LOADED, (id, data) => {
-            var frag = data.frag;
-            var source = undefined;
-            if (frag.loadByHTTP === true || frag.loadByHTTP === undefined) {
-                source = 'HTTP';
-            } else if (frag.loadByP2P === true) {
-                source = 'P2P';
-            }
-            addToTable(frag.relurl, frag.loaded, source);
-        });
-        hls.p2pEngine.on('stats', function ({totalHTTPDownloaded, totalP2PDownloaded}) {
+        hls.p2pEngine.on('stats', function ({totalHTTPDownloaded, totalP2PDownloaded, totalP2PUploaded}) {
             var total = totalHTTPDownloaded + totalP2PDownloaded;
-            document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB`;
-        })
-        function addToTable(url, downloaded, source) {
-            var infoStr = `download ${url}(size:${downloaded}B) by ${source}`;
-            document.querySelector('#table-body tbody').innerHTML +=
-                `<tr style="text-align: center">
-                    <td>${infoStr}</td>
-                </tr>`
-        };
+            document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB, uploaded: ${totalP2PUploaded}KB`;
+        });
     }
-</script><style type="text/css">
-    #myChartWrap[data-v-57799805] {
-        height: 300px;
-        margin-top: 80px;
-    }
-</style>
+</script>

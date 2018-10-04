@@ -1,6 +1,6 @@
 <h1 align="center"><a href="" target="_blank" rel="noopener noreferrer"><img width="250" src="figs/cdnbye.png" alt="cdnbye logo"></a></h1>
 <h4 align="center">Save Your Bandwidth using WebRTC.</h4>
-<h4 align="center">视频网站省流量神器.</h4>
+<h4 align="center">视频网站省流量&加速神器.</h4>
 <p align="center">
   <a href="https://www.npmjs.com/package/cdnbye"><img src="https://img.shields.io/npm/v/cdnbye.svg?style=flat" alt="npm"></a>
    <a href="https://www.jsdelivr.com/package/npm/cdnbye"><img src="https://data.jsdelivr.com/v1/package/npm/cdnbye/badge" alt="jsdelivr"></a>
@@ -40,6 +40,8 @@ v0.2.x已经废弃，请升级到最新版本。
 <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
 ```
 就是这么简单！
+#### 集成到第三方HTML5播放器
+参考[demos](#Player Integration), 也许你可以尝试下[P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer)和[P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer)。
 
 ## 浏览器支持情况
 由于WebRTC已成为HTML5标准，目前大部分主流浏览器都已经支持。CDNBye的浏览器兼容性取决于WebRTC和hls.js。需要注意的是iOS版Safari由于不支持MediaSource API，因此也不支持hls.js(不过Safari原生支持HLS播放)。
@@ -119,6 +121,10 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 });
 ```
 
+## CDN
+- [jsDelivr](https://www.jsdelivr.com/package/npm/cdnbye)
+- [unpkg](https://unpkg.com/cdnbye@latest/)
+
 ## API文档
 参见 [API.md](docs/中文/API.md)
 
@@ -151,6 +157,10 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
     - 参见 [jwplayer-demo.html](demo/jwplayer-demo.html)
 - [DPlayer](https://github.com/MoePlayer/DPlayer)
     - 参见 [dplayer-demo.html](demo/dplayer-demo.html)
+- [P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer)
+    - 嵌入hlsjs-p2p-engine的[DPlayer](https://github.com/MoePlayer/DPlayer).
+- [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer)
+    - 嵌入hlsjs-p2p-engine的[CKPlayer](http://www.ckplayer.com/).
 - [clappr](https://github.com/clappr/clappr)
     - 参见 [clappr-demo.html](demo/clappr-demo.html)
 - [MediaElement.js](http://www.mediaelementjs.com/)

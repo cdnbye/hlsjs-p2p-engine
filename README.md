@@ -33,6 +33,8 @@ with
 <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
 ```
 That's it!
+#### Integrate to HTML5 Players
+See [demos](#Player Integration), maybe you want to try [P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer) and [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer).
 
 ## Browser Support
 WebRTC has already been incorporated into the HTML5 standard and it is broadly deployed in modern browsers. The compatibility of CDNBye depends on the browser support of WebRTC and Hls.js. Please note that iOS Safari "Mobile" does not support the MediaSource API.
@@ -112,6 +114,10 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 });
 ```
 
+## CDN
+- [jsDelivr](https://www.jsdelivr.com/package/npm/cdnbye)
+- [unpkg](https://unpkg.com/cdnbye@latest/)
+
 ## API and Configuration
 See [API.md](docs/English/API.md)
 
@@ -144,6 +150,10 @@ We have collected some [frequently asked questions](docs/English/FAQ.md). Before
     - See [jwplayer-demo.html](demo/jwplayer-demo.html)
 - [DPlayer](https://github.com/MoePlayer/DPlayer)
     - See [dplayer-demo.html](demo/dplayer-demo.html)
+- [P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer)
+    - [DPlayer](https://github.com/MoePlayer/DPlayer) with hlsjs-p2p-engine built-in.
+- [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer)
+    - [CKPlayer](http://www.ckplayer.com/) with hlsjs-p2p-engine built-in.
 - [clappr](https://github.com/clappr/clappr)
     - See [clappr-demo.html](demo/clappr-demo.html)
 - [MediaElement.js](http://www.mediaelementjs.com/)
