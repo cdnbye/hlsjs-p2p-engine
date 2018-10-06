@@ -114,6 +114,28 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 });
 ```
 
+## Player Integration
+- [videojs](http://videojs.com/)
+    - See [videojs-demo.html](demo/videojs-demo.html)
+- [flowplayer](https://flowplayer.com/)
+    - See [flowplayer-demo.html](demo/flowplayer-demo.html)
+- [jwplayer](https://www.jwplayer.com/)
+    - See [jwplayer-demo.html](demo/jwplayer-demo.html)
+- [DPlayer](https://github.com/MoePlayer/DPlayer)
+    - See [dplayer-demo.html](demo/dplayer-demo.html)
+- [P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer)
+    - [DPlayer](https://github.com/MoePlayer/DPlayer) with hlsjs-p2p-engine built-in.
+- [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer)
+    - [CKPlayer](http://www.ckplayer.com/) with hlsjs-p2p-engine built-in.
+- [clappr](https://github.com/clappr/clappr)
+    - See [clappr-demo.html](demo/clappr-demo.html)
+- [MediaElement.js](http://www.mediaelementjs.com/)
+    - See [mediaelement-demo.html](demo/mediaelement-demo.html)
+- [TCPlayer](https://cloud.tencent.com/document/product/267/7479)(Tencent Cloud Player)
+    - See [tcplayer-demo.html](demo/tcplayer-demo.html)
+- `Add your customized player here`
+    - CDNBye can be integrated into any HTML5 video player that with hls.js built in.
+
 ## CDN
 - [jsDelivr](https://www.jsdelivr.com/package/npm/cdnbye)
 - [unpkg](https://unpkg.com/cdnbye@latest/)
@@ -141,28 +163,8 @@ See [design.md](docs/English/design.md)
 ## FAQ
 We have collected some [frequently asked questions](docs/English/FAQ.md). Before reporting an issue, please search if the FAQ has the answer to your problem.
 
-## Player Integration
-- [videojs](http://videojs.com/)
-    - See [videojs-demo.html](demo/videojs-demo.html)
-- [flowplayer](https://flowplayer.com/)
-    - See [flowplayer-demo.html](demo/flowplayer-demo.html)
-- [jwplayer](https://www.jwplayer.com/)
-    - See [jwplayer-demo.html](demo/jwplayer-demo.html)
-- [DPlayer](https://github.com/MoePlayer/DPlayer)
-    - See [dplayer-demo.html](demo/dplayer-demo.html)
-- [P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer)
-    - [DPlayer](https://github.com/MoePlayer/DPlayer) with hlsjs-p2p-engine built-in.
-- [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer)
-    - [CKPlayer](http://www.ckplayer.com/) with hlsjs-p2p-engine built-in.
-- [clappr](https://github.com/clappr/clappr)
-    - See [clappr-demo.html](demo/clappr-demo.html)
-- [MediaElement.js](http://www.mediaelementjs.com/)
-    - See [mediaelement-demo.html](demo/mediaelement-demo.html)
-- [TCPlayer](https://cloud.tencent.com/document/product/267/7479)(Tencent Cloud Player)
-    - See [tcplayer-demo.html](demo/tcplayer-demo.html)
-- `Add your customized player here`
-    - CDNBye can be integrated into any HTML5 video player that with hls.js built in.
-
+## Contact Us
+Email: service@cdnbye.com
 
 
 
