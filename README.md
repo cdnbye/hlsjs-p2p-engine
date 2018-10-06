@@ -133,6 +133,8 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
     - See [mediaelement-demo.html](demo/mediaelement-demo.html)
 - [TCPlayer](https://cloud.tencent.com/document/product/267/7479)(Tencent Cloud Player)
     - See [tcplayer-demo.html](demo/tcplayer-demo.html)
+- [Chimee](http://chimee.org/)
+    - See [chimee-demo.html](demo/chimee-demo.html)
 - `Add your customized player here`
     - CDNBye can be integrated into any HTML5 video player that with hls.js built in.
 

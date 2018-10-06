@@ -140,6 +140,8 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
     - 参见 [mediaelement-demo.html](demo/mediaelement-demo.html)
 - [TCPlayer](https://cloud.tencent.com/document/product/267/7479)(腾讯云播放器)
     - 参见 [tcplayer-demo.html](demo/tcplayer-demo.html)
+- [Chimee](http://chimee.org/)
+    - 参见 [chimee-demo.html](demo/chimee-demo.html)
 - `欢迎贡献您的播放器demo`
     - CDNBye可以集成到内置hls.js的任何H5视频播放器中！
 
