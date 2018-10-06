@@ -121,6 +121,28 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 });
 ```
 
+## 播放器集成
+- [videojs](http://videojs.com/)
+    - 参见 [videojs-demo.html](demo/videojs-demo.html)
+- [flowplayer](https://flowplayer.com/)
+    - 参见 [flowplayer-demo.html](demo/flowplayer-demo.html)
+- [jwplayer](https://www.jwplayer.com/)
+    - 参见 [jwplayer-demo.html](demo/jwplayer-demo.html)
+- [DPlayer](https://github.com/MoePlayer/DPlayer)
+    - 参见 [dplayer-demo.html](demo/dplayer-demo.html)
+- [P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer)
+    - 嵌入hlsjs-p2p-engine的[DPlayer](https://github.com/MoePlayer/DPlayer).
+- [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer)
+    - 嵌入hlsjs-p2p-engine的[CKPlayer](http://www.ckplayer.com/).
+- [clappr](https://github.com/clappr/clappr)
+    - 参见 [clappr-demo.html](demo/clappr-demo.html)
+- [MediaElement.js](http://www.mediaelementjs.com/)
+    - 参见 [mediaelement-demo.html](demo/mediaelement-demo.html)
+- [TCPlayer](https://cloud.tencent.com/document/product/267/7479)(腾讯云播放器)
+    - 参见 [tcplayer-demo.html](demo/tcplayer-demo.html)
+- `欢迎贡献您的播放器demo`
+    - CDNBye可以集成到内置hls.js的任何H5视频播放器中！
+
 ## CDN
 - [jsDelivr](https://www.jsdelivr.com/package/npm/cdnbye)
 - [unpkg](https://unpkg.com/cdnbye@latest/)
@@ -148,27 +170,8 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 ## FAQ
 我们收集了一些[常见问题](docs/中文/常见问题.md)。在报告issue之前请先查看一下。
 
-## 播放器集成
-- [videojs](http://videojs.com/)
-    - 参见 [videojs-demo.html](demo/videojs-demo.html)
-- [flowplayer](https://flowplayer.com/)
-    - 参见 [flowplayer-demo.html](demo/flowplayer-demo.html)
-- [jwplayer](https://www.jwplayer.com/)
-    - 参见 [jwplayer-demo.html](demo/jwplayer-demo.html)
-- [DPlayer](https://github.com/MoePlayer/DPlayer)
-    - 参见 [dplayer-demo.html](demo/dplayer-demo.html)
-- [P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer)
-    - 嵌入hlsjs-p2p-engine的[DPlayer](https://github.com/MoePlayer/DPlayer).
-- [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer)
-    - 嵌入hlsjs-p2p-engine的[CKPlayer](http://www.ckplayer.com/).
-- [clappr](https://github.com/clappr/clappr)
-    - 参见 [clappr-demo.html](demo/clappr-demo.html)
-- [MediaElement.js](http://www.mediaelementjs.com/)
-    - 参见 [mediaelement-demo.html](demo/mediaelement-demo.html)
-- [TCPlayer](https://cloud.tencent.com/document/product/267/7479)(腾讯云播放器)
-    - 参见 [tcplayer-demo.html](demo/tcplayer-demo.html)
-- `欢迎贡献您的播放器demo`
-    - CDNBye可以集成到内置hls.js的任何H5视频播放器中！
+## 联系我们
+邮箱：service@cdnbye.com
 
 <!--
 ## 捐赠
