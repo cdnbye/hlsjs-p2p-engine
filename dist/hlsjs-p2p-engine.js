@@ -1811,6 +1811,7 @@ var P2PEngine = function (_EventEmitter) {
             //初始化logger
             var logger = new _logger2.default(_this.config, _this.channel);
             _this.hlsjs.config.logger = _this.logger = logger;
+            logger.info('CDNBye version: ' + P2PEngine.version + ' Hlsjs version: ' + hlsjs.constructor.version);
             logger.info('channel ' + _this.channel);
             _this._init(_this.channel, _this.browserInfo);
 

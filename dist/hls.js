@@ -1767,6 +1767,8 @@ var CDNByeHlsjs = function (_Hlsjs) {
         // let merged = Object.assign({}, recommendedHlsjsConfig, config);
         // console.warn(`merged ${JSON.stringify(merged, null, 2)}`);
 
+        if (config.liveSyncDurationCount) delete recommendedHlsjsConfig.liveSyncDuration;
+
         var mergedHlsjsConfig = recommendedHlsjsConfig;
         for (var prop in config) {
             mergedHlsjsConfig[prop] = config[prop];
