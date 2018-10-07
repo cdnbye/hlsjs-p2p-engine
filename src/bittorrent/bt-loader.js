@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 // import URLToolkit from 'url-toolkit';
-import {defaultSegmentId} from '../utils/toolFuns';
+import {isBlockType} from '../utils/toolFuns';
 
 class FragLoader extends EventEmitter {
     constructor(config) {
@@ -18,6 +18,8 @@ class FragLoader extends EventEmitter {
         this.scheduler = config.scheduler;
         this.fetcher = config.fetcher;
         this.segmentId = config.segmentId;
+        this.blockTypes = config.p2pBlackList;
+
     }
 
     destroy() {
@@ -41,9 +43,23 @@ class FragLoader extends EventEmitter {
         frag.loadByP2P = false;                //初始化flag
         frag.loadByHTTP = false;
         // console.warn(`load frag level ${frag.level} sn ${frag.sn}`);
+
+        // 音频等非ts文件不使用P2P
+        if (isBlockType(frag.url, this.blockTypes)) {
+            logger.debug(`HTTP load blockType ${frag.url}`);
+            context.frag.loadByHTTP = true;
+            const onSuccess = callbacks.onSuccess;
+            callbacks.onSuccess = (response, stats, context) => {                       //在onsucess回调中复制并缓存二进制数据
+                this.fetcher.reportFlow(stats, false);
+                logger.info(`HTTP load time ${stats.tload - stats.trequest}ms`);
+                onSuccess(response,stats,context);
+            };
+            return this.xhrLoader.load(context, config, callbacks);
+        }
+
         const segId = this.segmentId(frag.level, frag.sn, frag.url);
         if (this.p2pEnabled && this.bufMgr.hasSegOfId(segId)) {                                     //如果命中缓存
-            logger.debug(`bufMgr found seg sn ${frag.sn} url ${frag.relurl}`);
+            logger.debug(`bufMgr found seg sn ${frag.sn} url ${frag.url}`);
             let seg = this.bufMgr.getSegById(segId);
             let response = { url : context.url, data : seg.data }, trequest, tfirst, tload, loaded, total;
             trequest = performance.now();

@@ -6,7 +6,7 @@ import SegmentManager from './segment-manager';
 import {Events, Fetcher, getBrowserRTC, DataChannel} from 'core';
 import Logger from './utils/logger';
 import platform from './utils/platform';
-import { defaultChannelId, defaultSegmentId} from './utils/toolFuns';
+import { defaultChannelId, defaultSegmentId, isBlockType} from './utils/toolFuns';
 
 class P2PEngine extends EventEmitter {
 
@@ -102,61 +102,67 @@ class P2PEngine extends EventEmitter {
         this.hlsjs.config.scheduler = this.tracker.scheduler;
         //在fLoader中使用fetcher
         this.hlsjs.config.fetcher = fetcher;
+        //向fLoader导入p2pBlackList
+        this.hlsjs.config.p2pBlackList = this.config.p2pBlackList;
 
 
         this.hlsjs.on(this.HLSEvents.FRAG_LOADING, (id, data) => {
             // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
-            logger.debug('loading frag ' + data.frag.sn);
-            this.tracker.currentLoadingSN = data.frag.sn;
-
+            if (!isBlockType(data.frag.url, this.config.p2pBlackList)) {
+                logger.debug('loading frag ' + data.frag.sn);
+                this.tracker.currentLoadingSN = data.frag.sn;
+            }
         });
 
         this.trackerTried = false;                                                   //防止重复连接ws
         this.hlsjs.on(this.HLSEvents.FRAG_LOADED, (id, data) => {
             let sn = data.frag.sn;
-            this.hlsjs.config.currLoaded = sn;
-            this.tracker.currentLoadedSN = sn;                                //用于BT算法
-            this.hlsjs.config.currLoadedDuration = data.frag.duration;
-            let bitrate = Math.round(data.frag.loaded*8/data.frag.duration);
-            if (!this.trackerTried && !this.tracker.connected && this.config.p2pEnabled) {
+            if (!isBlockType(data.frag.url, this.config.p2pBlackList)) {
+                this.hlsjs.config.currLoaded = sn;
+                this.tracker.currentLoadedSN = sn;                                //用于BT算法
+                this.hlsjs.config.currLoadedDuration = data.frag.duration;
+                let bitrate = Math.round(data.frag.loaded*8/data.frag.duration);
+                if (!this.trackerTried && !this.tracker.connected && this.config.p2pEnabled) {
 
-                this.tracker.scheduler.bitrate = bitrate;
-                logger.info(`bitrate ${bitrate}`);
+                    this.tracker.scheduler.bitrate = bitrate;
+                    logger.info(`bitrate ${bitrate}`);
 
-                this.tracker.resumeP2P();
-                this.trackerTried = true;
+                    this.tracker.resumeP2P();
+                    this.trackerTried = true;
+                }
+                // this.streamingRate = (this.streamingRate*this.fragLoadedCounter + bitrate)/(++this.fragLoadedCounter);
+                // this.tracker.scheduler.streamingRate = Math.floor(this.streamingRate);
+                if (!data.frag.loadByHTTP) {
+                    data.frag.loadByP2P = false;
+                    data.frag.loadByHTTP = true;
+                }
+                // console.warn(`data.frag.url ${data.frag.url}`);
+                // if (!this.checkTSPath(sn, data.frag.url)) {
+                //     logger.warn(`ts path of ${sn} equal to the previous, set tsStrictMatched to true`);
+                //     this.config.tsStrictMatched = true;
+                //     this.checkTSPath = noop;
+                // }
+
+                // 实验性功能
+                if (this.config.p2pEnabled && this.bufMgr.hasSegOfSN(sn+1)) {
+                    // console.warn(`found next seg in pool, sn ${sn+1}`);
+                    // set the level for next loaded fragment
+                    const nextSegId = this.bufMgr.getSegIdbySN(sn+1);
+                    const nextLevel = this.bufMgr.getSegById(nextSegId).level
+                    // console.warn(`change nextLoadLevel to ${nextLevel}`);
+                    this.hlsjs.nextLoadLevel = nextLevel;
+                }
             }
-            // this.streamingRate = (this.streamingRate*this.fragLoadedCounter + bitrate)/(++this.fragLoadedCounter);
-            // this.tracker.scheduler.streamingRate = Math.floor(this.streamingRate);
-            if (!data.frag.loadByHTTP) {
-                data.frag.loadByP2P = false;
-                data.frag.loadByHTTP = true;
-            }
-            // console.warn(`data.frag.url ${data.frag.url}`);
-            // if (!this.checkTSPath(sn, data.frag.url)) {
-            //     logger.warn(`ts path of ${sn} equal to the previous, set tsStrictMatched to true`);
-            //     this.config.tsStrictMatched = true;
-            //     this.checkTSPath = noop;
-            // }
-
-            // 实验性功能
-            if (this.config.p2pEnabled && this.bufMgr.hasSegOfSN(sn+1)) {
-                // console.warn(`found next seg in pool, sn ${sn+1}`);
-                // set the level for next loaded fragment
-                const nextSegId = this.bufMgr.getSegIdbySN(sn+1);
-                const nextLevel = this.bufMgr.getSegById(nextSegId).level
-                // console.warn(`change nextLoadLevel to ${nextLevel}`);
-                this.hlsjs.nextLoadLevel = nextLevel;
-            }
-
         });
 
         this.hlsjs.on(this.HLSEvents.FRAG_CHANGED, (id, data) => {
             // log('FRAG_CHANGED: '+JSON.stringify(data.frag, null, 2));
-            logger.debug('frag changed: '+data.frag.sn);
-            const sn = data.frag.sn;
-            this.hlsjs.config.currPlay = sn;
-            this.tracker.currentPlaySN = sn;
+            if (!isBlockType(data.frag.url, this.config.p2pBlackList)) {
+                logger.debug('frag changed: '+data.frag.sn);
+                const sn = data.frag.sn;
+                this.hlsjs.config.currPlay = sn;
+                this.tracker.currentPlaySN = sn;
+            }
         });
 
         this.hlsjs.on(this.HLSEvents.ERROR, (event, data) => {

@@ -1229,6 +1229,7 @@ exports.defaultSegmentId = defaultSegmentId;
 exports.defaultChannelId = defaultChannelId;
 exports.noop = noop;
 exports.getQueryParam = getQueryParam;
+exports.isBlockType = isBlockType;
 
 var _urlToolkit = __webpack_require__(3);
 
@@ -1239,6 +1240,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // 获取segment Id的函数
 function defaultSegmentId(streamLevel, segmentSn, segmentUrl) {
     return streamLevel + '-' + segmentSn;
+    // return `${streamLevel}-${segmentUrl}`
 }
 
 /*
@@ -1282,6 +1284,15 @@ function getQueryParam(name) {
     var r = window.location.search.substr(1).match(reg);
     if (r != null && r[2] !== '') return r[2].toString();
     return '';
+}
+
+function isBlockType(url, blackList) {
+    var urlObj = _urlToolkit2.default.parseURL(url);
+    var mediaType = urlObj.path.split('.')[1];
+    if (blackList.indexOf(mediaType) !== -1) {
+        return true;
+    }
+    return false;
 }
 
 /***/ }),
@@ -1975,58 +1986,66 @@ var P2PEngine = function (_EventEmitter) {
             this.hlsjs.config.scheduler = this.tracker.scheduler;
             //在fLoader中使用fetcher
             this.hlsjs.config.fetcher = fetcher;
+            //向fLoader导入p2pBlackList
+            this.hlsjs.config.p2pBlackList = this.config.p2pBlackList;
 
             this.hlsjs.on(this.HLSEvents.FRAG_LOADING, function (id, data) {
                 // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
-                logger.debug('loading frag ' + data.frag.sn);
-                _this2.tracker.currentLoadingSN = data.frag.sn;
+                if (!(0, _toolFuns.isBlockType)(data.frag.url, _this2.config.p2pBlackList)) {
+                    logger.debug('loading frag ' + data.frag.sn);
+                    _this2.tracker.currentLoadingSN = data.frag.sn;
+                }
             });
 
             this.trackerTried = false; //防止重复连接ws
             this.hlsjs.on(this.HLSEvents.FRAG_LOADED, function (id, data) {
                 var sn = data.frag.sn;
-                _this2.hlsjs.config.currLoaded = sn;
-                _this2.tracker.currentLoadedSN = sn; //用于BT算法
-                _this2.hlsjs.config.currLoadedDuration = data.frag.duration;
-                var bitrate = Math.round(data.frag.loaded * 8 / data.frag.duration);
-                if (!_this2.trackerTried && !_this2.tracker.connected && _this2.config.p2pEnabled) {
+                if (!(0, _toolFuns.isBlockType)(data.frag.url, _this2.config.p2pBlackList)) {
+                    _this2.hlsjs.config.currLoaded = sn;
+                    _this2.tracker.currentLoadedSN = sn; //用于BT算法
+                    _this2.hlsjs.config.currLoadedDuration = data.frag.duration;
+                    var bitrate = Math.round(data.frag.loaded * 8 / data.frag.duration);
+                    if (!_this2.trackerTried && !_this2.tracker.connected && _this2.config.p2pEnabled) {
 
-                    _this2.tracker.scheduler.bitrate = bitrate;
-                    logger.info('bitrate ' + bitrate);
+                        _this2.tracker.scheduler.bitrate = bitrate;
+                        logger.info('bitrate ' + bitrate);
 
-                    _this2.tracker.resumeP2P();
-                    _this2.trackerTried = true;
-                }
-                // this.streamingRate = (this.streamingRate*this.fragLoadedCounter + bitrate)/(++this.fragLoadedCounter);
-                // this.tracker.scheduler.streamingRate = Math.floor(this.streamingRate);
-                if (!data.frag.loadByHTTP) {
-                    data.frag.loadByP2P = false;
-                    data.frag.loadByHTTP = true;
-                }
-                // console.warn(`data.frag.url ${data.frag.url}`);
-                // if (!this.checkTSPath(sn, data.frag.url)) {
-                //     logger.warn(`ts path of ${sn} equal to the previous, set tsStrictMatched to true`);
-                //     this.config.tsStrictMatched = true;
-                //     this.checkTSPath = noop;
-                // }
+                        _this2.tracker.resumeP2P();
+                        _this2.trackerTried = true;
+                    }
+                    // this.streamingRate = (this.streamingRate*this.fragLoadedCounter + bitrate)/(++this.fragLoadedCounter);
+                    // this.tracker.scheduler.streamingRate = Math.floor(this.streamingRate);
+                    if (!data.frag.loadByHTTP) {
+                        data.frag.loadByP2P = false;
+                        data.frag.loadByHTTP = true;
+                    }
+                    // console.warn(`data.frag.url ${data.frag.url}`);
+                    // if (!this.checkTSPath(sn, data.frag.url)) {
+                    //     logger.warn(`ts path of ${sn} equal to the previous, set tsStrictMatched to true`);
+                    //     this.config.tsStrictMatched = true;
+                    //     this.checkTSPath = noop;
+                    // }
 
-                // 实验性功能
-                if (_this2.config.p2pEnabled && _this2.bufMgr.hasSegOfSN(sn + 1)) {
-                    // console.warn(`found next seg in pool, sn ${sn+1}`);
-                    // set the level for next loaded fragment
-                    var nextSegId = _this2.bufMgr.getSegIdbySN(sn + 1);
-                    var nextLevel = _this2.bufMgr.getSegById(nextSegId).level;
-                    // console.warn(`change nextLoadLevel to ${nextLevel}`);
-                    _this2.hlsjs.nextLoadLevel = nextLevel;
+                    // 实验性功能
+                    if (_this2.config.p2pEnabled && _this2.bufMgr.hasSegOfSN(sn + 1)) {
+                        // console.warn(`found next seg in pool, sn ${sn+1}`);
+                        // set the level for next loaded fragment
+                        var nextSegId = _this2.bufMgr.getSegIdbySN(sn + 1);
+                        var nextLevel = _this2.bufMgr.getSegById(nextSegId).level;
+                        // console.warn(`change nextLoadLevel to ${nextLevel}`);
+                        _this2.hlsjs.nextLoadLevel = nextLevel;
+                    }
                 }
             });
 
             this.hlsjs.on(this.HLSEvents.FRAG_CHANGED, function (id, data) {
                 // log('FRAG_CHANGED: '+JSON.stringify(data.frag, null, 2));
-                logger.debug('frag changed: ' + data.frag.sn);
-                var sn = data.frag.sn;
-                _this2.hlsjs.config.currPlay = sn;
-                _this2.tracker.currentPlaySN = sn;
+                if (!(0, _toolFuns.isBlockType)(data.frag.url, _this2.config.p2pBlackList)) {
+                    logger.debug('frag changed: ' + data.frag.sn);
+                    var sn = data.frag.sn;
+                    _this2.hlsjs.config.currPlay = sn;
+                    _this2.tracker.currentPlaySN = sn;
+                }
             });
 
             this.hlsjs.on(this.HLSEvents.ERROR, function (event, data) {
@@ -2106,7 +2125,7 @@ var P2PEngine = function (_EventEmitter) {
 
 P2PEngine.WEBRTC_SUPPORT = !!(0, _core.getBrowserRTC)(); // deprecated
 
-P2PEngine.version = "0.4.1";
+P2PEngine.version = "0.4.2";
 
 exports.default = P2PEngine;
 module.exports = exports['default'];
@@ -2153,7 +2172,9 @@ var defaultP2PConfig = _extends({
     channelId: null, // 标识channel的字段，默认是'[path]-[protocol version]'
     segmentId: null, // 标识ts文件的字段，默认是'[level]-[sn]'
 
-    webRTCConfig: {} }, _bittorrent.config);
+    webRTCConfig: {}, // 传入channelConfig用于createDataChannel，config用于RTCPeerConnection
+
+    p2pBlackList: ['aac', 'mp3'] }, _bittorrent.config);
 
 exports.default = defaultP2PConfig;
 module.exports = exports['default'];
@@ -3296,6 +3317,8 @@ var FragLoader = function (_EventEmitter) {
         _this.scheduler = config.scheduler;
         _this.fetcher = config.fetcher;
         _this.segmentId = config.segmentId;
+        _this.blockTypes = config.p2pBlackList;
+
         return _this;
     }
 
@@ -3329,10 +3352,25 @@ var FragLoader = function (_EventEmitter) {
             frag.loadByP2P = false; //初始化flag
             frag.loadByHTTP = false;
             // console.warn(`load frag level ${frag.level} sn ${frag.sn}`);
+
+            // 音频等非ts文件不使用P2P
+            if ((0, _toolFuns.isBlockType)(frag.url, this.blockTypes)) {
+                logger.debug('HTTP load blockType ' + frag.url);
+                context.frag.loadByHTTP = true;
+                var onSuccess = callbacks.onSuccess;
+                callbacks.onSuccess = function (response, stats, context) {
+                    //在onsucess回调中复制并缓存二进制数据
+                    _this2.fetcher.reportFlow(stats, false);
+                    logger.info('HTTP load time ' + (stats.tload - stats.trequest) + 'ms');
+                    onSuccess(response, stats, context);
+                };
+                return this.xhrLoader.load(context, config, callbacks);
+            }
+
             var segId = this.segmentId(frag.level, frag.sn, frag.url);
             if (this.p2pEnabled && this.bufMgr.hasSegOfId(segId)) {
                 //如果命中缓存
-                logger.debug('bufMgr found seg sn ' + frag.sn + ' url ' + frag.relurl);
+                logger.debug('bufMgr found seg sn ' + frag.sn + ' url ' + frag.url);
                 var seg = this.bufMgr.getSegById(segId);
                 var response = { url: context.url, data: seg.data },
                     trequest = void 0,
@@ -3366,7 +3404,7 @@ var FragLoader = function (_EventEmitter) {
                     _this2.xhrLoader.load(context, config, callbacks);
                     callbacks.onTimeout = onTimeout;
                 };
-                var onSuccess = callbacks.onSuccess;
+                var _onSuccess = callbacks.onSuccess;
                 callbacks.onSuccess = function (response, stats, context) {
                     //在onsucess回调中复制并缓存二进制数据
                     if (!_this2.bufMgr.hasSegOfId(segId)) {
@@ -3376,13 +3414,13 @@ var FragLoader = function (_EventEmitter) {
                     _this2.fetcher.reportFlow(stats, frag.loadByP2P);
                     frag.loaded = stats.loaded;
                     logger.debug((frag.loadByP2P ? 'P2P' : 'HTTP') + ' loaded segment id ' + segId);
-                    onSuccess(response, stats, context);
+                    _onSuccess(response, stats, context);
                 };
             } else {
                 logger.debug('HTTP load ' + frag.relurl + ' at ' + frag.sn + ' level ' + frag.level);
                 context.frag.loadByHTTP = true;
                 this.xhrLoader.load(context, config, callbacks);
-                var _onSuccess = callbacks.onSuccess;
+                var _onSuccess2 = callbacks.onSuccess;
                 callbacks.onSuccess = function (response, stats, context) {
                     //在onsucess回调中复制并缓存二进制数据
                     if (!_this2.bufMgr.hasSegOfId(segId)) {
@@ -3392,7 +3430,7 @@ var FragLoader = function (_EventEmitter) {
                     _this2.fetcher.reportFlow(stats, false);
                     logger.info('HTTP load time ' + (stats.tload - stats.trequest) + 'ms');
                     _this2.scheduler.loadTimeSample = stats.tload - stats.trequest;
-                    _onSuccess(response, stats, context);
+                    _onSuccess2(response, stats, context);
                 };
             }
         }

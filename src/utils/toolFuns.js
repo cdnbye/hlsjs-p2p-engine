@@ -3,6 +3,7 @@ import URLToolkit from 'url-toolkit';
 // 获取segment Id的函数
 export function defaultSegmentId(streamLevel, segmentSn, segmentUrl) {
     return `${streamLevel}-${segmentSn}`
+    // return `${streamLevel}-${segmentUrl}`
 }
 
 /*
@@ -44,4 +45,13 @@ export function getQueryParam(name) {
     var r = window.location.search.substr(1).match(reg);
     if (r != null && r[2] !== '') return r[2].toString();
     return '';
+}
+
+export function isBlockType(url, blackList) {
+    const urlObj = URLToolkit.parseURL(url);
+    const mediaType = urlObj.path.split('.')[1];
+    if (blackList.indexOf(mediaType) !== -1) {
+        return true;
+    }
+    return false;
 }
