@@ -122,9 +122,7 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 - [jwplayer](https://www.jwplayer.com/)
     - See [jwplayer-demo.html](demo/jwplayer-demo.html)
 - [DPlayer](https://github.com/MoePlayer/DPlayer)
-    - See [dplayer-demo.html](demo/dplayer-demo.html)
-- [P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer)
-    - [DPlayer](https://github.com/MoePlayer/DPlayer) with hlsjs-p2p-engine built-in.
+    - See [dplayer-demo.html](demo/dplayer-demo.html) or [P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer) with hlsjs-p2p-engine built-in.
 - [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer)
     - [CKPlayer](http://www.ckplayer.com/) with hlsjs-p2p-engine built-in.
 - [clappr](https://github.com/clappr/clappr)
