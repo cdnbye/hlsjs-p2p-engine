@@ -4,23 +4,28 @@ CDNBye implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC) datachannel to 
 
 To use CDNBye hlsjs-p2p-engine, WebRTC support is required (Chrome, Firefox, Opera, Safari).
 
-#### Install
-```bash
-npm install cdnbye --save
-```
-
-#### Quick Example
+#### Example
 ```javascript
-  var Hls = require('cdnbye');
-  var video = document.getElementById('video');
-  if(Hls.isSupported()) {
-    var hls = new Hls();
-    hls.loadSource('https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8');
-    hls.attachMedia(video);
-    hls.on(Hls.Events.MANIFEST_PARSED,function() {
-      video.play();
-    });
-  }
+<script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
+<video id="video" controls></video>
+<script>
+    if(Hls.isSupported()) {
+        var video = document.getElementById('video');
+        var hls = new Hls({
+            p2pConfig: {
+                logLevel: false,
+            }
+        });
+        hls.loadSource('https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8');
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
+            video.play();
+        });
+        hls.p2pEngine.on('stats', function (stats) {
+            console.log(`totalP2PDownloaded ${stats.totalP2PDownloaded}KB`);
+        });
+    }
+</script>
 ```
 
 ## Use Hls.js wrapped with P2PEngine
