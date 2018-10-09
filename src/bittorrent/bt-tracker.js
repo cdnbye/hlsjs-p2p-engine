@@ -160,7 +160,7 @@ class BTTracker extends EventEmitter {
                 this.scheduler.handshakePeer(datachannel);
 
                 //如果dc数量不够则继续尝试连接
-                const cancel = this.scheduler.peersNum <= 3 ? false : true;
+                const cancel = this.scheduler.peersNum <= 6 ? false : true;
                 this.requestMorePeers(cancel);
 
                 //更新conns
@@ -229,7 +229,7 @@ class BTTracker extends EventEmitter {
 
     _requestMorePeers() {
         // 连接的节点<=3时请求更多节点
-        if (this.scheduler.peersNum <= 3) {
+        if (this.scheduler.peersNum <= 6) {
             this.fetcher.btGetPeers().then(json => {
                 this.logger.info(`request more peers ${JSON.stringify(json)}`);
                 this._handlePeers(json.peers);

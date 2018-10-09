@@ -53,29 +53,13 @@ Hls.js | Yes | Yes | Yes | No | Yes | Yes | Yes
 CDNBye | Yes | Yes | Yes | No | Yes | No | No 
 
 ## 集成
-
-#### 通过script标签集成
-引入已经和hls.js打包的最新版本（推荐）：
+通过script标签引入已经和hls.js打包的最新版本（推荐）：
 ```javascript
 <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
 ```
 或者引入没有与hls.js打包的独立版本：
 ```javascript
 <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
-```
-
-#### 通过NPM安装依赖
-```
-cd yourProject && npm install cdnbye --save
-```
-在项目中通过import/require引入依赖包：
-```javascript
-import Hls from 'cdnbye';   // 打包了hls.js的依赖
-```
-或者
-```javascript
-import Hls from 'hls.js';     // 需要先执行"npm install --save hls.js"
-import P2PEngine from 'cdnbye/dist/hlsjs-p2p-engine';   // 没有打包hls.js的JS库
 ```
 
 ## 使用方法

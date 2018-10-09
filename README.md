@@ -45,30 +45,14 @@ WebRTC | Yes | Yes | Yes | Yes | Yes | No | No
 Hls.js | Yes | Yes | Yes | No | Yes | Yes | Yes
 CDNBye | Yes | Yes | Yes | No | Yes | No | No 
 
-## Installation
-
-#### Pre-built Script
-Include the latest version bundled with hls.js(recommended): 
+## Include
+Include the pre-built script of latest version bundled with hls.js(recommended): 
 ```javascript
 <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
 ```
 Or include the latest version without hls.js:
 ```javascript
 <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
-```
-
-#### Via NPM
-```
-cd yourProject && npm install cdnbye --save
-```
-In your application import/require the package you want to use as the following examples:
-```javascript
-import Hls from 'cdnbye';   // the package with hls.js
-```
-Or 
-```javascript
-import Hls from 'hls.js';     // please run "npm install --save hls.js" first
-import P2PEngine from 'cdnbye/dist/hlsjs-p2p-engine';   // the package without hls.js
 ```
 
 ## Usage
