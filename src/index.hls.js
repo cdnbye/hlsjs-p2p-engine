@@ -10,7 +10,7 @@ if (__IS_HLSJS_LIGHT__) {
 let recommendedHlsjsConfig = {
     maxBufferSize: 0,
     maxBufferLength: 30,
-    liveSyncDuration: 30,
+    liveSyncDurationCount: 10,
     fragLoadingTimeOut: 4000,              // used by fragment-loader
 };
 
@@ -28,7 +28,7 @@ class CDNByeHlsjs extends Hlsjs{
         // let merged = Object.assign({}, recommendedHlsjsConfig, config);
         // console.warn(`merged ${JSON.stringify(merged, null, 2)}`);
 
-        if (config.liveSyncDurationCount) delete recommendedHlsjsConfig.liveSyncDuration;
+        // if (config.liveSyncDurationCount) delete recommendedHlsjsConfig.liveSyncDuration;
 
         let mergedHlsjsConfig = recommendedHlsjsConfig;
         for (let prop in config) {

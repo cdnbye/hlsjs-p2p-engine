@@ -1753,7 +1753,7 @@ if (false) {
 var recommendedHlsjsConfig = {
     maxBufferSize: 0,
     maxBufferLength: 30,
-    liveSyncDuration: 30,
+    liveSyncDurationCount: 10,
     fragLoadingTimeOut: 4000 // used by fragment-loader
 };
 
@@ -1778,12 +1778,14 @@ var CDNByeHlsjs = function (_Hlsjs) {
         // let merged = Object.assign({}, recommendedHlsjsConfig, config);
         // console.warn(`merged ${JSON.stringify(merged, null, 2)}`);
 
-        if (config.liveSyncDurationCount) delete recommendedHlsjsConfig.liveSyncDuration;
+        // if (config.liveSyncDurationCount) delete recommendedHlsjsConfig.liveSyncDuration;
 
         var mergedHlsjsConfig = recommendedHlsjsConfig;
         for (var prop in config) {
             mergedHlsjsConfig[prop] = config[prop];
         }
+
+        console.warn(mergedHlsjsConfig);
 
         var _this = _possibleConstructorReturn(this, (CDNByeHlsjs.__proto__ || Object.getPrototypeOf(CDNByeHlsjs)).call(this, mergedHlsjsConfig));
 
@@ -2419,7 +2421,7 @@ var BTTracker = function (_EventEmitter) {
                 _this5.scheduler.handshakePeer(datachannel);
 
                 //如果dc数量不够则继续尝试连接
-                var cancel = _this5.scheduler.peersNum <= 3 ? false : true;
+                var cancel = _this5.scheduler.peersNum <= 6 ? false : true;
                 _this5.requestMorePeers(cancel);
 
                 //更新conns
@@ -2497,7 +2499,7 @@ var BTTracker = function (_EventEmitter) {
             var _this7 = this;
 
             // 连接的节点<=3时请求更多节点
-            if (this.scheduler.peersNum <= 3) {
+            if (this.scheduler.peersNum <= 6) {
                 this.fetcher.btGetPeers().then(function (json) {
                     _this7.logger.info('request more peers ' + JSON.stringify(json));
                     _this7._handlePeers(json.peers);
