@@ -881,29 +881,29 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         t.destroy(i(e, "ERR_DATA_CHANNEL"));
       };
     }, o.prototype._createOffer = function () {
-      var e = this;e.destroyed || e._pc.createOffer(function (t) {
+      var e = this;e.destroyed || e._pc.createOffer(e.offerConstraints).then(function (t) {
         function n() {
           e.destroyed || (e.trickle || e._iceComplete ? o() : e.once("_iceComplete", o));
         }function r(t) {
           e.destroy(i(t, "ERR_SET_LOCAL_DESCRIPTION"));
         }function o() {
           var n = e._pc.localDescription || t;e.emit("signal", { type: n.type, sdp: n.sdp });
-        }e.destroyed || (t.sdp = e.sdpTransform(t.sdp), e._pc.setLocalDescription(t, n, r));
-      }, function (t) {
+        }e.destroyed || (t.sdp = e.sdpTransform(t.sdp), e._pc.setLocalDescription(t).then(n).catch(r));
+      }).catch(function (t) {
         e.destroy(i(t, "ERR_CREATE_OFFER"));
-      }, e.offerConstraints);
+      });
     }, o.prototype._createAnswer = function () {
-      var e = this;e.destroyed || e._pc.createAnswer(function (t) {
+      var e = this;e.destroyed || e._pc.createAnswer(e.answerConstraints).then(function (t) {
         function n() {
           e.destroyed || (e.trickle || e._iceComplete ? o() : e.once("_iceComplete", o));
         }function r(t) {
           e.destroy(i(t, "ERR_SET_LOCAL_DESCRIPTION"));
         }function o() {
           var n = e._pc.localDescription || t;e.emit("signal", { type: n.type, sdp: n.sdp });
-        }e.destroyed || (t.sdp = e.sdpTransform(t.sdp), e._pc.setLocalDescription(t, n, r));
-      }, function (t) {
+        }e.destroyed || (t.sdp = e.sdpTransform(t.sdp), e._pc.setLocalDescription(t).then(n).catch(r));
+      }).catch(function (t) {
         e.destroy(i(t, "ERR_CREATE_ANSWER"));
-      }, e.answerConstraints);
+      });
     }, o.prototype._onIceStateChange = function () {
       var e = this;if (!e.destroyed) {
         var t = e._pc.iceConnectionState,
@@ -2305,7 +2305,7 @@ var BTTracker = function (_EventEmitter) {
                 _this5.scheduler.handshakePeer(datachannel);
 
                 //如果dc数量不够则继续尝试连接
-                var cancel = _this5.scheduler.peersNum <= 3 ? false : true;
+                var cancel = _this5.scheduler.peersNum <= 6 ? false : true;
                 _this5.requestMorePeers(cancel);
 
                 //更新conns
@@ -2383,7 +2383,7 @@ var BTTracker = function (_EventEmitter) {
             var _this7 = this;
 
             // 连接的节点<=3时请求更多节点
-            if (this.scheduler.peersNum <= 3) {
+            if (this.scheduler.peersNum <= 6) {
                 this.fetcher.btGetPeers().then(function (json) {
                     _this7.logger.info('request more peers ' + JSON.stringify(json));
                     _this7._handlePeers(json.peers);

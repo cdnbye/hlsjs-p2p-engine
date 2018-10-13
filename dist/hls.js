@@ -881,29 +881,29 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         t.destroy(i(e, "ERR_DATA_CHANNEL"));
       };
     }, o.prototype._createOffer = function () {
-      var e = this;e.destroyed || e._pc.createOffer(function (t) {
+      var e = this;e.destroyed || e._pc.createOffer(e.offerConstraints).then(function (t) {
         function n() {
           e.destroyed || (e.trickle || e._iceComplete ? o() : e.once("_iceComplete", o));
         }function r(t) {
           e.destroy(i(t, "ERR_SET_LOCAL_DESCRIPTION"));
         }function o() {
           var n = e._pc.localDescription || t;e.emit("signal", { type: n.type, sdp: n.sdp });
-        }e.destroyed || (t.sdp = e.sdpTransform(t.sdp), e._pc.setLocalDescription(t, n, r));
-      }, function (t) {
+        }e.destroyed || (t.sdp = e.sdpTransform(t.sdp), e._pc.setLocalDescription(t).then(n).catch(r));
+      }).catch(function (t) {
         e.destroy(i(t, "ERR_CREATE_OFFER"));
-      }, e.offerConstraints);
+      });
     }, o.prototype._createAnswer = function () {
-      var e = this;e.destroyed || e._pc.createAnswer(function (t) {
+      var e = this;e.destroyed || e._pc.createAnswer(e.answerConstraints).then(function (t) {
         function n() {
           e.destroyed || (e.trickle || e._iceComplete ? o() : e.once("_iceComplete", o));
         }function r(t) {
           e.destroy(i(t, "ERR_SET_LOCAL_DESCRIPTION"));
         }function o() {
           var n = e._pc.localDescription || t;e.emit("signal", { type: n.type, sdp: n.sdp });
-        }e.destroyed || (t.sdp = e.sdpTransform(t.sdp), e._pc.setLocalDescription(t, n, r));
-      }, function (t) {
+        }e.destroyed || (t.sdp = e.sdpTransform(t.sdp), e._pc.setLocalDescription(t).then(n).catch(r));
+      }).catch(function (t) {
         e.destroy(i(t, "ERR_CREATE_ANSWER"));
-      }, e.answerConstraints);
+      });
     }, o.prototype._onIceStateChange = function () {
       var e = this;if (!e.destroyed) {
         var t = e._pc.iceConnectionState,
@@ -1784,8 +1784,6 @@ var CDNByeHlsjs = function (_Hlsjs) {
         for (var prop in config) {
             mergedHlsjsConfig[prop] = config[prop];
         }
-
-        console.warn(mergedHlsjsConfig);
 
         var _this = _possibleConstructorReturn(this, (CDNByeHlsjs.__proto__ || Object.getPrototypeOf(CDNByeHlsjs)).call(this, mergedHlsjsConfig));
 

@@ -84,7 +84,7 @@ var hls = new Hls(hlsjsConfig);
 var hlsjsConfig = {
     maxBufferSize: 0,       // Highly recommended setting
     maxBufferLength: 30,    // Highly recommended setting
-    liveSyncDuration: 30    // Highly recommended setting
+    liveSyncDurationCount: 10,    // Highly recommended setting
 };
 
 var p2pConfig = {
