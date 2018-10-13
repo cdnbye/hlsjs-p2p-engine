@@ -59,7 +59,7 @@ If `opts` is specified, then the default options (shown below) will be overridde
 | `wsMaxRetries` | number | 3 | The maximum number of reconnection attempts that will be made by websocket before giving up.
 | `wsReconnectInterval` | number | 5 | The number of seconds to delay before attempting to reconnect by websocket.
 | `loadTimeout` | number | 3 | Timeout to download a segment from a peer, if exceeded the segment is dropped.
-| `maxBufSize` | number | 1024 * 1024 * 50 | The max size of binary data that can be stored in the cache.
+| `maxBufferSize` | Object | {"pc": 1024*1024*100, "mobile": 1024*1024*50} | The max size of binary data that can be stored in the cache, property of mobile is not working for now.
 | `p2pEnabled` | boolean | true | Enable or disable p2p engine.
 | `channelId` | function | - | Pass a function to generate channel Id.(See advanced usage)
 | `segmentId` | function | - | Pass a function to generate segment Id.(See advanced usage)

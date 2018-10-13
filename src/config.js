@@ -15,7 +15,11 @@ let defaultP2PConfig = {
     dcTolerance: 5,                             // 请求超时或错误多少次淘汰该peer
 
     packetSize: 64*1024,                        // 每次通过datachannel发送的包的大小
-    maxBufSize: 1024*1024*50,                   // p2p缓存的最大数据量
+    maxBufSize: 1024*1024*50,                   // p2p缓存的最大数据量（废弃）
+    maxBufferSize: {                            // p2p缓存的最大数据量（分为PC和移动端）
+        pc: 1024*1024*100,                      // PC端缓存大小
+        mobile: 1024*1024*50,                   // 移动端缓存大小(暂未实现)
+    },
     loadTimeout: 3.5,                             // p2p下载的超时时间
 
     enableLogUpload: false,                      // 上传log到服务器，默认false

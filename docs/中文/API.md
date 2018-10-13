@@ -59,7 +59,7 @@ if (Hls.WEBRTC_SUPPORT) {
 | `wsMaxRetries` | number | 3 |websocket连接重试次数。
 | `wsReconnectInterval` | number | 5 | websocket重连时间间隔。
 | `loadTimeout` | number | 3 | p2p下载的超时时间。
-| `maxBufSize` | number | 1024 * 1024 * 50 | p2p缓存的最大数据量。
+| `maxBufferSize` | Object | {"pc": 1024*1024*100, "mobile": 1024*1024*50} | p2p缓存的最大数据量，mobile字段暂未实现。
 | `p2pEnabled` | boolean | true | 是否开启P2P。
 | `channelId` | function | - | 标识channel的字段，同一个channel的用户可以共享数据。（参考高级用法）
 | `segmentId` | function | - | 标识ts文件的字段，防止相同ts文件具有不同的路径。（参考高级用法）
