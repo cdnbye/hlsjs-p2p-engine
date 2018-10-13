@@ -58,6 +58,11 @@ class BTTracker extends EventEmitter {
             this.engine.emit('peerId', this.peerId);
         }).catch(err => {
             console.warn(err);
+            if (this.fetcher.announceCount <= this.fetcher.announceMaxRetries) {
+                window.setTimeout(() => {
+                    this.resumeP2P();
+                }, 30000);
+            }
         })
     }
 

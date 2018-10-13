@@ -133,8 +133,8 @@ To communicate with another peer you simply need to exchange contact information
     - [gosignaler](https://github.com/cdnbye/gosignaler) (written by Golang)
     - [php-signaler](https://github.com/cdnbye/php-signaler) (written by PHP)
 - Use free Signaling Server
-    - 'wss://signal.cdnbye.com/wss' (provided by cdnbye, sometimes overloaded, not recommended)
-    - 'wss://free.freesignal.net' (contributed by freesignal.net, recommended)
+    - 'wss://signal.cdnbye.com/wss' (default signaling server)
+    - 'wss://free.freesignal.net' (contributed by freesignal.net)
 
 ## They are using CDNBye
 [<img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531253035445&di=7af6cc9ad4abe3d06ba376af22d85131&imgtype=0&src=http%3A%2F%2Fimg.kuai8.com%2Fattaches%2Fintro%2F1213%2F201612131436417407.png" width="120">](http://egame.qq.com/)
