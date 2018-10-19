@@ -707,7 +707,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } }, { key: "receiveSignal", value: function value(e) {
           this._datachannel.signal(e);
         } }, { key: "destroy", value: function value() {
-          this.logger.warn("destroy datachannel " + this.channelId), window.clearInterval(this.adjustSRInterval), window.clearInterval(this.statser);var e = { event: _.default.DC_CLOSE };this.sendJson(e), this._datachannel.removeAllListeners(), this.removeAllListeners(), this._datachannel.destroy();
+          this.logger.warn("destroy datachannel " + this.channelId), window.clearInterval(this.adjustSRInterval), window.clearInterval(this.statser), this.connTimeout && window.clearTimeout(this.connTimeout);var e = { event: _.default.DC_CLOSE };this.sendJson(e), this._datachannel.removeAllListeners(), this.removeAllListeners(), this._datachannel.destroy();
         } }, { key: "_handleRequestMsg", value: function value(e) {
           this.rcvdReqQueue.length > 0 ? e.urgent ? this.rcvdReqQueue.push(e.sn) : this.rcvdReqQueue.unshift(e.sn) : this.emit(_.default.DC_REQUEST, e);
         } }, { key: "_handlePieceAck", value: function value() {
@@ -1101,12 +1101,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         return _(g(e));
       }function w(e) {
         return v(m(e));
-      }function C(e, t) {
-        return y(g(e), g(t));
       }function b(e, t) {
-        return v(C(e, t));
+        return y(g(e), g(t));
+      }function C(e, t) {
+        return v(b(e, t));
       }function E(e, t, n) {
-        return t ? n ? C(t, e) : b(t, e) : n ? m(e) : w(e);
+        return t ? n ? b(t, e) : C(t, e) : n ? m(e) : w(e);
       }void 0 !== (r = function () {
         return E;
       }.call(t, n, t, e)) && (e.exports = r);
@@ -1139,7 +1139,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     }(),
         a = function () {
       function e(t, n, i, a, s) {
-        r(this, e), this.engine = t, this.key = n, this.baseUrl = a, this.channelId = window.btoa(i), this.timestamp = Date.parse(new Date()) / 1e3, this.announceInfo = o({}, s, { channel: this.channelId, ts: this.timestamp }), this.announceURL = a + "/channel", this.key = n, this.announceMaxRetries = 3, this.announceCount = 0, this.conns = 0, this.failConns = 0, this.totalHTTPDownloaded = 0, this.totalP2PDownloaded = 0, this.totalP2PUploaded = 0, this.httpDownloaded = 0, this.p2pDownloaded = 0, this.errsFragLoad = 0, this.errsBufStalled = 0, this.errsInternalExpt = 0;
+        r(this, e), this.engine = t, this.key = n, this.baseUrl = a, this.channelId = window.btoa(i), this.timestamp = Date.parse(new Date()) / 1e3, this.announceInfo = o({}, s, { channel: this.channelId, ts: this.timestamp }), this.announceURL = a + "/channel", this.key = n, this.conns = 0, this.failConns = 0, this.totalHTTPDownloaded = 0, this.totalP2PDownloaded = 0, this.totalP2PUploaded = 0, this.httpDownloaded = 0, this.p2pDownloaded = 0, this.errsBufStalled = 0, this.errsInternalExpt = 0;
       }return i(e, [{ key: "btAnnounce", value: function value() {
           var e = this,
               t = this.engine.logger;return new Promise(function (n, r) {
@@ -1147,10 +1147,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
               return e.json();
             }).then(function (t) {
               if (-1 === t.ret) r(t.data.msg);else {
-                var o = t.data;o.info && console.info("" + o.info), o.warn && console.warn("" + o.warn), e.peerId = e.id = o.id, e.v = o.v, e.btStats(o.report_interval), e.getPeersURL = e.baseUrl + "/channel/" + e.channelId + "/node/" + e.peerId + "/peers", e.statsURL = e.baseUrl + "/channel/" + e.channelId + "/node/" + e.peerId + "/stats", n(t.data);
+                var o = t.data;o.rejected = !0, o.info && console.info("" + o.info), o.warn && console.warn("" + o.warn), o.rejected ? e.engine.p2pEnabled = !1 : (e.peerId = e.id = o.id, e.v = o.v, e.btStats(o.report_interval), e.getPeersURL = e.baseUrl + "/channel/" + e.channelId + "/node/" + e.peerId + "/peers", e.statsURL = e.baseUrl + "/channel/" + e.channelId + "/node/" + e.peerId + "/stats", n(t.data));
               }
-            }).catch(function (n) {
-              t.error("btAnnounce error " + n), e.announceCount++, r(n);
+            }).catch(function (e) {
+              t.error("btAnnounce error " + e), r(e);
             });
           });
         } }, { key: "btStats", value: function value() {
@@ -1158,7 +1158,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
               t = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : 10,
               n = this.engine.logger;this.heartbeater = window.setInterval(function () {
             fetch(e.statsURL, { headers: e._requestHeader, method: "POST", body: JSON.stringify(e._makeStatsBody()) }).then(function (t) {
-              t.ok && (n.info("sucessfully report stats"), e.httpDownloaded = 0, e.p2pDownloaded = 0, e.conns = 0, e.failConns = 0, e.errsFragLoad = 0, e.errsBufStalled = 0, e.errsInternalExpt = 0);
+              t.ok && (n.info("sucessfully report stats"), e.httpDownloaded = 0, e.p2pDownloaded = 0, e.conns = 0, e.failConns = 0, e.errsBufStalled = 0, e.errsInternalExpt = 0);
             }).catch(function (e) {
               n.error("btStats error " + e);
             });
@@ -1190,7 +1190,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } }, { key: "_emitStats", value: function value() {
           this.engine.emit("stats", { totalHTTPDownloaded: this.totalHTTPDownloaded, totalP2PDownloaded: this.totalP2PDownloaded, totalP2PUploaded: this.totalP2PUploaded });
         } }, { key: "_makeStatsBody", value: function value() {
-          var e = { conns: this.conns, failConns: this.failConns, errsFragLoad: this.errsFragLoad, errsBufStalled: this.errsBufStalled, errsInternalExpt: this.errsInternalExpt, http: Math.round(this.httpDownloaded), p2p: Math.round(this.p2pDownloaded) };return Object.keys(e).forEach(function (t) {
+          var e = { conns: this.conns, failConns: this.failConns, errsBufStalled: this.errsBufStalled, errsInternalExpt: this.errsInternalExpt, http: Math.round(this.httpDownloaded), p2p: Math.round(this.p2pDownloaded) };return Object.keys(e).forEach(function (t) {
             0 === e[t] && delete e[t];
           }), e;
         } }, { key: "_requestHeader", get: function get() {
@@ -1925,13 +1925,15 @@ var P2PEngine = function (_EventEmitter) {
 
             var isLive = data.details.live;
             _this.config.live = isLive;
+            var channelAlias = _this.config.channelAlias;
             // 浏览器信息
             _this.browserInfo = {
                 device: _platform2.default.getPlatform(),
-                netType: _platform2.default.getNetType(),
+                netType: _platform2.default.getNetType() || undefined,
                 version: P2PEngine.version,
                 tag: _this.config.tag || _this.hlsjs.constructor.version,
-                live: isLive
+                live: isLive,
+                channelAlias: channelAlias
             };
             var signalId = _urlToolkit2.default.parseURL(_this.config.wsSignalerAddr).netLoc.substr(2);
             _this.channel = _this.config.channelId(hlsjs.url, _this.browserInfo) + '|' + signalId + '[' + _core.DataChannel.VERSION + ']';
@@ -2054,10 +2056,6 @@ var P2PEngine = function (_EventEmitter) {
                 logger.error('errorType ' + data.type + ' details ' + data.details + ' errorFatal ' + data.fatal);
                 var errDetails = _this2.hlsjs.constructor.ErrorDetails;
                 switch (data.details) {
-                    case errDetails.FRAG_LOAD_ERROR:
-                    case errDetails.FRAG_LOAD_TIMEOUT:
-                        _this2.fetcher.errsFragLoad++;
-                        break;
                     case errDetails.BUFFER_STALLED_ERROR:
                         _this2.fetcher.errsBufStalled++;
                         break;
@@ -2173,9 +2171,10 @@ var defaultP2PConfig = _extends({
     logUploadLevel: 'warn', // log上传level，分为debug、info、warn、error、none，默认warn
     logLevel: 'none', // log的level，分为debug、info、warn、error、none，设为true等于debug，设为false等于none，默认none
 
-    tag: '', // 用户自定义标签，可用于在后台查看参数调整效果
+    tag: '', // 用户自定义标签，默认为hlsjs版本号
 
     channelId: null, // 标识channel的字段，默认是'[path]-[protocol version]'
+    channelAlias: undefined, // 频道别名，用于在后台OMS识别该频道
     segmentId: null, // 标识ts文件的字段，默认是'[level]-[sn]'
 
     webRTCConfig: {}, // 传入channelConfig用于createDataChannel，config用于RTCPeerConnection
@@ -2268,11 +2267,6 @@ var BTTracker = function (_EventEmitter) {
                 _this2.engine.emit('peerId', _this2.peerId);
             }).catch(function (err) {
                 console.warn(err);
-                if (_this2.fetcher.announceCount <= _this2.fetcher.announceMaxRetries) {
-                    window.setTimeout(function () {
-                        _this2.resumeP2P();
-                    }, 30000);
-                }
             });
         }
     }, {

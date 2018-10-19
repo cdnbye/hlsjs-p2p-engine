@@ -46,10 +46,11 @@ class P2PEngine extends EventEmitter {
             // 浏览器信息
             this.browserInfo = {
                 device: platform.getPlatform(),
-                netType: platform.getNetType(),
+                netType: platform.getNetType() || undefined,
                 version: P2PEngine.version,
                 tag: this.config.tag || this.hlsjs.constructor.version,
                 live: isLive,
+                channelAlias: this.config.channelAlias || undefined,
             };
             const signalId = URLToolkit.parseURL(this.config.wsSignalerAddr).netLoc.substr(2);
             this.channel = `${this.config.channelId(hlsjs.url, this.browserInfo)}|${signalId}[${DataChannel.VERSION}]`;
@@ -169,10 +170,6 @@ class P2PEngine extends EventEmitter {
             logger.error(`errorType ${data.type} details ${data.details} errorFatal ${data.fatal}`);
             const errDetails = this.hlsjs.constructor.ErrorDetails;
             switch (data.details) {
-                case errDetails.FRAG_LOAD_ERROR:
-                case errDetails.FRAG_LOAD_TIMEOUT:
-                    this.fetcher.errsFragLoad ++;
-                    break;
                 case errDetails.BUFFER_STALLED_ERROR:
                     this.fetcher.errsBufStalled ++;
                     break;

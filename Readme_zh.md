@@ -143,10 +143,12 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
     - 'wss://signal.cdnbye.com/wss'（本插件默认信令地址）
     - 'wss://free.freesignal.net'（由freesignal.net提供的免费版本）
 
+<!--
 ## 用户案例
 [<img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531253035445&di=7af6cc9ad4abe3d06ba376af22d85131&imgtype=0&src=http%3A%2F%2Fimg.kuai8.com%2Fattaches%2Fintro%2F1213%2F201612131436417407.png" width="120">](http://egame.qq.com/)
 
 如果您也在使用这个开源项目，欢迎通过pull request提交您网站的logo和网址
+-->
 
 ## 设计&原理
 参见 [设计.md](docs/中文/设计.md)

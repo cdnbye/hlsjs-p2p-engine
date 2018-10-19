@@ -27,9 +27,10 @@ let defaultP2PConfig = {
     logUploadLevel: 'warn',                      // log上传level，分为debug、info、warn、error、none，默认warn
     logLevel: 'none',                            // log的level，分为debug、info、warn、error、none，设为true等于debug，设为false等于none，默认none
 
-    tag: '',                                     // 用户自定义标签，可用于在后台查看参数调整效果
+    tag: '',                                     // 用户自定义标签，默认为hlsjs版本号
 
     channelId: null,                             // 标识channel的字段，默认是'[path]-[protocol version]'
+    channelAlias: undefined,                            // 频道别名，用于在后台OMS识别该频道
     segmentId: null,                             // 标识ts文件的字段，默认是'[level]-[sn]'
 
     webRTCConfig: {},                            // 传入channelConfig用于createDataChannel，config用于RTCPeerConnection
