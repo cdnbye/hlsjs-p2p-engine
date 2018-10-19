@@ -10,3 +10,5 @@
 /demo/test-quick-start.html
 /demo/test-API.html
 /demo/test-tcplayer.html
+/dist/hls.js
+/dist/hlsjs-p2p-engine.js
