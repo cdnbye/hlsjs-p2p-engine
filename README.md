@@ -129,12 +129,12 @@ See [API.md](docs/English/API.md)
 
 ## Signaling Server
 To communicate with another peer you simply need to exchange contact information and the rest will be done by WebRTC. The process of connecting to the other peers is also known as signaling.
-- Deploy your own Signaling Server (recommended)
+- Deploy your own Signaling Server (Recommended)
     - [gosignaler](https://github.com/cdnbye/gosignaler) (written by Golang)
     - [php-signaler](https://github.com/cdnbye/php-signaler) (written by PHP)
 - Use free Signaling Server
-    - 'wss://signal.cdnbye.com/wss' (default signaling server)
-    - 'wss://free.freesignal.net' (contributed by freesignal.net)
+    - 'wss://signal.cdnbye.com/wss' (Default signaling server)
+    - 'wss://free.freesignal.net' (Contributed by freesignal.net)
 
 <!--
 ## They are using CDNBye

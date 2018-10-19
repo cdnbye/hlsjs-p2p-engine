@@ -65,6 +65,7 @@ If `opts` is specified, then the default options (shown below) will be overridde
 | `segmentId` | function | - | Pass a function to generate segment Id.(See advanced usage)
 | `packetSize` | number | 64 * 1024 | The maximum package size sent by datachannel, 64KB should work with most of recent browsers. Set it to 16KB for older browsers support.
 | `webRTCConfig` | Object | {} | A [Configuration dictionary](https://github.com/feross/simple-peer) providing options to configure WebRTC connections.
+| `channelAlias` | string | '' | Alias for channel, which is used in CDNBye OMS. 
 
 ## P2PEngine API
 
