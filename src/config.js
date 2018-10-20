@@ -34,6 +34,8 @@ let defaultP2PConfig = {
 
     p2pBlackList: ['aac', 'mp3'],                // 不参与P2P的文件类型，防止报错
 
+    agent: '',
+
     ...btConfig
 };
 
