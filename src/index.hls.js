@@ -25,11 +25,6 @@ class CDNByeHlsjs extends Hlsjs{
         let p2pConfig = config.p2pConfig || {};
         delete config.p2pConfig;
 
-        // let merged = Object.assign({}, recommendedHlsjsConfig, config);
-        // console.warn(`merged ${JSON.stringify(merged, null, 2)}`);
-
-        // if (config.liveSyncDurationCount) delete recommendedHlsjsConfig.liveSyncDuration;
-
         let mergedHlsjsConfig = recommendedHlsjsConfig;
         for (let prop in config) {
             mergedHlsjsConfig[prop] = config[prop];

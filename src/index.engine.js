@@ -36,9 +36,6 @@ class P2PEngine extends EventEmitter {
 
         this.HLSEvents = hlsjs.constructor.Events;
 
-        // 如果tsStrictMatched=false，需要自动检查不同ts路径是否相同
-        // this.checkTSPath = this.config.tsStrictMatched ? noop : tsPathChecker();
-
         const onLevelLoaded = (event, data) => {
 
             const isLive = data.details.live;
@@ -51,6 +48,7 @@ class P2PEngine extends EventEmitter {
                 tag: this.config.tag || this.hlsjs.constructor.version,
                 live: isLive,
                 channelAlias: this.config.channelAlias || undefined,
+                agent: this.config.agent || undefined,
             };
             const signalId = URLToolkit.parseURL(this.config.wsSignalerAddr).netLoc.substr(2);
             this.channel = `${this.config.channelId(hlsjs.url, this.browserInfo)}|${signalId}[${DataChannel.VERSION}]`;
@@ -157,7 +155,6 @@ class P2PEngine extends EventEmitter {
         });
 
         this.hlsjs.on(this.HLSEvents.FRAG_CHANGED, (id, data) => {
-            // log('FRAG_CHANGED: '+JSON.stringify(data.frag, null, 2));
             if (!isBlockType(data.frag.url, this.config.p2pBlackList)) {
                 logger.debug('frag changed: '+data.frag.sn);
                 const sn = data.frag.sn;
@@ -180,10 +177,6 @@ class P2PEngine extends EventEmitter {
             }
         });
 
-        // this.hlsjs.on(this.HLSEvents.DESTROYING, () => {
-        //     logger.warn('destroying hlsjs');
-        //     this.destroy();
-        // });
     }
 
     disableP2P() {                                              //停止p2p

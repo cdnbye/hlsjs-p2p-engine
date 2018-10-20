@@ -73,7 +73,6 @@ class FragLoader extends EventEmitter {
                 this.fetcher.reportFlow(stats, true);
                 callbacks.onSuccess(response, stats, context);
             }, 50)
-        // } else if (this.scheduler.hasIdlePeers && this.scheduler.peersHasSN(frag.sn)) {                             //如果在peers的bitmap中找到
         } else if (this.p2pEnabled && this.scheduler.hasAndSetTargetPeer(frag.sn)) {                             //如果在peers的bitmap中找到
             context.frag.loadByP2P = true;
             this.scheduler.load(context, config, callbacks);
@@ -88,7 +87,6 @@ class FragLoader extends EventEmitter {
             const onSuccess = callbacks.onSuccess;
             callbacks.onSuccess = (response, stats, context) => {                       //在onsucess回调中复制并缓存二进制数据
                 if (!this.bufMgr.hasSegOfId(segId)) {
-                    // this.bufMgr.copyAndAddBuffer(response.data, frag.sn, segId, frag.fromPeerId || this.fetcher.peerId);
                     this.bufMgr.handleFrag(frag.sn, frag.level, segId, response.data, frag.fromPeerId || this.fetcher.peerId, true);
                 }
                 this.fetcher.reportFlow(stats, frag.loadByP2P);
@@ -103,7 +101,6 @@ class FragLoader extends EventEmitter {
             const onSuccess = callbacks.onSuccess;
             callbacks.onSuccess = (response, stats, context) => {                       //在onsucess回调中复制并缓存二进制数据
                 if (!this.bufMgr.hasSegOfId(segId)) {
-                    // this.bufMgr.copyAndAddBuffer(response.data, frag.sn, segId, this.fetcher.peerId);
                     this.bufMgr.handleFrag(frag.sn, frag.level, segId, response.data, this.fetcher.peerId, true);
                 }
                 this.fetcher.reportFlow(stats, false);
@@ -113,8 +110,6 @@ class FragLoader extends EventEmitter {
             };
         }
     }
-
-
 }
 
 

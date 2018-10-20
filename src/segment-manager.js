@@ -56,36 +56,6 @@ class BufferManager extends EventEmitter {
         this.sn2Id.set(sn, segment.segId);
     }
 
-    // copyAndAddBuffer(data, sn, segId, fromPeerId = '') {                                       //先复制再缓存
-    //     let payloadBuf = Buffer.from(data);
-    //     let byteLength = payloadBuf.byteLength;
-    //     let targetBuffer = new Buffer(byteLength);
-    //     payloadBuf.copy(targetBuffer);
-    //
-    //     let segment = {
-    //         sn,
-    //         segId,
-    //         data: targetBuffer,
-    //         size: byteLength,
-    //         fromPeerId
-    //     };
-    //
-    //     this._addSeg(segment);
-    //     this.sn2Id.set(sn, segment.segId);
-    // }
-    //
-    // addBuffer(sn, segId, buf, fromPeerId = '', copy = false) {                                             //直接缓存
-    //     let segment = {
-    //         sn,
-    //         segId,
-    //         data: buf,
-    //         size: buf.byteLength,
-    //         fromPeerId
-    //     };
-    //     this._addSeg(segment);
-    //     this.sn2Id.set(sn, segment.segId);
-    // }
-
     _addSeg(seg) {
         const { logger } = this.engine;
         this._segPool.set(seg.segId, seg);
