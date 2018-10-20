@@ -9,7 +9,7 @@ if (__IS_HLSJS_LIGHT__) {
 
 let recommendedHlsjsConfig = {
     maxBufferSize: 0,
-    maxBufferLength: 30,
+    maxBufferLength: 8,
     liveSyncDurationCount: 10,
     fragLoadingTimeOut: 4000,              // used by fragment-loader
 };

@@ -185,9 +185,11 @@ class BTTracker extends EventEmitter {
                     if (this.failedDCSet.has(msg.from_peer_id)) return;
                     this.logger.debug(`handle signal of ${msg.from_peer_id}`);
                     if (!msg.data) {                                             //如果对等端已不在线
+                        this.logger.info(`signaling ${msg.from_peer_id} not found`);
+                        const datachannel = this.DCMap.get(msg.from_peer_id);
+                        datachannel.destroy();
                         this.DCMap.delete(msg.from_peer_id);
                         this.failedDCSet.add(msg.from_peer_id);              //记录失败的连接
-                        this.logger.info(`signaling ${msg.from_peer_id} not found`);
                     } else {
                         this._handleSignal(msg.from_peer_id, msg.data);
                     }

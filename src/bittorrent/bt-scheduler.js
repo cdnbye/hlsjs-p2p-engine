@@ -159,13 +159,14 @@ class BTScheduler extends EventEmitter {
         const { logger } = this.engine;
         this.context = context;
         const frag = context.frag;
+        // console.warn(`loadTimeout ${this.config.loadTimeoutRate * frag.duration * 1000}`);
         const segId = this.config.segmentId(frag.level, frag.sn, frag.url);
         this.callbacks = callbacks;
         this.stats = {trequest: performance.now(), retry: 0, tfirst: 0, tload: 0, loaded: 0};
         this.criticalSeg = {sn: frag.sn, segId};
         this.targetPeer.requestDataById(segId, true);
         logger.info(`request criticalSeg segId ${segId} at ${frag.sn}`);
-        this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeout*1000);
+        this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeoutRate * frag.duration * 1000);
     }
 
     get hasPeers() {
@@ -289,11 +290,11 @@ class BTScheduler extends EventEmitter {
                 }
             })
             .on(Events.DC_TIMEOUT, () => {
-                logger.warn(`DC_TIMEOUT`);
-                if (this.criticaltimeouter) {
-                    window.clearTimeout(this.criticaltimeouter);                             //清除定时器
-                    this._criticaltimeout();
-                }
+                // logger.warn(`DC_TIMEOUT`);
+                // if (this.criticaltimeouter) {
+                //     window.clearTimeout(this.criticaltimeouter);                             //清除定时器
+                //     this._criticaltimeout();
+                // }
             })
     }
 

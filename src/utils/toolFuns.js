@@ -17,25 +17,6 @@ export function defaultChannelId(url, browserInfo = {}) {
     return `${streamId}`;
 }
 
-// deprecated
-// export function tsPathChecker() {
-//     let lastSN = -1;
-//     let lastPath = '';
-//     return function (sn, path) {
-//         path = path.split('?')[0];
-//         let isOK = true;
-//         if (lastSN !== sn && lastPath === path) {
-//             isOK = false;
-//         }
-//         // if (lastSN !== sn && lastPath === path) {
-//         //     console.warn(`path of ${sn} equal to path of ${lastSN}`);
-//         // }
-//         lastSN = sn;
-//         lastPath = path;
-//         return isOK;
-//     }
-// }
-
 export function noop() {
     return true;
 }
