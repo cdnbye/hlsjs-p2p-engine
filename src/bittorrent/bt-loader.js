@@ -37,9 +37,6 @@ class FragLoader extends EventEmitter {
         const { logger } = this;
         const frag = context.frag;
         // console.warn(`frag.duration: ${frag.duration}`);
-        // 获取ts的正确相对路径 obtain the correct path. Issue: https://github.com/cdnbye/hlsjs-p2p-engine/issues/9
-        // const urlObj = URLToolkit.parseURL(frag.url);
-        // frag.relurl = urlObj.path + urlObj.query;
         frag.loadByP2P = false;                //初始化flag
         frag.loadByHTTP = false;
         // console.warn(`load frag level ${frag.level} sn ${frag.sn}`);

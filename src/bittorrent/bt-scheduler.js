@@ -16,7 +16,7 @@ class BTScheduler extends EventEmitter {
         this.targetPeer = null;               // 当前的目标peer
 
         // 传输控制(单位s)
-        this.lastFragDuration = 0;
+        this.lastFragDuration = 3;            // 默认3秒
 
         this._setupEngine();
     }
@@ -164,7 +164,9 @@ class BTScheduler extends EventEmitter {
         this.criticalSeg = {sn: frag.sn, segId};
         this.targetPeer.requestDataById(segId, true);
         logger.info(`request criticalSeg segId ${segId} at ${frag.sn}`);
-        this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), this.config.loadTimeoutRate * frag.duration * 1000);
+        const loadTimeout = this.config.loadTimeoutRate * this.lastFragDuration;
+        // console.warn(`lastFragDuration ${this.lastFragDuration} loadTimeout ${loadTimeout} current frag duration ${frag.duration}`);
+        this.criticaltimeouter = window.setTimeout(this._criticaltimeout.bind(this), loadTimeout * 1000);
     }
 
     get hasPeers() {

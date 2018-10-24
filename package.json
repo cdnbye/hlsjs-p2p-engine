@@ -1,6 +1,6 @@
 {
   "name": "cdnbye",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A Free and Infinitely Scalable Video P2P Engine.",
   "main": "./dist/hls.min.js",
   "scripts": {

@@ -27,7 +27,15 @@
         autoplay: true,
         live: false,
         width: '480',
-        height: '320'
+        height: '320',
+        hlsConfig: {
+            debug: true,
+            // Other hlsjsConfig options provided by hls.js
+            p2pConfig: {
+                tag: 'tcplayer',
+                // Other p2pConfig options provided by CDNBye
+            }
+        }
     };
     var player = new TcPlayer('video-container', options);
     window.qcplayer = player;
