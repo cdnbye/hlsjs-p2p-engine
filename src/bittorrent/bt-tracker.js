@@ -23,6 +23,7 @@ class BTTracker extends EventEmitter {
         peers: Array<Object{id:string}>
          */
         this.peers = [];
+        this.minConns = 0;
 
         // 防止调用频率过高
         this.requestMorePeers = getPeersThrottle(this._requestMorePeers, this);
@@ -52,7 +53,7 @@ class BTTracker extends EventEmitter {
         this.fetcher.btAnnounce().then(json => {
             this.logger.info(`announce request response ${JSON.stringify(json)}`)
             this.engine.peerId = this.peerId = json.id;
-            this.logger.identifier = this.peerId;
+            this.minConns = json.min_conns;
             this.signalerWs = this._initSignalerWs();                         //连上tracker后开始连接信令服务器
             this._handlePeers(json.peers);
             this.engine.emit('peerId', this.peerId);
@@ -158,9 +159,8 @@ class BTTracker extends EventEmitter {
             .once(Events.DC_OPEN, () => {
 
                 this.scheduler.handshakePeer(datachannel);
-
                 //如果dc数量不够则继续尝试连接
-                const cancel = this.scheduler.peersNum <= 6 ? false : true;
+                const cancel = this.scheduler.peersNum <= this.minConns ? false : true;
                 this.requestMorePeers(cancel);
 
                 //更新conns
@@ -231,7 +231,7 @@ class BTTracker extends EventEmitter {
 
     _requestMorePeers() {
         // 连接的节点<=3时请求更多节点
-        if (this.scheduler.peersNum <= 6) {
+        if (this.scheduler.peersNum <= this.minConns) {
             this.fetcher.btGetPeers().then(json => {
                 this.logger.info(`request more peers ${JSON.stringify(json)}`);
                 this._handlePeers(json.peers);
