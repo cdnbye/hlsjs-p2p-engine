@@ -31,24 +31,6 @@ class BTTracker extends EventEmitter {
         // this._setupScheduler(this.scheduler);
     }
 
-    set currentPlaySN(sn) {
-        // console.warn(`currentPlaySN ${sn} ${performance.now()}`);
-        if (!this.config.p2pEnabled) return;
-        this.scheduler.updatePlaySN(sn);
-    }
-
-    set currentLoadingSN(sn) {
-        // console.warn(`currentLoadingSN ${sn} ${performance.now()}`);
-        if (!this.config.p2pEnabled) return;
-        this.scheduler.updateLoadingSN(sn);
-    }
-
-    set currentLoadedSN(sn) {
-        // console.warn(`currentLoadedSN ${sn} ${performance.now()}`);
-        if (!this.config.p2pEnabled) return;
-        this.scheduler.updateLoadedSN(sn);                        //更新bitmap
-    }
-
     resumeP2P() {
         this.fetcher.btAnnounce().then(json => {
             this.logger.info(`announce request response ${JSON.stringify(json)}`)

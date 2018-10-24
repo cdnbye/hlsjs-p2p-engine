@@ -109,6 +109,10 @@ class FragLoader extends EventEmitter {
                 onSuccess(response,stats,context);
             };
         }
+
+        if (this.p2pEnabled) {
+            this.scheduler.nextFragLoadTime = frag.duration;
+        }
     }
 }
 

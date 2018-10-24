@@ -15,8 +15,10 @@ class BTScheduler extends EventEmitter {
 
         this.targetPeer = null;               // 当前的目标peer
 
-        // 传输控制(单位ms)
+        // 传输控制(单位s)
+        this.lastFragDuration = 0;
 
+        this._setupEngine();
     }
 
     updateLoadedSN(sn) {
@@ -29,10 +31,6 @@ class BTScheduler extends EventEmitter {
             sn: sn
         };
         this._broadcastToPeers(msg);
-    }
-
-    updateLoadingSN(sn) {                                                           //防止下载hls.js正在下载的sn
-        this.loadingSN = sn;
     }
 
     updatePlaySN(sn) {
@@ -196,6 +194,11 @@ class BTScheduler extends EventEmitter {
         })
     }
 
+    set nextFragLoadTime(val) {
+        this.lastFragDuration = val;
+        // console.warn(`lastFragDuration ${this.lastFragDuration}`);
+    }
+
     destroy() {
         const { logger } = this.engine;
         if (this.peersNum > 0) {
@@ -295,6 +298,18 @@ class BTScheduler extends EventEmitter {
                 //     window.clearTimeout(this.criticaltimeouter);                             //清除定时器
                 //     this._criticaltimeout();
                 // }
+            })
+    }
+
+    _setupEngine(){
+        this.engine.on(Events.FRAG_LOADING, (sn) => {
+            this.loadingSN = sn;
+        })
+            .on(Events.FRAG_LOADED, (sn) => {
+                this.updateLoadedSN(sn);
+            })
+            .on(Events.FRAG_CHANGED, (sn) => {
+                this.updatePlaySN(sn);
             })
     }
 

@@ -106,9 +106,10 @@ class P2PEngine extends EventEmitter {
 
         this.hlsjs.on(this.HLSEvents.FRAG_LOADING, (id, data) => {
             // log('FRAG_LOADING: ' + JSON.stringify(data.frag));
+            let sn = data.frag.sn;
             if (!isBlockType(data.frag.url, this.config.p2pBlackList)) {
-                logger.debug('loading frag ' + data.frag.sn);
-                this.tracker.currentLoadingSN = data.frag.sn;
+                logger.debug('loading frag ' + sn);
+                this.emit(Events.FRAG_LOADING, sn);
             }
         });
 
@@ -117,7 +118,7 @@ class P2PEngine extends EventEmitter {
             let sn = data.frag.sn;
             if (!isBlockType(data.frag.url, this.config.p2pBlackList)) {
                 this.hlsjs.config.currLoaded = sn;
-                this.tracker.currentLoadedSN = sn;                                //用于BT算法
+                this.emit(Events.FRAG_LOADED, sn);
                 this.hlsjs.config.currLoadedDuration = data.frag.duration;
                 let bitrate = Math.round(data.frag.loaded*8/data.frag.duration);
                 if (!this.trackerTried && !this.tracker.connected && this.config.p2pEnabled) {
@@ -158,7 +159,7 @@ class P2PEngine extends EventEmitter {
                 logger.debug('frag changed: '+data.frag.sn);
                 const sn = data.frag.sn;
                 this.hlsjs.config.currPlay = sn;
-                this.tracker.currentPlaySN = sn;
+                this.emit(Events.FRAG_CHANGED, sn);
             }
         });
 
