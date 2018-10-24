@@ -34,7 +34,7 @@ with
 ```
 That's it!
 #### Integrate to HTML5 Players
-See [demos](https://github.com/cdnbye/hlsjs-p2p-engine#player-integration), maybe you want to try [P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer) or [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer).
+See [demos](https://github.com/cdnbye/hlsjs-p2p-engine#player-integration).
 
 ## Browser Support
 WebRTC has already been incorporated into the HTML5 standard and it is broadly deployed in modern browsers. The compatibility of CDNBye depends on the browser support of WebRTC and Hls.js. Please note that iOS Safari "Mobile" does not support the MediaSource API.

@@ -47,7 +47,6 @@ class P2PEngine extends EventEmitter {
                 version: P2PEngine.version,
                 tag: this.config.tag || this.hlsjs.constructor.version,
                 live: isLive,
-                channelAlias: this.config.channelAlias || undefined,
                 agent: this.config.agent || undefined,
             };
             const signalId = URLToolkit.parseURL(this.config.wsSignalerAddr).netLoc.substr(2);

@@ -65,7 +65,6 @@ if (Hls.WEBRTC_SUPPORT) {
 | `segmentId` | function | - | 标识ts文件的字段，防止相同ts文件具有不同的路径。（参考高级用法）
 | `packetSize` | number | 64 * 1024 | 每次通过datachannel发送的包的大小，64KB适用于较新版本的浏览器，如果要兼容低版本浏览器可以设置成16KB。
 | `webRTCConfig` | Object | {} | 用于配置stun和datachannel的[字典](https://github.com/feross/simple-peer)。
-| `channelAlias` | string | '' | channel的别名，用于在后台管理系统识别出该频道。 
 
 
 ## P2PEngine API
