@@ -1,28 +1,21 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dplayer@latest/dist/DPlayer.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/p2p-dplayer@latest/dist/DPlayer.min.css">
 <div id="dplayer"></div>
 <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/dplayer@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/p2p-dplayer@latest"></script>
 <script>
-    var hlsjsConfig = {
-        debug: false,
-        // Other hlsjsConfig options provided by hls.js
-        p2pConfig: {
-            tag: 'dplayer',
-            // Other p2pConfig options provided by CDNBye
-        }
-    };
     var dp = new DPlayer({
         container: document.getElementById('dplayer'),
         autoplay: true,
         video: {
             url: 'https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8',
-            type: 'customHls',
-            customType: {
-                'customHls': function (video, player) {
-                    const hls = new Hls(hlsjsConfig);
-                    hls.loadSource(video.src);
-                    hls.attachMedia(video);
-                }
+            type: 'hls'
+        },
+        hlsjsConfig: {
+            debug: false,
+            // Other hlsjsConfig options provided by hls.js
+            p2pConfig: {
+                logLevel: true,
+                // Other p2pConfig options provided by CDNBye
             }
         }
     });
