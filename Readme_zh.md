@@ -115,7 +115,7 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 - [DPlayer](https://github.com/MoePlayer/DPlayer)
     - 参见 [dplayer-demo.html](demo/dplayer-demo.html)，基于嵌入hlsjs-p2p-engine的[P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer)
 - [CKPlayer](http://www.ckplayer.com/)
-    - 参见 [ckplayer-demo.html](demo/ckplayer-demo.html)
+    - 参见 [ckplayer-demo.html](demo/ckplayer-demo.html)，基于嵌入hlsjs-p2p-engine的[P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer)
 - [clappr](https://github.com/clappr/clappr)
     - 参见 [clappr-demo.html](demo/clappr-demo.html)
 - [MediaElement.js](http://www.mediaelementjs.com/)

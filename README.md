@@ -108,7 +108,7 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 - [DPlayer](https://github.com/MoePlayer/DPlayer)
     - See [dplayer-demo.html](demo/dplayer-demo.html) based on [P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer).
 - [CKPlayer](http://www.ckplayer.com/)
-    - See [ckplayer-demo.html](demo/ckplayer-demo.html)
+    - See [ckplayer-demo.html](demo/ckplayer-demo.html) based on [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer)
 - [clappr](https://github.com/clappr/clappr)
     - See [clappr-demo.html](demo/clappr-demo.html)
 - [MediaElement.js](http://www.mediaelementjs.com/)
