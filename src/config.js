@@ -11,7 +11,7 @@ let defaultP2PConfig = {
 
     dcRequestTimeout: 4,                        // datachannel接收二进制数据的超时时间(废弃)
     dcUploadTimeout: 4,                         // datachannel上传二进制数据的超时时间
-    dcPings: 5,                                 // datachannel发送ping数据包的数量
+    dcPings: 5,                                 // datachannel发送ping数据包的数量(废弃)
     dcTolerance: 5,                             // 请求超时或错误多少次淘汰该peer
 
     packetSize: 64*1024,                        // 每次通过datachannel发送的包的大小(如果要兼容旧浏览器可以设为16*1024)

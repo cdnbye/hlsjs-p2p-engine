@@ -114,12 +114,10 @@ class BTTracker extends EventEmitter {
                 this.requestMorePeers();
 
                 //更新conns
-                if (datachannel.isInitiator) {
-                    if (datachannel.connected) {                       //连接断开
-                        this.fetcher.decreConns();
-                    } else {                                           //连接失败
-                        this.fetcher.increFailConns();
-                    }
+                if (datachannel.connected) {                       //连接断开
+                    this.fetcher.decreConns();
+                } else {                                           //连接失败
+                    this.fetcher.increFailConns();
                 }
             })
             .once(Events.DC_CLOSE, () => {
