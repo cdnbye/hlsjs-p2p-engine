@@ -11,7 +11,7 @@
     "release-hlsjs": "webpack --progress --env.release-hlsjs",
     "release-hlsjs-light": "webpack --progress --env.release-hlsjs-light",
     "publish": "npm publish",
-    "git-push": "git add . && git commit -m 'conns report' && git push origin master",
+    "git-push": "git add . && git commit -m 'update docs' && git push origin master",
     "git-pull": "git pull origin master",
     "install-core": "cnpm install cdnbye-core@latest",
     "update-core": "npm update cdnbye-core --save",
@@ -24,7 +24,7 @@
   "author": "cdnbye",
   "license": "MIT",
   "dependencies": {
-    "cdnbye-core": "^0.3.6",
+    "cdnbye-core": "^0.3.7",
     "hls.js": "^0.11.0",
     "reconnecting-websocket": "^3.2.2"
   },

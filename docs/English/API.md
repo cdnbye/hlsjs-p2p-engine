@@ -118,11 +118,12 @@ p2pConfig: {
 ```
 
 ### Dynamic ts path issue
-Like dynamic m3u8 path issue, you should format a common segmentId for the same ts file.
+Like dynamic m3u8 path issue, you should format a common segmentId for the same ts file. We have da that for you. If you want to set the path as segment ID, override the segmentID like this:
 ```javascript
 p2pConfig: {
     segmentId: function (level, sn, tsUrl) {
-        const formatedUrl = format(tsUrl);  // format a segmentId by removing the different part
+        // const formatedUrl = `${level}-${sn}`;  // default implementation
+        const formatedUrl = tsUrl;  // the actual path of ts file
         return formatedUrl;
     }
 }

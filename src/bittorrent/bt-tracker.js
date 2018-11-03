@@ -37,7 +37,11 @@ class BTTracker extends EventEmitter {
             this.engine.peerId = this.peerId = json.id;
             this.minConns = json.min_conns;
             this.signalerWs = this._initSignalerWs();                         //连上tracker后开始连接信令服务器
-            this._handlePeers(json.peers);
+            if (json.peers.length === 0) {
+                this.requestMorePeers();
+            } else {
+                this._handlePeers(json.peers);
+            }
             this.engine.emit('peerId', this.peerId);
         }).catch(err => {
             console.warn(err);

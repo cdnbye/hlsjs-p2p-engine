@@ -119,11 +119,12 @@ p2pConfig: {
 ```
 
 ### 解决动态ts路径问题
-类似动态m3u8路径问题，相同ts文件的路径也可能有差异，这时候需要忽略ts路径差异的部分。
+类似动态m3u8路径问题，相同ts文件的路径也可能有差异，这时候需要忽略ts路径差异的部分。插件默认用ts的序号来标识每个ts文件，所以已经帮开发者解决了这个问题。如果想严格按ts路径匹配，可以按如下设置：
 ```javascript
 p2pConfig: {
     segmentId: function (level, sn, tsUrl) {
-        const formatedUrl = format(tsUrl);  // 忽略路径差异的部分，使相同的ts文件具有相同的segmentId
+        // const formatedUrl = `${level}-${sn}`;  // 默认实现
+        const formatedUrl = tsUrl;  // 将ts文件的URL作为唯一标识的ID
         return formatedUrl;
     }
 }
