@@ -13,7 +13,7 @@ P2P技术使观看相同内容的用户之间可以相互分享数据，不仅�
 另外，随着H5的普及，flash逐渐被淘汰已成为不可逆转的趋势。而在H5采用的视频传输格式中，hls由于兼容ios和android、可以穿过任何允许HTTP数据通过的防火墙、容易使用内容分发网络来传输媒体流和码率自适应等众多优势而在业界得到广泛使用。通过使用[hls.js](https://github.com/video-dev/hls.js)这个第三方库，几乎所有现代浏览器都可以播放hls视频。hls天生分片传输的优势，使其可以采用p2p的方式进行传输，从而减小服务器的负担。在web端，无插件化实现p2p传输能力的最好选择就是[WebRTC](https://en.wikipedia.org/wiki/WebRTC)技术，与hls.js类似，WebRTC也支持几乎所有现代浏览器。本项目是一个hls.js的插件，通过WebRTC datachannel技术，在不影响用户体验的前提下，最大化p2p率，是面向未来的Web P2P技术。如果使用的是dash协议，请移步[这里](https://github.com/cdnbye/dashjs-p2p-engine/issues/1)。
 
 该插件的优势如下：
-- 采用仿BT算法，简化BT的流程，并且针对流媒体的特点对算法进行调整
+- 采用仿BT算法，P2P能力基于WebRTC Datachannel技术，浏览器原生支持，无需安装任何插件
 - 不改动hls.js源码，并且可以与其无缝衔接，几行代码集成，便于在现有项目中快速集成
 - 高可配置化，用户可以根据特定的使用环境调整各个参数
 - 支持video.js、Clappr、Flowplayer等第三方播放器
@@ -161,9 +161,3 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 ## 联系我们
 邮箱：service@cdnbye.com
 
-<!--
-## 捐赠
-您的捐赠将用于购买服务器以及维持该开源项目的其它开销：）
-
-<img width="250" src="figs/pay.jpeg" alt="cdnbye logo" align="center">
--->
