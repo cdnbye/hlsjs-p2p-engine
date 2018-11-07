@@ -15,16 +15,15 @@ This JS library implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC) datach
 ## Features
 - WebRTC data channels for lightweight peer-to-peer communication with no plugins
 - Very easy to  integrate with an existing hls.js project
+- Seamlessly fallback to normal server usage if a browser doesn't support WebRTC
 - Highly configurable for users
 - Support most popular HTML5 players such as video.js、Clappr、Flowplayer
 - Efficient scheduling policies to enhance the performance of P2P streaming
 - Use IP database to group up peers by ISP and regions
 
-## Notice
-v0.2.x is deprecated, please update to the latest version.
 
 ## Playground
-[Click me!](https://cdnbye.github.io/hlsjs-p2p-demo/)
+[Click me!](https://demo.cdnbye.com/)
 
 ## Getting Started
 #### Quick Start Demo
@@ -127,12 +126,9 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 - `Add your customized player here`
     - CDNBye can be integrated into any HTML5 video player that with hls.js built in.
 
-## CDN
-- [jsDelivr](https://www.jsdelivr.com/package/npm/cdnbye)
-- [unpkg](https://unpkg.com/cdnbye@latest/)
 
 ## API and Configuration
-See [API.md](docs/English/API.md)
+See [API.md](https://docs.cdnbye.com/#/en/API)
 
 ## Signaling Server
 To communicate with another peer you simply need to exchange contact information and the rest will be done by WebRTC. The process of connecting to the other peers is also known as signaling.
@@ -153,10 +149,10 @@ Your website here – Send a pull request with your logo and URL!
 -->
 
 ## How It Works
-See [design.md](docs/English/design.md)
+See [design.md](https://docs.cdnbye.com/#/en/design)
 
 ## FAQ
-We have collected some [frequently asked questions](docs/English/FAQ.md). Before reporting an issue, please search if the FAQ has the answer to your problem.
+We have collected some [frequently asked questions](https://docs.cdnbye.com/#/en/FAQ). Before reporting an issue, please search if the FAQ has the answer to your problem.
 
 ## Contact Us
 Email: service@cdnbye.com

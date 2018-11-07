@@ -15,16 +15,14 @@ P2P技术使观看相同内容的用户之间可以相互分享数据，不仅�
 该插件的优势如下：
 - 采用仿BT算法，P2P能力基于WebRTC Datachannel技术，浏览器原生支持，无需安装任何插件
 - 不改动hls.js源码，并且可以与其无缝衔接，几行代码集成，便于在现有项目中快速集成
+- 浏览器不支持WebRTC时无缝切换到HTTP下载模式
 - 高可配置化，用户可以根据特定的使用环境调整各个参数
 - 支持video.js、Clappr、Flowplayer等第三方播放器
 - 通过有效的调度策略来保证用户的播放体验以及p2p率
 - Tracker服务器根据访问IP的ISP、地域等进行智能调度
 
-## 注意
-v0.2.x已经废弃，请升级到最新版本。
-
 ## 演示Demo
-打开2个相同的网页：[demo](https://cdnbye.github.io/hlsjs-p2p-demo/)
+打开2个相同的网页：[demo](https://demo.cdnbye.com/)
 
 ## 快速入门
 #### 快速入门Demo
@@ -127,12 +125,8 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 - `欢迎贡献您的播放器demo`
     - CDNBye可以集成到内置hls.js的任何H5视频播放器中！
 
-## CDN
-- [jsDelivr](https://www.jsdelivr.com/package/npm/cdnbye)
-- [unpkg](https://unpkg.com/cdnbye@latest/)
-
 ## API文档
-参见 [API.md](docs/中文/API.md)
+参见 [API.md](https://docs.cdnbye.com/#/API)
 
 ## 信令服务器
 信令服务器用于在WebRTC建立P2P连接过程中交换信令。
@@ -153,10 +147,10 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
 -->
 
 ## 设计&原理
-参见 [设计.md](docs/中文/设计.md)
+参见 [设计.md](https://docs.cdnbye.com/#/design)
 
 ## FAQ
-我们收集了一些[常见问题](docs/中文/常见问题.md)。在报告issue之前请先查看一下。
+我们收集了一些[常见问题](https://docs.cdnbye.com/#/FAQ)。在报告issue之前请先查看一下。
 
 ## 联系我们
 邮箱：service@cdnbye.com
