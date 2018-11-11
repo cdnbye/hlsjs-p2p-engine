@@ -23,13 +23,14 @@ class CDNByeHlsjs extends Hlsjs{
     constructor(config = {}) {
 
         let p2pConfig = config.p2pConfig || {};
-        delete config.p2pConfig;
 
         let mergedHlsjsConfig = recommendedHlsjsConfig;
         for (let prop in config) {
+            if (prop === 'p2pConfig') continue;
             mergedHlsjsConfig[prop] = config[prop];
         }
 
+        // console.warn(mergedHlsjsConfig);
         super(mergedHlsjsConfig);
 
         if (P2PEngine.isSupported()) {

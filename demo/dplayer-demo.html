@@ -7,8 +7,16 @@
         container: document.getElementById('dplayer'),
         autoplay: true,
         video: {
-            url: 'https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8',
-            type: 'hls'
+            quality: [{
+                name: 'HD',
+                url: 'https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8',
+                type: 'hls',
+            }, {
+                name: 'SD',
+                url: 'https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8',
+                type: 'hls',
+            }],
+            defaultQuality: 0,
         },
         hlsjsConfig: {
             debug: false,
@@ -16,6 +24,7 @@
             p2pConfig: {
                 logLevel: true,
                 // Other p2pConfig options provided by CDNBye
+                // https://docs.cdnbye.com/#/en/API
             }
         }
     });

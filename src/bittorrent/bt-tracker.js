@@ -54,8 +54,10 @@ class BTTracker extends EventEmitter {
         this.requestMorePeers(true);          // 清空里面的定时器
         this.scheduler.destroy();
         this.scheduler = null;
-        this.signalerWs.destroy();
-        this.signalerWs = null;
+        if (this.signalerWs) {
+            this.signalerWs.destroy();
+            this.signalerWs = null;
+        }
         this.peers = [];
 
         // 销毁所有datachannel

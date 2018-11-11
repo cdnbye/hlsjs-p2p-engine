@@ -5,7 +5,7 @@
 /server
 /src/core
 !/src/cdnbye-core/index.js
-/docs/Private
+/docs
 /demo/test-standalone.html
 /demo/test-quick-start.html
 /demo/test-API.html
