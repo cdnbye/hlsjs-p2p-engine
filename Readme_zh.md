@@ -14,6 +14,7 @@ P2P技术使观看相同内容的用户之间可以相互分享数据，不仅�
 
 该插件的优势如下：
 - 采用仿BT算法，P2P能力基于WebRTC Datachannel技术，浏览器原生支持，无需安装任何插件
+- 支持基于HLS流媒体协议(m3u8)的直播和点播场景
 - 不改动hls.js源码，并且可以与其无缝衔接，几行代码集成，便于在现有项目中快速集成
 - 浏览器不支持WebRTC时无缝切换到HTTP下载模式
 - 高可配置化，用户可以根据特定的使用环境调整各个参数
@@ -61,47 +62,7 @@ CDNBye | Yes | Yes | Yes | No | Yes | No | No
 ```
 
 ## 使用方法
-#### Bundle
-在hlsjsConfig对象字面量中加入p2pConfig字段，然后在实例化hls.js时把hlsjsConfig作为参数传入。
-```javascript
-var hlsjsConfig = {
-    debug: true,
-    // Other hlsjsConfig options provided by hls.js
-    p2pConfig: {
-        logLevel: 'debug',
-        // Other p2pConfig options if applicable
-    }
-};
-// Hls constructor is overriden by included bundle
-var hls = new Hls(hlsjsConfig);
-// Use `hls` just like the usual hls.js ...
-```
-#### Engine(没有打包hls.js的插件，需要自己引入hls.js)
-实例化hls.js并将hlsjsConfig作为参数传入。然后实例化P2PEngine并将p2pConfig作为参数传入。调用hls.js的loadSource和attachMedia方法。
-```javascript
-var hlsjsConfig = {
-    maxBufferSize: 0,       // Highly recommended setting
-    maxBufferLength: 30,    // Highly recommended setting
-    liveSyncDurationCount: 10,    // Highly recommended setting
-};
-
-var p2pConfig = {
-    logLevel: 'debug',
-    // Other p2pConfig options if applicable
-};
-
-var hls = new Hls(hlsjsConfig);
-if (P2PEngine.isSupported()) {
-    new P2PEngine(hls, p2pConfig);        // Key step
-}
-
-// Use `hls` just like your usual hls.js…
-hls.loadSource(contentUrl);
-hls.attachMedia(video);
-hls.on(Hls.Events.MANIFEST_PARSED,function() {
-    video.play();
-});
-```
+参考[文档](http://docs.cdnbye.com/#/usage?id=%E4%BD%BF%E7%94%A8%E6%8F%92%E4%BB%B6)
 
 ## 播放器集成
 - [videojs](http://videojs.com/)
@@ -135,19 +96,7 @@ hls.on(Hls.Events.MANIFEST_PARSED,function() {
     - [php-signaler](https://github.com/cdnbye/php-signaler) (PHP版)
 - 第三方免费信令服务
     - 'wss://signal.cdnbye.com/wss'（本插件默认信令地址）
-    <!--
-    - 'wss://free.freesignal.net'（由freesignal.net提供的免费版本）
-    -->
     
-<!--
-## 用户案例
-[<img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531253035445&di=7af6cc9ad4abe3d06ba376af22d85131&imgtype=0&src=http%3A%2F%2Fimg.kuai8.com%2Fattaches%2Fintro%2F1213%2F201612131436417407.png" width="120">](http://egame.qq.com/)
-
-如果您也在使用这个开源项目，欢迎通过pull request提交您网站的logo和网址
--->
-
-## 设计&原理
-参见 [设计.md](https://docs.cdnbye.com/#/design)
 
 ## FAQ
 我们收集了一些[常见问题](https://docs.cdnbye.com/#/FAQ)。在报告issue之前请先查看一下。

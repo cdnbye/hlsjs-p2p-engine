@@ -14,6 +14,7 @@ This JS library implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC) datach
 
 ## Features
 - WebRTC data channels for lightweight peer-to-peer communication with no plugins
+- Support live and VOD streams over HLS protocol(m3u8)
 - Very easy to  integrate with an existing hls.js project
 - Seamlessly fallback to normal server usage if a browser doesn't support WebRTC
 - Highly configurable for users
@@ -62,47 +63,7 @@ Or include the latest version without hls.js:
 ```
 
 ## Usage
-#### Bundle
-Add p2pConfig as a property of hlsjsConfig, then Create hls.js instance passing hlsjsConfig as constructor param.
-```javascript
-var hlsjsConfig = {
-    debug: true,
-    // Other hlsjsConfig options provided by hls.js
-    p2pConfig: {
-        logLevel: 'debug',
-        // Other p2pConfig options if applicable
-    }
-};
-// Hls constructor is overriden by included bundle
-var hls = new Hls(hlsjsConfig);
-// Use `hls` just like the usual hls.js ...
-```
-#### Engine(the library without hls.js)
-Create hls.js instance passsing hlsjsConfig as param. Create P2PEngine instance passing hls.js instance and p2pConfig as params. Call hls.js loadSource and attachMedia methods.
-```javascript
-var hlsjsConfig = {
-    maxBufferSize: 0,       // Highly recommended setting
-    maxBufferLength: 30,    // Highly recommended setting
-    liveSyncDurationCount: 10,    // Highly recommended setting
-};
-
-var p2pConfig = {
-    logLevel: 'debug',
-    // Other p2pConfig options if applicable
-};
-
-var hls = new Hls(hlsjsConfig);
-if (P2PEngine.isSupported()) {
-    new P2PEngine(hls, p2pConfig);        // Key step
-}
-
-// Use `hls` just like your usual hls.js…
-hls.loadSource(contentUrl);
-hls.attachMedia(video);
-hls.on(Hls.Events.MANIFEST_PARSED,function() {
-    video.play();
-});
-```
+See [Usage](http://docs.cdnbye.com/#/en/usage?id=usage)
 
 ## Player Integration
 - [videojs](http://videojs.com/)
@@ -137,19 +98,7 @@ To communicate with another peer you simply need to exchange contact information
     - [php-signaler](https://github.com/cdnbye/php-signaler) (written by PHP)
 - Use free Signaling Server
     - 'wss://signal.cdnbye.com/wss' (Default signaling server)
-    <!--
-    - 'wss://free.freesignal.net' (Contributed by freesignal.net)
-    -->
     
-<!--
-## They are using CDNBye
-[<img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531253035445&di=7af6cc9ad4abe3d06ba376af22d85131&imgtype=0&src=http%3A%2F%2Fimg.kuai8.com%2Fattaches%2Fintro%2F1213%2F201612131436417407.png" width="120">](http://egame.qq.com/)
-
-Your website here – Send a pull request with your logo and URL!
--->
-
-## How It Works
-See [design.md](https://docs.cdnbye.com/#/en/design)
 
 ## FAQ
 We have collected some [frequently asked questions](https://docs.cdnbye.com/#/en/FAQ). Before reporting an issue, please search if the FAQ has the answer to your problem.
