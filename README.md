@@ -89,16 +89,7 @@ See [Usage](http://docs.cdnbye.com/#/en/usage?id=usage)
 
 
 ## API and Configuration
-See [API.md](https://docs.cdnbye.com/#/en/API)
-
-## Signaling Server
-To communicate with another peer you simply need to exchange contact information and the rest will be done by WebRTC. The process of connecting to the other peers is also known as signaling.
-- Deploy your own Signaling Server (Recommended)
-    - [gosignaler](https://github.com/cdnbye/gosignaler) (written by Golang)
-    - [php-signaler](https://github.com/cdnbye/php-signaler) (written by PHP)
-- Use free Signaling Server
-    - 'wss://signal.cdnbye.com/wss' (Default signaling server)
-    
+See [API.md](https://docs.cdnbye.com/#/en/API) 
 
 ## FAQ
 We have collected some [frequently asked questions](https://docs.cdnbye.com/#/en/FAQ). Before reporting an issue, please search if the FAQ has the answer to your problem.
