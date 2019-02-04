@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CDNBye Clappr Demo</title>
+    <!-- Clappr Builds -->
+    <script src="//cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+    <!-- CDNBye P2PEngine -->
+    <script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
+    <!-- CDNBye Clappr Plugin -->
+    <script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/clappr-plugin.min.js"></script>
+</head>
+<body>
+<div id="player"></div>
+<script>
+    var player = new Clappr.Player(
+        {
+            source: "https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8",
+            parentId: "#player",
+            autoPlay: true,
+            plugins: {
+                playback: [CDNByeClapprPlugin]
+            },
+            playback: {
+                hlsjsConfig: {
+                    maxBufferSize: 0,       // Highly recommended setting
+                    maxBufferLength: 5,     // Highly recommended setting
+                    liveSyncDuration: 30,   // Highly recommended setting
+                    // Other hlsjsConfig options provided by hls.js
+                    p2pConfig: {
+                        logLevel: 'debug',
+                        live: false,        // set to true in live mode
+                        // Other p2pConfig options provided by CDNBye
+                    }
+                }
+            }
+        });
+</script>
+</body>
+</html>

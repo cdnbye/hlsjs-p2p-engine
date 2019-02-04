@@ -1,0 +1,16 @@
+.DS_Store
+.idea
+/node_modules
+/test
+/server
+/src/core
+!/src/cdnbye-core/index.js
+/docs
+/demo/test-standalone.html
+/demo/test-quick-start.html
+/demo/test-API.html
+/demo/test-player.html
+/demo/test-android.html
+/dist/hls.js
+/dist/hlsjs-p2p-engine.js
+/src

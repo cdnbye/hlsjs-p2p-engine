@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CDNBye videojs5 demo</title>
+</head>
+<link href="//vjs.zencdn.net/7.2/video-js.min.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/7.2/video.min.js"></script>
+<!-- increase browser support with MSE polyfill -->
+<script src="//unpkg.com/videojs-contrib-media-sources@4.4.4/dist/videojs-contrib-media-sources.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/cdnbye@latest"></script>
+<script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/videojs-contrib-hlsjs.min.js"></script>
+
+<body>
+<div id="main">
+    <video id="player" class="video-js vjs-default-skin" height="360" width="640" controls preload="none">
+        <source src="https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8"
+                type="application/x-mpegURL"/>
+    </video>
+</div>
+<script>
+    var player = videojs('#player', {
+        autoplay: true,
+        html5: {
+            hlsjsConfig: {
+                debug: false,
+                // Other hlsjsConfig options provided by hls.js
+                p2pConfig: {
+                    logLevel: true,
+                    live: false,        // set to true in live mode
+                    // Other p2pConfig options provided by CDNBye
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

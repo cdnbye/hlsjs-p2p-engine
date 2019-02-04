@@ -1,0 +1,61 @@
+<script src="//cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
+<video id="video" controls></video>
+<p id="version"></p>
+<h3>download info:</h3>
+<p id="info"></p>
+<table id="table-body">
+    <tbody ></tbody>
+</table>
+<script>
+    var source = 'https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8';
+    var video = document.getElementById('video');
+    if(Hls.isSupported()) {
+        var hls = new Hls({
+            maxBufferSize: 0,       // Highly recommended setting
+            maxBufferLength: 5,     // Highly recommended setting
+            liveSyncDuration: 30,   // Highly recommended setting
+        });
+        if (P2PEngine.isSupported()) {
+            var engine = new P2PEngine(hls, {
+                logLevel: true,
+                live: false,        // set to true in live mode
+                // Other p2pConfig options provided by CDNBye
+            });
+            engine.on('stats', function ({totalHTTPDownloaded=0, totalP2PDownloaded=0, totalP2PUploaded=0}) {
+                var total = totalHTTPDownloaded + totalP2PDownloaded;
+                document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB`;
+            })
+        }
+        hls.loadSource(source);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED,function(event, data) {
+            video.play();
+        });
+        hls.on(Hls.Events.FRAG_LOADED, (id, data) => {
+            var frag = data.frag;
+            var source = undefined;
+            if (frag.loadByHTTP === true || frag.loadByHTTP === undefined) {
+                source = 'HTTP';
+            } else if (frag.loadByP2P === true) {
+                source = 'P2P';
+            }
+            addToTable(frag.relurl, frag.loaded, source);
+        });
+        document.querySelector('#version').innerText = `hls.js version: ${Hls.version}  cdnbye version: ${P2PEngine.version}`;
+        function addToTable(url, downloaded, source) {
+            var infoStr = `download ${url}(size:${downloaded}B) by ${source}`;
+            document.querySelector('#table-body tbody').innerHTML +=
+                `<tr style="text-align: center">
+                    <td>${infoStr}</td>
+                </tr>`
+        };
+    }
+    // This is using the built-in support of the plain video element, without using hls.js.
+    else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = source;
+        video.addEventListener('loadedmetadata',function() {
+            video.play();
+        });
+    }
+</script>

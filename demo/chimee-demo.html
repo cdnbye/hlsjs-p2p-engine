@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CDNBye Chimee Demo</title>
+    <!-- Chimee Builds -->
+    <script src="//cdn.jsdelivr.net/npm/chimee@0.11.0/lib/index.browser.min.js"></script>
+    <!-- CDNBye P2PEngine -->
+    <script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
+    <!-- Chimee HLS Kernel -->
+    <script src="//cdn.jsdelivr.net/npm/p2p-chimee-kernel-hls@latest"></script>
+</head>
+<body>
+<div id="player"></div>
+<script>
+    new Chimee({
+        wrapper: '#player',  // video dom容器
+        src: 'https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8',
+        controls: true,
+        kernels: {
+            hls: {
+                handler: window.ChimeeKernelHls,
+                maxBufferSize: 0,       // Highly recommended setting
+                maxBufferLength: 5,     // Highly recommended setting
+                liveSyncDuration: 30,   // Highly recommended setting
+                p2pConfig: {
+                    logLevel: 'debug',
+                    live: false,        // set to true in live mode
+                    // Other p2pConfig options provided by CDNBye
+                }
+            }
+        },
+    });
+</script>
+</body>
+</html>
