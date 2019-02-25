@@ -15,7 +15,7 @@
         // captions.update is required for captions to work with hls.js
         var player = new Plyr(video, {
             captions: {active: true, update: true, language: 'en'},
-            autoplay: true,
+            // autoplay: true,
         });
 
         if (!Hls.isSupported()) {
