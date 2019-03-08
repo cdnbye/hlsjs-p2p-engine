@@ -102,6 +102,9 @@ See [API.md](https://docs.cdnbye.com/#/en/API)
 ## Console
 Bind your domain in `https://oms.cdnbye.com`, where you can view p2p-related information.
 
+## They are using CDNBye
+[<img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531253035445&di=7af6cc9ad4abe3d06ba376af22d85131&imgtype=0&src=http%3A%2F%2Fimg.kuai8.com%2Fattaches%2Fintro%2F1213%2F201612131436417407.png" width="120">](http://egame.qq.com/?hls=1)
+
 ## FAQ
 We have collected some [frequently asked questions](https://docs.cdnbye.com/#/en/FAQ). Before reporting an issue, please search if the FAQ has the answer to your problem.
 
