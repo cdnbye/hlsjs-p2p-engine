@@ -33,6 +33,9 @@
             p2pConfig: {
                 logLevel: true,
                 live: false,        // set to true in live mode
+                getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
+                    console.log(`totalP2PDownloaded ${totalP2PDownloaded} totalP2PUploaded ${totalP2PUploaded} totalHTTPDownloaded ${totalHTTPDownloaded}`)
+                },
                 // Other p2pConfig options provided by CDNBye
             }
         }

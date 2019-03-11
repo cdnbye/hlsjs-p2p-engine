@@ -3,10 +3,14 @@
 <div class="container">
     <video controls crossorigin playsinline></video>
 </div>
+<p id="version"></p>
+<h3>download info:</h3>
+<p id="info"></p>
 <link rel="stylesheet" href="//cdn.plyr.io/3.4.7/plyr.css">
 <script src="//cdn.plyr.io/3.4.7/plyr.js"></script>
 <script src="//cdn.jsdelivr.net/npm/cdnbye@latest"></script>
 <script>
+    document.querySelector('#version').innerText = `hls.js version: ${Hls.version}  cdnbye version: ${Hls.engineVersion}`;
     document.addEventListener('DOMContentLoaded', () => {
         var source = 'https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8';
         var video = document.querySelector('video');
@@ -26,6 +30,10 @@
                 p2pConfig: {
                     logLevel: true,
                     live: false,        // set to true in live mode
+                    getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
+                        var total = totalHTTPDownloaded + totalP2PDownloaded;
+                        document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB, uploaded: ${totalP2PUploaded}KB`;
+                    },
                     // Other p2pConfig options provided by CDNBye
                 }
             });

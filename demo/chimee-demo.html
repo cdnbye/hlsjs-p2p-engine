@@ -12,6 +12,8 @@
 </head>
 <body>
 <div id="player"></div>
+<h3>download info:</h3>
+<p id="info"></p>
 <script>
     new Chimee({
         wrapper: '#player',  // video dom容器
@@ -26,6 +28,10 @@
                 p2pConfig: {
                     logLevel: 'debug',
                     live: false,        // set to true in live mode
+                    getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
+                        var total = totalHTTPDownloaded + totalP2PDownloaded;
+                        document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB, uploaded: ${totalP2PUploaded}KB`;
+                    },
                     // Other p2pConfig options provided by CDNBye
                 }
             }

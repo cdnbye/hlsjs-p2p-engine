@@ -2,6 +2,8 @@
 <html>
 <body>
 <div id="video" style="width: 100%; height: 400px;max-width: 600px;"></div>
+<h3>download info:</h3>
+<p id="info"></p>
 <script type="text/javascript" src="//cdn.jsdelivr.net/npm/p2p-ckplayer@latest/ckplayer/ckplayer.min.js" charset="UTF-8"></script>
 <script type="text/javascript">
     var videoObject = {
@@ -16,6 +18,10 @@
             p2pConfig: {
                 logLevel: 'debug',
                 live: false,        // set to true in live mode
+                getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
+                    var total = totalHTTPDownloaded + totalP2PDownloaded;
+                    document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB, uploaded: ${totalP2PUploaded}KB`;
+                },
                 // Other p2pConfig options provided by CDNBye
                 // https://docs.cdnbye.com/#/en/API
             }

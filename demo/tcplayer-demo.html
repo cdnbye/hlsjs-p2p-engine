@@ -19,9 +19,13 @@
 <body>
 <div id="video-container" style="margin: 0px auto;">
 </div>
+<p id="version"></p>
+<h3>download info:</h3>
+<p id="info"></p>
 <script src="//cdn.jsdelivr.net/npm/cdnbye@latest"></script>
 <script src="//imgcache.qq.com/open/qcloud/video/vcplayer/TcPlayer-2.2.3.js"></script>
 <script>
+    document.querySelector('#version').innerText = `hls.js version: ${Hls.version}  cdnbye version: ${Hls.engineVersion}`;
     var options = {
         m3u8: 'https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8' ,
         autoplay: true,
@@ -34,6 +38,10 @@
             p2pConfig: {
                 logLevel: true,
                 live: false,        // set to true in live mode
+                getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
+                    var total = totalHTTPDownloaded + totalP2PDownloaded;
+                    document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB, uploaded: ${totalP2PUploaded}KB`;
+                },
                 // Other p2pConfig options provided by CDNBye
             }
         }

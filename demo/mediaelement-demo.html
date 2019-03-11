@@ -13,7 +13,11 @@
        class="mejs__player"
        controls>
 </video>
+<p id="version"></p>
+<h3>download info:</h3>
+<p id="info"></p>
 <script>
+    document.querySelector('#version').innerText = `hls.js version: ${Hls.version}  cdnbye version: ${Hls.engineVersion}`;
     var player = new MediaElementPlayer('player', {
         hls: {
             debug: false,
@@ -21,6 +25,10 @@
             p2pConfig: {
                 logLevel: true,
                 live: false,        // set to true in live mode
+                getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
+                    var total = totalHTTPDownloaded + totalP2PDownloaded;
+                    document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB, uploaded: ${totalP2PUploaded}KB`;
+                },
                 // Other p2pConfig options provided by CDNBye
             }
         },
