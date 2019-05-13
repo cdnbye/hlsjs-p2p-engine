@@ -5,6 +5,8 @@
 
 - 将PPVOD安装目录中的将share.js（linux下路径一般是/home/work/public/js/share.js）替换成CDNBye提供的share.js
 
+- PPVOD的视频加密设置会导致P2P失效，请在PPVOD系统的`系统设置`->`转码设置`中将`视频加密`取消。
+
 - 在控制台绑定域名后即可开启P2P服务并查看实时数据
 
 ## P2P官方文档地址
