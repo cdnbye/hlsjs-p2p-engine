@@ -65,41 +65,41 @@ Or include the latest version without hls.js:
 ```
 
 ## Usage
-See [Usage](http://docs.cdnbye.com/#/en/usage?id=usage)
+See [Usage](http://docs.cdnbye.com/#/en/web/usage?id=usage)
 
 ## Player Integration
 - [videojs](http://videojs.com/)
-    - See [videojs demo](https://docs.cdnbye.com/#/en/players?id=videojs)
+    - See [videojs demo](https://docs.cdnbye.com/#/en/web/players?id=videojs)
 - [flowplayer](https://flowplayer.com/)
-    - See [flowplayer demo](https://docs.cdnbye.com/#/en/players?id=flowplayer)
+    - See [flowplayer demo](https://docs.cdnbye.com/#/en/web/players?id=flowplayer)
 - [jwplayer](https://www.jwplayer.com/)
-    - See [jwplayer demo](https://docs.cdnbye.com/#/en/players?id=jwplayer)
+    - See [jwplayer demo](https://docs.cdnbye.com/#/en/web/players?id=jwplayer)
 - [DPlayer](https://github.com/MoePlayer/DPlayer)
-    - See [dplayer demo](https://docs.cdnbye.com/#/en/players?id=dplayer)
+    - See [dplayer demo](https://docs.cdnbye.com/#/en/web/players?id=dplayer)
 - [CKPlayer](http://www.ckplayer.com/)
-    - See [ckplayer demo](https://docs.cdnbye.com/#/en/players?id=ckplayer) based on [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer)
+    - See [ckplayer demo](https://docs.cdnbye.com/#/en/web/players?id=ckplayer) based on [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer)
 - [clappr](https://github.com/clappr/clappr)
-    - See [clappr demo](https://docs.cdnbye.com/#/en/players?id=clappr)
+    - See [clappr demo](https://docs.cdnbye.com/#/en/web/players?id=clappr)
 - [MediaElement.js](http://www.mediaelementjs.com/)
-    - See [mediaelement demo](https://docs.cdnbye.com/#/en/players?id=mediaelementjs)
+    - See [mediaelement demo](https://docs.cdnbye.com/#/en/web/players?id=mediaelementjs)
 - [TCPlayer](https://cloud.tencent.com/document/product/267/7479)(Tencent Cloud Player)
-    - See [tcplayer demo](https://docs.cdnbye.com/#/en/players?id=tcplayer)
+    - See [tcplayer demo](https://docs.cdnbye.com/#/en/web/players?id=tcplayer)
 - [Chimee](http://chimee.org/)
-    - See [chimee demo](https://docs.cdnbye.com/#/en/players?id=chimee)
+    - See [chimee demo](https://docs.cdnbye.com/#/en/web/players?id=chimee)
 - [XGPlayer](http://h5player.bytedance.com/en/)
-    - See [xgplayer demo](https://docs.cdnbye.com/#/en/players?id=xgplayer)
+    - See [xgplayer demo](https://docs.cdnbye.com/#/en/web/players?id=xgplayer)
 - [fluidplayer](https://www.fluidplayer.com/)
-    - See [fluidplayer demo](https://docs.cdnbye.com/#/en/players?id=fluidplayer)
+    - See [fluidplayer demo](https://docs.cdnbye.com/#/en/web/players?id=fluidplayer)
 - [OpenPlayer](https://www.openplayerjs.com/)
-    - See [OpenPlayer demo](https://docs.cdnbye.com/#/en/players?id=openplayer)
+    - See [OpenPlayer demo](https://docs.cdnbye.com/#/en/web/players?id=openplayer)
 - [Plyr](https://plyr.io/)
-    - See [Plyr demo](https://docs.cdnbye.com/#/en/players?id=plyr)
+    - See [Plyr demo](https://docs.cdnbye.com/#/en/web/players?id=plyr)
 - `Add your customized player here`
     - CDNBye can be integrated into any HTML5 video player that with hls.js built in.
 
 
 ## API and Configuration
-See [API.md](https://docs.cdnbye.com/#/en/API)
+See [API.md](https://docs.cdnbye.com/#/en/web/API)
 
 ## Console
 Bind your domain in `https://oms.cdnbye.com`, where you can view p2p-related information.
