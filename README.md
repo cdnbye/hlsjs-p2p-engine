@@ -104,6 +104,9 @@ See [API.md](https://docs.cdnbye.com/#/en/web/API)
 ## Console
 Bind your domain in `https://oms.cdnbye.com`, where you can view p2p-related information.
 
+## Related Projects
+- [ios-p2p-engine](https://github.com/cdnbye/ios-p2p-engine) - iOS Video P2P Engine for Any Player.
+
 ## They are using CDNBye
 [<img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531253035445&di=7af6cc9ad4abe3d06ba376af22d85131&imgtype=0&src=http%3A%2F%2Fimg.kuai8.com%2Fattaches%2Fintro%2F1213%2F201612131436417407.png" width="120">](https://egame.qq.com/?hls=1&p2p=1&_debug=1)
 
