@@ -14,6 +14,7 @@ CDNBye hlsjs-p2p-engine implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC
 ## Features
 - WebRTC data channels for lightweight peer-to-peer communication with no plugins
 - Support live and VOD streams over HLS protocol(m3u8)
+- Support encrypted HLS stream
 - Very easy to  integrate with an existing hls.js project
 - Seamlessly fallback to normal server usage if a browser doesn't support WebRTC
 - Highly configurable for users
