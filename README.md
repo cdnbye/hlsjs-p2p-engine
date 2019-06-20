@@ -105,6 +105,8 @@ See [API.md](https://docs.cdnbye.com/#/en/web/API)
 Bind your domain in `https://oms.cdnbye.com`, where you can view p2p-related information.
 
 ## Related Projects
+- [P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer) - DPlayer with CDNBye P2P Engine.
+- [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer) - CKPlayer with CDNBye P2P Engine.
 - [ios-p2p-engine](https://github.com/cdnbye/ios-p2p-engine) - iOS Video P2P Engine for Any Player.
 
 ## They are using CDNBye

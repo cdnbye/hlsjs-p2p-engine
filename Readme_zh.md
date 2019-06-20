@@ -106,6 +106,8 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ | ❌ |
 在接入P2P插件后，访问`https://oms.cdnbye.com`，注册并绑定域名，即可查看该域名的P2P流量、在线人数、用户地理分布等信息。
 
 ## 相关项目
+- [P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer) - 嵌入CDNBye P2P引擎的DPlayer。
+- [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer) - 嵌入CDNBye P2P引擎的CKPlayer。
 - [ios-p2p-engine](https://github.com/cdnbye/ios-p2p-engine) - iOS端P2P流媒体加速引擎。
 
 ## 客户案例
