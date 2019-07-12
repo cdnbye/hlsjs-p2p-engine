@@ -109,6 +109,7 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ | ❌ |
 ## 相关项目
 - [P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer) - 嵌入CDNBye P2P引擎的DPlayer。
 - [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer) - 嵌入CDNBye P2P引擎的CKPlayer。
+- [android-p2p-engine](https://github.com/cdnbye/android-p2p-engine) - 安卓端P2P流媒体加速引擎。
 - [ios-p2p-engine](https://github.com/cdnbye/ios-p2p-engine) - iOS端P2P流媒体加速引擎。
 
 ## 客户案例
