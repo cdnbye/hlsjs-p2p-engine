@@ -23,9 +23,6 @@ CDNBye hlsjs-p2p-engine implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC
 - Use IP database to group up peers by ISP and regions
 - API frozen, new releases will not break your code
 
-## Notice
-All domain names that are not bound in the management system (https://oms.cdnbye.com) will stop providing P2P services. Please bind your domain names in time to avoid being affected.
-
 ## Playground
 [Click me!](https://demo.cdnbye.com/)
 
