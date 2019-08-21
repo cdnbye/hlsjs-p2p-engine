@@ -8,8 +8,8 @@
   <a href="https://github.com/cdnbye/hlsjs-p2p-engine/tree/master/dist"><img src="https://badge-size.herokuapp.com/cdnbye/hlsjs-p2p-engine/master/dist/hlsjs-p2p-engine.min.js?compression=gzip&style=flat-square" alt="size"></a>
 </p>
 
-
 CDNBye hlsjs-p2p-engine implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC) datachannel to scale live/vod video streaming by peer-to-peer network using bittorrent-like protocol. The forming peer network can be layed over other CDNs or on top of the origin server. Powered by [hls.js](https://github.com/video-dev/hls.js), it can play HLS on any platform with many popular HTML5 players such as video.js, JWPlayer and Flowplayer. BTW, you can view how much traffic has been saved [here](https://oms.cdnbye.com)!
+
 ## Features
 - WebRTC data channels for lightweight peer-to-peer communication with no plugins
 - Support live and VOD streams over HLS protocol(m3u8)
@@ -102,8 +102,6 @@ See [API.md](https://docs.cdnbye.com/#/en/web/API)
 Bind your domain in `https://oms.cdnbye.com`, where you can view p2p-related information.
 
 ## Related Projects
-- [P2P-DPlayer](https://github.com/cdnbye/P2P-DPlayer) - DPlayer with CDNBye P2P Engine.
-- [P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer) - CKPlayer with CDNBye P2P Engine.
 - [android-p2p-engine](https://github.com/cdnbye/android-p2p-engine) - Live/VOD P2P Engine for Android and Android TV.
 - [ios-p2p-engine](https://github.com/cdnbye/ios-p2p-engine) - iOS Video P2P Engine for Any Player.
 - [flutter-p2p-engine](https://github.com/cdnbye/flutter-p2p-engine) - Live/VOD P2P Engine for Flutter, contributed by [mjl0602](https://github.com/mjl0602).
