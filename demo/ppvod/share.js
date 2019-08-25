@@ -236,7 +236,7 @@ function dplay(main, xml, starttime, cb) {
                                 debug: false,
                                 // Other hlsjsConfig options provided by hls.js
                                 p2pConfig: {
-                                    logLevel: 'debug',
+                                    // logLevel: 'debug',
                                     live: false,        // 如果是直播设为true
                                     channelId: function (m3u8Url) {
                                         return videoid;

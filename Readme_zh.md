@@ -82,7 +82,7 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ | ❌ |
     - 参见 [clappr demo](https://docs.cdnbye.com/#/web/players?id=clappr)
 - [MediaElement.js](http://www.mediaelementjs.com/)
     - 参见 [mediaelement demo](https://docs.cdnbye.com/#/web/players?id=mediaelementjs)
-- [TCPlayer](https://cloud.tencent.com/document/product/267/7479)(腾讯云播放器)
+- [TCPlayer](https://cloud.tencent.com/document/product/881/20207)(腾讯云播放器)
     - 参见 [tcplayer demo](https://docs.cdnbye.com/#/web/players?id=tcplayer)
 - [Chimee](http://chimee.org/)
     - 参见 [chimee demo](https://docs.cdnbye.com/#/web/players?id=chimee)
