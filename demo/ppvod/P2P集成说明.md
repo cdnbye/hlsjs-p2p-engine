@@ -1,7 +1,9 @@
 
 ## 集成步骤
 
-- 将PPVOD安装目录中的hls.mim.js（linux下路径一般是/home/work/public/dplayer/hls.mim.js）替换成CDNBye的[hls.min.js](https://github.com/cdnbye/hlsjs-p2p-engine/tree/master/dist)
+- 将PPVOD安装目录中的hls.min.js（linux下路径一般是/home/work/public/dplayer/hls.min.js）替换成CDNBye的[hls.min.js](https://github.com/cdnbye/hlsjs-p2p-engine/tree/master/dist)
+
+- 将PPVOD安装目录中的DPlayer.min.js（linux下路径一般是/home/work/public/dplayer/DPlayer.min.js）替换成CDNBye的[DPlayer.min.js](https://github.com/cdnbye/hlsjs-p2p-engine/tree/master/demo/ppvod)
 
 - 将PPVOD安装目录中的将share.js（linux下路径一般是/home/work/public/js/share.js）替换成CDNBye提供的share.js
 
