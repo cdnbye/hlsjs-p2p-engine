@@ -1,6 +1,6 @@
 {
   "name": "cdnbye",
-  "version": "0.12.0",
+  "version": "0.12.2",
   "description": "Save Your Bandwidth using WebRTC.",
   "main": "./dist/hls.min.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "release-hlsjs": "webpack --progress --env.release-hlsjs",
     "release-hlsjs-light": "webpack --progress --env.release-hlsjs-light",
     "publish": "npm publish",
-    "git-push": "git add . && git commit -m 'add DPlayer.min.js' && git push origin master",
+    "git-push": "git add . && git commit -m 'release v0.12.2' && git push origin master",
     "git-pull": "git pull origin master",
     "install-core": "cnpm install cdnbye-core@latest",
     "update-core": "npm update cdnbye-core --save",
