@@ -94,6 +94,8 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ | ❌ |
     - 参见 [OpenPlayer demo](https://docs.cdnbye.com/#/web/players?id=openplayer)
 - [Plyr](https://plyr.io/)
     - 参见 [Plyr demo](https://docs.cdnbye.com/#/web/players?id=plyr)
+- [Playerjs](https://playerjs.com/)
+    - 参见 [Playerjs demo](https://docs.cdnbye.com/#/web/players?id=playerjs)
 - `欢迎贡献您的播放器demo`
     - CDNBye可以集成到内置hls.js的任何H5视频播放器中！
 
