@@ -48,11 +48,11 @@ P2P技术使观看相同内容的用户之间可以相互分享数据，不仅�
 ## 浏览器支持情况
 由于WebRTC已成为HTML5标准，目前大部分主流浏览器都已经支持。CDNBye的浏览器兼容性取决于WebRTC和hls.js。需要注意的是iOS版Safari由于不支持MediaSource API，因此也不支持hls.js(不过Safari原生支持HLS播放)。
 
- 兼容性|Chrome | Firefox | macOS Safari| 安卓微信/QQ | Opera | IE | Edge| iOS Safari | 
+ 兼容性|Chrome | Firefox | macOS Safari| 安卓微信/QQ | Opera | Edge | IE | iOS Safari | 
 :-: | :-: | :-: | :-: | :-: | :-: | :-:| :-:| :-:
-WebRTC Datachannel | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ | ✔ |
+WebRTC Datachannel | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ✔ |
 Hls.js | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ |
-CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ | ❌ | 
+CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ | 
 
 ## 集成
 通过script标签引入已经和hls.js打包的最新版本（推荐）：
