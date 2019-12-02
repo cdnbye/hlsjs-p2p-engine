@@ -93,6 +93,8 @@ See [Usage](http://docs.cdnbye.com/#/en/web/usage?id=usage)
     - See [Plyr demo](https://docs.cdnbye.com/#/en/web/players?id=plyr)
 - [Playerjs](https://playerjs.com/)
     - See [Playerjs demo](https://docs.cdnbye.com/#/en/web/players?id=playerjs)
+- [CHPlayer](http://www.chplayer.com/)
+    - See [chplayer demo](https://docs.cdnbye.com/#/en/web/players?id=chplayer) based on [P2P-CHPlayer](https://github.com/cdnbye/P2P-CHPlayer)
 - `Add your customized player here`
     - CDNBye can be integrated into any HTML5 video player that with hls.js built in.
 

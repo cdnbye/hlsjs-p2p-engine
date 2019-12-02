@@ -96,6 +96,8 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
     - 参见 [Plyr demo](https://docs.cdnbye.com/#/web/players?id=plyr)
 - [Playerjs](https://playerjs.com/)
     - 参见 [Playerjs demo](https://docs.cdnbye.com/#/web/players?id=playerjs)
+- [CHPlayer](http://www.chplayer.com/)
+    - 参见 [chplayer demo](https://docs.cdnbye.com/#/web/players?id=chplayer)，基于嵌入hlsjs-p2p-engine的[P2P-CHPlayer](https://github.com/cdnbye/P2P-CHPlayer)
 - `欢迎贡献您的播放器demo`
     - CDNBye可以集成到内置hls.js的任何H5视频播放器中！
 
