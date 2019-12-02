@@ -238,7 +238,7 @@ function dplay(main, xml, starttime, cb) {
                                     // logLevel: 'debug',
                                     live: false,        // 如果是直播设为true
                                     channelId: function (m3u8Url) {
-                                        return videoid;
+                                        return window.location.hostname + videoid;
                                     }
                                     // Other p2pConfig options provided by CDNBye
                                 }
