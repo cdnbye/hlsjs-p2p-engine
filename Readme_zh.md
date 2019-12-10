@@ -107,6 +107,9 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 ## 后台管理系统
 在接入P2P插件后，访问`https://oms.cdnbye.com`，注册并绑定域名，即可查看该域名的P2P流量、在线人数、用户地理分布等信息。
 
+## 支持内网设备接入P2P服务
+请参考[如何在内网使用CDNBye](https://docs.cdnbye.com/#/FAQ?id=%e5%a6%82%e4%bd%95%e5%9c%a8%e5%86%85%e7%bd%91%e4%bd%bf%e7%94%a8cdnbye%ef%bc%9f)
+
 ## 相关项目
 - [android-p2p-engine](https://gitee.com/cdnbye/android-p2p-engine) - 安卓端P2P流媒体加速引擎。
 - [ios-p2p-engine](https://gitee.com/cdnbye/ios-p2p-engine) - iOS端P2P流媒体加速引擎。
