@@ -18,6 +18,7 @@
         video: {
             url: 'https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8',
             type: 'customHls',
+            hotkey: true,        // 移动端全屏时向右划动快进，向左划动快退。
             customType: {
                 'customHls': function (video, player) {
                     const hls = new Hls({
