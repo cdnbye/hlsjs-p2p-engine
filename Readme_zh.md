@@ -56,11 +56,11 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 
 ## 集成
 通过script标签引入已经和hls.js打包的最新版本（推荐）：
-```javascript
+```html
 <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
 ```
 或者引入没有与hls.js打包的独立版本：
-```javascript
+```html
 <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
 ```
 

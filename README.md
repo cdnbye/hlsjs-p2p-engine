@@ -31,11 +31,11 @@ Put the [quick-start.html](demo/quick-start.html) in your web page, run it. Wait
 The first web peer will serve as a seed, if no one else in the same channel.
 #### Integrate to Your Hls.js Project
 Simply replace the hls.js script tag like:
- ```javascript
+ ```html
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 ```
 with 
- ```javascript
+ ```html
 <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
 ```
 That's it!
