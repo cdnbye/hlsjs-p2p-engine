@@ -1,7 +1,7 @@
 **English | [简体中文](Readme_zh.md)**
 
 <h1 align="center"><a href="" target="_blank" rel="noopener noreferrer"><img width="250" src="https://cdnbye.oss-cn-beijing.aliyuncs.com/pic/cdnbye.png" alt="cdnbye logo"></a></h1>
-<h4 align="center">Save Your Bandwidth using WebRTC.</h4>
+<h4 align="center">Boost Your Stream using WebRTC.</h4>
 <p align="center">
   <a href="https://www.npmjs.com/package/cdnbye"><img src="https://img.shields.io/npm/v/cdnbye.svg?style=flat" alt="npm"></a>
   <a href="https://www.jsdelivr.com/package/npm/cdnbye"><img src="https://data.jsdelivr.com/v1/package/npm/cdnbye/badge" alt="jsdelivr"></a>
@@ -112,7 +112,8 @@ Bind your domain in `https://oms.cdnbye.com`, where you can view p2p-related inf
 - [dashjs-p2p-engine](https://github.com/cdnbye/dashjs-p2p-engine) - Web Video Delivery Technology with No Plugins for MPEG-dash.
 
 ## They are using CDNBye
-[<img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531253035445&di=7af6cc9ad4abe3d06ba376af22d85131&imgtype=0&src=http%3A%2F%2Fimg.kuai8.com%2Fattaches%2Fintro%2F1213%2F201612131436417407.png" width="120">](https://egame.qq.com/?hls=1&p2p=1&_debug=1)
+[<img src="https://cdnbye.oss-cn-beijing.aliyuncs.com/pic/wstream.png" width="120">](https://wstream.video/)
+[<img src="https://mystream.to/favicon.ico" width="120">](https://mystream.to/)
 
 ## FAQ
 We have collected some [frequently asked questions](https://docs.cdnbye.com/#/en/FAQ). Before reporting an issue, please search if the FAQ has the answer to your problem.
