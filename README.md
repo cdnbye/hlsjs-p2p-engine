@@ -112,8 +112,12 @@ Bind your domain in `https://oms.cdnbye.com`, where you can view p2p-related inf
 - [dashjs-p2p-engine](https://github.com/cdnbye/dashjs-p2p-engine) - Web Video Delivery Technology with No Plugins for MPEG-dash.
 
 ## They are using CDNBye
-[<img src="https://cdnbye.oss-cn-beijing.aliyuncs.com/pic/wstream.png" width="120">](https://wstream.video/)
-[<img src="https://mystream.to/favicon.ico" width="120">](https://mystream.to/)
+<table>
+    <tr>
+        <td ><center> <a target="_blank" href="https://wstream.video/"><img src="https://cdnbye.oss-cn-beijing.aliyuncs.com/pic/wstream.png" width="120"></a></center></td>
+        <td ><center> <a target="_blank" href="https://mystream.to/"><img src="https://mystream.to/favicon.ico" width="120"></a></center></td>
+    </tr>
+</table>
 
 ## FAQ
 We have collected some [frequently asked questions](https://docs.cdnbye.com/#/en/FAQ). Before reporting an issue, please search if the FAQ has the answer to your problem.
