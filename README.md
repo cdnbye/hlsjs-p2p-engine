@@ -62,16 +62,16 @@ Or include the latest version without hls.js:
 ```
 
 ## Usage
-See [Usage](https://www.cdnbye.com/en/views/web/usage.html)
+See [Usage](https://p2p.cdnbye.com/en/views/web/usage.html)
 
 ## Player Integration
-Support almost all web players, click [here](https://www.cdnbye.com/en/views/web/players.html) for more information.
+Support almost all web players, click [here](https://p2p.cdnbye.com/en/views/web/players.html) for more information.
 - `Add your customized player here`
     - CDNBye can be integrated into any HTML5 video player that with hls.js built in.
 
 
 ## API and Configuration
-See [API.md](https://www.cdnbye.com/en/views/web/API.html)
+See [API.md](https://p2p.cdnbye.com/en/views/web/API.html)
 
 ## Console
 Bind your domain in `https://oms.cdnbye.com`, where you can view p2p-related information.
@@ -91,7 +91,7 @@ Bind your domain in `https://oms.cdnbye.com`, where you can view p2p-related inf
 </table>
 
 ## FAQ
-We have collected some [frequently asked questions](https://www.cdnbye.com/en/views/FAQ.html). Before reporting an issue, please search if the FAQ has the answer to your problem.
+We have collected some [frequently asked questions](https://p2p.cdnbye.com/en/views/FAQ.html). Before reporting an issue, please search if the FAQ has the answer to your problem.
 
 ## Contact Us
 Email: service@cdnbye.com
