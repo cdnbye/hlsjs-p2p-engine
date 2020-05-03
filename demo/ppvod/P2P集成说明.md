@@ -10,7 +10,7 @@
 - 在控制台绑定域名后即可开启P2P服务并查看实时数据
 
 ## P2P官方文档地址
-https://docs.cdnbye.com 
+https://www.cdnbye.com 
 
 ## 使用说明
 使用P2P之前需要在控制台绑定域名，目前每天会提供50GB免费流量，足够大部分小型视频网站使用，如需购买流量包或者包年包月套餐，可登陆https://oms.cdnbye.com

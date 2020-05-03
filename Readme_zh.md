@@ -65,50 +65,21 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 ```
 
 ## 使用方法
-参考[文档](http://docs.cdnbye.com/#/web/usage?id=%E4%BD%BF%E7%94%A8%E6%8F%92%E4%BB%B6)
+参考[文档](https://www.cdnbye.com/views/web/usage.html)
 
 ## 播放器集成  
-- [videojs](http://videojs.com/)
-    - 参见 [videojs demo](https://docs.cdnbye.com/#/web/players?id=videojs)
-- [flowplayer](https://flowplayer.com/)
-    - 参见 [flowplayer demo](https://docs.cdnbye.com/#/web/players?id=flowplayer)
-- [jwplayer](https://www.jwplayer.com/)
-    - 参见 [jwplayer demo](https://docs.cdnbye.com/#/web/players?id=jwplayer)
-- [DPlayer](https://github.com/MoePlayer/DPlayer)
-    - 参见 [dplayer demo](https://docs.cdnbye.com/#/web/players?id=dplayer%E6%8E%A8%E8%8D%90)
-- [CKPlayer](http://www.ckplayer.com/)
-    - 参见 [ckplayer demo](https://docs.cdnbye.com/#/web/players?id=ckplayer)，基于嵌入hlsjs-p2p-engine的[P2P-CKPlayer](https://github.com/cdnbye/P2P-CKPlayer)
-- [clappr](https://github.com/clappr/clappr)
-    - 参见 [clappr demo](https://docs.cdnbye.com/#/web/players?id=clappr)
-- [MediaElement.js](http://www.mediaelementjs.com/)
-    - 参见 [mediaelement demo](https://docs.cdnbye.com/#/web/players?id=mediaelementjs)
-- [TCPlayer](https://cloud.tencent.com/document/product/881/20207)(腾讯云播放器)
-    - 参见 [tcplayer demo](https://docs.cdnbye.com/#/web/players?id=tcplayer)
-- [Chimee](http://chimee.org/)
-    - 参见 [chimee demo](https://docs.cdnbye.com/#/web/players?id=chimee)
-- [XGPlayer](http://h5player.bytedance.com/en/)
-    - 参见 [xgplayer demo](https://docs.cdnbye.com/#/web/players?id=xgplayer)
-- [fluidplayer](https://www.fluidplayer.com/)
-    - 参见 [fluidplayer demo](https://docs.cdnbye.com/#/web/players?id=fluidplayer)
-- [OpenPlayer](https://www.openplayerjs.com/)
-    - 参见 [OpenPlayer demo](https://docs.cdnbye.com/#/web/players?id=openplayer)
-- [Plyr](https://plyr.io/)
-    - 参见 [Plyr demo](https://docs.cdnbye.com/#/web/players?id=plyr)
-- [Playerjs](https://playerjs.com/)
-    - 参见 [Playerjs demo](https://docs.cdnbye.com/#/web/players?id=playerjs)
-- [CHPlayer](http://www.chplayer.com/)
-    - 参见 [chplayer demo](https://docs.cdnbye.com/#/web/players?id=chplayer)，基于嵌入hlsjs-p2p-engine的[P2P-CHPlayer](https://github.com/cdnbye/P2P-CHPlayer)
+支持几乎所有主流播放器，请点击[这里](https://www.cdnbye.com/views/web/players.html#cbplayer)
 - `欢迎贡献您的播放器demo`
     - CDNBye可以集成到内置hls.js的任何H5视频播放器中！
 
 ## API文档
-参见 [API.md](https://docs.cdnbye.com/#/web/API)
+参见 [API.md](https://www.cdnbye.com/views/web/API.html)
 
 ## 后台管理系统
 在接入P2P插件后，访问`https://oms.cdnbye.com`，注册并绑定域名，即可查看该域名的P2P流量、在线人数、用户地理分布等信息。
 
 ## 支持内网设备接入P2P服务
-请参考[如何在内网使用CDNBye](https://docs.cdnbye.com/#/FAQ?id=%e5%a6%82%e4%bd%95%e5%9c%a8%e5%86%85%e7%bd%91%e4%bd%bf%e7%94%a8cdnbye%ef%bc%9f)
+请参考[如何在内网使用CDNBye](https://www.cdnbye.com/views/FAQ.html#%E5%A6%82%E4%BD%95%E5%9C%A8%E5%86%85%E7%BD%91%E4%BD%BF%E7%94%A8cdnbye%EF%BC%9F)
 
 ## 相关项目
 - [android-p2p-engine](https://gitee.com/cdnbye/android-p2p-engine) - 安卓端P2P流媒体加速引擎。
@@ -127,7 +98,7 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 </table>
 
 ## FAQ
-我们收集了一些[常见问题](https://docs.cdnbye.com/#/FAQ)。在报告issue之前请先查看一下。
+我们收集了一些[常见问题](https://www.cdnbye.com/views/FAQ.html)。在报告issue之前请先查看一下。
 
 ## 联系我们
 邮箱：service@cdnbye.com
