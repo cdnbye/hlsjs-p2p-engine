@@ -95,6 +95,13 @@ We have collected some [frequently asked questions](https://p2p.cdnbye.com/en/vi
 
 ## Contact Us
 Email: service@cdnbye.com
+<br>
+Telegram: @cdnbye
+<br>
+Skype: live:86755838
+
+### Join the Discussion
+[Telegram Group](https://t.me/cdnbye_group)
 
 
 
