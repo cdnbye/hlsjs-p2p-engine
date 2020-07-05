@@ -2,26 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CDNBye OpenPlayer Demo</title>
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/openplayerjs@latest/dist/openplayer.css">
+    <title>CDNBye MediaElement Demo</title>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/mediaelement@latest/build/mediaelementplayer.min.css">
+    <script src="//cdn.jsdelivr.net/npm/cdnbye@latest"></script>
+    <script src="//cdn.jsdelivr.net/npm/mediaelement@latest/build/mediaelement-and-player.min.js"></script>
 </head>
 <body>
-<video class="op-player__media" id="video" controls playsinline>
-    <source src="https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8"></video>
+<video id="player"
+       src="example.m3u8"
+       class="mejs__player"
+       controls>
+</video>
 <p id="version"></p>
 <h3>download info:</h3>
 <p id="info"></p>
-<script src="//cdn.jsdelivr.net/npm/cdnbye@latest"></script>
-<script src="//cdn.jsdelivr.net/npm/openplayerjs@latest"></script>
-</body>
 <script>
     document.querySelector('#version').innerText = `hls.js version: ${Hls.version}  cdnbye version: ${Hls.engineVersion}`;
-    var player = new OpenPlayer('video', null, false, {
+    var player = new MediaElementPlayer('player', {
         hls: {
             debug: false,
             // Other hlsjsConfig options provided by hls.js
             p2pConfig: {
-                logLevel: 'debug',
+                logLevel: true,
                 live: false,        // set to true in live mode
                 wsSignalerAddr: 'wss://opensignal.cdnbye.com',
                 getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
@@ -30,8 +32,12 @@
                 },
                 // Other p2pConfig options provided by CDNBye
             }
+        },
+        success: function (me) {
+            me.play();
         }
     });
-    player.init();
+
 </script>
+</body>
 </html>

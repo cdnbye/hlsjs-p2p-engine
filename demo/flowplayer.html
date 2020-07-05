@@ -1,25 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>CDNBye MediaElement Demo</title>
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/mediaelement@latest/build/mediaelementplayer.min.css">
-    <script src="//cdn.jsdelivr.net/npm/cdnbye@latest"></script>
-    <script src="//cdn.jsdelivr.net/npm/mediaelement@latest/build/mediaelement-and-player.min.js"></script>
-</head>
-<body>
-<video id="player"
-       src="https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8"
-       class="mejs__player"
-       controls>
-</video>
+<!-- head section -->
+<!-- skin -->
+<link rel="stylesheet" href="https://releases.flowplayer.org/7.2.6/skin/skin.css">
+<!-- CDNBye hls.js -->
+<script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/hls.light.min.js"></script>
+<!-- flowplayer -->
+<script src="//releases.flowplayer.org/7.2.6/flowplayer.min.js"></script>
+
+<!-- body section -->
+<div id="player"></div>
 <p id="version"></p>
 <h3>download info:</h3>
 <p id="info"></p>
+
 <script>
     document.querySelector('#version').innerText = `hls.js version: ${Hls.version}  cdnbye version: ${Hls.engineVersion}`;
-    var player = new MediaElementPlayer('player', {
-        hls: {
+    flowplayer('#player', {
+        live: true,  // set if it's a live stream
+        ratio: 9/16, // set the aspect ratio of the stream
+        clip: {
+            sources: [
+                // path to the HLS m3u8
+                { type: "application/x-mpegurl", src: "example.m3u8"},
+            ]
+        },
+        hlsjs: {
             debug: false,
             // Other hlsjsConfig options provided by hls.js
             p2pConfig: {
@@ -32,12 +36,6 @@
                 },
                 // Other p2pConfig options provided by CDNBye
             }
-        },
-        success: function (me) {
-            me.play();
         }
     });
-
 </script>
-</body>
-</html>

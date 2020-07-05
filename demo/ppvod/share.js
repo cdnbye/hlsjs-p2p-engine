@@ -237,6 +237,7 @@ function dplay(main, xml, starttime, cb) {
                                 p2pConfig: {
                                     // logLevel: 'debug',
                                     live: false,        // 如果是直播设为true
+                                    channelIdPrefix: 'ppvod:',
                                     channelId: function (m3u8Url) {
                                         return window.location.hostname + videoid;
                                     }

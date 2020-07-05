@@ -14,7 +14,7 @@
 <body>
 <div id="main">
     <video id="player" class="video-js vjs-default-skin" height="360" width="640" controls preload="none">
-        <source src="https://video-dev.github.io/streams/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8"
+        <source src="example.m3u8"
                 type="application/x-mpegURL"/>
     </video>
     <p id="version"></p>
@@ -38,7 +38,8 @@
                         document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB, uploaded: ${totalP2PUploaded}KB`;
                     },
                     // Other p2pConfig options provided by CDNBye
-                }
+                },
+
             }
         }
     });
