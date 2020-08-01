@@ -1,48 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>CDNBye videojs demo</title>
+    <link href="//vjs.zencdn.net/7.8.2/video-js.min.css" rel="stylesheet">
+    <script src="//vjs.zencdn.net/7.8.2/video.min.js"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/@streamroot/videojs-hlsjs-plugin@1.0.15"></script>-->
+    <script src="../dist/videojs-hlsjs-plugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
 </head>
-<link href="//vjs.zencdn.net/7.2/video-js.min.css" rel="stylesheet">
-<script src="//vjs.zencdn.net/7.2/video.min.js"></script>
-<!-- increase browser support with MSE polyfill -->
-<script src="//unpkg.com/videojs-contrib-media-sources@4.4.4/dist/videojs-contrib-media-sources.min.js"></script>
-<script src="//cdn.jsdelivr.net/npm/cdnbye@latest"></script>
-<script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/videojs-contrib-hlsjs.min.js"></script>
-
 <body>
-<div id="main">
-    <video id="player" class="video-js vjs-default-skin" height="360" width="640" controls preload="none">
-        <source src="example.m3u8"
-                type="application/x-mpegURL"/>
-    </video>
-    <p id="version"></p>
-    <h3>download info:</h3>
-    <p id="info"></p>
-</div>
+<video id=video width=600 height=300 class="video-js vjs-default-skin" controls>
+    <source src="https://www.nmgxwhz.com:65/20200107/17hTnjxI/index.m3u8" type="application/x-mpegURL">
+</video>
+<p id="version"></p>
+<h3>download info:</h3>
+<p id="info"></p>
 <script>
-    document.querySelector('#version').innerText = `hls.js version: ${Hls.version}  cdnbye version: ${Hls.engineVersion}`;
-    var player = videojs('#player', {
-        autoplay: true,
+    var options = {
         html5: {
             hlsjsConfig: {
-                debug: false,
-                // Other hlsjsConfig options provided by hls.js
-                p2pConfig: {
-                    logLevel: true,
-                    live: false,        // set to true in live mode
-                    wsSignalerAddr: 'wss://opensignal.cdnbye.com',
-                    getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
-                        var total = totalHTTPDownloaded + totalP2PDownloaded;
-                        document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB, uploaded: ${totalP2PUploaded}KB`;
-                    },
-                    // Other p2pConfig options provided by CDNBye
-                },
-
+                // Put your hls.js config here
+                // debug: true,
+                maxBufferLength: 40,
+                liveSyncDurationCount: 15,
             }
         }
+    };
+    videojs.Html5Hlsjs.addHook('beforeinitialize', (videojsPlayer, hlsjsInstance) => {
+        if (P2PEngine.isSupported()) {
+            var engine = new P2PEngine(hlsjsInstance, {
+                // logLevel: 'debug',
+                getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
+                    var total = totalHTTPDownloaded + totalP2PDownloaded;
+                    document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB, uploaded: ${totalP2PUploaded}KB`;
+                },
+            });
+        }
     });
+    var player = videojs('video', options);
 </script>
 </body>
 </html>
