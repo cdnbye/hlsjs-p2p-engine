@@ -13,11 +13,11 @@
 </head>
 <body style="background:#000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" oncontextmenu=window.event.returnValue=false>
 <div id="video"></div>
-<script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/cbplayer2@latest"></script>
+<script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/hls.js@0.14.0"></script>
+<script src="//cdn.jsdelivr.net/npm/cbplayer2@latest"></script>
 <script>
-    var url = '<?php echo($_REQUEST['url']);?>';
+    var url = 'example.m3u8';
     var dp = new CBPlayer({
         container: document.getElementById('video'),
         autoplay: true,

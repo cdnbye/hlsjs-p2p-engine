@@ -3,19 +3,23 @@
     <title>CDNBye videojs demo</title>
     <link href="//vjs.zencdn.net/7.8.2/video-js.min.css" rel="stylesheet">
     <script src="//vjs.zencdn.net/7.8.2/video.min.js"></script>
-    <!--<script src="https://cdn.jsdelivr.net/npm/@streamroot/videojs-hlsjs-plugin@1.0.15"></script>-->
-    <script src="../dist/videojs-hlsjs-plugin.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/videojs-hlsjs-plugin.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
 </head>
 <body>
 <video id=video width=600 height=300 class="video-js vjs-default-skin" controls>
-    <source src="https://www.nmgxwhz.com:65/20200107/17hTnjxI/index.m3u8" type="application/x-mpegURL">
 </video>
 <p id="version"></p>
 <h3>download info:</h3>
 <p id="info"></p>
 <script>
     var options = {
+        sources:[
+            {
+                src: 'example.m3u8',
+            }
+        ],
         html5: {
             hlsjsConfig: {
                 // Put your hls.js config here
