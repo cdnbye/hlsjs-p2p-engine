@@ -1,10 +1,10 @@
 {
   "name": "cdnbye",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Save Your Bandwidth using WebRTC.",
   "main": "./dist/hls.min.js",
   "scripts": {
-    "git-push": "git add . && git commit -m 'release v1.7.0' && git push origin master",
+    "git-push": "git add . && git commit -m 'release v1.7.1' && git push origin master",
     "git-pull": "git pull origin master",
     "publish": "npm publish",
     "test": "webpack --progress --env.test-bundle"
