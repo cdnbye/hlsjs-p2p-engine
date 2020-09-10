@@ -64,21 +64,21 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 ```
 
 ## 使用方法
-参考[文档](https://www.cdnbye.com/views/web/usage.html)
+参考[文档](https://www.cdnbye.com/cn/views/web/usage.html)
 
 ## 播放器集成  
-支持几乎所有主流播放器，请点击[这里](https://www.cdnbye.com/views/web/players.html#cbplayer)
+支持几乎所有主流播放器，请点击[这里](https://www.cdnbye.com/cn/views/web/players.html#cbplayer)
 - `欢迎贡献您的播放器demo`
     - CDNBye可以集成到内置hls.js的任何H5视频播放器中！
 
 ## API文档
-参见 [API.md](https://www.cdnbye.com/views/web/API.html)
+参见 [API.md](https://www.cdnbye.com/cn/views/web/API.html)
 
 ## 后台管理系统
 在接入P2P插件后，访问`https://oms.cdnbye.com`，注册并绑定域名，即可查看该域名的P2P流量、在线人数、用户地理分布等信息。
 
 ## 支持内网设备接入P2P服务
-请参考[如何在内网使用CDNBye](https://www.cdnbye.com/views/FAQ.html#%E5%A6%82%E4%BD%95%E5%9C%A8%E5%86%85%E7%BD%91%E4%BD%BF%E7%94%A8cdnbye%EF%BC%9F)
+请参考[如何在内网使用CDNBye](https://www.cdnbye.com/cn/views/FAQ.html#%E5%A6%82%E4%BD%95%E5%9C%A8%E5%86%85%E7%BD%91%E4%BD%BF%E7%94%A8cdnbye%EF%BC%9F)
 
 ## 相关项目
 - [android-p2p-engine](https://gitee.com/cdnbye/android-p2p-engine) - 安卓端P2P流媒体加速引擎。
@@ -98,7 +98,7 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 </table>
 
 ## FAQ
-我们收集了一些[常见问题](https://www.cdnbye.com/views/FAQ.html)。在报告issue之前请先查看一下。
+我们收集了一些[常见问题](https://www.cdnbye.com/cn/views/FAQ.html)。在报告issue之前请先查看一下。
 
 ## 联系我们
 邮箱：service@cdnbye.com

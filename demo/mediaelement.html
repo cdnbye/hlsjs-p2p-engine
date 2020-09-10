@@ -5,11 +5,11 @@
     <title>CDNBye MediaElement Demo</title>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/mediaelement@latest/build/mediaelementplayer.min.css">
     <script src="//cdn.jsdelivr.net/npm/cdnbye@latest"></script>
-    <script src="//cdn.jsdelivr.net/npm/mediaelement@latest/build/mediaelement-and-player.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/mediaelement@4.2.16/build/mediaelement-and-player.min.js"></script>
 </head>
 <body>
 <video id="player"
-       src="example.m3u8"
+       src="https://test-streams.mux.dev/x36xhzz/url_8/193039199_mp4_h264_aac_fhd_7.m3u8"
        class="mejs__player"
        controls>
 </video>
@@ -19,6 +19,7 @@
 <script>
     document.querySelector('#version').innerText = `hls.js version: ${Hls.version}  cdnbye version: ${Hls.engineVersion}`;
     var player = new MediaElementPlayer('player', {
+        stretching: 'responsive',
         hls: {
             debug: false,
             // Other hlsjsConfig options provided by hls.js
