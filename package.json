@@ -4,7 +4,7 @@
   "description": "Save Your Bandwidth using WebRTC.",
   "main": "./dist/hls.min.js",
   "scripts": {
-    "git-push": "git add . && git commit -m 'update readme' && git push origin master",
+    "git-push": "git add demo && git add package.json && git add README.md && git add Readme_zh.md && git commit -m 'update demo' && git push origin master",
     "git-pull": "git pull origin master",
     "publish": "npm publish",
     "test": "webpack --progress --env.test-bundle"
