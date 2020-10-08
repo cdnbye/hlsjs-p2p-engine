@@ -6,7 +6,6 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/cdnbye"><img src="https://img.shields.io/npm/v/cdnbye.svg?style=flat" alt="npm"></a>
   <a href="https://www.jsdelivr.com/package/npm/cdnbye"><img src="https://data.jsdelivr.com/v1/package/npm/cdnbye/badge" alt="jsdelivr"></a>
-  <a href="https://github.com/cdnbye/hlsjs-p2p-engine/tree/master/dist"><img src="https://badge-size.herokuapp.com/cdnbye/hlsjs-p2p-engine/master/dist/hlsjs-p2p-engine.min.js?compression=gzip&style=flat-square" alt="size"></a>
 </p>
 
 P2P技术使观看相同内容的用户之间可以相互分享数据，不仅能效降低视频/直播网站的带宽成本，还可以提升用户的播放体验，降低卡顿、二次缓存的发生率。
@@ -93,7 +92,6 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
         <td ><center> <a target="_blank" href="https://egame.qq.com/?hls=1&p2p=1&_debug=1"><img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531253035445&di=7af6cc9ad4abe3d06ba376af22d85131&imgtype=0&src=http%3A%2F%2Fimg.kuai8.com%2Fattaches%2Fintro%2F1213%2F201612131436417407.png" width="120"></a></center></td>
         <td ><center> <a target="_blank" href="https://sj.qq.com/myapp/detail.htm?apkName=com.hnr.dxxw"><img src="https://cdnbye.oss-cn-beijing.aliyuncs.com/pic/dxxw.png" width="120"></a></center></td>
         <td ><center> <a target="_blank" href="https://www.fuyin.tv/"><img src="https://cdnbye.oss-cn-beijing.aliyuncs.com/pic/fuyin.png" width="120"></a></center></td>
-        <td ><center> <a target="_blank" href="https://wstream.video/"><img src="https://cdnbye.oss-cn-beijing.aliyuncs.com/pic/wstream.png" width="120"></a></center></td>
     </tr>
 </table>
 

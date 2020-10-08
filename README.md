@@ -5,7 +5,6 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/cdnbye"><img src="https://img.shields.io/npm/v/cdnbye.svg?style=flat" alt="npm"></a>
   <a href="https://www.jsdelivr.com/package/npm/cdnbye"><img src="https://data.jsdelivr.com/v1/package/npm/cdnbye/badge" alt="jsdelivr"></a>
-  <a href="https://github.com/cdnbye/hlsjs-p2p-engine/tree/master/dist"><img src="https://badge-size.herokuapp.com/cdnbye/hlsjs-p2p-engine/master/dist/hlsjs-p2p-engine.min.js?compression=gzip&style=flat-square" alt="size"></a>
 </p>
 
 CDNBye hlsjs-p2p-engine implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC) datachannel to scale live/vod video streaming by peer-to-peer network using bittorrent-like protocol. The forming peer network can be layed over other CDNs or on top of the origin server. Powered by [hls.js](https://github.com/video-dev/hls.js), it can play HLS on any platform with many popular HTML5 players such as video.js, JWPlayer and Flowplayer.
@@ -83,6 +82,7 @@ Bind your domain in `https://oms.cdnbye.com`, where you can view p2p-related inf
 - [dashjs-p2p-engine](https://github.com/cdnbye/dashjs-p2p-engine) - Web Video Delivery Technology with No Plugins for MPEG-dash.
 - [mp4-p2p-engine](https://github.com/cdnbye/mp4-p2p-engine) - Web Video Delivery Technology with No Plugins for MP4.
 
+<!--
 ## They are using CDNBye
 <table>
     <tr>
@@ -90,6 +90,7 @@ Bind your domain in `https://oms.cdnbye.com`, where you can view p2p-related inf
         <td ><center> <a target="_blank" href="https://cyclingentertainment.stream/"><img src="https://cdnbye.oss-cn-beijing.aliyuncs.com/pic/%20cyclingentertainment.png" width="120"></a></center></td>
     </tr>
 </table>
+-->
 
 ## FAQ
 We have collected some [frequently asked questions](https://p2p.cdnbye.com/en/views/FAQ.html). Before reporting an issue, please search if the FAQ has the answer to your problem.
