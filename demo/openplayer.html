@@ -12,11 +12,11 @@
 <h3>download info:</h3>
 <p id="info"></p>
 <script src="//cdn.jsdelivr.net/npm/cdnbye@latest"></script>
-<script src="//cdn.jsdelivr.net/npm/openplayerjs@1.16.11"></script>
+<script src="//cdn.jsdelivr.net/npm/openplayerjs@2.0.0"></script>
 </body>
 <script>
     document.querySelector('#version').innerText = `hls.js version: ${Hls.version}  cdnbye version: ${Hls.engineVersion}`;
-    var player = new OpenPlayer('video', null, false, {
+    var player = new OpenPlayer('video', {
         hls: {
             debug: false,
             // Other hlsjsConfig options provided by hls.js
