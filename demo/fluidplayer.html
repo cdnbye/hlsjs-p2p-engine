@@ -1,6 +1,5 @@
-<link rel="stylesheet" href="https://cdn.fluidplayer.com/v2/current/fluidplayer.min.css" type="text/css"/>
 <script src="//cdn.jsdelivr.net/npm/cdnbye@latest"></script>
-<script src="https://cdn.fluidplayer.com/v2/current/fluidplayer.min.js"></script>
+<script src="https://cdn.fluidplayer.com/v3/current/fluidplayer.min.js"></script>
 <video id='hls-video'>
     <source src='https://test-streams.mux.dev/x36xhzz/url_8/193039199_mp4_h264_aac_fhd_7.m3u8' type='application/x-mpegURL'/>
 </video>
@@ -15,20 +14,21 @@
             layoutControls: {
                 fillToContainer: true
             },
-            hlsjsConfig: {
-                // debug: false,
-                // Other hlsjsConfig options provided by hls.js
-                p2pConfig: {
-                    logLevel: true,
-                    live: false,        // set to true in live mode
-                    wsSignalerAddr: 'wss://opensignal.cdnbye.com',
-                    getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
-                        var total = totalHTTPDownloaded + totalP2PDownloaded;
-                        document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB, uploaded: ${totalP2PUploaded}KB`;
-                    },
-                    // Other p2pConfig options provided by CDNBye
-                    // https://docs.cdnbye.com/#/API
-                }
+            modules: {
+                configureHls: (options) => {
+                    options.p2pConfig = {
+                        logLevel: true,
+                        live: false,        // set to true in live mode
+                        wsSignalerAddr: 'wss://opensignal.cdnbye.com',
+                        getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
+                            var total = totalHTTPDownloaded + totalP2PDownloaded;
+                            document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB, uploaded: ${totalP2PUploaded}KB`;
+                        },
+                        // Other p2pConfig options provided by CDNBye
+                        // http://www.cdnbye.com/en/views/web/API.html
+                    };
+                    return options;
+                },
             }
         }
     );
