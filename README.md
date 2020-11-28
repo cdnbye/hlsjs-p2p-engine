@@ -1,7 +1,7 @@
 **English | [简体中文](Readme_zh.md)**
 
 <h1 align="center"><a href="" target="_blank" rel="noopener noreferrer"><img width="250" src="https://cdnbye.oss-cn-beijing.aliyuncs.com/pic/cdnbye.png" alt="cdnbye logo"></a></h1>
-<h4 align="center">Boost Your Stream using WebRTC.</h4>
+<h4 align="center">Let your viewers become your unlimitedly scalable CDN.</h4>
 <p align="center">
   <a href="https://www.npmjs.com/package/cdnbye"><img src="https://img.shields.io/npm/v/cdnbye.svg?style=flat" alt="npm"></a>
   <a href="https://www.jsdelivr.com/package/npm/cdnbye"><img src="https://data.jsdelivr.com/v1/package/npm/cdnbye/badge" alt="jsdelivr"></a>
@@ -15,11 +15,10 @@ CDNBye hlsjs-p2p-engine implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC
 - Support encrypted HLS stream
 - Very easy to integrate with an existing hls.js project
 - Seamlessly fallback to normal server usage if a browser doesn't support WebRTC
-- Highly configurable for users
+- Compatible with all CDNs, agnostic to DRM and video codecs. No service side changes required.
 - Support most popular HTML5 players such as video.js、Clappr、Flowplayer
 - Efficient scheduling policies to enhance the performance of P2P streaming
 - Use IP database to group up peers by ISP and regions
-- API frozen, new releases will not break your code
 
 ## Playground
 [Click me!](https://demo.cdnbye.com/)
@@ -79,6 +78,7 @@ Bind your domain in `https://oms.cdnbye.com`, where you can view p2p-related inf
 - [android-p2p-engine](https://github.com/cdnbye/android-p2p-engine) - Live/VOD P2P Engine for Android and Android TV.
 - [ios-p2p-engine](https://github.com/cdnbye/ios-p2p-engine) - iOS Video P2P Engine for Any Player.
 - [flutter-p2p-engine](https://github.com/cdnbye/flutter-p2p-engine) - Live/VOD P2P Engine for Flutter, contributed by [mjl0602](https://github.com/mjl0602).
+- [shaka-p2p-engine](https://github.com/cdnbye/shaka-p2p-engine) - P2P engine for Shaka Player.
 - [dashjs-p2p-engine](https://github.com/cdnbye/dashjs-p2p-engine) - Web Video Delivery Technology with No Plugins for MPEG-dash.
 - [mp4-p2p-engine](https://github.com/cdnbye/mp4-p2p-engine) - Web Video Delivery Technology with No Plugins for MP4.
 

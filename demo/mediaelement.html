@@ -26,7 +26,7 @@
             p2pConfig: {
                 logLevel: true,
                 live: false,        // set to true in live mode
-                wsSignalerAddr: 'wss://opensignal.cdnbye.com',
+                wsSignalerAddr: 'wss://signal.hdtvcloud.com',
                 getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
                     var total = totalHTTPDownloaded + totalP2PDownloaded;
                     document.querySelector('#info').innerText = `p2p ratio: ${Math.round(totalP2PDownloaded/total*100)}%, saved traffic: ${totalP2PDownloaded}KB, uploaded: ${totalP2PUploaded}KB`;

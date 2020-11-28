@@ -21,7 +21,6 @@ P2P技术使观看相同内容的用户之间可以相互分享数据，不仅�
 - 支持video.js、Clappr、Flowplayer、DPlayer等第三方播放器
 - 通过有效的调度策略来保证用户的播放体验以及p2p率
 - Tracker服务器根据访问IP的ISP、地域等进行智能调度
-- API已经固化，新版本完全兼容旧版本代码
 
 ## 演示Demo
 打开2个相同的网页：[demo](https://demo.cdnbye.com/)
@@ -74,7 +73,7 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 参见 [API.md](https://www.cdnbye.com/cn/views/web/API.html)
 
 ## 后台管理系统
-在接入P2P插件后，访问`https://oms.cdnbye.com`，注册并绑定域名，即可查看该域名的P2P流量、在线人数、用户地理分布等信息。
+在接入P2P插件后，访问`https://www.cdnbye.com/oms`，注册并绑定域名，即可查看该域名的P2P流量、在线人数、用户地理分布等信息。
 
 ## 支持内网设备接入P2P服务
 请参考[如何在内网使用CDNBye](https://www.cdnbye.com/cn/views/FAQ.html#%E5%A6%82%E4%BD%95%E5%9C%A8%E5%86%85%E7%BD%91%E4%BD%BF%E7%94%A8cdnbye%EF%BC%9F)
@@ -83,6 +82,7 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 - [android-p2p-engine](https://gitee.com/cdnbye/android-p2p-engine) - 安卓端P2P流媒体加速引擎。
 - [ios-p2p-engine](https://gitee.com/cdnbye/ios-p2p-engine) - iOS端P2P流媒体加速引擎。
 - [flutter-p2p-engine](https://gitee.com/cdnbye/flutter-p2p-engine) - Flutter视频/直播APP省流量&加速神器, 由 [mjl0602](https://github.com/mjl0602) 贡献。
+- [shaka-p2p-engine](https://github.com/cdnbye/shaka-p2p-engine) - 同时支持HLS和Mpeg-Dash格式。
 - [dashjs-p2p-engine](https://github.com/cdnbye/dashjs-p2p-engine) - MPEG-dash协议的Web端P2P流媒体方案。
 - [mp4-p2p-engine](https://github.com/cdnbye/mp4-p2p-engine) - 支持MP4的Web端P2P流媒体方案。
 
