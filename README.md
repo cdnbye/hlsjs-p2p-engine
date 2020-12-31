@@ -72,7 +72,7 @@ Support almost all web players, click [here](https://p2p.cdnbye.com/en/views/web
 See [API.md](https://p2p.cdnbye.com/en/views/web/API.html)
 
 ## Console
-Bind your domain in `https://oms.cdnbye.com`, where you can view p2p-related information.
+Register your domain in `https://oms.cdnbye.com`, where you can view p2p-related information.
 
 ## Related Projects
 - [android-p2p-engine](https://github.com/cdnbye/android-p2p-engine) - Live/VOD P2P Engine for Android and Android TV.
@@ -102,9 +102,6 @@ Skype: live:86755838
 <br>
 Telegram: @cdnbye
 
-
-### Join the Discussion
-[Telegram Group](https://t.me/cdnbye_group)
 
 
 
