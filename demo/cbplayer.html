@@ -1,10 +1,9 @@
 <html>
 <head>
-    <title>dplayer增加记忆+P2P播放</title>
+    <title>cbplayer demo</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=11" />
     <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" id="viewport" name="viewport">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cbplayer@latest/dist/CBPlayer.min.css" />
     <style type="text/css">
         body,html{width:100%;height:100%;background:#000;padding:0;margin:0;overflow-x:hidden;overflow-y:hidden}
         *{margin:0;border:0;padding:0;text-decoration:none}
@@ -17,8 +16,8 @@
 <script src="//cdn.jsdelivr.net/npm/hls.js@0.14.16"></script>
 <script src="//cdn.jsdelivr.net/npm/cbplayer2@latest"></script>
 <script>
-    var url = 'https://test-streams.mux.dev/x36xhzz/url_8/193039199_mp4_h264_aac_fhd_7.m3u8';
-    var dp = new CBPlayer({
+    var url = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+    var cb = new CBPlayer({
         container: document.getElementById('video'),
         autoplay: true,
         hotkey: true,  // 移动端全屏时向右划动快进，向左划动快退。
@@ -35,7 +34,7 @@
             }
         },
     });
-    dp.on('fullscreen', function () {
+    cb.on('fullscreen', function () {
         if (/Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             screen.orientation.lock('landscape');
         }
