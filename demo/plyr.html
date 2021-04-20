@@ -29,7 +29,7 @@
             var hls = new Hls({
                 p2pConfig: {
                     logLevel: true,
-                    live: false,        // set to true in live mode
+                    live: true,        // set to false in VOD mode
                     wsSignalerAddr: 'wss://signal.hdtvcloud.com',
                     getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
                         var total = totalHTTPDownloaded + totalP2PDownloaded;
