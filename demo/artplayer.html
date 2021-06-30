@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ArtPlayer</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+<div class="artplayer-app" style="width:400px;height:300px"></div>
+<script src="//cdn.jsdelivr.net/npm/cdnbye@latest"></script>
+<script src="//cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js"></script>
+<script>
+    var art = new Artplayer({
+        container: '.artplayer-app',
+        url: 'https://wowza.peer5.com/live/smil:bbb_abr.smil/chunklist_b591000.m3u8',
+        customType: {
+            m3u8: function (video, url) {
+                var hls = new Hls({
+                    p2pConfig: {
+                        logLevel: false,
+                        live: false,
+                        getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
+                            console.log(`totalP2PDownloaded ${totalP2PDownloaded} totalP2PUploaded ${totalP2PUploaded} totalHTTPDownloaded ${totalHTTPDownloaded}`)
+                        },
+                        // Other p2pConfig options provided by CDNBye
+                    }
+                });
+                hls.loadSource(url);
+                hls.attachMedia(video);
+            },
+        },
+    });
+</script>
+</body>
+</html>
