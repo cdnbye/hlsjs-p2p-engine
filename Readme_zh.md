@@ -75,9 +75,6 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 ## 后台管理系统
 在接入P2P插件后，访问`https://www.cdnbye.com/oms`，注册并绑定域名，即可查看该域名的P2P流量、在线人数、用户地理分布等信息。
 
-## 支持内网设备接入P2P服务
-请参考[如何在内网使用CDNBye](https://www.cdnbye.com/cn/views/FAQ.html#%E5%A6%82%E4%BD%95%E5%9C%A8%E5%86%85%E7%BD%91%E4%BD%BF%E7%94%A8cdnbye%EF%BC%9F)
-
 ## 相关项目
 - [android-p2p-engine](https://gitee.com/cdnbye/android-p2p-engine) - 安卓端P2P流媒体加速引擎。
 - [ios-p2p-engine](https://gitee.com/cdnbye/ios-p2p-engine) - iOS端P2P流媒体加速引擎。
@@ -86,6 +83,7 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 - [dashjs-p2p-engine](https://github.com/cdnbye/dashjs-p2p-engine) - MPEG-dash协议的Web端P2P流媒体方案。
 - [mp4-p2p-engine](https://github.com/cdnbye/mp4-p2p-engine) - 支持MP4的Web端P2P流媒体方案。
 
+<!--
 ## 客户案例
 <table>
     <tr>
@@ -94,6 +92,7 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
         <td ><center> <a target="_blank" href="https://www.fuyin.tv/"><img src="https://cdnbye.oss-cn-beijing.aliyuncs.com/pic/fuyin.png" width="120"></a></center></td>
     </tr>
 </table>
+-->
 
 ## FAQ
 我们收集了一些[常见问题](https://www.cdnbye.com/cn/views/FAQ.html)。在报告issue之前请先查看一下。
