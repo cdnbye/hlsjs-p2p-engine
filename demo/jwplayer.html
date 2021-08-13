@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <title>CDNBye JWPlayer Demo</title>
-
     <!-- CDNBye Plugin -->
     <script src="//cdn.jsdelivr.net/npm/cdnbye@latest"></script>
-    <!--<script src="//cdn.jsdelivr.net/gh/teranode/jw-provider@latest/provider.hlsjs.js"></script>-->
+    <script src="//cdn.jsdelivr.net/gh/teranode/jw-provider@0.0.8/provider.hlsjs.js"></script>
+    <!--<script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/jwplayer.provider.hls.js"></script>-->
     <!-- JW Player Builds -->
-    <script src="//ssl.p.jwpcdn.com/player/v/8.20.2/jwplayer.js"></script>
+    <script src="//ssl.p.jwpcdn.com/player/v/8.21.2/jwplayer.js"></script>
     <!-- JWPlayer Hlsjs Provider -->
-    <script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/jwplayer.hlsjs.provider.min.js"></script>
+    <!--<script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/jwplayer.hlsjs.provider.min.js"></script>-->
 
 </head>
 
@@ -32,7 +32,7 @@
             // debug: true,
             // Other hlsjsConfig options provided by hls.js
             p2pConfig: {
-                logLevel: true,
+                // logLevel: true,
                 live: true,        // set to false in VOD mode
                 // Other p2pConfig options provided by CDNBye
             }
