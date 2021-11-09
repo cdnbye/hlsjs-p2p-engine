@@ -1,8 +1,0 @@
-.DS_Store
-.idea
-/node_modules
-/demo/test-standalone.html
-/demo/test-quick-start.html
-/demo/test-API.html
-/demo/test-player.html
-/demo/test-android.html
