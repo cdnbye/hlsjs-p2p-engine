@@ -28,7 +28,6 @@
             // For more Hls.js options, see https://github.com/dailymotion/hls.js
             var hls = new Hls({
                 p2pConfig: {
-                    logLevel: true,
                     live: true,        // set to false in VOD mode
                     getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
                         var total = totalHTTPDownloaded + totalP2PDownloaded;

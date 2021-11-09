@@ -26,7 +26,6 @@
                 maxBufferLength: 5,     // Highly recommended setting
                 liveSyncDuration: 30,   // Highly recommended setting
                 p2pConfig: {
-                    logLevel: 'debug',
                     live: true,        // set to false in VOD mode
                     getStats: function (totalP2PDownloaded, totalP2PUploaded, totalHTTPDownloaded) {
                         var total = totalHTTPDownloaded + totalP2PDownloaded;
