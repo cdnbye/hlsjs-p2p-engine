@@ -1,0 +1,15 @@
+
+注：本教程适用于ppvod新版点播系统
+
+1. 修改 /home/work/views/share.ejs，
+将 <script type="text/javascript" src="/html/js/share.js?time=8" charset="utf-8"></script>
+改为
+<script type="text/javascript" src="/html/js/share2.js?time=8" charset="utf-8"></script>
+
+2. 将本文件夹中的 share2.js 放到目录 /home/work/public/js/
+
+3. 用本文件夹中的 dplayer文件夹 替换 /home/work/public/dplayer
+
+4. 登录cdnbye控制台 https://www.cdnbye.com/oms/ 绑定播放域名
+
+5. 刷新浏览器缓存

@@ -1,6 +1,6 @@
 **English | [简体中文](Readme_zh.md)**
 
-<h1 align="center"><a href="" target="_blank" rel="noopener noreferrer"><img width="250" src="https://cdnbye.oss-cn-beijing.aliyuncs.com/pic/cdnbye.png" alt="cdnbye logo"></a></h1>
+<h1 align="center"><a href="" target="_blank" rel="noopener noreferrer"><img width="250" src="https://swarmcloud.net/logo.png" alt="cdnbye logo"></a></h1>
 <h4 align="center">Let your viewers become your unlimitedly scalable CDN.</h4>
 <p align="center">
   <a href="https://www.npmjs.com/package/cdnbye"><img src="https://img.shields.io/npm/v/cdnbye.svg?style=flat" alt="npm"></a>
@@ -75,13 +75,13 @@ See [API.md](https://www.hdtvcloud.com/en/views/web/API.html)
 Register your domain in `https://oms.cdnbye.com`, where you can view p2p-related information.
 
 ## Related Projects
-- [iosweb-p2p-engine](https://github.com/swarm-cloud/iosweb-p2p-engine) - Live/VOD P2P Engine for iOS Safari.
+- [hls-sw-p2p-engine](https://github.com/swarm-cloud/hls-sw-p2p-engine) - Live/VOD P2P Engine for all browsers including iOS Safari, with the help of ServiceWorker.
 - [android-p2p-engine](https://github.com/cdnbye/android-p2p-engine) - Live/VOD P2P Engine for Android and Android TV.
 - [ios-p2p-engine](https://github.com/cdnbye/ios-p2p-engine) - iOS Video P2P Engine for Any Player.
 - [flutter-p2p-engine](https://github.com/cdnbye/flutter-p2p-engine) - Live/VOD P2P Engine for Flutter, contributed by [mjl0602](https://github.com/mjl0602).
 - [shaka-p2p-engine](https://github.com/cdnbye/shaka-p2p-engine) - P2P engine for Shaka Player.
 - [dashjs-p2p-engine](https://github.com/cdnbye/dashjs-p2p-engine) - Web Video Delivery Technology with No Plugins for MPEG-dash.
-- [mp4-p2p-engine](https://github.com/cdnbye/mp4-p2p-engine) - Web Video Delivery Technology with No Plugins for MP4.
+- [mp4-sw-p2p-engine](https://github.com/swarm-cloud/mp4-sw-p2p-engine) - Web Video Delivery Technology for MP4.
 
 <!--
 ## They are using CDNBye

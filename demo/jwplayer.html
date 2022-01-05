@@ -6,10 +6,10 @@
     <title>CDNBye JWPlayer Demo</title>
     <!-- CDNBye Plugin -->
     <script src="//cdn.jsdelivr.net/npm/cdnbye@latest"></script>
-    <!--<script src="//cdn.jsdelivr.net/gh/teranode/jw-provider@0.0.8/provider.hlsjs.js"></script>-->
-    <script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/jwplayer.provider.hls.js"></script>
+    <script src="//cdn.jsdelivr.net/gh/teranode/jw-provider@0.0.9/provider.hlsjs.js"></script>
+<!--    <script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/jwplayer.provider.hls.js"></script>-->
     <!-- JW Player Builds -->
-    <script src="//ssl.p.jwpcdn.com/player/v/8.21.2/jwplayer.js"></script>
+    <script src="//ssl.p.jwpcdn.com/player/v/8.22.0/jwplayer.js"></script>
 
 </head>
 
@@ -22,7 +22,7 @@
     jwplayer.key = "uoW6qHjBL3KNudxKVnwa3rt5LlTakbko9e6aQ6VUyKQ=";
 
     jwplayer('demoplayer').setup({
-        file: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+        file: 'https://wowza.peer5.com/live/smil:bbb_abr.smil/chunklist_b591000.m3u8',
         width: 512,
         height: 288,
         autostart: true,

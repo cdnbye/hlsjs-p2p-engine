@@ -1,6 +1,6 @@
 **[English](README.md) | 简体中文**
 
-<h1 align="center"><a href="" target="_blank" rel="noopener noreferrer"><img width="250" src="https://cdnbye.oss-cn-beijing.aliyuncs.com/pic/cdnbye.png" alt="cdnbye logo"></a></h1>
+<h1 align="center"><a href="" target="_blank" rel="noopener noreferrer"><img width="250" src="https://swarmcloud.net/logo.png" alt="cdnbye logo"></a></h1>
 <h4 align="center">Save Your Bandwidth using WebRTC.</h4>
 <h4 align="center">视频网站省流量&加速神器.</h4>
 <p align="center">
@@ -76,13 +76,13 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 在接入P2P插件后，访问`https://www.cdnbye.com/oms`，注册并绑定域名，即可查看该域名的P2P流量、在线人数、用户地理分布等信息。
 
 ## 相关项目
-- [iosweb-p2p-engine](https://github.com/swarm-cloud/iosweb-p2p-engine) - 适用于iOS浏览器的P2P流媒体加速引擎。
+- [hls-sw-p2p-engine](https://github.com/swarm-cloud/hls-sw-p2p-engine) - 基于ServiceWorker的P2P流媒体加速引擎，适用于所有浏览器。
 - [android-p2p-engine](https://gitee.com/cdnbye/android-p2p-engine) - 安卓端P2P流媒体加速引擎。
 - [ios-p2p-engine](https://gitee.com/cdnbye/ios-p2p-engine) - iOS端P2P流媒体加速引擎。
 - [flutter-p2p-engine](https://gitee.com/cdnbye/flutter-p2p-engine) - Flutter视频/直播APP省流量&加速神器, 由 [mjl0602](https://github.com/mjl0602) 贡献。
 - [shaka-p2p-engine](https://github.com/cdnbye/shaka-p2p-engine) - 同时支持HLS和Mpeg-Dash格式。
 - [dashjs-p2p-engine](https://github.com/cdnbye/dashjs-p2p-engine) - MPEG-dash协议的Web端P2P流媒体方案。
-- [mp4-p2p-engine](https://github.com/cdnbye/mp4-p2p-engine) - 支持MP4的Web端P2P流媒体方案。
+- [mp4-sw-p2p-engine](https://github.com/swarm-cloud/mp4-sw-p2p-engine) - 支持MP4的Web端P2P流媒体方案。
 
 <!--
 ## 客户案例

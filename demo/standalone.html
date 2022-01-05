@@ -8,7 +8,7 @@
     <tbody ></tbody>
 </table>
 <script>
-    var source = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+    var source = 'https://test-streams.mux.dev/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8';
     var video = document.getElementById('video');
     if(Hls.isSupported()) {
         var hls = new Hls({
@@ -34,10 +34,10 @@
         hls.on(Hls.Events.FRAG_LOADED, (id, data) => {
             var frag = data.frag;
             var source = undefined;
-            if (frag.loadByHTTP === true || frag.loadByHTTP === undefined) {
-                source = 'HTTP';
-            } else if (frag.loadByP2P === true) {
+            if (frag.loadByP2P === true) {
                 source = 'P2P';
+            } else {
+                source = 'HTTP';
             }
             addToTable(frag.relurl, frag.loaded, source);
         });
