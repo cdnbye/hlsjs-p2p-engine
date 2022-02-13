@@ -1,13 +1,13 @@
 {
   "name": "cdnbye",
-  "version": "1.19.5",
+  "version": "1.20.0",
   "description": "Let your viewers become your unlimitedly scalable CDN.",
   "main": "./dist/hls.min.js",
   "files": [
     "dist"
   ],
   "scripts": {
-    "git-push": "git add demo && git add package.json && git add README.md && git add Readme_zh.md && git commit -m 'update demo' && git push origin master",
+    "git-push": "git add demo && git add package.json && git add README.md && git add Readme_zh.md && git commit -m 'release v1.20.0' && git push origin master",
     "git-pull": "git pull origin master",
     "publish": "npm publish",
     "test": "webpack --progress --env.test-bundle"
