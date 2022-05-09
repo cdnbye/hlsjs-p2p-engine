@@ -19,6 +19,7 @@
 <script>
     document.querySelector('#version').innerText = `hls.js version: ${Hls.version}  cdnbye version: ${Hls.engineVersion}`;
     var player = new MediaElementPlayer('player', {
+        renderers: ['native_hls'],
         stretching: 'responsive',
         hls: {
             debug: false,
