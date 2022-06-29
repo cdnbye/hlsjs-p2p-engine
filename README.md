@@ -23,23 +23,6 @@ CDNBye hlsjs-p2p-engine implements [WebRTC](https://en.wikipedia.org/wiki/WebRTC
 ## Playground
 [Click me!](https://demo.cdnbye.com/)
 
-## Getting Started
-#### Quick Start Demo
-Put the [quick-start.html](demo/quick-start.html) in your web page, run it. Wait for a few seconds，then open the same page from another browser. Now you have a direct P2P connection between two browsers without plugin!
-The first web peer will serve as a seed, if no one else in the same channel.
-#### Integrate to Your Hls.js Project
-Simply replace the hls.js script tag like:
- ```html
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-```
-with 
- ```html
-<script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
-```
-That's it!
-#### Integrate to HTML5 Players
-See [demos](https://github.com/cdnbye/hlsjs-p2p-engine#player-integration).
-
 ## Browser Support
 WebRTC has already been incorporated into the HTML5 standard and it is broadly deployed in modern browsers. The compatibility of CDNBye depends on the browser support of WebRTC and Hls.js. Please note that iOS Safari "Mobile" does not support the MediaSource API.
 
@@ -49,27 +32,14 @@ WebRTC Datachannel | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ✔ |
 Hls.js | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ |
 CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 
-## Include
-Include the pre-built script of latest version bundled with hls.js(recommended): 
-```javascript
-<script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
-```
-Or include the latest version without hls.js:
-```javascript
-<script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
-```
-
 ## Usage
-See [Usage](https://www.hdtvcloud.com/en/views/web/usage.html)
+See [documentation](https://swarmcloud.net/en/views/hls-de/usage.html)
 
 ## Player Integration
-Support almost all web players, click [here](https://www.hdtvcloud.com/en/views/web/players.html) for more information.
-- `Add your customized player here`
-    - CDNBye can be integrated into any HTML5 video player that with hls.js built in.
-
+Support almost all web players, click [here](https://swarmcloud.net/cn/views/hls-de/players.html) for more information.
 
 ## API and Configuration
-See [API.md](https://www.hdtvcloud.com/en/views/web/API.html)
+See [API.md](https://swarmcloud.net/cn/views/hls-de/API.html)
 
 ## Console
 Register your domain in `https://oms.cdnbye.com`, where you can view p2p-related information.

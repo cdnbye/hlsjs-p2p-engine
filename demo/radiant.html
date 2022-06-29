@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<body>
+<script src="https://cdn.radiantmediatechs.com/rmp/7.8.1/js/rmp.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
+<div id="rmp"></div>
+<script>
+    const src = {
+        hls: 'https://test-streams.mux.dev/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8'
+    };
+    // config for p2p
+    var p2pConfig = {
+        live: true,
+        // announceLocation: 'hk',        // if using Hongkong tracker
+        // announceLocation: 'us',        // if using USA tracker
+    }
+    const settings = {
+        licenseKey: 'your-license-key',
+        src: src,
+        width: 640,
+        height: 360,
+        forceHlsJSOnIpadOS: true,
+        hlsJSCustomConfig: {
+            maxBufferSize: 0,       // Highly recommended setting in live mode
+            maxBufferLength: 10,     // Highly recommended setting in live mode
+            liveSyncDurationCount: 10,   // Highly recommended setting in live mode
+        }
+    };
+    const elementID = 'rmp';
+    const rmp = new RadiantMP(elementID);
+    const container = document.getElementById(elementID);
+    container.addEventListener('hlsinstancecreated', () => {
+        const hlsJSInstance = rmp.getHlsJSInstance();
+        if (P2PEngine.isSupported()) {
+            new P2PEngine(hlsJSInstance, p2pConfig);
+        }
+    });
+    rmp.init(settings);
+</script>
+</body>
+</html>

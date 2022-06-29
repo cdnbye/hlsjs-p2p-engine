@@ -25,23 +25,6 @@ P2P技术使观看相同内容的用户之间可以相互分享数据，不仅�
 ## 演示Demo
 打开2个相同的网页：[demo](https://demo.cdnbye.com/)
 
-## 快速入门
-#### 快速入门Demo
-将[quick-start.html](demo/quick-start.html)拷贝到您的网页中并运行。再打开另一个相同的网页。见证奇迹的时候到了！您已在两个网页之间建立了一个P2P连接，在不安装任何插件的情况下。如果在这个频道中（一个m3u8标识了一个频道）没有其它参与者，那么您打开的第一个网页将作为种子为第二个网页提供数据。
-
-#### 在现有的hls.js项目中集成
-只需要将原有的引入hls.js的script标签如：
- ```javascript
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-```
-替换为
- ```javascript
-<script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
-```
-就是这么简单！
-#### 集成到第三方HTML5播放器
-参考[demos](https://github.com/cdnbye/hlsjs-p2p-engine/blob/master/Readme_zh.md#%E6%92%AD%E6%94%BE%E5%99%A8%E9%9B%86%E6%88%90)。
-
 ## 浏览器支持情况
 由于WebRTC已成为HTML5标准，目前大部分主流浏览器都已经支持。CDNBye的浏览器兼容性取决于WebRTC和hls.js。需要注意的是iOS版Safari由于不支持MediaSource API，因此也不支持hls.js(不过Safari原生支持HLS播放)。
 
@@ -49,28 +32,16 @@ P2P技术使观看相同内容的用户之间可以相互分享数据，不仅�
 :-: | :-: | :-: | :-: | :-: | :-: | :-:| :-:| :-:
 WebRTC Datachannel | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ✔ |
 Hls.js | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ |
-CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ | 
-
-## 集成
-通过script标签引入已经和hls.js打包的最新版本（推荐）：
-```html
-<script src="https://cdn.jsdelivr.net/npm/cdnbye@latest"></script>
-```
-或者引入没有与hls.js打包的独立版本：
-```html
-<script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/hlsjs-p2p-engine.min.js"></script>
-```
+CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 
 ## 使用方法
-参考[文档](https://www.cdnbye.com/cn/views/web/usage.html)
+参考[文档](https://swarmcloud.net/cn/views/hls-de/usage.html)
 
 ## 播放器集成  
-支持几乎所有主流播放器，请点击[这里](https://www.cdnbye.com/cn/views/web/players.html#cbplayer)
-- `欢迎贡献您的播放器demo`
-    - CDNBye可以集成到内置hls.js的任何H5视频播放器中！
+支持几乎所有主流播放器，请点击[这里](https://swarmcloud.net/cn/views/hls-de/players.html)
 
 ## API文档
-参见 [API.md](https://www.cdnbye.com/cn/views/web/API.html)
+参见 [API.md](https://swarmcloud.net/cn/views/hls-de/API.html)
 
 ## 后台管理系统
 在接入P2P插件后，访问`https://www.cdnbye.com/oms`，注册并绑定域名，即可查看该域名的P2P流量、在线人数、用户地理分布等信息。
