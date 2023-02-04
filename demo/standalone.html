@@ -19,6 +19,7 @@
         if (P2PEngine.isSupported()) {
             var engine = new P2PEngine(hls, {
                 live: true,        // set to false in VOD mode
+                // token: YOUR_TOKEN
                 // Other p2pConfig options provided by CDNBye
             });
             engine.on('stats', function ({totalHTTPDownloaded=0, totalP2PDownloaded=0, totalP2PUploaded=0}) {
