@@ -33,13 +33,13 @@ Hls.js | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ |
 CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 
 ## Usage
-See [documentation](https://swarmcloud.net/en/views/hls-de/usage.html)
+See [documentation](https://docs.swarmcloud.net/web-hls)
 
 ## Player Integration
-Support almost all web players, click [here](https://swarmcloud.net/cn/views/hls-de/players.html) for more information.
+Support almost all web players, click [here](https://docs.swarmcloud.net/web-hls/players) for more information.
 
 ## API and Configuration
-See [API.md](https://swarmcloud.net/cn/views/hls-de/API.html)
+See [API.md](https://docs.swarmcloud.net/web-hls/API)
 
 ## Console
 Register your domain in `https://oms.cdnbye.com`, where you can view p2p-related information.
@@ -64,7 +64,7 @@ Register your domain in `https://oms.cdnbye.com`, where you can view p2p-related
 -->
 
 ## FAQ
-We have collected some [frequently asked questions](https://www.hdtvcloud.com/en/views/FAQ.html). Before reporting an issue, please search if the FAQ has the answer to your problem.
+We have collected some [frequently asked questions](https://docs.swarmcloud.net/faq). Before reporting an issue, please search if the FAQ has the answer to your problem.
 
 ## Contact Us
 Email: service@cdnbye.com
