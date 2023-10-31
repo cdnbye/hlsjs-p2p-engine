@@ -35,13 +35,13 @@ Hls.js | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ |
 CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 
 ## 使用方法
-参考[文档](https://swarmcloud.net/cn/views/hls-de/usage.html)
+参考[文档](https://swarmcloud.net/cn/web-hls/usage.html)
 
 ## 播放器集成  
-支持几乎所有主流播放器，请点击[这里](https://swarmcloud.net/cn/views/hls-de/players.html)
+支持几乎所有主流播放器，请点击[这里](https://swarmcloud.net/cn/web-hls/players.html)
 
 ## API文档
-参见 [API.md](https://swarmcloud.net/cn/views/hls-de/API.html)
+参见 [API.md](https://swarmcloud.net/cn/web-hls/API.html)
 
 ## 后台管理系统
 在接入P2P插件后，访问`https://www.cdnbye.com/oms`，注册并绑定域名，即可查看该域名的P2P流量、在线人数、用户地理分布等信息。
@@ -67,7 +67,7 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 -->
 
 ## FAQ
-我们收集了一些[常见问题](https://www.cdnbye.com/cn/views/FAQ.html)。在报告issue之前请先查看一下。
+我们收集了一些[常见问题](https://www.cdnbye.com/faq.html)。在报告issue之前请先查看一下。
 
 ## 联系我们
 邮箱：service@cdnbye.com
