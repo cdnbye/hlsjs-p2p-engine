@@ -42,7 +42,7 @@ Support almost all web players, click [here](https://docs.swarmcloud.net/web-hls
 See [API.md](https://docs.swarmcloud.net/web-hls/API)
 
 ## Console
-Register your domain in `https://oms.cdnbye.com`, where you can view p2p-related information.
+Register your domain in [dashboard](https://www.swarmcloud.net), where you can view p2p-related information.
 
 ## Related Projects
 - [hls-sw-p2p-engine](https://github.com/swarm-cloud/hls-sw-p2p-engine) - Live/VOD P2P Engine for all browsers including iOS Safari, with the help of ServiceWorker.
