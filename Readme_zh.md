@@ -1,6 +1,6 @@
 **[English](README.md) | 简体中文**
 
-<h1 align="center"><a href="" target="_blank" rel="noopener noreferrer"><img width="250" src="https://www.cdnbye.com/logo.png" alt="cdnbye logo"></a></h1>
+<h1 align="center"><a href="" target="_blank" rel="noopener noreferrer"><img width="250" src="https://www.swarmcloud.net/img/logo.png" alt="cdnbye logo"></a></h1>
 <h4 align="center">Save Your Bandwidth using WebRTC.</h4>
 <h4 align="center">视频网站省流量&加速神器.</h4>
 <p align="center">
@@ -38,10 +38,10 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 参考[文档](https://swarmcloud.net/cn/web-hls/usage.html)
 
 ## 播放器集成  
-支持几乎所有主流播放器，请点击[这里](https://swarmcloud.net/cn/web-hls/players.html)
+支持几乎所有主流播放器，请点击[这里](https://swarmcloud.net/web-hls/players.html)
 
 ## API文档
-参见 [API.md](https://swarmcloud.net/cn/web-hls/API.html)
+参见 [API.md](https://swarmcloud.net/web-hls/API.html)
 
 ## 后台管理系统
 在接入P2P插件后，访问[dashboard](https://dash.swarmcloud.net)，注册并绑定域名，即可查看该域名的P2P流量、在线人数、用户地理分布等信息。
