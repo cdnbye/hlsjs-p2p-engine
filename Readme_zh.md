@@ -35,13 +35,13 @@ Hls.js | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ |
 CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 
 ## 使用方法
-参考[文档](https://swarmcloud.net/cn/web-hls/usage.html)
+参考[文档](https://www.cdnbye.com/web-hls/usage.html)
 
 ## 播放器集成  
-支持几乎所有主流播放器，请点击[这里](https://swarmcloud.net/web-hls/players.html)
+支持几乎所有主流播放器，请点击[这里](https://www.cdnbye.com/web-hls/players.html)
 
 ## API文档
-参见 [API.md](https://swarmcloud.net/web-hls/API.html)
+参见 [API.md](https://www.cdnbye.com/web-hls/API.html)
 
 ## 后台管理系统
 在接入P2P插件后，访问[dashboard](https://dash.swarmcloud.net)，注册并绑定域名，即可查看该域名的P2P流量、在线人数、用户地理分布等信息。
@@ -54,17 +54,6 @@ CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 - [shaka-p2p-engine](https://github.com/cdnbye/shaka-p2p-engine) - 同时支持HLS和Mpeg-Dash格式。
 - [dashjs-p2p-engine](https://github.com/cdnbye/dashjs-p2p-engine) - MPEG-dash协议的Web端P2P流媒体方案。
 - [mp4-sw-p2p-engine](https://github.com/swarm-cloud/mp4-sw-p2p-engine) - 支持MP4的Web端P2P流媒体方案。
-
-<!--
-## 客户案例
-<table>
-    <tr>
-        <td ><center> <a target="_blank" href="https://egame.qq.com/?hls=1&p2p=1&_debug=1"><img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531253035445&di=7af6cc9ad4abe3d06ba376af22d85131&imgtype=0&src=http%3A%2F%2Fimg.kuai8.com%2Fattaches%2Fintro%2F1213%2F201612131436417407.png" width="120"></a></center></td>
-        <td ><center> <a target="_blank" href="https://sj.qq.com/myapp/detail.htm?apkName=com.hnr.dxxw"><img src="https://cdnbye.oss-cn-beijing.aliyuncs.com/pic/dxxw.png" width="120"></a></center></td>
-        <td ><center> <a target="_blank" href="https://www.fuyin.tv/"><img src="https://cdnbye.oss-cn-beijing.aliyuncs.com/pic/fuyin.png" width="120"></a></center></td>
-    </tr>
-</table>
--->
 
 ## FAQ
 我们收集了一些[常见问题](https://www.cdnbye.com/faq.html)。在报告issue之前请先查看一下。
