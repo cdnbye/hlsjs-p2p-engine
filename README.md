@@ -33,16 +33,16 @@ Hls.js | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ |
 CDNBye | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ | ❌ | ❌ |
 
 ## Usage
-See [documentation](https://docs.swarmcloud.net/web-hls)
+See [documentation](https://docs.swarmcloud.net/web-hls?utm_source=github)
 
 ## Player Integration
-Support almost all web players, click [here](https://docs.swarmcloud.net/web-hls/players) for more information.
+Support almost all web players, click [here](https://docs.swarmcloud.net/web-hls/players?utm_source=github) for more information.
 
 ## API and Configuration
-See [API.md](https://docs.swarmcloud.net/web-hls/API)
+See [API.md](https://docs.swarmcloud.net/web-hls/API?utm_source=github)
 
 ## Console
-Register your domain in [dashboard](https://dash.swarmcloud.net), where you can view p2p-related information.
+Register your domain in [dashboard](https://dash.swarmcloud.net?source=github), where you can view p2p-related information.
 
 ## Related Projects
 - [hls-sw-p2p-engine](https://github.com/swarm-cloud/hls-sw-p2p-engine) - Live/VOD P2P Engine for all browsers including iOS Safari, with the help of ServiceWorker.
@@ -72,6 +72,7 @@ Email: service@cdnbye.com
 Skype: live:86755838
 <br>
 Telegram: @cdnbye
+
 
 
 
